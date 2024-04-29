@@ -21,5 +21,4 @@ If needed.
 * [ ] There are no style errors.
 * [ ] The code is documented.
 * [ ] Labels are attached to this Merge Request.
-* [ ] Time estimates / time tracking is written for this Merge Request.
 * [ ] You are merging to `dev` branch
