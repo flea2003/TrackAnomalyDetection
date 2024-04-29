@@ -7,12 +7,9 @@ What is the goal of this issue?
 * [ ] Task 1
 * [ ] Task 2
 
-### Acceptance Criteria
-
-* [ ] Criteria 1
-* [ ] Criteria 2
-
 ### Checklist
 
-* [ ]  Labels are attached to this Merge Request.
-* [ ] Time estimates / time tracking is written for this Merge Request.
+* [ ] Labels are attached to this Issue.
+* [ ] Time estimates / time tracking is written for this Issue.
+* [ ] Due date is set for this issue.
+* [ ] A milestone is set for this issue.
