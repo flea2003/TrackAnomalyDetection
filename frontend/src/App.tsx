@@ -14,7 +14,6 @@ function App() {
       <div>
         <Button variant="primary" onClick={handleButtonClick}>Do not press this button</Button>
         {showImage && <img src={cat} alt="" />}
-          {/*<div>Hi</div>*/}
       </div>
   );
 }
