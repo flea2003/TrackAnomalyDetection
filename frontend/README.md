@@ -25,9 +25,9 @@ npx create-react-app frontend --template typescript --use-npm
 
 ## Description of the files
 
-`tsconfig` - typescript configuration.
+`tsconfig` - Typescript configuration.
 
-`package.json` - the dependencies.
+`package.json` - the dependencies of the frontend.
 
 `package-lock.json` - fetched versions of the dependencies.
 
@@ -39,15 +39,12 @@ In this directory, one can use the following commands:
 
 `npm install` - installs dependencies listed in the `package.json` file.
 
-`npm start` - Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-The page will reload if you make edits. You will also see any lint errors in the console.
+`npm start` - Runs the app in the development mode. Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits. You will also see any lint errors in the console.
 
-`npm test` - This command runs the test suite.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+`npm test` - This command runs the test suite. See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-`npm run build` - Builds the app for production to the `build` folder.\
-This command prepares the code for deployment.
+`npm run build` - Builds the app for production to the `build` folder. This command prepares the code for deployment.
+
 ## Learn More
 
 If this documentation wasn't clear enough, here is the [React documentation](https://reactjs.org/).
