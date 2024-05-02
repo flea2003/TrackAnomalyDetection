@@ -63,7 +63,7 @@ public class DebsParser implements Parser {
     }
 
     /**
-     * Gets the raeder.
+     * Gets the reader.
      *
      * @return the buffered reader
      */
