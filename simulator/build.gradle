@@ -5,9 +5,7 @@ plugins {
     id 'jacoco'
 }
 
-apply plugin: 'java'
 apply plugin: 'jacoco'
-
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'

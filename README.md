@@ -17,10 +17,9 @@ In order to build the project, the following steps should be followed:
 sudo apt update
 sudo apt install default-jdk
  ``` 
-2. Make sure that Kafka is installed. If not, that that could be done by running the following commands: 
+2. Make sure that Kafka is installed. If not, that that could be done by running the following command: 
 ```
-curl -O https://downloads.apache.org/kafka/3.1.0/kafka_2.13-3.1.0.tgz 
-tar -xzf kafka_2.13-3.1.0.tgz
+brew install kafka
 ```
 ## Starting the project
 
@@ -34,14 +33,16 @@ In order to start the simulator, the following steps should be taken:
    5. Start time of the stream
    6. End time of the stream
    7. Stream speed (optional)
-3. Start a ZooKeeper server. That could be done by running `bin/zookeeper-server-start.sh config/zookeeper.properties`
-4. Create a new Kafka topic: `bin/kafka-topics.sh --create --topic test --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1`. Here the name of the topic is 'test', but that could be changed to any other string.
-5. In new terminal window, run a consumer in order to see what messages are appended to the topic. That could be done by running `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning`
-6. Then, the simulator can be started by running the `main()` method. It will start appending messages to the specified topic.
+3. ZooKeeper server should be started. That could be done by running `zkServer start` or `zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties`
+4. Kafka should be started. That could be done by running `kafka-server-start /usr/local/etc/kafka/server.properties`
+5. A new Kafka topic should be added: `bin/kafka-topics.sh --create --topic test --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1`. Here the name of the topic is 'test', but that could be changed to any other string.
+6. In new terminal window, a consumer should be added in order to see what messages are appended to the topic. That could be done by running `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning`
+7. Then, the simulator can be started by running the `main()` method. It will start appending messages to the specified topic.
+8. When the stream stops, Kafka could be stopped by running `kafka-server-stop`
 
 ## Additional information
 1. If a dataset of a new format is added for which a parser has not been implemented, a wanted parser could be implemented by adding a new parser class in 'parsers' directory.
-2. The format at which the AIS signals are sent is ... TODO
+2. The AIS signals are sent as AIS class objects converted to a json string. This is a matter of convention.
 
    
 

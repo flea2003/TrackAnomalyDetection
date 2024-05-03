@@ -32,7 +32,7 @@ public class Timestamp implements Comparable<Timestamp> {
      * CompareTo method for comparing two timestamps
      *
      * @param timestamp the object to be compared.
-     * @return integer that corresponds to weather the comparable timestamp corresponds to an eralier date
+     * @return integer that corresponds to weather the comparable timestamp corresponds to an earlier date
      */
     @Override
     public int compareTo(Timestamp timestamp) {
