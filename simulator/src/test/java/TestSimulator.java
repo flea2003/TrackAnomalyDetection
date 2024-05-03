@@ -5,7 +5,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
-import parsers.DebsParser;
+import parsers.DEBSParser;
 import parsers.Parser;
 
 import java.io.BufferedReader;
@@ -27,6 +27,10 @@ public class TestSimulator {
     KafkaProducer<String, String> producer;
     BufferedReader reader;
     List<SimpleEntry<Timestamp, String>> resultingData;
+    String startSignal = "{\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"27/01/2024 10:10\",\"departurePort\":\"VALLETTA\"}";
+    String endSignal = "{\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"27/01/2024 10:11\",\"departurePort\":\"CEUTA\"}";
+    String thirdSignal = "{\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"27/01/2024 10:10\",\"departurePort\":\"CEUTA\"}";
+
 
     @BeforeEach
     public void setup() throws IOException {
@@ -36,9 +40,9 @@ public class TestSimulator {
         startTime = new Timestamp(2024, 1, 27, 10, 10);
         endTime = new Timestamp(2024, 1, 27, 10, 11);
         resultingData = new ArrayList<>(List.of(
-                new SimpleEntry<>(startTime, "first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n"),
-                new SimpleEntry<>(new Timestamp(2024, 1, 27, 10, 10), "third,0.6,-5.3482,35.92638,8,284,27/01/2024 10:10,CEUTA\n"),
-                new SimpleEntry<>(endTime, "second,0.6,-5.3482,35.92638,8,284,27/01/2024 10:11,CEUTA\n")
+                new SimpleEntry<>(startTime, startSignal),
+                new SimpleEntry<>(new Timestamp(2024, 1, 27, 10, 10), thirdSignal),
+                new SimpleEntry<>(endTime, endSignal)
         ));
         reader = mock(BufferedReader.class);
         when(reader.readLine())
@@ -48,7 +52,7 @@ public class TestSimulator {
                 .thenReturn("third,0.6,-5.3482,35.92638,8,284,27/01/2024 10:10,CEUTA\n")
                 .thenReturn(null);
 
-        this.parser = new DebsParser(reader);
+        this.parser = new DEBSParser(reader);
         this.simulator = new Simulator(parser, startTime, endTime, topicName, producer);
         this.simulator.setSpeed(60);
     }
@@ -62,15 +66,15 @@ public class TestSimulator {
         verify(reader, times(5)).readLine();
         assertThat(simulator.getStream().getData()).isEqualTo(resultingData);
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, "first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n")),
+                eq(new ProducerRecord<>(topicName, startSignal)),
                 any());
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, "third,0.6,-5.3482,35.92638,8,284,27/01/2024 10:10,CEUTA\n")),
+                eq(new ProducerRecord<>(topicName, thirdSignal)),
                 any());
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, "second,0.6,-5.3482,35.92638,8,284,27/01/2024 10:11,CEUTA\n")),
+                eq(new ProducerRecord<>(topicName, endSignal)),
                 any());
 
         inOrder.verify(producer).flush();
@@ -100,15 +104,15 @@ public class TestSimulator {
         verify(reader, times(5)).readLine();
         assertThat(simulator.getStream().getData()).isEqualTo(resultingData);
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, "first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n")),
+                eq(new ProducerRecord<>(topicName, startSignal)),
                 any());
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, "third,0.6,-5.3482,35.92638,8,284,27/01/2024 10:10,CEUTA\n")),
+                eq(new ProducerRecord<>(topicName, thirdSignal)),
                 any());
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, "second,0.6,-5.3482,35.92638,8,284,27/01/2024 10:11,CEUTA\n")),
+                eq(new ProducerRecord<>(topicName, endSignal)),
                 any());
 
         inOrder.verify(producer).flush();

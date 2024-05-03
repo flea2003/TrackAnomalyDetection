@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 public class TestDebsParser {
 
-    DebsParser debsParser;
+    DEBSParser debsParser;
     BufferedReader reader;
     List<AbstractMap.SimpleEntry<Timestamp, String>> resultObject;
 
@@ -28,10 +28,10 @@ public class TestDebsParser {
                 .thenReturn("0x97df717d828ac6df388396b8e48ec1299e837917,1.9,14.54255,35.8167,25,1,01/04/2015 20:19,VALLETTA\n")
                 .thenReturn("0xd7aeaeb3986186e3550aa68bd1561f8df9672d17,0.6,-5.3482,35.92638,8,284,25/04/2015 05:12,CEUTA\n")
                 .thenReturn(null);  // It could be common to return null t
-        debsParser = new DebsParser(reader);
+        debsParser = new DEBSParser(reader);
         resultObject = new ArrayList<>();
-        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2015, 4, 1, 20, 19), "0x97df717d828ac6df388396b8e48ec1299e837917,1.9,14.54255,35.8167,25,1,01/04/2015 20:19,VALLETTA\n"));
-        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2015, 4, 25, 5, 12), "0xd7aeaeb3986186e3550aa68bd1561f8df9672d17,0.6,-5.3482,35.92638,8,284,25/04/2015 05:12,CEUTA\n"));}
+        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2015, 4, 1, 20, 19), "{\"shipHash\":\"0x97df717d828ac6df388396b8e48ec1299e837917\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"01/04/2015 20:19\",\"departurePort\":\"VALLETTA\"}"));
+        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2015, 4, 25, 5, 12), "{\"shipHash\":\"0xd7aeaeb3986186e3550aa68bd1561f8df9672d17\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"25/04/2015 05:12\",\"departurePort\":\"CEUTA\"}"));}
 
     @Test
     void parse() throws IOException {

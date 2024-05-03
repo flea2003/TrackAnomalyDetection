@@ -1,12 +1,22 @@
 image: gradle:7.6.0-jdk19-alpine
 
 stages:
+  - build
   - test
   - code_quality
 
 before_script:
   - cd simulator
   - chmod +x ./gradlew
+
+
+build_project:
+  stage: build
+  script:
+    - ./gradlew assemble
+  only:
+    - merge_requests
+    - main
 
 run_tests:
   stage: test

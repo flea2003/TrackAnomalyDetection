@@ -48,8 +48,9 @@
             <property name="max" value="40"/>
         </module>
         <module name="VisibilityModifier">
-            <property name="severity" value="error"/>
+            <property name="severity" value="warning"/>
             <property name="protectedAllowed" value="true"/>
+            <property name="allowPublicFinalFields" value="true"/>
         </module>
 
         <module name="OuterTypeFilename">

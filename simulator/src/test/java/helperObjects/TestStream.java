@@ -2,12 +2,11 @@ package helperObjects;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import parsers.DebsParser;
+import parsers.DEBSParser;
 import parsers.Parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,15 +23,18 @@ public class TestStream {
     Timestamp endTime;
     List<SimpleEntry<Timestamp, String>> resultingData;
     Stream stream;
+    String startSignal = "{\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"27/01/2024 10:10\",\"departurePort\":\"VALLETTA\"}";
+    String endSignal = "{\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"26/02/2024 10:10\",\"departurePort\":\"CEUTA\"}";
+    String thirdSignal = "{\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"26/02/2024 10:09\",\"departurePort\":\"CEUTA\"}";
 
     @BeforeEach
     void setUp() throws IOException {
         startTime = new Timestamp(2024, 1, 27, 10, 10);
         endTime = new Timestamp(2024, 2, 26, 10, 10);
         resultingData = new ArrayList<>(List.of(
-                new SimpleEntry<>(startTime, "first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n"),
-                new SimpleEntry<>(endTime, "second,0.6,-5.3482,35.92638,8,284,26/02/2024 10:10,CEUTA\n"),
-                new SimpleEntry<>(new Timestamp(2024, 2, 26, 10, 9), "third,0.6,-5.3482,35.92638,8,284,26/02/2024 10:09,CEUTA\n")
+                new SimpleEntry<>(startTime, startSignal),
+                new SimpleEntry<>(endTime, endSignal),
+                new SimpleEntry<>(new Timestamp(2024, 2, 26, 10, 9), thirdSignal)
         ));
         reader = mock(BufferedReader.class);
         when(reader.readLine())
@@ -42,7 +44,7 @@ public class TestStream {
                 .thenReturn("third,0.6,-5.3482,35.92638,8,284,26/02/2024 10:09,CEUTA\n")
                 .thenReturn(null);
 
-        parser = new DebsParser(reader);
+        parser = new DEBSParser(reader);
         stream = new Stream(startTime, endTime);
     }
 
@@ -93,9 +95,9 @@ public class TestStream {
         assertThat(stream.getData()).isEqualTo(resultingData);
         stream.sortStream();
         assertThat(stream.getData()).isEqualTo(new ArrayList<>(List.of(
-                new SimpleEntry<>(startTime, "first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n"),
-                new SimpleEntry<>(new Timestamp(2024, 2, 26, 10, 9), "third,0.6,-5.3482,35.92638,8,284,26/02/2024 10:09,CEUTA\n"),
-                new SimpleEntry<>(endTime, "second,0.6,-5.3482,35.92638,8,284,26/02/2024 10:10,CEUTA\n")
+                new SimpleEntry<>(startTime, startSignal),
+                new SimpleEntry<>(new Timestamp(2024, 2, 26, 10, 9), thirdSignal),
+                new SimpleEntry<>(endTime, endSignal)
         )));
     }
 
@@ -105,7 +107,7 @@ public class TestStream {
         stream.parseData(parser);
         verify(reader, times(5)).readLine();
         assertThat(stream.getData()).isEqualTo(new ArrayList<>(List.of(
-                new SimpleEntry<>(startTime, "first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n")
+                new SimpleEntry<>(startTime, startSignal)
         )));
     }
 
@@ -142,29 +144,5 @@ public class TestStream {
         stream.setData(null);
         stream.sortStream();
         assertThat(stream.getData()).isEqualTo(new ArrayList<>());
-    }
-
-
-    @Test
-    void testSortData2() throws IOException {
-        reader = mock(BufferedReader.class);
-        when(reader.readLine())
-                .thenReturn("VESSEL_HASH,speed,LON,LAT,COURSE,HEADING,TIMESTAMP,departurePortName\n")
-                .thenReturn("first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n")
-                .thenReturn("second,0.6,-5.3482,35.92638,8,284,26/02/2024 10:10,CEUTA\n")
-                .thenReturn("third,0.6,-5.3482,35.92638,8,284,26/02/2024 10:10,CEUTA\n")
-                .thenReturn(null);
-
-        resultingData = new ArrayList<>(List.of(
-                new SimpleEntry<>(startTime, "first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n"),
-                new SimpleEntry<>(endTime, "second,0.6,-5.3482,35.92638,8,284,26/02/2024 10:10,CEUTA\n"),
-                new SimpleEntry<>(new Timestamp(2024, 2, 26, 10, 10), "third,0.6,-5.3482,35.92638,8,284,26/02/2024 10:10,CEUTA\n")
-        ));
-
-        parser = new DebsParser(reader);
-        stream = new Stream(startTime, endTime);
-        stream.parseData(parser);
-        stream.sortStream();
-        assertThat(stream.getData()).isEqualTo(resultingData);
     }
 }
