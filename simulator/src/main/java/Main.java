@@ -1,23 +1,25 @@
-import helperObjects.Timestamp;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import parsers.DebsParser;
-import parsers.Parser;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
 public class Main {
+    /**
+     * Main method
+     *
+     * @param args arguments
+     * @throws InterruptedException exception
+     * @throws IOException exception
+     */
     public static void main(String[] args) throws InterruptedException, IOException {
         /*
         // Example of creating a simulator
 
         String topicName = "myTopic";
         String serverName  = "localhost:9092";
-        String dataSet = "/Users/justinas/Desktop/codebase/simulator/stream files/DEBS_DATASET_PUBLIC_second.csv";
+        String dataSet = "/Users/justinas/Desktop/codebase/simulator/stream files
+        /DEBS_DATASET_PUBLIC_second.csv";
         Timestamp startTime = new Timestamp(2015, 04, 28, 20, 25);
         Timestamp endTimestamp = new Timestamp(2015, 04, 28, 20, 26);
 

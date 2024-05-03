@@ -23,11 +23,13 @@ public class Simulator {
      * @param streamStart   start timestamp of the stream
      * @param streamEnd     end timestamp of the stream
      * @param topicName     name of the topic where the stream is directed to
+     * @param producer      Kafka producer
      */
-    public Simulator(Parser parser, Timestamp streamStart, Timestamp streamEnd, String topicName, KafkaProducer<String, String> producer) throws IOException {
+    public Simulator(Parser parser, Timestamp streamStart, Timestamp streamEnd, String topicName,
+                     KafkaProducer<String, String> producer) throws IOException {
         this.stream = new Stream(streamStart, streamEnd);
         this.stream.parseData(parser);
-        this.stream.sortStream(); // could later be changed to not be included in constructor, oif we want to test how it behaves for unsynced stream
+        this.stream.sortStream();
         this.topicName = topicName;
         this.producer = producer;
         this.speed = 1;
@@ -68,7 +70,8 @@ public class Simulator {
         for (SimpleEntry<Timestamp, String> entry : data) {
 
             // Check if the current signal should be streamed at the same time as the previous one. If yes, stream it.
-            if (previous.getKey().compareTo(entry.getKey()) == 0) producer.send(new ProducerRecord<>(this.topicName, entry.getValue()), (metadata, exception) -> {});
+            if (previous.getKey().compareTo(entry.getKey()) == 0)
+                producer.send(new ProducerRecord<>(this.topicName, entry.getValue()), (metadata, exception) -> {});
             else {
 
                 // Otherwise, stream it after a needed amount of time

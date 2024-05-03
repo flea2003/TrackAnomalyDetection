@@ -17,6 +17,9 @@ public class Stream {
     /**
      * Constructor for the Stream object
      *
+     * @param streamStart starting timestamp for the stream
+     * @param streamEnd ending timestamp for the stream
+     *
      */
     public Stream(Timestamp streamStart, Timestamp streamEnd) {
         this.data = new ArrayList<>();
@@ -70,7 +73,8 @@ public class Stream {
     public List<SimpleEntry<Timestamp, String>> getData() {
         if (this.data == null || this.data.isEmpty()) return new ArrayList<>();
         else return this.data.stream()
-                .filter(entry -> entry.getKey().compareTo(this.streamStart) >= 0 && entry.getKey().compareTo(this.streamEnd) <= 0)
+                .filter(entry -> entry.getKey().compareTo(this.streamStart) >= 0
+                        && entry.getKey().compareTo(this.streamEnd) <= 0)
                 .collect(Collectors.toList());
     }
 
@@ -108,7 +112,8 @@ public class Stream {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Stream stream = (Stream) o;
-        return Objects.equals(data, stream.data) && Objects.equals(streamStart, stream.streamStart) && Objects.equals(streamEnd, stream.streamEnd);
+        return Objects.equals(data, stream.data) && Objects.equals(streamStart, stream.streamStart)
+                && Objects.equals(streamEnd, stream.streamEnd);
     }
 
     /**

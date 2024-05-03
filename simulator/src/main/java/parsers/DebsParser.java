@@ -22,11 +22,11 @@ public class DebsParser implements Parser {
     }
 
     /**
-     * Parses the datafile and returns a list of pairs, where a pair has a timestamp and the string representation of
-     * the signal
+     * Parses the datafile and returns a list of pairs, where a pair has a timestamp and the
+     * string representation of the signal
      *
-     * @return a list of pairs, where a pair has a timestamp and the string representation of the signal,
-     * extracted from the data file
+     * @return a list of pairs, where a pair has a timestamp and the string representation of the
+     * signal, extracted from the data file
      */
 
     @Override

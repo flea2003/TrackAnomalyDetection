@@ -7,5 +7,11 @@ import java.util.List;
 
 
 public interface Parser {
+    /**
+     * General method that parsers should implement
+     *
+     * @return a list of the parsed AIS data with corresponding timestamp
+     * @throws IOException
+     */
     List<SimpleEntry<Timestamp, String>> parse() throws IOException;
 }

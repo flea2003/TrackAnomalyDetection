@@ -37,7 +37,8 @@ public class Timestamp implements Comparable<Timestamp> {
     @Override
     public int compareTo(Timestamp timestamp) {
         LocalDateTime dateTime1 = LocalDateTime.of(year, month, day, hour, minute);
-        LocalDateTime dateTime2 = LocalDateTime.of(timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute);
+        LocalDateTime dateTime2 = LocalDateTime.of(timestamp.year, timestamp.month, timestamp.day,
+                timestamp.hour, timestamp.minute);
 
         if (dateTime1.isBefore(dateTime2)) return -1;
         if (dateTime1.isEqual(dateTime2)) return 0;
@@ -52,7 +53,8 @@ public class Timestamp implements Comparable<Timestamp> {
      */
     public long difference(Timestamp timestamp) {
         LocalDateTime dateTime1 = LocalDateTime.of(year, month, day, hour, minute);
-        LocalDateTime dateTime2 = LocalDateTime.of(timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute);
+        LocalDateTime dateTime2 = LocalDateTime.of(timestamp.year, timestamp.month, timestamp.day,
+                timestamp.hour, timestamp.minute);
         return Duration.between(dateTime2, dateTime1).toMinutes();
     }
 
@@ -112,7 +114,8 @@ public class Timestamp implements Comparable<Timestamp> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Timestamp timestamp = (Timestamp) o;
-        return year == timestamp.year && month == timestamp.month && day == timestamp.day && minute == timestamp.minute && hour == timestamp.hour;
+        return year == timestamp.year && month == timestamp.month && day == timestamp.day
+                && minute == timestamp.minute && hour == timestamp.hour;
     }
 
     /**
