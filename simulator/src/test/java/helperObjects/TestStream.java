@@ -85,9 +85,6 @@ public class TestStream {
         assertThat(stream.getData()).isEqualTo(new ArrayList<>());
     }
 
-
-
-
     @Test
     void testSortData() throws IOException {
         stream.parseData(parser);
@@ -110,7 +107,6 @@ public class TestStream {
                 new SimpleEntry<>(startTime, startSignal)
         )));
     }
-
 
     @Test
     void testToString() {

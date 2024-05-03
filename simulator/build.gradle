@@ -2,13 +2,12 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'info.solidsoft.pitest' version '1.5.2'
-
+    id 'jacoco'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
-}
+apply plugin: 'java'
+apply plugin: 'jacoco'
+
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
@@ -56,3 +55,19 @@ pitest {
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
 }
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+jacocoTestReport {
+    dependsOn test // Ensures that the test task completes before generating the report.
+
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+
+

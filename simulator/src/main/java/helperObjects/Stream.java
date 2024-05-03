@@ -1,4 +1,5 @@
 package helperObjects;
+import lombok.Getter;
 import parsers.Parser;
 
 import java.io.IOException;
@@ -11,7 +12,21 @@ import java.util.stream.Collectors;
 public class Stream {
 
     private List<SimpleEntry<Timestamp, String>> data;
+    /**
+     * -- GETTER --
+     *  Returns the start timestamp of the stream
+     *
+     * @return the starting timestamp of the stream
+     */
+    @Getter
     private Timestamp streamStart;
+    /**
+     * -- GETTER --
+     *  Returns the ending timestamp of the stream
+     *
+     * @return the ending timestamp of the stream
+     */
+    @Getter
     private Timestamp streamEnd;
 
     /**
@@ -105,7 +120,7 @@ public class Stream {
      *  Equals method
      *
      * @param o object that is being compared
-     * @return whether or not two objects are equal
+     * @return whether two objects are equal
      */
     @Override
     public boolean equals(Object o) {
@@ -116,21 +131,4 @@ public class Stream {
                 && Objects.equals(streamEnd, stream.streamEnd);
     }
 
-    /**
-     * Returns the start timestamp of the stream
-     *
-     * @return the starting timestamp of the stream
-     */
-    public Timestamp getStreamStart() {
-        return streamStart;
-    }
-
-    /**
-     * Returns the ending timestamp of the stream
-     *
-     * @return the ending timestamp of the stream
-     */
-    public Timestamp getStreamEnd() {
-        return streamEnd;
-    }
 }
