@@ -10,6 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class AIS implements Serializable {
     public final String shipHash;
     public final float speed;
@@ -21,36 +22,17 @@ public class AIS implements Serializable {
     public final String departurePort;
 
     /**
-     * ToString method for an AIS signal class
-     *
-     * @return human-readable format representation of the object
-     */
-    @Override
-    public String toString() {
-        return "AIS{" +
-                "shipHash='" + shipHash + '\'' +
-                ", speed=" + speed +
-                ", longitude=" + longitude +
-                ", latitude=" + latitude +
-                ", course=" + course +
-                ", heading=" + heading +
-                ", timestamp='" + timestamp + '\'' +
-                ", departurePort='" + departurePort + '\'' +
-                '}';
-    }
-
-    /**
      * Returns the object in JSON format
      *
      * @return json representation of the object
      */
-    public String toJson(){
+    public String toJson() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         String json = null;
         try {
             json = mapper.writeValueAsString( this );
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw e;
         }
         return json;
     }
@@ -61,13 +43,12 @@ public class AIS implements Serializable {
      * @param val string value (in JSON format) that is being converted to an AIS object
      * @return AIS object from a given string
      */
-    public static AIS fromJson(String val) {
+    public static AIS fromJson(String val) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(val, AIS.class);
         } catch (JsonProcessingException e) {
-            return new AIS("", -1, -1, -1,
-                    -1, -1, "", "");
+            throw e;
         }
     }
 }

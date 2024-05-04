@@ -1,5 +1,2 @@
-"include":
+include:
   - simulator/.gitlab-ci.yml
-
-
-

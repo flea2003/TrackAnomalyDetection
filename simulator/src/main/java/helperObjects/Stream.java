@@ -1,32 +1,22 @@
 package helperObjects;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import parsers.Parser;
 
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Getter
+@EqualsAndHashCode
+@ToString
 public class Stream {
 
     private List<SimpleEntry<Timestamp, String>> data;
-    /**
-     * -- GETTER --
-     *  Returns the start timestamp of the stream
-     *
-     * @return the starting timestamp of the stream
-     */
-    @Getter
     private Timestamp streamStart;
-    /**
-     * -- GETTER --
-     *  Returns the ending timestamp of the stream
-     *
-     * @return the ending timestamp of the stream
-     */
-    @Getter
     private Timestamp streamEnd;
 
     /**
@@ -101,34 +91,4 @@ public class Stream {
     public void setData(List<SimpleEntry<Timestamp, String>> data) {
         this.data = data;
     }
-
-    /**
-     * Returns the object as a string
-     *
-     * @return a string format of the object
-     */
-    @Override
-    public String toString() {
-        return "Stream{" +
-                "data=" + data +
-                ", streamStart=" + streamStart +
-                ", streamEnd=" + streamEnd +
-                '}';
-    }
-
-    /**
-     *  Equals method
-     *
-     * @param o object that is being compared
-     * @return whether two objects are equal
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Stream stream = (Stream) o;
-        return Objects.equals(data, stream.data) && Objects.equals(streamStart, stream.streamStart)
-                && Objects.equals(streamEnd, stream.streamEnd);
-    }
-
 }

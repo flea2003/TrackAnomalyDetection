@@ -6,6 +6,7 @@ import parsers.DEBSParser;
 import parsers.Parser;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -21,18 +22,18 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
         // Example of creating a simulator
 
-        String topicName = "example-topic";
+        String topicName = "ships";
         String serverName  = "localhost:9092";
-        String dataSet = "/Users/justinas/Desktop/codebase/simulator/streaming_data/DEBS_DATASET_PUBLIC_second.csv";
+        String dataSetName = "DEBS_DATASET_PUBLIC_second.csv";
         Timestamp startTime = new Timestamp(2015, 04, 1, 20, 25);
         Timestamp endTimestamp = new Timestamp(2015, 04, 1, 20, 25);
-        Parser parser = new DEBSParser(new BufferedReader(new FileReader(dataSet)));
+
+        Parser parser = new DEBSParser(getReader(dataSetName));
         KafkaProducer<String, String> producer = createProducer(serverName);
         Simulator simulator = new Simulator(parser, startTime, endTimestamp, topicName, producer);
         simulator.setSpeed(60);
 
         simulator.startStream();
-
     }
 
     /**
@@ -47,5 +48,17 @@ public class Main {
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         return new KafkaProducer<>(properties);
+    }
+
+    /**
+     * Creates a buffered reader for a given dataset. It assumes that the dataset is located in the
+     * streaming_data folder
+     *
+     * @param fileName the name of the dataset
+     * @return reader for the dataset
+     * @throws FileNotFoundException throw in case the file is not found
+     */
+    private static BufferedReader getReader(String fileName) throws FileNotFoundException {
+        return new BufferedReader(new FileReader("simulator/streaming_data/"+ fileName));
     }
 }

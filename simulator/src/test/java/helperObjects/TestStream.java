@@ -110,7 +110,7 @@ public class TestStream {
 
     @Test
     void testToString() {
-        assertThat(stream.toString()).isEqualTo("Stream{data=[], streamStart=Timestamp{year=2024, month=1, day=27, minute=10, hour=10}, streamEnd=Timestamp{year=2024, month=2, day=26, minute=10, hour=10}}");
+        assertThat(stream.toString()).isEqualTo("Stream(data=[], streamStart=Timestamp(year=2024, month=1, day=27, minute=10, hour=10), streamEnd=Timestamp(year=2024, month=2, day=26, minute=10, hour=10))");
     }
 
     @Test

@@ -17,28 +17,24 @@ In order to build the project, the following steps should be followed:
 sudo apt update
 sudo apt install default-jdk
  ``` 
-2. Make sure that Kafka is installed. If not, that that could be done by running the following command: 
-```
-brew install kafka
-```
+For this project's environment, I used Java 17.
+2. Make sure that Kafka is installed. If not, that that could be done by following the procedure described in backend project readme.md file. 
+
 ## Starting the project
 
 In order to start the simulator, the following steps should be taken:
-1. A wanted dataset file should be added, preferably, in `streaming_data` directory
+1. A wanted dataset file should be added to `streaming_data` directory. For now, the default dataset that we are using is downloaded from `https://www.marinetraffic.com/research/dataset/marinetraffic-automatic-identification-system-ais/`.
 2. The following parameters should be instantiated in the `main()` method:
    1. Name of the Kafka topic
    2. Server name
    3. Parser type
-   4. Path to dataset
+   4. Name of the dataset
    5. Start time of the stream
    6. End time of the stream
    7. Stream speed (optional)
-3. ZooKeeper server should be started. That could be done by running `zkServer start` or `zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties`
-4. Kafka should be started. That could be done by running `kafka-server-start /usr/local/etc/kafka/server.properties`
-5. A new Kafka topic should be added: `bin/kafka-topics.sh --create --topic test --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1`. Here the name of the topic is 'test', but that could be changed to any other string.
-6. In new terminal window, a consumer should be added in order to see what messages are appended to the topic. That could be done by running `bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning`
-7. Then, the simulator can be started by running the `main()` method. It will start appending messages to the specified topic.
-8. When the stream stops, Kafka could be stopped by running `kafka-server-stop`
+3. Kafka server should be started and a wanted topic should be created (and possibly a new consumer window added). Once again, the documentation of how that could be done is presented in backend project readme.md file.
+4. Then, the simulator can be started by running the `main()` method. It will start appending messages to the specified topic. Please make sure that the name of the topic in the simulator matches the one created in Kafka.
+5. When the stream stops, Kafka could be stopped by running `kafka-server-stop`
 
 ## Additional information
 1. If a dataset of a new format is added for which a parser has not been implemented, a wanted parser could be implemented by adding a new parser class in 'parsers' directory.

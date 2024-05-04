@@ -2,7 +2,11 @@ package helperObjects;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import lombok.*;
 
+@Getter
+@ToString
+@EqualsAndHashCode
 public class Timestamp implements Comparable<Timestamp> {
 
     private int year;
@@ -56,81 +60,5 @@ public class Timestamp implements Comparable<Timestamp> {
         LocalDateTime dateTime2 = LocalDateTime.of(timestamp.year, timestamp.month, timestamp.day,
                 timestamp.hour, timestamp.minute);
         return Duration.between(dateTime2, dateTime1).toMinutes();
-    }
-
-    /**
-     * Gets year.
-     *
-     * @return the year
-     */
-    public int getYear() {
-        return year;
-    }
-
-    /**
-     * Gets month.
-     *
-     * @return the month
-     */
-    public int getMonth() {
-        return month;
-    }
-
-    /**
-     * Gets day.
-     *
-     * @return the day
-     */
-    public int getDay() {
-        return day;
-    }
-
-    /**
-     * Gets minute.
-     *
-     * @return the minute
-     */
-    public int getMinute() {
-        return minute;
-    }
-
-    /**
-     * Gets hour.
-     *
-     * @return the hour
-     */
-    public int getHour() {
-        return hour;
-    }
-
-    /**
-     * Equals method
-     *
-     * @param o object that is being compared
-     * @return whether two objects are equal
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Timestamp timestamp = (Timestamp) o;
-        return year == timestamp.year && month == timestamp.month && day == timestamp.day
-                && minute == timestamp.minute && hour == timestamp.hour;
-    }
-
-    /**
-     * Returns object as a string
-     *
-     * @return object representation in human-readable format
-     */
-    @Override
-    public String toString() {
-        return "Timestamp{" +
-                "year=" + year +
-                ", month=" + month +
-                ", day=" + day +
-                ", minute=" + minute +
-                ", hour=" + hour +
-                '}';
     }
 }

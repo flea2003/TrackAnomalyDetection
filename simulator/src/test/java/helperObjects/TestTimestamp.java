@@ -76,7 +76,7 @@ public class TestTimestamp {
 
     @Test
     void testToString() {
-        assertThat(timestamp1.toString()).isEqualTo("Timestamp{year=2004, month=1, day=27, minute=0, hour=10}");
+        assertThat(timestamp1.toString()).isEqualTo("Timestamp(year=2004, month=1, day=27, minute=0, hour=10)");
     }
 
     @Test
