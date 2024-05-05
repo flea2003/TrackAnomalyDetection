@@ -1,7 +1,9 @@
-package dev.system.backend.models;
+package dev.system.backend.commons;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 
 
 @Entity
@@ -9,6 +11,9 @@ public class AIS {
 
     @Id
     private String hash;
+
+    @ManyToOne
+    private Ship ship;
     private float speed;
     private float lon;
     private float lat;
@@ -62,5 +67,9 @@ public class AIS {
 
     public String getDeparturePortName() {
         return departurePortName;
+    }
+
+    public Ship getShip() {
+        return ship;
     }
 }
