@@ -1,6 +1,6 @@
 package parsers;
 
-import helperObjects.AIS;
+import helperObjects.AISSignal;
 import helperObjects.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,8 +35,8 @@ public class TestDebsParser {
         resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2015, 4, 25, 5, 12), "{\"shipHash\":\"0xd7aeaeb3986186e3550aa68bd1561f8df9672d17\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"25/04/2015 05:12\",\"departurePort\":\"CEUTA\"}"));}
 
     @Test
-    void testParseAIS() throws IOException {
-        assertThat(debsParser.parseAIS(new String[]{"a", "1","2.0","3","4","5.5","b", "c"})).isEqualTo(new AIS("a", 1F,2,3,4,5.5F,"b", "c"));
+    void testParseAISSignal() throws IOException {
+        assertThat(debsParser.parseAISSignal(new String[]{"a", "1","2.0","3","4","5.5","b", "c"})).isEqualTo(new AISSignal("a", 1F,2,3,4,5.5F,"b", "c"));
     }
 
     @Test
