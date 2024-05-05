@@ -1,12 +1,8 @@
-package dev.system.backend.services;
+package services;
 
-import dev.system.backend.commons.AIS;
-import dev.system.backend.commons.AnomalyInformation;
-import dev.system.backend.commons.PipelineObject;
-import dev.system.backend.commons.Ship;
-import dev.system.backend.repositories.ShipRepository;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import commons.AIS;
+import commons.AnomalyInformation;
+import commons.PipelineObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

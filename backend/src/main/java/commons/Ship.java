@@ -1,4 +1,4 @@
-package dev.system.backend.commons;
+package commons;
 import jakarta.persistence.*;
 import java.util.List;
 

@@ -6,7 +6,7 @@ stages:
   - code_quality
 
 before_script:
-  - cd simulator
+  - cd backend
   - chmod +x ./gradlew
 
 

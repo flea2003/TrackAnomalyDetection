@@ -1,8 +1,8 @@
-package dev.system.backend.controllers;
+package controllers;
 
-import dev.system.backend.commons.AIS;
-import dev.system.backend.commons.AnomalyInformation;
-import dev.system.backend.services.ShipsDataService;
+import commons.AIS;
+import commons.AnomalyInformation;
+import services.ShipsDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
