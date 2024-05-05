@@ -3,6 +3,7 @@ import L, {bounds} from "leaflet";
 import createShipIcon from "./Ship";
 import config from "../../config";
 import axios from "axios";
+import './Map.css'
 
 /**
  * this is a convenience interface to store the ship details
