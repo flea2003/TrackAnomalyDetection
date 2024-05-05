@@ -19,6 +19,7 @@ public class StreamUtils {
     /**
      * Loads a configuration file.
      *
+     * @param path the path to the configuration file
      * @return the loaded properties
      * @throws IOException if such file does not exist
      */

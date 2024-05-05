@@ -1,6 +1,5 @@
 package sp.pipeline;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import sp.model.AISSignal;
 import sp.model.AISUpdate;
 import sp.model.CurrentShipDetails;
@@ -72,7 +71,8 @@ public class AnomalyDetectionPipeline {
 
         // Create a Flink stream that consumes AIS signals from Kafka
         KafkaSource<String> kafkaSource = StreamUtils.getFlinkStreamConsumingFromKafka(INCOMING_AIS_TOPIC_NAME);
-        DataStream<String> sourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka AIS Source");
+        DataStream<String> sourceSerialized = flinkEnv.fromSource(kafkaSource,
+                WatermarkStrategy.noWatermarks(), "AIS Source");
 //        sourceSerialized.print(); // does not work with Spring :)
         DataStream<AISSignal> source = sourceSerialized.map((x) -> {
             System.out.println("Got as input" + x);
@@ -91,7 +91,8 @@ public class AnomalyDetectionPipeline {
                         .setValueSerializationSchema(new SimpleStringSchema())
                         .build()
                 )
-//                .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE) // TODO: Maybe we need this, maybe not. Not sure yet.
+//                 TODO: Maybe we need this, maybe not. Not sure yet.
+//                .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
                 .build();
         updateStreamSerialized.sinkTo(sink);
     }
