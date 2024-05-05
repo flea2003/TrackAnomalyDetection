@@ -1,2 +1,2 @@
 "include":
-  - "frontend/.gitlab-ci.yml"
+  - "backend/.gitlab-ci.yml"
