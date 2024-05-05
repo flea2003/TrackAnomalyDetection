@@ -46,12 +46,6 @@ public class AnomalyDetectionPipeline {
      */
     @Autowired
     public AnomalyDetectionPipeline(ScoreCalculationStategy scoreCalculationStrategy) {
-        AISSignal signal = new AISSignal("hashas1", 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, "2021-01-01", "port1");
-        try {
-            System.out.println("==== " + signal.toJson());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         buildPipeline();
     }
