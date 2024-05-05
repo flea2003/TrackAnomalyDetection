@@ -1,5 +1,7 @@
-### IntelliJ IDEA ###
-.idea
 
 ### Data ###
 data
+
+build/
+.gradle
+*.csv
