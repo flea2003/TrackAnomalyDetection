@@ -1,8 +1,12 @@
 package commons;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor
 public class AnomalyInformation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -12,16 +16,15 @@ public class AnomalyInformation {
     private Ship ship;
     private String info;
 
+    /**
+     * Constructor
+     *
+     * @param score anomaly score
+     * @param info anomaly explanation
+     */
     public AnomalyInformation(float score, String info) {
         this.score = score;
         this.info = info;
     }
 
-    public float getScore() {
-        return score;
-    }
-
-    public String getInfo() {
-        return info;
-    }
 }

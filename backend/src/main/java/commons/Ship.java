@@ -1,9 +1,9 @@
 package commons;
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
 public class Ship {
+    /*
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long shipID;
@@ -52,10 +52,13 @@ public class Ship {
         if(windowSize> anomalyInformationHistory.size()){
             throw new IndexOutOfBoundsException("Invalid window size");
         }
-        return anomalyInformationHistory.subList(anomalyInformationHistory.size()-1-windowSize, anomalyInformationHistory.size()-1);
+        return anomalyInformationHistory.subList(anomalyInformationHistory.size()-1-windowSize,
+         anomalyInformationHistory.size()-1);
     }
 
     public AnomalyInformation getLastAnomalyScore(){
         return anomalyInformationHistory.get(anomalyInformationHistory.size()-1);
     }
+
+     */
 }

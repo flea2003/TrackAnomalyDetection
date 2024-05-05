@@ -41,7 +41,8 @@ public class ShipsDataController {
      * @return AnomalyInformation object for a specified ship
      */
     @GetMapping("ships/anomaly/{id}")
-    public AnomalyInformation getCurrentAnomalyInformation(@PathVariable long id) {return this.shipsDataService.getCurrentAnomalyInformation(id);}
+    public AnomalyInformation getCurrentAnomalyInformation(@PathVariable long id)
+    {return this.shipsDataService.getCurrentAnomalyInformation(id);}
 
     /**
      * Gets the current AIS data for all ships
