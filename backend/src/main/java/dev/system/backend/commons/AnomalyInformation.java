@@ -3,7 +3,7 @@ package dev.system.backend.commons;
 import jakarta.persistence.*;
 
 @Entity
-public class AnomalyScore {
+public class AnomalyInformation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -12,7 +12,7 @@ public class AnomalyScore {
     private Ship ship;
     private String info;
 
-    public AnomalyScore(float score, String info) {
+    public AnomalyInformation(float score, String info) {
         this.score = score;
         this.info = info;
     }

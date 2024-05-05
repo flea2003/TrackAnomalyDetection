@@ -12,16 +12,16 @@ public class Ship {
     private List<AIS> signalHistory;
 
     @OneToMany(mappedBy = "ship", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AnomalyScore> anomalyScoreHistory;
+    private List<AnomalyInformation> anomalyInformationHistory;
 
     public Ship(){
 
     }
 
-    public Ship(long shipID, List<AIS> signalHistory, List<AnomalyScore> anomalyScoreHistory){
+    public Ship(long shipID, List<AIS> signalHistory, List<AnomalyInformation> anomalyInformationHistory){
         this.shipID = shipID;
         this.signalHistory = signalHistory;
-        this.anomalyScoreHistory = anomalyScoreHistory;
+        this.anomalyInformationHistory = anomalyInformationHistory;
     }
 
     public long getShipID() {
@@ -43,19 +43,19 @@ public class Ship {
         return signalHistory.get(signalHistory.size()-1);
     }
 
-    public List<AnomalyScore> getAnomalyScoreHistory() {
-        return anomalyScoreHistory;
+    public List<AnomalyInformation> getAnomalyScoreHistory() {
+        return anomalyInformationHistory;
     }
 
 
-    public List<AnomalyScore> getWindowedAnomalyScoreHistory(int windowSize) throws IndexOutOfBoundsException{
-        if(windowSize>anomalyScoreHistory.size()){
+    public List<AnomalyInformation> getWindowedAnomalyScoreHistory(int windowSize) throws IndexOutOfBoundsException{
+        if(windowSize> anomalyInformationHistory.size()){
             throw new IndexOutOfBoundsException("Invalid window size");
         }
-        return anomalyScoreHistory.subList(anomalyScoreHistory.size()-1-windowSize, anomalyScoreHistory.size()-1);
+        return anomalyInformationHistory.subList(anomalyInformationHistory.size()-1-windowSize, anomalyInformationHistory.size()-1);
     }
 
-    public AnomalyScore getLastAnomalyScore(){
-        return anomalyScoreHistory.get(anomalyScoreHistory.size()-1);
+    public AnomalyInformation getLastAnomalyScore(){
+        return anomalyInformationHistory.get(anomalyInformationHistory.size()-1);
     }
 }
