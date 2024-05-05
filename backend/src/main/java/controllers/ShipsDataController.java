@@ -1,7 +1,6 @@
 package controllers;
-
-import commons.AIS;
-import commons.AnomalyInformation;
+import dtos.AnomalyInformation;
+import model.AISSignal;
 import services.ShipsDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +28,8 @@ public class ShipsDataController {
      * @param id the id of the ship
      * @return AIS class object of the ship
      */
-    @GetMapping("ships/ais/{id}")
-    public AIS getCurrentAISInformation(@PathVariable long id){
+    @GetMapping("/ships/ais/{id}")
+    public AISSignal getCurrentAISInformation(@PathVariable String id){
         return this.shipsDataService.getCurrentAISInformation(id);
     }
 
@@ -40,17 +39,18 @@ public class ShipsDataController {
      * @param id the id of the ship
      * @return AnomalyInformation object for a specified ship
      */
-    @GetMapping("ships/anomaly/{id}")
-    public AnomalyInformation getCurrentAnomalyInformation(@PathVariable long id)
-    {return this.shipsDataService.getCurrentAnomalyInformation(id);}
+    @GetMapping("/ships/anomaly/{id}")
+    public AnomalyInformation getCurrentAnomalyInformation(@PathVariable String id) {
+        return this.shipsDataService.getCurrentAnomalyInformation(id);
+    }
 
     /**
      * Gets the current AIS data for all ships
      *
      * @return the current AIS data for all ships
      */
-    @GetMapping("ships/ais")
-    public List<AIS> getCurrentAISInformationOfAllShips(){
+    @GetMapping("/ships/ais")
+    public List<AISSignal> getCurrentAISInformationOfAllShips(){
         return this.shipsDataService.getCurrentAISInformationOfAllShips();
     }
 
@@ -59,7 +59,7 @@ public class ShipsDataController {
      *
      * @return a list of anomaly information objects for all ships
      */
-    @GetMapping("ships/anomaly")
+    @GetMapping("/ships/anomaly")
     public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips(){
         return this.shipsDataService.getCurrentAnomalyInformationOfAllShips();
     }
