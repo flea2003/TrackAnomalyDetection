@@ -1,0 +1,45 @@
+image: gradle:7.6.0-jdk19-alpine
+
+stages:
+  - build
+  - test
+  - code_quality
+
+before_script:
+  - cd simulator
+  - chmod +x ./gradlew
+
+
+build_project:
+  stage: build
+  script:
+    - ./gradlew assemble
+  only:
+    - merge_requests
+    - main
+
+run_tests:
+  stage: test
+  script:
+    - ./gradlew test
+  artifacts:
+    reports:
+      junit: build/test-results/test/**/TEST-*.xml
+    paths:
+      - build/reports/tests
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
+
+checkstyle:
+  stage: code_quality
+  script:
+    - ./gradlew checkstyleMain
+  artifacts:
+    paths:
+      - build/reports/checkstyle
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
