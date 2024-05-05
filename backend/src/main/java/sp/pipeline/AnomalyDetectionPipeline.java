@@ -1,9 +1,9 @@
-package pipeline;
+package sp.pipeline;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import model.AISSignal;
-import model.AISUpdate;
-import model.CurrentShipDetails;
+import sp.model.AISSignal;
+import sp.model.AISUpdate;
+import sp.model.CurrentShipDetails;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -24,7 +24,7 @@ import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pipeline.scoreCalculators.ScoreCalculationStategy;
+import sp.pipeline.scoreCalculators.ScoreCalculationStategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Private helper method for building the pipeline.
+     * Private helper method for building the sp.pipeline.
      */
     private void buildPipeline() {
         buildScoreCalculationPart();
@@ -65,7 +65,7 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Builds the first part of the pipeline - the score calculation part, done in Flink. This pipeline
+     * Builds the first part of the sp.pipeline - the score calculation part, done in Flink. This sp.pipeline
      * consumes AIS signals from Kafka, calculates the anomaly scores (in Flink) and sends them to back
      * to Kafka into another topic.
 
@@ -85,7 +85,7 @@ public class AnomalyDetectionPipeline {
             return AISSignal.fromJson(x);
         });
 
-        // Set up the anomaly detection part of the pipeline (happens in Flink)
+        // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
         DataStream<AISUpdate> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
         DataStream<String> updateStreamSerialized = updateStream.map(AISUpdate::toJson);
 
@@ -103,9 +103,9 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Builds the second part of the pipeline - the score aggregation part. In particular, this part
+     * Builds the second part of the sp.pipeline - the score aggregation part. In particular, this part
      * takes the calculated score updates from Kafka (which were pushed there by the previous part)
-     * and aggregates them into a KTable. This KTable is then used as the state of the pipeline.
+     * and aggregates them into a KTable. This KTable is then used as the state of the sp.pipeline.
      */
     private void buildScoreAggregationPart() {
         // Create a keyed Kafka Stream of incoming AISUpdate signals

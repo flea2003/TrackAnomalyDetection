@@ -1,4 +1,4 @@
-package dtos;
+package sp.dtos;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;

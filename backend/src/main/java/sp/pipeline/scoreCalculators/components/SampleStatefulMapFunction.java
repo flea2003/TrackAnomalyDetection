@@ -1,7 +1,7 @@
-package pipeline.scoreCalculators.components;
+package sp.pipeline.scoreCalculators.components;
 
-import model.AISSignal;
-import model.AISUpdate;
+import sp.model.AISSignal;
+import sp.model.AISUpdate;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.time.Time;

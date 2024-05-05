@@ -1,12 +1,12 @@
-package pipeline.scoreCalculators;
+package sp.pipeline.scoreCalculators;
 
-import model.AISSignal;
-import model.AISUpdate;
+import sp.model.AISSignal;
+import sp.model.AISUpdate;
 import org.apache.flink.streaming.api.datastream.DataStream;
 
 public interface ScoreCalculationStategy {
     /**
-     * The key method to implement when setting up the pipeline. This method takes as argument a Flink
+     * The key method to implement when setting up the sp.pipeline. This method takes as argument a Flink
      * DataStream of AIS signals and is supposed to return a FlinkStream of AISUpdate objects. Everything
      * inside of this method should deal with Flink.
      *

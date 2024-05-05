@@ -1,7 +1,7 @@
-package controllers;
-import dtos.AnomalyInformation;
-import model.AISSignal;
-import services.ShipsDataService;
+package sp.controllers;
+import sp.dtos.AnomalyInformation;
+import sp.model.AISSignal;
+import sp.services.ShipsDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

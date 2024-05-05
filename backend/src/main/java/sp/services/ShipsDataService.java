@@ -1,11 +1,11 @@
-package services;
+package sp.services;
 
-import dtos.AnomalyInformation;
-import model.AISSignal;
-import model.CurrentShipDetails;
+import sp.dtos.AnomalyInformation;
+import sp.model.AISSignal;
+import sp.model.CurrentShipDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pipeline.AnomalyDetectionPipeline;
+import sp.pipeline.AnomalyDetectionPipeline;
 
 import java.util.HashMap;
 import java.util.List;

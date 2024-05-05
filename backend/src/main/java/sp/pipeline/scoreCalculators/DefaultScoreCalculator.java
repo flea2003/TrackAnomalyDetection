@@ -1,10 +1,10 @@
-package pipeline.scoreCalculators;
+package sp.pipeline.scoreCalculators;
 
-import model.AISSignal;
-import model.AISUpdate;
+import sp.model.AISSignal;
+import sp.model.AISUpdate;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.stereotype.Component;
-import pipeline.scoreCalculators.components.SampleStatefulMapFunction;
+import sp.pipeline.scoreCalculators.components.SampleStatefulMapFunction;
 
 @Component
 public class DefaultScoreCalculator implements ScoreCalculationStategy{

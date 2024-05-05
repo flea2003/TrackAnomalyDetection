@@ -1,4 +1,4 @@
-package pipeline;
+package sp.pipeline;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
