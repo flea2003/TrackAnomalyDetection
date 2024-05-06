@@ -138,10 +138,14 @@ function Map(){
 
     }, []);
 
+    function closeInfo():void{
+        setSelectedShip(null);
+    }
+
     return (
         <div id="map-container">
             <div id="info-box">
-                {selectedShip && <Info ship={selectedShip} />}
+                {selectedShip && <Info ship={selectedShip} onClose={closeInfo} />}
             </div>
             <div id="map"></div>
         </div>
