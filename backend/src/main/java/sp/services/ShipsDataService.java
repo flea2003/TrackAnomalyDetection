@@ -1,29 +1,30 @@
-package services;
+package sp.services;
 
-import commons.AIS;
-import commons.AnomalyInformation;
-import commons.PipelineObject;
+import sp.dtos.AnomalyInformation;
+import sp.model.AISSignal;
+import sp.model.CurrentShipDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sp.pipeline.AnomalyDetectionPipeline;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Service
 public class ShipsDataService {
 
-    private PipelineObject pipelineObject;
+    private AnomalyDetectionPipeline anomalyDetectionPipeline;
 
     /**
      * Constructor for service class
      *
-     * @param pipelineObject object that is responsible for managing and handling the stream of data and
+     * @param anomalyDetectionPipeline object that is responsible for managing and handling the stream of data and
      * anomaly information computation
      */
     @Autowired
-    public ShipsDataService(PipelineObject pipelineObject){
-        this.pipelineObject = pipelineObject;
+    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline){
+        this.anomalyDetectionPipeline = anomalyDetectionPipeline;
+        anomalyDetectionPipeline.runPipeline();
     }
 
     /**
@@ -32,9 +33,10 @@ public class ShipsDataService {
      * @param id the id of a ship
      * @return current AIS information for a specified ship
      */
-    public AIS getCurrentAISInformation(long id){
-        HashMap<Integer, Integer> map = pipelineObject.returnHashMap();
-        return new AIS();
+    public AISSignal getCurrentAISInformation(String id){
+        HashMap<String, CurrentShipDetails> map = anomalyDetectionPipeline.getCurrentScores();
+        System.out.println("Map is: " + map);
+        return null;
     }
 
     /**
@@ -43,9 +45,8 @@ public class ShipsDataService {
      * @param shipId the id of the ship
      * @return anomaly information for a specified ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(long shipId){
-        HashMap<Integer, Integer> map = pipelineObject.returnHashMap();
-        return new AnomalyInformation(0.0F, "");
+    public AnomalyInformation getCurrentAnomalyInformation(String shipId){
+        return null;
     }
 
 
@@ -54,9 +55,8 @@ public class ShipsDataService {
      *
      * @return the current AIS data for all ships
      */
-    public List<AIS> getCurrentAISInformationOfAllShips(){
-        HashMap<Integer, Integer> map = pipelineObject.returnHashMap();
-        return new ArrayList<>();
+    public List<AISSignal> getCurrentAISInformationOfAllShips(){
+        return null;
     }
 
     /**
@@ -65,7 +65,6 @@ public class ShipsDataService {
      * @return a list of anomaly information objects for all ships
      */
     public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips(){
-        HashMap<Integer, Integer> map = pipelineObject.returnHashMap();
-        return new ArrayList<>();
+        return null;
     }
 }

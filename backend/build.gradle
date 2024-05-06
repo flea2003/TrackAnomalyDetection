@@ -3,6 +3,21 @@ plugins {
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'checkstyle'
+
+	// For Flink
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+ext {
+	flinkVersion = '1.18.1'
+	scalaBinaryVersion = '_2.12'
+	slf4jVersion = '1.7.36'
+	log4jVersion = '2.17.1'
+	jacksonVersion = '2.17.0'
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
 }
 
 group = 'dev.system'
@@ -23,6 +38,16 @@ repositories {
 	mavenCentral()
 }
 
+// For Flink
+configurations {
+	flinkShadowJar
+	flinkShadowJar.exclude group: 'org.apache.flink', module: 'force-shading'
+	flinkShadowJar.exclude group: 'com.google.code.findbugs', module: 'jsr305'
+	flinkShadowJar.exclude group: 'org.slf4j'
+	flinkShadowJar.exclude group: 'org.apache.logging.log4j'
+}
+
+
 dependencies {
 	implementation 'io.r2dbc:r2dbc-spi:0.9.0.RELEASE' // Check for the latest version
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -38,8 +63,54 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 	testCompileOnly 'org.projectlombok:lombok:1.18.32'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+	// For Flink:
+	implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
+	implementation "org.apache.flink:flink-clients:${flinkVersion}"
+	implementation 'org.projectlombok:lombok:1.18.28'
+	flinkShadowJar "org.apache.flink:flink-connector-kafka:3.0.1-1.18"
+	runtimeOnly "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+	runtimeOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+	runtimeOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+	implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+	implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+	implementation 'org.projectlombok:lombok:1.18.28'
+	compileOnly 'org.projectlombok:lombok:1.18.32'
+	annotationProcessor 'org.projectlombok:lombok:1.18.32'
+	testCompileOnly 'org.projectlombok:lombok:1.18.32'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+	// For kafka client:
+	implementation group: 'org.apache.flink', name: 'flink-core', version: "${flinkVersion}"
+	implementation group: 'org.apache.flink', name: 'flink-queryable-state-client-java', version: "${flinkVersion}"
+	implementation "org.apache.flink:flink-queryable-state-runtime:${flinkVersion}"
+	implementation 'org.apache.kafka:kafka-streams:3.4.0'
+	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.4.0'
+	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
+}
+
+// For Flink
+sourceSets {
+	main.compileClasspath += configurations.flinkShadowJar
+	main.runtimeClasspath += configurations.flinkShadowJar
+	test.compileClasspath += configurations.flinkShadowJar
+	test.runtimeClasspath += configurations.flinkShadowJar
+	javadoc.classpath += configurations.flinkShadowJar
+}
+//run.classpath = sourceSets.main.runtimeClasspath
+
+jar {
+	manifest {
+		attributes 'Built-By': System.getProperty('user.name'),
+				'Build-Jdk': System.getProperty('java.version')
+	}
+}
+
+shadowJar {
+	configurations = [project.configurations.flinkShadowJar]
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
