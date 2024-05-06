@@ -6,16 +6,6 @@ import axios from "axios";
 import './Map.css'
 import Info from "./Info";
 
-/**
- * this is a convenience interface to store the ship details
- */
-interface shipDetails{
-    name: string,
-    color: number,
-    heading: number,
-    lat: number,
-    lng: number
-}
 
 /**
  * This is how our API call to backend would look like
@@ -39,7 +29,7 @@ interface shipDetails{
 const fetchInitial = () => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const data: shipDetails[] = [
+            const data: ShipDetails[] = [
                 {name: 'loren iopsum', color: 0.2, heading: 90, lat: -60.53973419889964, lng: 13.606189517209998},
                 {name: 'loren iopsum', color: 0.4, heading: 180, lat: 5.695212883123546, lng: 95.5444375499444},
                 {name: 'loren iopsum', color: 0.7, heading: 330, lat: -28.31129313464126, lng: 102.9402365060044},
@@ -100,7 +90,7 @@ function Map(){
                 fetchInitial().then((data) => {
                     // you can look at the console and see that the code is indeed executed
                     console.log('rendering')
-                    let dataShips = data as shipDetails[]
+                    let dataShips = data as ShipDetails[]
                     dataShips.forEach(ship => {
                         // deal with repeated world map : https://stackoverflow.com/questions/33632608/markers-do-not-appear-on-continuous-world-in-leaflet
                         L.marker([ship.lat, ship.lng], {icon: createShipIcon(ship.color, ship.heading)})
