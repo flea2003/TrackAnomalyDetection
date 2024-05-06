@@ -1,0 +1,11 @@
+stages:
+  - tests
+
+react_tests:
+  stage: tests
+  image: node
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm run test

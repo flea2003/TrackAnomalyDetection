@@ -1,0 +1,11 @@
+stages:
+  - tests
+  - build
+  - test
+  - code_quality
+
+include:
+  - local: frontend/.gitlab-ci.yml
+  - local: simulator/.gitlab-ci.yml
+  - local: backend/.gitlab-ci.yml
+

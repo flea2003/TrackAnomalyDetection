@@ -1,0 +1,7 @@
+
+### Data ###
+data
+
+build/
+.gradle
+*.csv
