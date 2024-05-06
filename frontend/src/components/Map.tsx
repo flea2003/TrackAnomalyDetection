@@ -1,9 +1,10 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import L, {bounds} from "leaflet";
 import createShipIcon from "./Ship";
 import config from "../../config";
 import axios from "axios";
 import './Map.css'
+import Info from "./Info";
 
 /**
  * this is a convenience interface to store the ship details
@@ -65,6 +66,9 @@ const fetchInitial = () => {
 
 function Map(){
 
+    const [selectedShip, setSelectedShip] = useState<ShipDetails | null>(null);
+
+
     useEffect(() => {
 
         let southWest = L.latLng(-90, -180);
@@ -101,13 +105,22 @@ function Map(){
                         // deal with repeated world map : https://stackoverflow.com/questions/33632608/markers-do-not-appear-on-continuous-world-in-leaflet
                         L.marker([ship.lat, ship.lng], {icon: createShipIcon(ship.color, ship.heading)})
                             .addTo(map)
-                            .bindPopup(ship.name);
+                            .bindPopup(ship.name)
+                            .on('click', () => {
+                                setSelectedShip(ship);
+                            });
                         L.marker([ship.lat, ship.lng - 360], {icon: createShipIcon(ship.color, ship.heading)})
                             .addTo(map)
-                            .bindPopup(ship.name);
+                            .bindPopup(ship.name)
+                            .on('click', () => {
+                                setSelectedShip(ship);
+                            });
                         L.marker([ship.lat, ship.lng + 360], {icon: createShipIcon(ship.color, ship.heading)})
                             .addTo(map)
-                            .bindPopup(ship.name);
+                            .bindPopup(ship.name)
+                            .on('click', () => {
+                                setSelectedShip(ship);
+                            });
                     });
                     return;
                 }).then(() => { // thanks to ChatGPT for helping me set up this wonderful callback
@@ -125,7 +138,15 @@ function Map(){
 
     }, []);
 
-    return <div id = 'map'></div>
+    return (
+        <div id="map-container">
+            <div id="info-box">
+                {selectedShip && <Info ship={selectedShip} />}
+            </div>
+            <div id="map"></div>
+        </div>
+    );
 }
+
 
 export default Map;
