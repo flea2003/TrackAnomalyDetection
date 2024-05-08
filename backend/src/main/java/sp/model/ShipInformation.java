@@ -5,15 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.*;
 import org.apache.kafka.common.serialization.Serde;
+import sp.dtos.AnomalyInformation;
 
 @Getter
 @Builder
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @ToString
-public class AISUpdate {
+public class ShipInformation {
     private String shipHash;
-    private float newScore;
+    private AnomalyInformation anomalyInformation;
     private AISSignal correspondingSignal;
 
     /**
@@ -38,10 +39,10 @@ public class AISUpdate {
      * @param val the JSON string to convert
      * @return the converted AISUpdate object
      */
-    public static AISUpdate fromJson(String val) {
+    public static ShipInformation fromJson(String val) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(val, AISUpdate.class);
+            return mapper.readValue(val, ShipInformation.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -52,8 +53,8 @@ public class AISUpdate {
      *
      * @return Serde object for this class.
      */
-    public static Serde<AISUpdate> getSerde() {
+    public static Serde<ShipInformation> getSerde() {
         ObjectMapper jsonObjectMapper = new ObjectMapper();
-        return new Jackson2Serde<>(jsonObjectMapper, AISUpdate.class);
+        return new Jackson2Serde<>(jsonObjectMapper, ShipInformation.class);
     }
 }

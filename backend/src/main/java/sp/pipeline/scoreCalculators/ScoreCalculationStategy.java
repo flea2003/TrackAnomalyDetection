@@ -1,7 +1,7 @@
 package sp.pipeline.scoreCalculators;
 
 import sp.model.AISSignal;
-import sp.model.AISUpdate;
+import sp.model.ShipInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
 
 public interface ScoreCalculationStategy {
@@ -13,5 +13,5 @@ public interface ScoreCalculationStategy {
      * @param source the source stream of incoming AIS signals
      * @return a stream of AISUpdate objects
      */
-    DataStream<AISUpdate> setupFlinkAnomalyScoreCalculationPart(DataStream<AISSignal> source);
+    DataStream<ShipInformation> setupFlinkAnomalyScoreCalculationPart(DataStream<AISSignal> source);
 }

@@ -1,7 +1,8 @@
 package sp.pipeline;
 
+import sp.dtos.AnomalyInformation;
 import sp.model.AISSignal;
-import sp.model.AISUpdate;
+import sp.model.ShipInformation;
 import sp.model.CurrentShipDetails;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.pipeline.scoreCalculators.ScoreCalculationStategy;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -66,7 +68,7 @@ public class AnomalyDetectionPipeline {
      * injected scoreCalculationStrategy class. I.e., this part only calls that method. This way the
      * anomaly detection algorithm can be easily swapped out.
      */
-    private void buildScoreCalculationPart() {
+    private void buildScoreCalculationPart() throws IOException {
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Create a Flink stream that consumes AIS signals from Kafka
@@ -80,8 +82,8 @@ public class AnomalyDetectionPipeline {
         });
 
         // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
-        DataStream<AISUpdate> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
-        DataStream<String> updateStreamSerialized = updateStream.map(AISUpdate::toJson);
+        DataStream<ShipInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
+        DataStream<String> updateStreamSerialized = updateStream.map(ShipInformation::toJson);
 
         // Send the calculated scores to Kafka
         KafkaSink<String> sink = KafkaSink.<String>builder()
@@ -94,6 +96,12 @@ public class AnomalyDetectionPipeline {
 //                 TODO: Maybe we need this, maybe not. Not sure yet.
 //                .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
                 .build();
+
+        StreamsBuilder builder = new StreamsBuilder();
+        KStream<String, AISSignal> sourceStream = builder.stream(INCOMING_AIS_TOPIC_NAME);
+        sourceStream.to(CALCULATED_SCORES_TOPIC_NAME);
+        new KafkaStreams(builder.build(), StreamUtils.loadConfig(StreamUtils.CONFIG_PATH)).start();
+
         updateStreamSerialized.sinkTo(sink);
     }
 
@@ -106,25 +114,25 @@ public class AnomalyDetectionPipeline {
         // Create a keyed Kafka Stream of incoming AISUpdate signals
         StreamsBuilder builder = new StreamsBuilder();
         KStream<String, String> streamSerialized = builder.stream(CALCULATED_SCORES_TOPIC_NAME);
-        KStream<String, AISUpdate> streamNotKeyed = streamSerialized.mapValues(AISUpdate::fromJson);
-        KStream<String, AISUpdate> streamKeyed = streamNotKeyed.selectKey((key, value) -> value.getShipHash());
+        KStream<String, ShipInformation> streamNotKeyed = streamSerialized.mapValues(ShipInformation::fromJson);
+        KStream<String, ShipInformation> streamKeyed = streamNotKeyed.selectKey((key, value) -> value.getShipHash());
 
         // Create a KTable that aggregates the incoming updates
         // TODO: we are mapping to JSON and then immediately deserializing it back inside. There should be a way to
         //       do this with Serdes directly, I could not figure out how
-        KTable<String, CurrentShipDetails> table = streamKeyed.mapValues(AISUpdate::toJson).groupByKey().aggregate(
+        KTable<String, CurrentShipDetails> table = streamKeyed.mapValues(ShipInformation::toJson).groupByKey().aggregate(
                 CurrentShipDetails::new,
                 (key, valueJson, aggregatedShipDetails) -> {
                     // If the ship is not in the state, initialize it
-                    if (aggregatedShipDetails == null || aggregatedShipDetails.getPastSignals() == null) {
+                    if (aggregatedShipDetails == null || aggregatedShipDetails.getPastInformation() == null) {
                         aggregatedShipDetails = new CurrentShipDetails();
-                        aggregatedShipDetails.setScore(0.0f);
-                        aggregatedShipDetails.setPastSignals(new ArrayList<>());
+                        aggregatedShipDetails.setAnomalyInformation(new AnomalyInformation(0.0f, "", "", ""));
+                        aggregatedShipDetails.setPastInformation(new ArrayList<>());
                     }
 
-                    AISUpdate value = AISUpdate.fromJson(valueJson);
-                    aggregatedShipDetails.getPastSignals().add(value.getCorrespondingSignal());
-                    aggregatedShipDetails.setScore(value.getNewScore());
+                    ShipInformation value = ShipInformation.fromJson(valueJson);
+                    aggregatedShipDetails.getPastInformation().add(new ShipInformation("HASH", new AnomalyInformation(0.0f, "", "", ""), value.getCorrespondingSignal()));
+                    aggregatedShipDetails.setAnomalyInformation(new AnomalyInformation(0.0f, "", "", ""));
                     return aggregatedShipDetails;
                 },
                 Materialized

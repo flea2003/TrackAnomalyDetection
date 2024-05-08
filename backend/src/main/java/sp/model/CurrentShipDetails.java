@@ -6,6 +6,7 @@ import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.kafka.common.serialization.Serde;
+import sp.dtos.AnomalyInformation;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @JsonSerialize
 public class CurrentShipDetails implements Serializable {
-    private Float score;
-    private List<AISSignal> pastSignals;
+    private AnomalyInformation anomalyInformation;
+    private List<ShipInformation> pastInformation;
 
 
     /**
