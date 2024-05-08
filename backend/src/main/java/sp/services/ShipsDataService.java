@@ -57,7 +57,8 @@ public class ShipsDataService {
      * @param shipId the id of the ship
      * @return anomaly information for a specified ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(String shipId) throws NotExistingShipException, PipelineException {
+    public AnomalyInformation getCurrentAnomalyInformation(String shipId)
+            throws NotExistingShipException, PipelineException {
         HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
         CurrentShipDetails shipDetails = shipsInfo.get(shipId);
 

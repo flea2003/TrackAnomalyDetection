@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 public class ShipsDataServiceTest {
 
     private ShipsDataService shipsDataService;
-
+    private ShipsDataService shipsDataServiceBroken;
     private HashMap<String, CurrentShipDetails> map;
     private AISSignal signal1;
     private AISSignal signal2;
@@ -82,12 +82,11 @@ public class ShipsDataServiceTest {
         AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
 
-        try {
-            when(anomalyDetectionPipeline.getCurrentScores()).thenReturn(map);
-        }catch (Exception e){
-            System.out.println("technically shouldn't happen");
-        }
+        doReturn(map).when(anomalyDetectionPipeline).getCurrentScores();
 
+        AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
+        shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
+        doThrow(PipelineException.class).when(anomalyDetectionPipelineBroken).getCurrentScores();
 
 
     }
@@ -108,6 +107,12 @@ public class ShipsDataServiceTest {
     }
 
     @Test
+    void getCurrentAISInformationTestPipelineException(){
+        assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAISInformation("hash6"))
+                .isInstanceOf(PipelineException.class);
+    }
+
+    @Test
     void getCurrentAnomalyInformationTest(){
         try{
             AnomalyInformation anomalyInformation = shipsDataService.getCurrentAnomalyInformation("hash1");
@@ -119,9 +124,15 @@ public class ShipsDataServiceTest {
     }
 
     @Test
-    void getCurrentAnomalyInformationTestException(){
+    void getCurrentAnomalyInformationTestNotShipException(){
         assertThatThrownBy(() -> shipsDataService.getCurrentAnomalyInformation("hash6"))
                 .isInstanceOf(NotExistingShipException.class).hasMessage("Couldn't find such ship.");
+    }
+
+    @Test
+    void getCurrentAnomalyInformationTestPipelineException(){
+        assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAnomalyInformation("hash6"))
+                .isInstanceOf(PipelineException.class);
     }
 
     @Test
@@ -135,17 +146,15 @@ public class ShipsDataServiceTest {
     }
 
     @Test
-    void getCurrentAnomalyInformationOfAllShipsTest(){
-        AnomalyInformation anomalyInformation1 = new AnomalyInformation(0.5f, "hash1");
-        AnomalyInformation anomalyInformation2 = new AnomalyInformation(0.2f, "hash2");
-        AnomalyInformation anomalyInformation3 = new AnomalyInformation(0.7f, "hash3");
-        AnomalyInformation anomalyInformation4 = new AnomalyInformation(0.1f, "hash4");
-        try {
-            List<AnomalyInformation> AISInformationOfAllShips = shipsDataService.getCurrentAnomalyInformationOfAllShips();
-            assertThat(AISInformationOfAllShips).containsExactlyInAnyOrder(anomalyInformation1, anomalyInformation2, anomalyInformation3, anomalyInformation4);
-        }catch (Exception e){
-            fail("Expected result but error was thrown");
-        }
+    void CurrentAISOfAllShipsPipelineExceptionTest(){
+        assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAISInformationOfAllShips())
+                .isInstanceOf(PipelineException.class);
+    }
+
+    @Test
+    void CurrentAnomalyInformationOfAllShipsExceptionTest(){
+        assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAnomalyInformationOfAllShips())
+                .isInstanceOf(PipelineException.class);
     }
 
 }

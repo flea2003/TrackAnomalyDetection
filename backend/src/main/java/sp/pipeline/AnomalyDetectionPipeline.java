@@ -1,10 +1,5 @@
 package sp.pipeline;
 
-import org.apache.kafka.common.KafkaException;
-import org.springframework.kafka.listener.KafkaBackoffException;
-import sp.model.AISSignal;
-import sp.model.AISUpdate;
-import sp.model.CurrentShipDetails;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -25,10 +20,12 @@ import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sp.model.AISSignal;
+import sp.model.AISUpdate;
+import sp.model.CurrentShipDetails;
 import sp.model.Exceptions.PipelineException;
 import sp.pipeline.scoreCalculators.ScoreCalculationStategy;
 
-import java.nio.channels.Pipe;
 import java.util.ArrayList;
 import java.util.HashMap;
 
