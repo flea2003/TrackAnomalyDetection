@@ -5,6 +5,8 @@ import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sp.model.Exceptions.NotExistingShipException;
+import sp.model.Exceptions.PipelineException;
 import sp.pipeline.AnomalyDetectionPipeline;
 
 import java.util.ArrayList;
@@ -35,20 +37,17 @@ public class ShipsDataService {
      * @param shipId the id of a ship
      * @return current AIS information for a specified ship
      */
-    public AISSignal getCurrentAISInformation(String shipId) throws Exception{
-        HashMap<String, CurrentShipDetails> map = anomalyDetectionPipeline.getCurrentScores();
-        CurrentShipDetails shipDetails = map.get(shipId);
+    public AISSignal getCurrentAISInformation(String shipId) throws NotExistingShipException, PipelineException{
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        CurrentShipDetails shipDetails = shipsInfo.get(shipId);
 
         if(shipDetails == null){
-            throw new Exception("Couldn't find such ship");
+            throw new NotExistingShipException("Couldn't find such ship.");
         }
 
         List<AISSignal> pastSignals = shipDetails.getPastSignals();
 
         int size = pastSignals.size();
-        if(size == 0) {
-            throw new Exception("There are no past signals");
-        }
         return pastSignals.get(size - 1);
     }
 
@@ -58,12 +57,12 @@ public class ShipsDataService {
      * @param shipId the id of the ship
      * @return anomaly information for a specified ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(String shipId) throws Exception{
-        HashMap<String, CurrentShipDetails> map = anomalyDetectionPipeline.getCurrentScores();
-        CurrentShipDetails shipDetails = map.get(shipId);
+    public AnomalyInformation getCurrentAnomalyInformation(String shipId) throws NotExistingShipException, PipelineException {
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        CurrentShipDetails shipDetails = shipsInfo.get(shipId);
 
         if(shipDetails == null){
-            throw new Exception("Couldn't find such ship");
+            throw new NotExistingShipException("Couldn't find such ship.");
         }
 
         return new AnomalyInformation(shipDetails.getScore(), shipId);
@@ -75,12 +74,15 @@ public class ShipsDataService {
      *
      * @return the current AIS data for all ships
      */
-    public List<AISSignal> getCurrentAISInformationOfAllShips(){
-        HashMap<String, CurrentShipDetails> map = anomalyDetectionPipeline.getCurrentScores();
+    public List<AISSignal> getCurrentAISInformationOfAllShips() throws PipelineException{
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
         List<AISSignal>aisInformation = new ArrayList<>();
 
-        for(Map.Entry<String, CurrentShipDetails>entry : map.entrySet()){
-            aisInformation.addAll(entry.getValue().getPastSignals());
+        for(CurrentShipDetails currentShipDetails : shipsInfo.values()){
+            List<AISSignal> pastSignals = currentShipDetails.getPastSignals();
+            if(pastSignals != null && !pastSignals.isEmpty()) {
+                aisInformation.add(pastSignals.get(pastSignals.size() - 1));
+            }
         }
 
         return aisInformation;
@@ -91,11 +93,11 @@ public class ShipsDataService {
      *
      * @return a list of anomaly information objects for all ships
      */
-    public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips(){
-        HashMap<String, CurrentShipDetails> map = anomalyDetectionPipeline.getCurrentScores();
-        List<AnomalyInformation>anomalyInformation = new ArrayList<>();
+    public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException{
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        List<AnomalyInformation> anomalyInformation = new ArrayList<>();
 
-        for(Map.Entry<String, CurrentShipDetails>entry : map.entrySet()){
+        for (Map.Entry<String, CurrentShipDetails> entry : shipsInfo.entrySet()) {
             anomalyInformation.add(new AnomalyInformation(entry.getValue().getScore(), entry.getKey()));
         }
 

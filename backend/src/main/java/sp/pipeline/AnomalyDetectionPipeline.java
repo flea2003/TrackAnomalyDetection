@@ -1,5 +1,7 @@
 package sp.pipeline;
 
+import org.apache.kafka.common.KafkaException;
+import org.springframework.kafka.listener.KafkaBackoffException;
 import sp.model.AISSignal;
 import sp.model.AISUpdate;
 import sp.model.CurrentShipDetails;
@@ -23,8 +25,10 @@ import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sp.model.Exceptions.PipelineException;
 import sp.pipeline.scoreCalculators.ScoreCalculationStategy;
 
+import java.nio.channels.Pipe;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -156,7 +160,7 @@ public class AnomalyDetectionPipeline {
      *
      * @return the current scores of the ships in the system.
      */
-    public HashMap<String, CurrentShipDetails> getCurrentScores() {
+    public HashMap<String, CurrentShipDetails> getCurrentScores() throws PipelineException {
         try {
             // Get the current state of the KTable
             final String storeName = this.state.queryableStoreName();
@@ -171,8 +175,9 @@ public class AnomalyDetectionPipeline {
             }
             return stateCopy;
         }catch (Exception e) {
-            System.out.println("Failed to query store: " + e.getMessage() + ", continuing");
-            return null;
+            String err = "Failed to query store: " + e.getMessage() + ", continuing";
+            System.out.println(err);
+            throw new PipelineException(err);
         }
     }
 }

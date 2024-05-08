@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import sp.dtos.AnomalyInformation;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
+import sp.model.Exceptions.NotExistingShipException;
+import sp.model.Exceptions.PipelineException;
 import sp.pipeline.AnomalyDetectionPipeline;
 
 import java.util.HashMap;
@@ -13,14 +15,14 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
 public class ShipsDataServiceTest {
 
     private ShipsDataService shipsDataService;
+
     private HashMap<String, CurrentShipDetails> map;
     private AISSignal signal1;
     private AISSignal signal2;
@@ -30,7 +32,7 @@ public class ShipsDataServiceTest {
     private AISSignal signal6;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() throws Exception {
         signal1 = new AISSignal("hash1", 60.0f, 10.0f,
                 20.0f, 60.0f, 80.0f,
                 "17/04/2015", "Klaipeda");
@@ -79,7 +81,15 @@ public class ShipsDataServiceTest {
 
         AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
-        when(anomalyDetectionPipeline.getCurrentScores()).thenReturn(map);
+
+        try {
+            when(anomalyDetectionPipeline.getCurrentScores()).thenReturn(map);
+        }catch (Exception e){
+            System.out.println("technically shouldn't happen");
+        }
+
+
+
     }
 
     @Test
@@ -92,9 +102,9 @@ public class ShipsDataServiceTest {
     }
 
     @Test
-    void getCurrentAISInformationTestException(){
+    void getCurrentAISInformationTestNoShipException(){
         assertThatThrownBy(() -> shipsDataService.getCurrentAISInformation("hash6"))
-                .isInstanceOf(Exception.class).hasMessage("Couldn't find such ship");
+                .isInstanceOf(NotExistingShipException.class).hasMessage("Couldn't find such ship.");
     }
 
     @Test
@@ -111,23 +121,31 @@ public class ShipsDataServiceTest {
     @Test
     void getCurrentAnomalyInformationTestException(){
         assertThatThrownBy(() -> shipsDataService.getCurrentAnomalyInformation("hash6"))
-                .isInstanceOf(Exception.class).hasMessage("Couldn't find such ship");
+                .isInstanceOf(NotExistingShipException.class).hasMessage("Couldn't find such ship.");
     }
 
     @Test
     void getCurrentAISInformationOfAllShipsTest(){
-        List<AISSignal>AISInformationOfAllShips = shipsDataService.getCurrentAISInformationOfAllShips();
-        assertThat(AISInformationOfAllShips).containsExactlyInAnyOrder(signal1, signal2, signal3, signal4, signal5, signal6);
+        try {
+            List<AISSignal> AISInformationOfAllShips = shipsDataService.getCurrentAISInformationOfAllShips();
+            assertThat(AISInformationOfAllShips).containsExactlyInAnyOrder(signal2, signal3, signal5, signal6);
+        }catch (Exception e){
+          fail("Expected result but error was thrown");
+        }
     }
 
     @Test
     void getCurrentAnomalyInformationOfAllShipsTest(){
-        List<AnomalyInformation>AISInformationOfAllShips = shipsDataService.getCurrentAnomalyInformationOfAllShips();
         AnomalyInformation anomalyInformation1 = new AnomalyInformation(0.5f, "hash1");
         AnomalyInformation anomalyInformation2 = new AnomalyInformation(0.2f, "hash2");
         AnomalyInformation anomalyInformation3 = new AnomalyInformation(0.7f, "hash3");
         AnomalyInformation anomalyInformation4 = new AnomalyInformation(0.1f, "hash4");
-        assertThat(AISInformationOfAllShips).containsExactlyInAnyOrder(anomalyInformation1, anomalyInformation2, anomalyInformation3, anomalyInformation4);
+        try {
+            List<AnomalyInformation> AISInformationOfAllShips = shipsDataService.getCurrentAnomalyInformationOfAllShips();
+            assertThat(AISInformationOfAllShips).containsExactlyInAnyOrder(anomalyInformation1, anomalyInformation2, anomalyInformation3, anomalyInformation4);
+        }catch (Exception e){
+            fail("Expected result but error was thrown");
+        }
     }
 
 }
