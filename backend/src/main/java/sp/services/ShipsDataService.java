@@ -5,10 +5,14 @@ import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sp.model.Exceptions.NotExistingShipException;
+import sp.model.Exceptions.PipelineException;
 import sp.pipeline.AnomalyDetectionPipeline;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ShipsDataService {
@@ -30,13 +34,21 @@ public class ShipsDataService {
     /**
      * Computes the current AIS information for a specified ship
      *
-     * @param id the id of a ship
+     * @param shipId the id of a ship
      * @return current AIS information for a specified ship
      */
-    public AISSignal getCurrentAISInformation(String id){
-        HashMap<String, CurrentShipDetails> map = anomalyDetectionPipeline.getCurrentScores();
-        System.out.println("Map is: " + map);
-        return null;
+    public AISSignal getCurrentAISInformation(String shipId) throws NotExistingShipException, PipelineException{
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        CurrentShipDetails shipDetails = shipsInfo.get(shipId);
+
+        if(shipDetails == null){
+            throw new NotExistingShipException("Couldn't find such ship.");
+        }
+
+        List<AISSignal> pastSignals = shipDetails.getPastSignals();
+
+        int size = pastSignals.size();
+        return pastSignals.get(size - 1);
     }
 
     /**
@@ -45,8 +57,16 @@ public class ShipsDataService {
      * @param shipId the id of the ship
      * @return anomaly information for a specified ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(String shipId){
-        return null;
+    public AnomalyInformation getCurrentAnomalyInformation(String shipId)
+            throws NotExistingShipException, PipelineException {
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        CurrentShipDetails shipDetails = shipsInfo.get(shipId);
+
+        if(shipDetails == null){
+            throw new NotExistingShipException("Couldn't find such ship.");
+        }
+
+        return new AnomalyInformation(shipDetails.getScore(), shipId);
     }
 
 
@@ -55,8 +75,18 @@ public class ShipsDataService {
      *
      * @return the current AIS data for all ships
      */
-    public List<AISSignal> getCurrentAISInformationOfAllShips(){
-        return null;
+    public List<AISSignal> getCurrentAISInformationOfAllShips() throws PipelineException{
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        List<AISSignal>aisInformation = new ArrayList<>();
+
+        for(CurrentShipDetails currentShipDetails : shipsInfo.values()){
+            List<AISSignal> pastSignals = currentShipDetails.getPastSignals();
+            if(pastSignals != null && !pastSignals.isEmpty()) {
+                aisInformation.add(pastSignals.get(pastSignals.size() - 1));
+            }
+        }
+
+        return aisInformation;
     }
 
     /**
@@ -64,7 +94,14 @@ public class ShipsDataService {
      *
      * @return a list of anomaly information objects for all ships
      */
-    public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips(){
-        return null;
+    public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException{
+        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        List<AnomalyInformation> anomalyInformation = new ArrayList<>();
+
+        for (Map.Entry<String, CurrentShipDetails> entry : shipsInfo.entrySet()) {
+            anomalyInformation.add(new AnomalyInformation(entry.getValue().getScore(), entry.getKey()));
+        }
+
+        return anomalyInformation;
     }
 }
