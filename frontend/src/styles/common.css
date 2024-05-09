@@ -1,0 +1,31 @@
+/* This css file is meant for managing the root layout and the color shcemes */
+
+:root {
+    --map-background-color: red;
+}
+
+#root-div {
+    background-color: yellow;
+    height: 100vh;
+}
+
+#sidebar {
+    background-color: red;
+    width: 55px;
+    height: 100vh;
+    border-left: 2px solid black;
+    text-align: center;
+}
+
+#anomaly-list-container {
+    background-color: blue;
+    width: 20%;
+    height: 100vh;
+}
+
+#map-container {
+    background-color: green;
+    width: 70%;
+    height: 100vh;
+    flex-grow: 1;
+}

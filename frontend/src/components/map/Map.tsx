@@ -3,7 +3,9 @@ import L, {bounds} from "leaflet";
 import createShipIcon from "../ship/Ship";
 import config from "../../../config";
 import axios from "axios";
-import './Map.css'
+import '../../styles/map.css'
+import '../../styles/common.css'
+
 import Info from "../Info";
 
 
