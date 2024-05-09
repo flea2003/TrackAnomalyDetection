@@ -3,7 +3,7 @@
 }
 
 #anomaly-list-title {
-    height: 50px;
+    height: var(--anomaly-list-title-height);
     width: 100%;
     text-align: center;
     display: flex;
@@ -11,6 +11,5 @@
     align-items: center;
     font-size: var(--anomaly-list-title-font-size);
     font-weight: bold;
-    /* background-color: red; */
     border-bottom: 1px solid black;
 }

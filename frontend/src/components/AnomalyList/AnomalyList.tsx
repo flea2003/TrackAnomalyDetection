@@ -20,7 +20,7 @@ function AnomalyList() {
 
     return (
         <Stack id="anomaly-list-container">
-            <span id="anomaly-list-title">Anomaly List</span>
+            <span id="anomaly-list-title">Anomaly list</span>
             <List style={{maxHeight: '100%', overflow: 'auto', padding: '0'}}>
                 {entries}
             </List>
