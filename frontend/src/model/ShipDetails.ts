@@ -5,3 +5,5 @@ interface ShipDetails{
     lat: number,
     lng: number
 }
+
+export default ShipDetails;

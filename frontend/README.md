@@ -62,3 +62,4 @@ If this documentation wasn't clear enough, here is the [React documentation](htt
 - bell-notifiations.svg - taken from https://iconoir.com/
 - settings.svg - taken from https://iconoir.com/
 - ship.png - taken from https://www.freepik.com
+- back.svg - taken from https://www.svgrepo.com

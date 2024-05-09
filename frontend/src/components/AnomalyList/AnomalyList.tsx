@@ -1,13 +1,12 @@
 import React from 'react';
 import Stack from '@mui/material/Stack';
-import AnomalyListEntry from '../AnomalyListEntry/AnomalyListEntry';
+import AnomalyListEntry from './AnomalyListEntry';
 import List from '@mui/material/List';
 
 import '../../styles/common.css';
 import '../../styles/anomalyList.css';
 
 function AnomalyList() {
-    // Create a list for anomaly list entries
     const entries = [];
     const entryCount = 40;
     for (var i = 0; i < entryCount; i++) {

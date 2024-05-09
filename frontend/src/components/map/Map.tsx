@@ -6,7 +6,7 @@ import axios from "axios";
 import '../../styles/map.css'
 import '../../styles/common.css'
 
-import Info from "../Info";
+import ShipDetails from "../../model/ShipDetails";
 
 
 /**
@@ -136,9 +136,6 @@ function Map(){
 
     return (
         <div id="map-container">
-            <div id="info-box">
-                {selectedShip && <Info ship={selectedShip} onClose={closeInfo} />}
-            </div>
             <div id="map"></div>
         </div>
     );

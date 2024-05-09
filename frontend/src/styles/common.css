@@ -10,6 +10,11 @@
 
     --sidebar-icon-size: 30px;
 
+    --object-details-return-icon-size: 30px;
+    --object-details-return-icon-margin: 10px;
+
+    --object-details-entry-padding: 10px;
+
 }
 
 #root-div {
@@ -22,7 +27,7 @@
     border-left: 1px solid black;
 }
 
-#anomaly-list-container {
+#anomaly-list-container, #object-details-container {
     width: 17%;
     height: 100vh;
     border-left: 1px solid black;
