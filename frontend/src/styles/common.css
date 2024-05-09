@@ -1,30 +1,34 @@
 /* This css file is meant for managing the root layout and the color shcemes */
 
 :root {
-    --map-background-color: red;
+
+    --anomaly-list-title-font-size: 1.0em;
+
+    --anomaly-list-entry-font-size: 0.8em;
+    --anomaly-list-entry-height: 36px;
+    --anomaly-list-entry-icon-size: 20px;
+
+    --sidebar-icon-size: 30px;
+
 }
 
 #root-div {
-    background-color: yellow;
     height: 100vh;
 }
 
 #sidebar {
-    background-color: red;
-    width: 55px;
+    width: 40px;
     height: 100vh;
-    border-left: 2px solid black;
-    text-align: center;
+    border-left: 1px solid black;
 }
 
 #anomaly-list-container {
-    background-color: blue;
-    width: 20%;
+    width: 17%;
     height: 100vh;
+    border-left: 1px solid black;
 }
 
 #map-container {
-    background-color: green;
     width: 70%;
     height: 100vh;
     flex-grow: 1;

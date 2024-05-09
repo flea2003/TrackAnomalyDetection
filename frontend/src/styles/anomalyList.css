@@ -1,0 +1,16 @@
+#anomaly-list-container {
+    text-align: center;
+}
+
+#anomaly-list-title {
+    height: 50px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--anomaly-list-title-font-size);
+    font-weight: bold;
+    /* background-color: red; */
+    border-bottom: 1px solid black;
+}

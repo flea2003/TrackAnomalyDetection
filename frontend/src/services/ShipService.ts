@@ -7,6 +7,6 @@ class ShipService {
 
     // TODO: write methods that will fetch ship information from the server
     // and return whatever needed. Use the HttpSender class to send requests.
-    // Return objects from the "model" folder. 
+    // Return objects from the "model" folder.
 
 }
