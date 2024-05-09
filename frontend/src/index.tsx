@@ -16,6 +16,6 @@ root.render(
     // not sure why it is enabled in the first place
 
     // <React.StrictMode>
-        <App />
+    <App />
     // </React.StrictMode>
 );

@@ -7,6 +7,10 @@ import ObjectDetailsEntry from "./ObjectDetailsEntry";
 import "../../styles/common.css";
 import "../../styles/objectDetails.css";
 
+/**
+ * This component is the second column of the main view of the application. It displays the details of a selected object.
+ * The object to whose details are to be displayed is passed as a prop.
+ */
 function ObjectDetails(props: { ship: ShipDetails}): JSX.Element {
 
     const ship = props.ship;

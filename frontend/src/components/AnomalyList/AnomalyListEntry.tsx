@@ -9,7 +9,12 @@ interface AnomalyListEntryProps {
     someInformation: boolean
 }
 
+/**
+ * This component is a single entry in the Anomaly List. It displays the anomaly score and an icon of an object.
+ * The object to render is passed as a prop.
+ */
 function AnomalyListEntry({ someInformation } : AnomalyListEntryProps) {
+
     const shipIcon = require('../../assets/icons/ship.png');
 
     return (

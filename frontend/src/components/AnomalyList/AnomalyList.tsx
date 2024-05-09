@@ -6,7 +6,12 @@ import List from '@mui/material/List';
 import '../../styles/common.css';
 import '../../styles/anomalyList.css';
 
+/**
+ * This component is the second column of the main view of the application. It essentially displays
+ * the "Anomaly List" title and renders all the AnomalyListEntry components.
+ */
 function AnomalyList() {
+
     const entries = [];
     const entryCount = 40;
     for (var i = 0; i < entryCount; i++) {

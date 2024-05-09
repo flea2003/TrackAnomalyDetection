@@ -4,6 +4,9 @@ import Stack from '@mui/material/Stack';
 import '../../styles/common.css';
 import '../../styles/sidebar.css';
 
+/**
+ * This prop is the sidebar of the application (third column). It contains three icons that are placeholders for future functionality.
+ */
 function Sidebar() {
     const shipIcon = require('../../assets/icons/ship.png');
     const bellIcon = require('../../assets/icons/bell-notification.svg').default;
