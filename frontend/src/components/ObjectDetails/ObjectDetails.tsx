@@ -16,7 +16,6 @@ function ObjectDetails(props: { ship: ShipDetails}): JSX.Element {
     const ship = props.ship;
 
     const entries = [];
-    const entryCount = 40;
 
     // Just an example. In fact, these details should be extracted from the ship object.
     entries.push(<ObjectDetailsEntry type={"Object type"} value={"Ship"} />);
