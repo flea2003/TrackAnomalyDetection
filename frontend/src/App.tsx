@@ -31,6 +31,10 @@ function App() {
                 return <AnomalyList ships={ships} pageChanger={setCurrentPage} />;
             case 'objectDetails':
                 return <ObjectDetails ships={ships} shipId={currentPage.shownShipId} pageChanger={setCurrentPage}/>;
+            case 'notifications':
+                return <div>Notifications</div>;
+            case 'settings':
+                return <div>Settings</div>;
         }
     }
 
@@ -56,7 +60,7 @@ function App() {
             <Stack direction="row">
                 <Map ships={ships} pageChanger={setCurrentPage} />
                 {middleColumn()}
-                <Sidebar />
+                <Sidebar pageChanger={setCurrentPage} />
             </Stack>
         </div>
     );

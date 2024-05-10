@@ -14,7 +14,7 @@
     cursor: pointer;
 }
 .anomaly-list-entry:hover{
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .anomaly-list-entry-main-text {
