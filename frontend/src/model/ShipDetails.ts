@@ -1,4 +1,5 @@
 class ShipDetails{
+    static rounding: number = 1000;
     id: string;
     heading: number;
     lat: number;
@@ -26,8 +27,8 @@ class ShipDetails{
             {type: "Object type", value: "Ship"},
             {type: "Anomaly score", value: this.anomalyScore + "%"},
             {type: "Explanation", value: this.explanation},
-            {type: "Longitude", value: "" + (Math.round(this.lng * 1000) / 1000) },
-            {type: "Latitude", value: "" +  (Math.round(this.lat * 1000) / 1000) },
+            {type: "Latitude", value: "" +  (Math.round(this.lat * ShipDetails.rounding) / ShipDetails.rounding) },
+            {type: "Longitude", value: "" + (Math.round(this.lng * ShipDetails.rounding) / ShipDetails.rounding) },
             {type: "Heading", value: "" + this.heading}
         ];
     }
