@@ -21,8 +21,8 @@ interface AnomalyListEntryProps {
  */
 function calculateAnomalyColor(shipAnomalyScore : number) {
     shipAnomalyScore /= 100.0;
-    const red = Math.floor(255 * (1 - shipAnomalyScore));
-    const green = Math.floor(255 * shipAnomalyScore);
+    const green = Math.floor(255 * (1 - shipAnomalyScore));
+    const red = Math.floor(255 * shipAnomalyScore);
     const alpha = 0.4;
     return `rgba(${red}, ${green}, 0, ${alpha})`;
 }

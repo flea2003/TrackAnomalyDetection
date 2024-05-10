@@ -14,9 +14,7 @@
     cursor: pointer;
 }
 .anomaly-list-entry:hover{
-    /* change transparency */
-    border-top: 1px solid black;
-    border-bottom: 2px solid black;
+    font-weight: bold;
 }
 
 .anomaly-list-entry-main-text {
