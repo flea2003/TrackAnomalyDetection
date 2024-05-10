@@ -10,21 +10,17 @@ import "../../styles/objectDetails.css";
 /**
  * This component is the second column of the main view of the application. It displays the details of a selected object.
  * The object to whose details are to be displayed is passed as a prop.
+ *
+ * @param props properties passed to this component. Most importantly, it contains the ship object whose details to display.
  */
-function ObjectDetails(props: { ship: ShipDetails}): JSX.Element {
+function ObjectDetails(props: { ship: ShipDetails}) {
 
     const ship = props.ship;
 
-    const entries = [];
-
-    // Just an example. In fact, these details should be extracted from the ship object.
-    entries.push(<ObjectDetailsEntry type={"Object type"} value={"Ship"} />);
-    entries.push(<ObjectDetailsEntry type={"Anomaly score"} value={"95%"} />);
-    entries.push(<ObjectDetailsEntry type={"Explanation"} value={"The ship has been travelling faster than 30 knots for more than 15 minutes."} />);
-    entries.push(<ObjectDetailsEntry type={"Speed"} value={"10 knots"} />);
-    entries.push(<ObjectDetailsEntry type={"Longitude"} value={"" + ship.lng} />);
-    entries.push(<ObjectDetailsEntry type={"Latitude"} value={"" + ship.lat} />);
-    entries.push(<ObjectDetailsEntry type={"Heading"} value={"" + ship.heading} />);
+    const properties = ship.getPropertyList();
+    const propertyList = properties.map((property) => {
+        return <ObjectDetailsEntry type={property.type} value={property.value} />
+    });
 
     const returnIcon = require("../../assets/icons/back.svg").default;
 
@@ -35,7 +31,7 @@ function ObjectDetails(props: { ship: ShipDetails}): JSX.Element {
                 <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">{ship.name}</span> </span>
             </div>
             <List style={{maxHeight: '100%', overflow: 'auto'}} className="object-details-list">
-                {entries}
+                {propertyList}
             </List>
         </Stack>
     )

@@ -1,5 +1,6 @@
 #anomaly-list-container {
     text-align: center;
+    display: flex;
 }
 
 #anomaly-list-title {
@@ -12,4 +13,8 @@
     font-size: var(--anomaly-list-title-font-size);
     font-weight: bold;
     border-bottom: 1px solid black;
+}
+
+#anomaly-list-internal-container {
+    height: 100%;
 }

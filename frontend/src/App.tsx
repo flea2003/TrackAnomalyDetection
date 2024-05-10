@@ -7,6 +7,8 @@ import AnomalyList from './components/AnomalyList/AnomalyList';
 import Sidebar from './components/Sidebar/Sidebar';
 import ObjectDetails from './components/ObjectDetails/ObjectDetails';
 
+import ShipDetails from './model/ShipDetails';
+
 import './styles/common.css';
 import { Browser } from 'leaflet';
 
@@ -15,15 +17,21 @@ import { Browser } from 'leaflet';
 
 
 function App() {
-    var fakeShip = { name: "Fake Ship", color: 0, heading: 32.1, lat: 12.121, lng: 54.123};
+
+
+    var ships = [
+        new ShipDetails('loren iopsum', 180, 123.695212883123546, 95.5444375499444,  12, 'The ship has been travelling faster than 30 knots for more than 15 minutes.'),
+        new ShipDetails('loren iopsum', 180, 123.695212883123546, 95.5444375499444,  52, 'The ship has been travelling faster than 30 knots for more than 15 minutes.'),
+    ];
+
     return (
         <div className="App" id="root-div">
             <Stack direction="row">
                 <Map />
                 <BrowserRouter>
                     <Routes>
-                        <Route path="/" element={<AnomalyList />} />
-                        <Route path="/objectDetails" element={<ObjectDetails ship={fakeShip} />} />
+                        <Route path="/" element={<AnomalyList ships={ships} />} />
+                        <Route path="/objectDetails" element={<ObjectDetails ship={ships[0]} />} />
                     </Routes>
                 </BrowserRouter>
                 <Sidebar />

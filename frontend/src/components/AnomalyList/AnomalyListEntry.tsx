@@ -2,17 +2,19 @@ import React from 'react';
 import Stack from '@mui/material/Stack';
 import PropTypes from 'prop-types';
 
+import ShipDetails from '../../model/ShipDetails';
+
 import '../../styles/common.css';
 import '../../styles/anomalyListEntry.css';
 import { randomInt } from 'crypto';
 
 interface AnomalyListEntryProps {
-    someInformation: boolean
+    shipDetails: ShipDetails
 }
 
 /**
  * Given an anomaly score, this function calculates the color of the anomaly list entry.
- * 
+ *
  * @param shipAnomalyScore the anomaly score of the ship
  * @returns the color of the anomaly list entry
  */
@@ -27,12 +29,14 @@ function calculateAnomalyColor(shipAnomalyScore : number) {
 /**
  * This component is a single entry in the Anomaly List. It displays the anomaly score and an icon of an object.
  * The object to render is passed as a prop.
+ *
+ * @param props properties passed to this component. Most importantly, it contains the ship details to display.
  */
-function AnomalyListEntry({ someInformation } : AnomalyListEntryProps) {
+function AnomalyListEntry({ shipDetails } : AnomalyListEntryProps) {
 
     const shipIcon = require('../../assets/icons/ship.png');
 
-    const shipAnomalyScore = Math.floor((Math.random()) * 100); // TODO: To be deduced from the ship object passed as a prop
+    const shipAnomalyScore = shipDetails.anomalyScore;
     const color = calculateAnomalyColor(shipAnomalyScore);
 
     return (
@@ -43,9 +47,5 @@ function AnomalyListEntry({ someInformation } : AnomalyListEntryProps) {
         </Stack>
     )
 }
-
- AnomalyListEntry.defaultProps = {
-    someInformation: false
- };
 
 export default AnomalyListEntry;
