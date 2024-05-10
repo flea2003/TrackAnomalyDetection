@@ -16,20 +16,22 @@ import java.util.Properties;
 
 public class StreamUtils {
     public static final String CONFIG_PATH = "kafka-connection.properties";
+
     /**
-     * Loads a configuration file.
+     * Loads the properties for the configuration file.
      *
-     * @param path the path to the configuration file
      * @return the loaded properties
      * @throws IOException if such file does not exist
      */
-    public static Properties loadConfig(String path) throws IOException {
-        if (!Files.exists(Paths.get(path))) {
-            throw new IOException("Kafka configuration file '" + path + "' was not found.");
+    public static Properties loadConfig() throws IOException {
+        if (!Files.exists(Paths.get(CONFIG_PATH))) {
+            throw new IOException("Kafka configuration file '" + CONFIG_PATH + "' was not found.");
         }
         Properties config = new Properties();
-        try (InputStream inputStream = new FileInputStream(path)) {
+        try (InputStream inputStream = new FileInputStream(CONFIG_PATH)) {
             config.load(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading configuration file '" + CONFIG_PATH + "'.", e);
         }
         return config;
     }
@@ -44,7 +46,7 @@ public class StreamUtils {
         // Load the properties of Kafka from the configuration file
         Properties props;
         try {
-            props = loadConfig(CONFIG_PATH);
+            props = loadConfig();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -67,7 +69,7 @@ public class StreamUtils {
         // Load properties from the configuration file
         Properties props;
         try {
-            props = loadConfig(CONFIG_PATH);
+            props = loadConfig();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

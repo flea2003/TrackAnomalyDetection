@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.*;
 import org.apache.kafka.common.serialization.Serde;
-import sp.dtos.AnomalyInformation;
-import sp.dtos.StreamRecord;
 
 import java.io.Serializable;
 
@@ -18,7 +16,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 @JsonSerialize
-public class AISSignal implements Serializable, StreamRecord {
+public class AISSignal implements Serializable {
 
     public final String shipHash;
     public final float speed;
@@ -34,7 +32,6 @@ public class AISSignal implements Serializable, StreamRecord {
      *
      * @return json representation of the object
      */
-    @Override
     public String toJson() {
         ObjectMapper mapper = new ObjectMapper();
         try {return mapper.writeValueAsString(this);}
@@ -57,10 +54,4 @@ public class AISSignal implements Serializable, StreamRecord {
             throw new RuntimeException(e);
         }
     }
-
-    public static Serde<AISSignal> getSerde() {
-        ObjectMapper jsonObjectMapper = new ObjectMapper();
-        return new Jackson2Serde<>(jsonObjectMapper, AISSignal.class);
-    }
-
 }

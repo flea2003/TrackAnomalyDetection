@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.*;
 import org.apache.kafka.common.serialization.Serde;
-import sp.model.ShipInformation;
-
 import java.io.Serializable;
-import java.util.stream.Stream;
 
 @Getter
 @Builder
@@ -16,19 +13,17 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @Setter
 @ToString
-public class AnomalyInformation implements Serializable, StreamRecord {
+public class AnomalyInformation implements Serializable {
     private final Float score;
     private final String explanation;
     private final String correspondingTimestamp;
     private final String shipHash;
-
 
     /**
      * Converts a particular AISUpdate object to a JSON string.
      *
      * @return the respective JSON string
      */
-    @Override
     public String toJson(){
         ObjectMapper mapper = new ObjectMapper();
         String json = null;
@@ -53,11 +48,5 @@ public class AnomalyInformation implements Serializable, StreamRecord {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    public static Serde<AnomalyInformation> getSerde() {
-        ObjectMapper jsonObjectMapper = new ObjectMapper();
-        return new Jackson2Serde<>(jsonObjectMapper, AnomalyInformation.class);
     }
 }

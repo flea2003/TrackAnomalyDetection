@@ -13,16 +13,12 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-//@NoArgsConstructor
+@NoArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrentShipDetails implements Serializable {
     private AnomalyInformation anomalyInformation;
     private List<ShipInformation> pastInformation;
-
-    public CurrentShipDetails() {
-        System.out.println("kuriama!!!");
-    }
 
     /**
      * Get serializer+deserializer for CurrentShipDetails. I am using simple JSON serialization here.

@@ -24,7 +24,6 @@ public class ShipInformation {
      * @return the respective JSON string
      */
     public String toJson(){
-        System.out.println("to json!!!!!!!!!");
         ObjectMapper mapper = new ObjectMapper();
         String json = null;
         try {
@@ -42,7 +41,6 @@ public class ShipInformation {
      * @return the converted AISUpdate object
      */
     public static ShipInformation fromJson(String val) {
-        System.out.println("from json!!!!!!!!!");
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(val, ShipInformation.class);
@@ -57,7 +55,6 @@ public class ShipInformation {
      * @return Serde object for this class.
      */
     public static Serde<ShipInformation> getSerde() {
-        System.out.println("serde!!!!!!!!!");
         ObjectMapper jsonObjectMapper = new ObjectMapper();
         return new Jackson2Serde<>(jsonObjectMapper, ShipInformation.class);
     }
