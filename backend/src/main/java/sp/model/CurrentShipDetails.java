@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.serialization.Serde;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
 public class CurrentShipDetails implements Serializable {
     private AnomalyInformation anomalyInformation;
     private List<ShipInformation> pastInformation;

@@ -22,6 +22,7 @@ import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sp.exceptions.PipelineException;
 import sp.pipeline.scoreCalculators.ScoreCalculationStategy;
 
 import java.io.IOException;
@@ -97,7 +98,7 @@ public class AnomalyDetectionPipeline {
                 scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
 
         DataStream<String> updateStreamSerialized = updateStream.map(x -> {
-            System.out.println("Mapping the AnomalyInformation object to JSON (from the ships-AIS topic). Object: " + x);
+            System.out.println("Mapping the AnomalyInformation object to JSON (from the ships-AIS topic). Object: " +x);
             return x.toJson();
         });
 
@@ -137,7 +138,7 @@ public class AnomalyDetectionPipeline {
         KStream<String, String> streamAISSignalsJSON = builder.stream(INCOMING_AIS_TOPIC_NAME);
         KStream<String, ShipInformation> streamAISSignals = streamAISSignalsJSON
                 .mapValues(x -> {
-                    System.out.println("Received AIS signal as JSON to topic ship-AIS for the building part. JSON: " + x);
+                    System.out.println("Received AIS signal as JSON to topic ship-AIS for the building part. JSON: "+x);
                     AISSignal aisSignal = AISSignal.fromJson(x);
                     return new ShipInformation(aisSignal.getShipHash(), null, aisSignal);
                 });
@@ -182,7 +183,7 @@ public class AnomalyDetectionPipeline {
      *
      * @return the current scores of the ships in the system.
      */
-    public HashMap<String, CurrentShipDetails> getCurrentScores() {
+    public HashMap<String, CurrentShipDetails> getCurrentScores() throws PipelineException {
         try {
             // Get the current state of the KTable
             final String storeName = this.state.queryableStoreName();
@@ -196,9 +197,11 @@ public class AnomalyDetectionPipeline {
                 iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value));
             }
             return stateCopy;
+
         } catch (Exception e) {
-            System.out.println("Failed to query store: " + e.getMessage() + ", continuing");
-            return null;
+            String err = "Failed to query store: " + e.getMessage() + ", continuing";
+            System.out.println(err);
+            throw new PipelineException(err);
         }
     }
 
@@ -227,7 +230,7 @@ public class AnomalyDetectionPipeline {
         else if (shipInformation.getAisSignal() == null) {
             // Set the anomaly information to be the most recent one
             // TODO: for now we assume that the newest anomaly score is the omne that arrived the most recently,
-            //  bcs to compute whether the current anomaly date
+            //  because to compute whether the current anomaly date
             //  is actually older than the one that just arrived, it would be nice to store the date not a string.
             //  But for that we will need to make an assumption for the data format, so for now i just leave it simple.
 
