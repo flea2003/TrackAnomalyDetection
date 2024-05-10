@@ -1,5 +1,6 @@
 package sp.pipeline.scoreCalculators;
 
+import sp.dtos.AnomalyInformation;
 import sp.model.AISSignal;
 import sp.model.ShipInformation;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -16,7 +17,7 @@ public class DefaultScoreCalculator implements ScoreCalculationStategy{
      * @return a stream of score updates
      */
     @Override
-    public DataStream<ShipInformation> setupFlinkAnomalyScoreCalculationPart(DataStream<AISSignal> source) {
+    public DataStream<AnomalyInformation> setupFlinkAnomalyScoreCalculationPart(DataStream<AISSignal> source) {
         return source
                 .keyBy(AISSignal::getShipHash)          // Group AIS signals by their ship hash
                 .map(new SampleStatefulMapFunction());  // Map each item to an AISUpdate object

@@ -12,7 +12,7 @@ import org.apache.flink.configuration.Configuration;
 
 import java.time.Duration;
 
-public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, ShipInformation> {
+public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
 
     private transient ValueState<Float> score;
     private transient ListState<Float> latitudes;
@@ -53,7 +53,7 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, ShipIn
     }
 
     /**
-     * Performs a stateful map. In this case - maps an incoming AIS signal into an AISUpdate.
+     * Performs a stateful map. In this case - maps an incoming AIS signal into an Anomaly Information object.
      * This map is essentially a counter, which counts to score.
      *
      * @param value The input value.
@@ -61,9 +61,12 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, ShipIn
      * @throws Exception in case the state cannot be accessed for some reason
      */
     @Override
-    public ShipInformation map(AISSignal value) throws Exception {
-
+    public AnomalyInformation map(AISSignal value) throws Exception {
+        Thread.sleep(4000);
         // Access the current score for the ship. If it is empty, initialize it to 0
+
+        System.out.println("Siuo metu mapo funkcijoje, objektas:\n" + value);
+
         Float currentScore = score.value();
         if (currentScore == null) {
             currentScore = 0F;
@@ -77,6 +80,6 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, ShipIn
         latitudes.add(value.getLatitude());
 
         // Return the calculated score update
-        return new ShipInformation(value.getShipHash(), new AnomalyInformation(currentScore, "", "", ""), value);
+        return new AnomalyInformation(currentScore, "", value.timestamp, value.shipHash);
     }
 }
