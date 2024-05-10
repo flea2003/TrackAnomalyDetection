@@ -1,6 +1,10 @@
 package sp.controllers;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import sp.dtos.AnomalyInformation;
 import sp.model.AISSignal;
+import sp.model.Exceptions.NotExistingShipException;
+import sp.model.Exceptions.PipelineException;
 import sp.services.ShipsDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +33,14 @@ public class ShipsDataController {
      * @return AIS class object of the ship
      */
     @GetMapping("/ships/ais/{id}")
-    public AISSignal getCurrentAISInformation(@PathVariable String id){
-        return this.shipsDataService.getCurrentAISInformation(id);
+    public ResponseEntity<AISSignal> getCurrentAISInformation(@PathVariable String id){
+        try{
+            return ResponseEntity.ok(this.shipsDataService.getCurrentAISInformation(id));
+        }catch (NotExistingShipException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }catch (PipelineException e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -40,8 +50,14 @@ public class ShipsDataController {
      * @return AnomalyInformation object for a specified ship
      */
     @GetMapping("/ships/anomaly/{id}")
-    public AnomalyInformation getCurrentAnomalyInformation(@PathVariable String id) {
-        return this.shipsDataService.getCurrentAnomalyInformation(id);
+    public ResponseEntity<AnomalyInformation> getCurrentAnomalyInformation(@PathVariable String id) {
+        try {
+            return ResponseEntity.ok(this.shipsDataService.getCurrentAnomalyInformation(id));
+        } catch (NotExistingShipException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (PipelineException e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -50,8 +66,12 @@ public class ShipsDataController {
      * @return the current AIS data for all ships
      */
     @GetMapping("/ships/ais")
-    public List<AISSignal> getCurrentAISInformationOfAllShips(){
-        return this.shipsDataService.getCurrentAISInformationOfAllShips();
+    public ResponseEntity<List<AISSignal>> getCurrentAISInformationOfAllShips(){
+        try {
+            return ResponseEntity.ok(this.shipsDataService.getCurrentAISInformationOfAllShips());
+        }catch (PipelineException e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -60,7 +80,11 @@ public class ShipsDataController {
      * @return a list of anomaly information objects for all ships
      */
     @GetMapping("/ships/anomaly")
-    public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips(){
-        return this.shipsDataService.getCurrentAnomalyInformationOfAllShips();
+    public ResponseEntity<List<AnomalyInformation>> getCurrentAnomalyInformationOfAllShips(){
+        try {
+            return ResponseEntity.ok(this.shipsDataService.getCurrentAnomalyInformationOfAllShips());
+        }catch (PipelineException e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
