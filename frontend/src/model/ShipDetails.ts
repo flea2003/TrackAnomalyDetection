@@ -26,8 +26,8 @@ class ShipDetails{
             {type: "Object type", value: "Ship"},
             {type: "Anomaly score", value: this.anomalyScore + "%"},
             {type: "Explanation", value: this.explanation},
-            {type: "Longitude", value: "" + this.lng},
-            {type: "Latitude", value: "" + this.lat},
+            {type: "Longitude", value: "" + (Math.round(this.lng * 1000) / 1000) },
+            {type: "Latitude", value: "" +  (Math.round(this.lat * 1000) / 1000) },
             {type: "Heading", value: "" + this.heading}
         ];
     }
