@@ -1,0 +1,34 @@
+.anomaly-list-entry {
+    /* background-color: aquamarine; */
+
+    width: 100%;
+    height: var(--anomaly-list-entry-height);
+
+    border-bottom: 1px solid black;
+    align-items: center;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.anomaly-list-entry-main-text {
+    font-size: var(--anomaly-list-entry-font-size);
+}
+
+.anomaly-list-entry-score {
+    font-weight: bold;
+}
+
+.anomaly-list-entry-icon-container {
+    font-size: var(--anomaly-list-entry-font-size);
+    height: 100%;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.anomaly-list-entry-icon{
+    height: var(--anomaly-list-entry-icon-size);
+    width: var(--anomaly-list-entry-icon-size);
+}

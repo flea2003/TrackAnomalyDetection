@@ -10,10 +10,8 @@ import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.model.ShipInformation;
 import sp.pipeline.AnomalyDetectionPipeline;
-
 import java.util.HashMap;
 import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
