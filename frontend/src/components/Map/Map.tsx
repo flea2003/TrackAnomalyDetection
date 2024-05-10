@@ -81,7 +81,6 @@ function Map({ ships, pageChanger } : MapProps){
                 });
         });
 
-
         return () => {
 
             if (map) {
