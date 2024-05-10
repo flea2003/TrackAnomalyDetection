@@ -1,7 +1,7 @@
 package sp.services;
 
 import sp.dtos.AnomalyInformation;
-import sp.model.AISSignal;
+import sp.dtos.AISSignal;
 import sp.model.CurrentShipDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

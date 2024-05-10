@@ -18,7 +18,7 @@ public class StreamUtils {
     public static final String CONFIG_PATH = "kafka-connection.properties";
 
     /**
-     * Loads the properties for the configuration file.
+     * Loads the properties from the configuration file.
      *
      * @return the loaded properties
      * @throws IOException if such file does not exist

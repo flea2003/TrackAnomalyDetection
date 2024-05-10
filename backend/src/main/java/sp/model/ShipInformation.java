@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.*;
 import org.apache.kafka.common.serialization.Serde;
+import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 @Getter
@@ -16,7 +17,7 @@ import sp.dtos.AnomalyInformation;
 public class ShipInformation {
     private String shipHash;
     private AnomalyInformation anomalyInformation;
-    private AISSignal AISSignal;
+    private AISSignal aisSignal;
 
     /**
      * Converts a particular AISUpdate object to a JSON string.
@@ -24,8 +25,21 @@ public class ShipInformation {
      * @return the respective JSON string
      */
     public String toJson(){
+        // Assert that there are no flaws in the data
+        if (!shipHash.isEmpty() && !shipHash.isBlank()) {
+            if (anomalyInformation != null) {
+                assert(anomalyInformation.getShipHash().equals(shipHash));
+            }
+            if (aisSignal != null) {
+                assert(aisSignal.getShipHash().equals(shipHash));
+            }
+            if (anomalyInformation != null && aisSignal != null) {
+                assert(anomalyInformation.getShipHash().equals(anomalyInformation.getShipHash()));
+            }
+        }
+
         ObjectMapper mapper = new ObjectMapper();
-        String json = null;
+        String json;
         try {
             json = mapper.writeValueAsString( this );
         } catch (JsonProcessingException e) {

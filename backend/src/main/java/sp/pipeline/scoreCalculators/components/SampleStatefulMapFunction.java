@@ -1,8 +1,7 @@
 package sp.pipeline.scoreCalculators.components;
 
 import sp.dtos.AnomalyInformation;
-import sp.model.AISSignal;
-import sp.model.ShipInformation;
+import sp.dtos.AISSignal;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.time.Time;

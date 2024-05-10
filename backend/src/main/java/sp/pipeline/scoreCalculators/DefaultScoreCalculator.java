@@ -1,8 +1,7 @@
 package sp.pipeline.scoreCalculators;
 
 import sp.dtos.AnomalyInformation;
-import sp.model.AISSignal;
-import sp.model.ShipInformation;
+import sp.dtos.AISSignal;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.stereotype.Component;
 import sp.pipeline.scoreCalculators.components.SampleStatefulMapFunction;

@@ -2,9 +2,7 @@ package sp.dtos;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.*;
-import org.apache.kafka.common.serialization.Serde;
 import java.io.Serializable;
 
 @Getter
@@ -26,7 +24,7 @@ public class AnomalyInformation implements Serializable {
      */
     public String toJson(){
         ObjectMapper mapper = new ObjectMapper();
-        String json = null;
+        String json;
         try {
             json = mapper.writeValueAsString( this );
         } catch (JsonProcessingException e) {

@@ -1,7 +1,6 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import sp.model.AISSignal;
+import sp.dtos.AISSignal;
 
 class BackendApplicationTests {
     @Test

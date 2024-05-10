@@ -2,7 +2,7 @@ package sp.pipeline;
 
 import org.apache.kafka.streams.kstream.*;
 import sp.dtos.AnomalyInformation;
-import sp.model.AISSignal;
+import sp.dtos.AISSignal;
 import sp.model.ShipInformation;
 import sp.model.CurrentShipDetails;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -88,14 +88,16 @@ public class AnomalyDetectionPipeline {
                 WatermarkStrategy.noWatermarks(), "AIS Source");
 
         DataStream<AISSignal> source = sourceSerialized.map((x) -> {
-            System.out.println("Received AIS signal as JSON to topic SHIP. JSON: " + x);
+            System.out.println("Received AIS signal as JSON to topic ships-AIS. JSON: " + x);
             return AISSignal.fromJson(x);
         });
 
         // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
-        DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
+        DataStream<AnomalyInformation> updateStream =
+                scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
+
         DataStream<String> updateStreamSerialized = updateStream.map(x -> {
-            System.out.println("Mapping the AnomalyInformation object to JSON. Object: " + x);
+            System.out.println("Mapping the AnomalyInformation object to JSON (from the ships-AIS topic). Object: " + x);
             return x.toJson();
         });
 
@@ -117,7 +119,9 @@ public class AnomalyDetectionPipeline {
     /**
      * Builds the second part of the sp.pipeline - the score aggregation part. In particular, this part
      * takes the calculated score updates from Kafka (which were pushed there by the previous part)
-     * and aggregates them into a KTable. This KTable is then used as the state of the sp.pipeline.
+     * and aggregates them into a KTable. It also takes care of appending needed AIS signals to the KTable.
+     * This KTable is then used as the state of the sp.pipeline.
+     *
      */
     private void buildScoreAggregationPart() throws IOException {
         // Create a keyed Kafka Stream of incoming AISUpdate signals
@@ -125,67 +129,35 @@ public class AnomalyDetectionPipeline {
 
         KStream<String, String> streamAnomalyInformationJSON = builder.stream(CALCULATED_SCORES_TOPIC_NAME);
         KStream<String, ShipInformation> streamAnomalyInformation  = streamAnomalyInformationJSON.mapValues(x -> {
-                    System.out.println("Received AnomalyInformation object as JSON string in ship-scores. JSON: " + x);
-                    AnomalyInformation anomalyInformation = AnomalyInformation.fromJson(x);
-                    return new ShipInformation(anomalyInformation.getShipHash(), anomalyInformation, null);
-                });
+            System.out.println("Received AnomalyInformation object as JSON string in ship-scores. JSON: " + x);
+            AnomalyInformation anomalyInformation = AnomalyInformation.fromJson(x);
+            return new ShipInformation(anomalyInformation.getShipHash(), anomalyInformation, null);
+        });
 
         KStream<String, String> streamAISSignalsJSON = builder.stream(INCOMING_AIS_TOPIC_NAME);
         KStream<String, ShipInformation> streamAISSignals = streamAISSignalsJSON
                 .mapValues(x -> {
-                    System.out.println("Received AIS signal " + x);
+                    System.out.println("Received AIS signal as JSON to topic ship-AIS for the building part. JSON: " + x);
                     AISSignal aisSignal = AISSignal.fromJson(x);
                     return new ShipInformation(aisSignal.getShipHash(), null, aisSignal);
                 });
 
 
         KStream<String, ShipInformation> mergedStream = streamAISSignals
-                .merge(streamAISSignals)
+                .merge(streamAnomalyInformation)
                 .selectKey((key, value) -> value.getShipHash());
 
         KTable<String, CurrentShipDetails> table = mergedStream
-                .mapValues(ShipInformation::toJson)
-                .groupByKey()
-                .aggregate(
-                CurrentShipDetails::new,
-                (key, valueJson, aggregatedShipDetails) -> {
-                    System.out.println("Started aggregating JSON value. JSON: " + valueJson);
-
-                    if (aggregatedShipDetails.getPastInformation() == null)
-                        aggregatedShipDetails.setPastInformation(new ArrayList<>());
-
-
-                    ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
-                    AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
-
-                    // If the signal is AIS signal, add it to past information
-                    if (shipInformation.getAnomalyInformation() == null) {
-                        aggregatedShipDetails.getPastInformation().add(shipInformation);
-                    }
-                    // If the signal is Anomaly Information signal, attach it to a needed AIS signal
-                    else if (shipInformation.getAISSignal() == null) {
-                        aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
-                        for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
-                            ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
-                            if (information.getAISSignal().timestamp.equals(anomalyInformation.getCorrespondingTimestamp())) {
-                                information.setAnomalyInformation(anomalyInformation);
-                                aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
-                                break;
-                            }
-                        }
-                    } else {
-                        throw new RuntimeException("Something went wrong");
-                    }
-
-                    System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
-                    return aggregatedShipDetails;
-                },
-                Materialized
-                        .<String, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as("ship-score-store")
-                        .withValueSerde(CurrentShipDetails.getSerde())
-        );
+            .mapValues(ShipInformation::toJson)
+            .groupByKey()
+            .aggregate(
+            CurrentShipDetails::new,
+                (key, valueJson, aggregatedShipDetails) -> aggregateSignals(aggregatedShipDetails, valueJson, key),
+            Materialized
+                    .<String, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as("ship-score-store")
+                    .withValueSerde(CurrentShipDetails.getSerde())
+            );
         builder.build();
-
         // Save the KTable as the state
         this.state = table;
         this.kafkaStreams = StreamUtils.getKafkaStreamConsumingFromKafka(builder);
@@ -220,7 +192,7 @@ public class AnomalyDetectionPipeline {
 
             // Create a copy of the state
             HashMap<String, CurrentShipDetails> stateCopy = new HashMap<>();
-            try(KeyValueIterator<String, CurrentShipDetails> iter = view.all()) {
+            try (KeyValueIterator<String, CurrentShipDetails> iter = view.all()) {
                 iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value));
             }
             return stateCopy;
@@ -228,5 +200,54 @@ public class AnomalyDetectionPipeline {
             System.out.println("Failed to query store: " + e.getMessage() + ", continuing");
             return null;
         }
+    }
+
+    /**
+     * Aggregates data to a resulting map
+     *
+     * @param aggregatedShipDetails object that stores all needed data for a ship
+     * @param valueJson json value for a signal
+     * @param key hash value of the ship
+     * @return updated object that stores all needed data for a ship
+     */
+    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key) {
+        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
+
+        if (aggregatedShipDetails.getPastInformation() == null)
+            aggregatedShipDetails.setPastInformation(new ArrayList<>());
+
+        ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
+        AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
+
+        // If the signal is AIS signal, add it to past information
+        if (shipInformation.getAnomalyInformation() == null) {
+            aggregatedShipDetails.getPastInformation().add(shipInformation);
+        }
+        // If the signal is Anomaly Information signal, attach it to a needed AIS signal
+        else if (shipInformation.getAisSignal() == null) {
+            // Set the anomaly information to be the most recent one
+            // TODO: for now we assume that the newest anomaly score is the omne that arrived the most recently,
+            //  bcs to compute whether the current anomaly date
+            //  is actually older than the one that just arrived, it would be nice to store the date not a string.
+            //  But for that we will need to make an assumption for the data format, so for now i just leave it simple.
+
+            aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
+
+            for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
+                ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
+                if (information.getAisSignal().timestamp.equals(anomalyInformation.getCorrespondingTimestamp())) {
+                    // Check that there are no problems with the data
+                    assert(information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash()));
+                    assert(information.getShipHash().equals(anomalyInformation.getShipHash()));
+
+                    information.setAnomalyInformation(anomalyInformation);
+                    aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
+                    break;
+                }
+            }
+        } else throw new RuntimeException("Something went wrong");
+
+        System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
+        return aggregatedShipDetails;
     }
 }
