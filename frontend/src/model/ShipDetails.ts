@@ -1,13 +1,13 @@
 class ShipDetails{
-    name: string;
+    id: string;
     heading: number;
     lat: number;
     lng: number;
     anomalyScore: number;
     explanation: string;
 
-    constructor(name: string, heading: number, lat: number, lng: number, anomalyScore: number, explanation: string) {
-        this.name = name;
+    constructor(id: string, heading: number, lat: number, lng: number, anomalyScore: number, explanation: string) {
+        this.id = id;
         this.heading = heading;
         this.lat = lat;
         this.lng = lng;

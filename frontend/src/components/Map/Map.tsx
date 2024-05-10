@@ -84,19 +84,19 @@ function Map(){
                         // deal with repeated world map : https://stackoverflow.com/questions/33632608/markers-do-not-appear-on-continuous-world-in-leaflet
                         L.marker([ship.lat, ship.lng], {icon: createShipIcon(ship.anomalyScore / 100, ship.heading)})
                             .addTo(map)
-                            .bindPopup(ship.name)
+                            .bindPopup(ship.id)
                             .on('click', () => {
                                 setSelectedShip(ship);
                             });
                         L.marker([ship.lat, ship.lng - 360], {icon: createShipIcon(ship.anomalyScore / 100, ship.heading)})
                             .addTo(map)
-                            .bindPopup(ship.name)
+                            .bindPopup(ship.id)
                             .on('click', () => {
                                 setSelectedShip(ship);
                             });
                         L.marker([ship.lat, ship.lng + 360], {icon: createShipIcon(ship.anomalyScore / 100, ship.heading)})
                             .addTo(map)
-                            .bindPopup(ship.name)
+                            .bindPopup(ship.id)
                             .on('click', () => {
                                 setSelectedShip(ship);
                             });

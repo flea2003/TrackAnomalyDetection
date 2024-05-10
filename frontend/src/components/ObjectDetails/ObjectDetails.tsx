@@ -7,15 +7,30 @@ import ObjectDetailsEntry from "./ObjectDetailsEntry";
 import "../../styles/common.css";
 import "../../styles/objectDetails.css";
 
+interface ObjectDetailsProps {
+    ships: ShipDetails[],
+    shipId: string
+}
+
 /**
  * This component is the second column of the main view of the application. It displays the details of a selected object.
  * The object to whose details are to be displayed is passed as a prop.
  *
  * @param props properties passed to this component. Most importantly, it contains the ship object whose details to display.
  */
-function ObjectDetails(props: { ship: ShipDetails}) {
+function ObjectDetails(props: ObjectDetailsProps) {
+    const allShips = props.ships;
+    const shipID = props.shipId;
 
-    const ship = props.ship;
+    const ship = allShips.find((ship) => ship.id === shipID);
+    if (ship === undefined) {
+        return (
+            <Stack id="object-details-container">
+                <span className="object-details-title">Object ID: {shipID} </span>
+                <span className="object-details-title">Object not found</span>
+            </Stack>
+        )
+    }
 
     const properties = ship.getPropertyList();
     const propertyList = properties.map((property) => {
@@ -28,7 +43,7 @@ function ObjectDetails(props: { ship: ShipDetails}) {
         <Stack id="object-details-container">
             <div className="object-details-title-container">
                 <img src={returnIcon} className="object-details-return-icon" />
-                <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">{ship.name}</span> </span>
+                <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">{ship.id}</span> </span>
             </div>
             <List style={{maxHeight: '100%', overflow: 'auto'}} className="object-details-list">
                 {propertyList}

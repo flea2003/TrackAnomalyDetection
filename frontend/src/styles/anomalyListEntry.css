@@ -9,6 +9,14 @@
 
     display: flex;
     justify-content: space-between;
+
+    /* Make sure when hovering it s like a link */
+    cursor: pointer;
+}
+.anomaly-list-entry:hover{
+    /* change transparency */
+    border-top: 1px solid black;
+    border-bottom: 2px solid black;
 }
 
 .anomaly-list-entry-main-text {

@@ -9,7 +9,8 @@ import '../../styles/anomalyListEntry.css';
 import { randomInt } from 'crypto';
 
 interface AnomalyListEntryProps {
-    shipDetails: ShipDetails
+    shipDetails: ShipDetails,
+    pageChanger: Function
 }
 
 /**
@@ -32,15 +33,19 @@ function calculateAnomalyColor(shipAnomalyScore : number) {
  *
  * @param props properties passed to this component. Most importantly, it contains the ship details to display.
  */
-function AnomalyListEntry({ shipDetails } : AnomalyListEntryProps) {
+function AnomalyListEntry({ shipDetails, pageChanger } : AnomalyListEntryProps) {
 
     const shipIcon = require('../../assets/icons/ship.png');
 
     const shipAnomalyScore = shipDetails.anomalyScore;
     const color = calculateAnomalyColor(shipAnomalyScore);
 
+    const onClick = () => {
+        pageChanger({currentPage: 'objectDetails', shownShipId: shipDetails.id});
+    }
+
     return (
-        <Stack direction="row" className="anomaly-list-entry" spacing={0} style={{backgroundColor: color}} >
+        <Stack direction="row" className="anomaly-list-entry" spacing={0} style={{backgroundColor: color}} onClick={onClick}>
             <span className="anomaly-list-entry-icon-container"><img src={shipIcon} className="anomaly-list-entry-icon"/></span>
             <span className="anomaly-list-entry-main-text">Anomaly score: <span className="anomaly-list-entry-score">{shipAnomalyScore}</span> </span>
             <span></span> {/* Empty span for spacing */}

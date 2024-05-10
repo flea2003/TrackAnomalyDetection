@@ -8,19 +8,23 @@ import ShipDetails from '../../model/ShipDetails';
 import '../../styles/common.css';
 import '../../styles/anomalyList.css';
 
+interface AnomalyListProps {
+    ships: ShipDetails[],
+    pageChanger: Function
+}
+
+
 /**
  * This component is the second column of the main view of the application. It essentially displays
  * the "Anomaly List" title and renders all the AnomalyListEntry components.
  *
  * @param props properties passed to this component. Most importantly, it contains the list of ships to display.
  */
-function AnomalyList(props: { ships: ShipDetails[] }) {
-
-    const ships = props.ships;
+function AnomalyList({ ships, pageChanger }: AnomalyListProps) {
 
     const listEntries = [];
     for (var i = 0; i < ships.length; i++) {
-        listEntries.push(<AnomalyListEntry shipDetails={ships[i]} />);
+        listEntries.push(<AnomalyListEntry shipDetails={ships[i]} pageChanger={pageChanger} />);
     }
 
     return (
