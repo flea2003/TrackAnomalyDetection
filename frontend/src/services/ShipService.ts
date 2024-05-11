@@ -22,6 +22,7 @@ class ShipService {
 
         let AISResults = ShipService.httpSender.get(shipsAISEndpoint)
             .then(response => {
+                if(Array.isArray(response) && response.length > 0){
                const aisResults: AISSignal[] = response.map((item: any) => {
                    return {
                        id: item.shipHash,
@@ -34,18 +35,25 @@ class ShipService {
                        timestamp: item.timestamp
                    }
                })
-                return aisResults;
+                return aisResults;}
+                else{
+                    return [];
+                }
             });
 
         let AnomalyInfoResults = ShipService.httpSender.get(shipsAnomalyInfoEndpoint)
             .then(response => {
+                if(Array.isArray(response) && response.length > 0){
                 const anomalyInfoResults: AnomalyInformation[] = response.map((item: any) => {
                     return {
                         id: item.shipHash,
                         anomalyScore: item.score
                     }
                 });
-                return anomalyInfoResults;
+                return anomalyInfoResults;}
+                else{
+                    return [];
+                }
             })
 
         // As the resulting list of type ShipDetails is the result of an aggregation,
@@ -68,6 +76,7 @@ class ShipService {
             )
         return result;
     };
+
 }
 
 export default ShipService;
