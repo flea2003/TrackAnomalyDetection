@@ -9,7 +9,10 @@ interface SidebarProps {
 }
 
 /**
- * This prop is the sidebar of the application (third column). It contains three icons that are placeholders for future functionality.
+ * This prop is the sidebar of the application (third column). It contains three icons that are placeholders
+ * for future functionality.
+ *
+ * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 function Sidebar({ pageChanger } : SidebarProps) {
     // Load the icons

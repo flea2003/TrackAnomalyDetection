@@ -46,13 +46,9 @@ function getInitialMap() {
  * A list of ships is passed as a prop.
  *
  * @param ships the ships to display on the map
+ * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 function Map({ ships, pageChanger } : MapProps){
-
-    // A method to change the page to the object details one
-    const shipWasClicked = (id : String) => {
-        pageChanger({currentPage: 'objectDetails', shownShipId: id});
-    };
 
     // Initialize the map as state, since we want to have a single instance
     const [map, setMap] = useState<L.Map | null>(null);
@@ -77,7 +73,7 @@ function Map({ ships, pageChanger } : MapProps){
                 .addTo(map)
                 .bindPopup(ship.id)
                 .on('click', () => {
-                    shipWasClicked(ship.id);
+                    pageChanger({currentPage: 'objectDetails', shownShipId: ship.id});
                 });
         });
 

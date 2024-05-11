@@ -39,7 +39,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
     // Create a list of properties to display
     const properties = ship.getPropertyList();
     const propertyList = properties.map((property) => {
-        return <ObjectDetailsEntry type={property.type} value={property.value} />
+        return <ObjectDetailsEntry key={property.type} type={property.type} value={property.value} />
     });
 
     // Define the return icon and its click handler

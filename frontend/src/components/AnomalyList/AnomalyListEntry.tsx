@@ -18,7 +18,8 @@ interface AnomalyListEntryProps {
  * This component is a single entry in the Anomaly List. It displays the anomaly score and an icon of an object.
  * The object to render is passed as a prop.
  *
- * @param props properties passed to this component. Most importantly, it contains the ship details to display.
+ * @param shipDetails the specific details of the ship to display
+ * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 function AnomalyListEntry({ shipDetails, pageChanger } : AnomalyListEntryProps) {
 
