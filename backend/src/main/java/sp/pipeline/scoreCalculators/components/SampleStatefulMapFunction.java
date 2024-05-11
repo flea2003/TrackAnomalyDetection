@@ -1,7 +1,7 @@
 package sp.pipeline.scoreCalculators.components;
 
-import sp.model.AISSignal;
-import sp.model.AISUpdate;
+import sp.dtos.AnomalyInformation;
+import sp.dtos.AISSignal;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.*;
 import org.apache.flink.api.common.time.Time;
@@ -11,9 +11,9 @@ import org.apache.flink.configuration.Configuration;
 
 import java.time.Duration;
 
-public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AISUpdate> {
+public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
 
-    private transient ValueState<Long> score;
+    private transient ValueState<Float> score;
     private transient ListState<Float> latitudes;
 
     /**
@@ -31,10 +31,10 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AISUpd
                 .build();
 
         // Setup the state descriptors
-        ValueStateDescriptor<Long> scoreDescriptor =
+        ValueStateDescriptor<Float> scoreDescriptor =
                 new ValueStateDescriptor<>(
                         "score",
-                        TypeInformation.of(new TypeHint<Long>() {})
+                        TypeInformation.of(new TypeHint<Float>() {})
                 );
         ListStateDescriptor<Float> latitudesDescriptor =
                 new ListStateDescriptor<>(
@@ -52,7 +52,7 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AISUpd
     }
 
     /**
-     * Performs a stateful map. In this case - maps an incoming AIS signal into an AISUpdate.
+     * Performs a stateful map. In this case - maps an incoming AIS signal into an Anomaly Information object.
      * This map is essentially a counter, which counts to score.
      *
      * @param value The input value.
@@ -60,12 +60,15 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AISUpd
      * @throws Exception in case the state cannot be accessed for some reason
      */
     @Override
-    public AISUpdate map(AISSignal value) throws Exception {
-
+    public AnomalyInformation map(AISSignal value) throws Exception {
+        // Thread.sleep(4000);
         // Access the current score for the ship. If it is empty, initialize it to 0
-        Long currentScore = score.value();
+
+        System.out.println("Received the AISSignal in the anomaly computation method. Object: " + value);
+
+        Float currentScore = score.value();
         if (currentScore == null) {
-            currentScore = 0L;
+            currentScore = 0F;
         }
 
         // Increment the score
@@ -76,6 +79,6 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AISUpd
         latitudes.add(value.getLatitude());
 
         // Return the calculated score update
-        return new AISUpdate(value.getShipHash(), currentScore, value);
+        return new AnomalyInformation(currentScore, "", value.timestamp, value.shipHash);
     }
 }

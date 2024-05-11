@@ -1,4 +1,4 @@
-package sp.model.Exceptions;
+package sp.exceptions;
 
 public class NotExistingShipException  extends Exception{
 
