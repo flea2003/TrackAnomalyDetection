@@ -26,10 +26,16 @@ function Sidebar({ pageChanger } : SidebarProps) {
     const onSettingsIconClicked = () => pageChanger({currentPage: 'settings', shownShipId: ''});
 
     return (
-        <Stack id="sidebar">
-            <span className="sidebar-entry" onClick={onShipIconClicked}><img src={shipIcon} className="sidebar-icon"/></span>
-            <span className="sidebar-entry" onClick={onBellIconClicked}><img src={bellIcon} className="sidebar-icon" /></span>
-            <span className="sidebar-entry" onClick={onSettingsIconClicked}><img src={settingsIcon} className="sidebar-icon" /></span>
+        <Stack id="sidebar" data-testid="sidebar">
+            <span data-testid="sidebar-ship-icon" className="sidebar-entry" onClick={onShipIconClicked}>
+                <img src={shipIcon} className="sidebar-icon"/>
+            </span>
+            <span data-testid="sidebar-bell-icon" className="sidebar-entry" onClick={onBellIconClicked}>
+                <img src={bellIcon} className="sidebar-icon" />
+            </span>
+            <span data-testid="sidebar-settings-icon" className="sidebar-entry" onClick={onSettingsIconClicked}>
+                <img src={settingsIcon} className="sidebar-icon" />
+            </span>
         </Stack>
     )
 }

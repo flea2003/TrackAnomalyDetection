@@ -92,7 +92,7 @@ function Map({ ships, pageChanger } : MapProps){
 
     return (
         <div id="map-container">
-            <div id="map"></div>
+            <div id="map" data-testid="map"></div>
         </div>
     );
 }

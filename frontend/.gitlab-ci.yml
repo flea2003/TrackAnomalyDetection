@@ -8,4 +8,4 @@ react_tests:
     - cd frontend
     - npm ci
   script:
-    - npm run test
+    - npm run test a
