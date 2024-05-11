@@ -3,7 +3,6 @@ import ShipDetails from "../model/ShipDetails";
 import HttpSender from "../utils/HttpSender";
 import AISSignal from "../model/AISSignal";
 import AnomalyInformation from "../model/AnomalyInformation";
-import ResponseEntity from "../model/ResponseEntity";
 
 class ShipService {
     static httpSender: HttpSender = new HttpSender();
@@ -22,20 +21,40 @@ class ShipService {
         let shipsAnomalyInfoEndpoint = '/ships/anomaly';
 
         let AISResults = ShipService.httpSender.get(shipsAISEndpoint)
-            .then(response => response as ResponseEntity<AISSignal[]>)
-            .then(responseEntity => responseEntity.data);
+            .then(response => {
+               const aisResults: AISSignal[] = response.map((item: any) => {
+                   return {
+                       id: item.shipHash,
+                       speed: item.speed,
+                       long: item.longitude,
+                       lat: item.latitude,
+                       course: item.course,
+                       departurePort: item.departurePort,
+                       heading: item.heading,
+                       timestamp: item.timestamp
+                   }
+               })
+                return aisResults;
+            });
 
         let AnomalyInfoResults = ShipService.httpSender.get(shipsAnomalyInfoEndpoint)
-            .then(response => response as ResponseEntity<AnomalyInformation[]>)
-            .then(responseEntity => responseEntity.data);
+            .then(response => {
+                const anomalyInfoResults: AnomalyInformation[] = response.map((item: any) => {
+                    return {
+                        id: item.shipHash,
+                        anomalyScore: item.score
+                    }
+                });
+                return anomalyInfoResults;
+            })
 
         // As the resulting list of type ShipDetails is the result of an aggregation,
         // we have to wait for both Promise objects to resolve to lists as we can not
         // aggregate unresolved Promise objects
-        return Promise.all([AISResults, AnomalyInfoResults])
+        const result =  Promise.all([AISResults, AnomalyInfoResults])
             .then(([aisResults, anomalyInfoResults]: [AISSignal[], AnomalyInformation[]]) => {
                 return aisResults.reduce((result: ShipDetails[], aisSignal: AISSignal) => {
-                    // We match the items based on the ID of the ship
+                    // We match the items based on the ID (hash) of the ship
                     const matchingAnomalyInfo = anomalyInfoResults.find((item) => item["id"] === aisSignal["id"]);
                     if(matchingAnomalyInfo){
                         const shipDetailsItem = new ShipDetails(aisSignal.id,aisSignal.heading,aisSignal.lat, aisSignal.long,
@@ -46,8 +65,8 @@ class ShipService {
                     return result;
                 }, []);
                 }
-            ).then(result => Promise.resolve(result));
-
+            )
+        return result;
     };
 }
 

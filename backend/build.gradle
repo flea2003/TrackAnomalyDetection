@@ -27,6 +27,10 @@ java {
 	sourceCompatibility = '17'
 }
 
+bootRun{
+	jvmArgs = ["--add-opens=java.base/java.util=ALL-UNNAMED"]
+}
+
 checkstyle {
 	toolVersion = '10.15.0'
 	config = resources.text.fromFile('checkstyle.xml')
@@ -53,6 +57,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.apache.kafka:kafka-streams'
 	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
