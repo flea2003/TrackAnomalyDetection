@@ -1,9 +1,10 @@
 stages:
-  - tests
+  - test
 
 react_tests:
-  stage: tests
+  stage: test
   image: node
+  needs: []
   before_script:
     - cd frontend
     - npm ci
