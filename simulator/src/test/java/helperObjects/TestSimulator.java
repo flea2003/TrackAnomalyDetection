@@ -1,9 +1,12 @@
-import helperObjects.Stream;
-import helperObjects.Timestamp;
+package helperObjects;
+
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import parsers.DEBSParser;
 import parsers.Parser;
@@ -57,6 +60,24 @@ public class TestSimulator {
         this.simulator.setSpeed(60);
     }
 
+    @Test
+    void testSpeed() throws IOException, InterruptedException {
+        Stream stream = new Stream(startTime, endTime);
+        stream.setData(resultingData);
+        simulator = new Simulator(stream, topicName, producer);
+        simulator.setSpeed(60);
+
+        long expectedSleepMillis = 1000; // Calculate expected sleep time
+
+        long startSleepTime = System.currentTimeMillis(); // Record start time of sleep
+        simulator.startStream();
+        long endSleepTime = System.currentTimeMillis(); // Record end time of sleep
+        long actualSleepTime = endSleepTime - startSleepTime; // Calculate actual sleep time
+
+        // Assert that the actual sleep time is within an acceptable range of the expected sleep time
+        assertThat(actualSleepTime).isBetween(expectedSleepMillis * 95 / 100, expectedSleepMillis * 105 / 100); // Allow a 5% margin of error
+    }
+
 
     @Test
     void testStartStream() throws IOException, InterruptedException {
@@ -64,18 +85,40 @@ public class TestSimulator {
         simulator.startStream();
 
         verify(reader, times(5)).readLine();
-        assertThat(simulator.getStream().getData()).isEqualTo(resultingData);
+        AssertionsForClassTypes.assertThat(simulator.getStream().getData()).isEqualTo(resultingData);
         inOrder.verify(producer).send(
                 eq(new ProducerRecord<>(topicName, startSignal)),
-                any());
+                argThat((ArgumentMatcher<Callback>) (callback) -> {
+                    if (callback instanceof Callback) {
+                        callback.onCompletion(null, null);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
+                );
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
                 eq(new ProducerRecord<>(topicName, thirdSignal)),
-                any());
+                argThat((ArgumentMatcher<Callback>) (callback) -> {
+                    if (callback instanceof Callback) {
+                        callback.onCompletion(null, null);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }));
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
                 eq(new ProducerRecord<>(topicName, endSignal)),
-                any());
+                argThat((ArgumentMatcher<Callback>) (callback) -> {
+                    if (callback instanceof Callback) {
+                        callback.onCompletion(null, null);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }));
 
         inOrder.verify(producer).flush();
         inOrder.verify(producer).close();
@@ -87,7 +130,7 @@ public class TestSimulator {
     void testGetStream() throws IOException {
         Stream stream = new Stream(startTime, endTime);
         stream.setData(resultingData);
-        assertThat(simulator.getStream()).isEqualTo(stream);
+        AssertionsForClassTypes.assertThat(simulator.getStream()).isEqualTo(stream);
         verify(reader, times(5)).readLine();
     }
 
@@ -102,7 +145,7 @@ public class TestSimulator {
         simulator.startStream();
 
         verify(reader, times(5)).readLine();
-        assertThat(simulator.getStream().getData()).isEqualTo(resultingData);
+        AssertionsForClassTypes.assertThat(simulator.getStream().getData()).isEqualTo(resultingData);
         inOrder.verify(producer).send(
                 eq(new ProducerRecord<>(topicName, startSignal)),
                 any());
@@ -129,7 +172,7 @@ public class TestSimulator {
         simulator.startStream();
 
         verify(reader, times(5)).readLine();
-        assertThat(simulator.getStream().getData()).isEqualTo(new ArrayList<>());
+        AssertionsForClassTypes.assertThat(simulator.getStream().getData()).isEqualTo(new ArrayList<>());
         verifyNoMoreInteractions(reader);
     }
 }
