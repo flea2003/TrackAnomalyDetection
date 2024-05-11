@@ -279,7 +279,7 @@ public class AnomalyDetectionPipeline {
         else if (shipInformation.getAisSignal() == null) {
             // Set the anomaly information to be the most recent one
             // TODO: take care of proper format for the date
-
+            // TODO: CONSIDER ANOMALY INFO ARRIVING EARLIER THAN AIS SIGNAL
             aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
 
             // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
