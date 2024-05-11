@@ -11,6 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Setter
 @ToString
+@EqualsAndHashCode
 public class AnomalyInformation implements Serializable {
     private final Float score;
     private final String explanation;

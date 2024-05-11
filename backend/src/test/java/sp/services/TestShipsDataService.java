@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
-public class ShipsDataServiceTest {
+public class TestShipsDataService {
 
     private ShipsDataService shipsDataService;
     private ShipsDataService shipsDataServiceBroken;

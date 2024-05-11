@@ -2,9 +2,7 @@ package sp.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.*;
-import org.apache.kafka.common.serialization.Serde;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 
@@ -14,6 +12,7 @@ import sp.dtos.AnomalyInformation;
 @AllArgsConstructor
 @Setter
 @ToString
+@EqualsAndHashCode
 public class ShipInformation {
     private String shipHash;
     private AnomalyInformation anomalyInformation;
@@ -61,15 +60,5 @@ public class ShipInformation {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Get serializer+deserializer for AISUpdate. Simple JSON serialization is used here.
-     *
-     * @return Serde object for this class.
-     */
-    public static Serde<ShipInformation> getSerde() {
-        ObjectMapper jsonObjectMapper = new ObjectMapper();
-        return new Jackson2Serde<>(jsonObjectMapper, ShipInformation.class);
     }
 }
