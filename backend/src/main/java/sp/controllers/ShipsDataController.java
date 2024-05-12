@@ -34,6 +34,7 @@ public class ShipsDataController {
      */
     @GetMapping("/ships/ais/{id}")
     public ResponseEntity<AISSignal> getCurrentAISInformation(@PathVariable String id){
+        System.out.println("here");
         try{
             return ResponseEntity.ok(this.shipsDataService.getCurrentAISInformation(id));
         }catch (NotExistingShipException e){

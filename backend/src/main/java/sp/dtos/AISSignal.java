@@ -1,5 +1,6 @@
 package sp.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -22,7 +23,10 @@ public class AISSignal implements Serializable {
     public final float latitude;
     public final float course;
     public final float heading;
+
+//    @JsonProperty("timestamp")
     public final String timestamp;
+
     public final String departurePort;
 
     /**

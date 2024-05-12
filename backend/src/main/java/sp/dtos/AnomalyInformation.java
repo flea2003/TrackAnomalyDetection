@@ -1,20 +1,22 @@
 package sp.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import java.io.Serializable;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@Setter
 @ToString
 @EqualsAndHashCode
 public class AnomalyInformation implements Serializable {
     private final Float score;
     private final String explanation;
+//    @JsonProperty("timestamp")
     private final String correspondingTimestamp;
     private final String shipHash;
 

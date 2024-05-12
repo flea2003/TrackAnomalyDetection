@@ -1,5 +1,6 @@
 package helperObjects;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -7,7 +8,7 @@ import lombok.*;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class Timestamp implements Comparable<Timestamp> {
+public class Timestamp implements Comparable<Timestamp>, Serializable {
 
     private int year;
     private int month;

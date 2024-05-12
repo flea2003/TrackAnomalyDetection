@@ -83,4 +83,9 @@ public class TestTimestamp {
     void testDifference() {
         assertThat(timestamp1.difference(new Timestamp(2004, 01, 27, 10, 1))).isEqualTo(-1);
     }
+
+    void testJSON(){
+        Timestamp timestamp = new Timestamp(2004, 01, 27, 10, 1);
+        System.out.println(timestamp.to);
+    }
 }
