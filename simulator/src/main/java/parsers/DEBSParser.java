@@ -1,74 +1,71 @@
 package parsers;
 
-import helperObjects.AISSignal;
-import helperObjects.Timestamp;
+import helperobjects.AISSignal;
+import helperobjects.Timestamp;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.BufferedReader;
-import java.io.IOException;
 
-public class DEBSParser implements Parser {
-
-    private BufferedReader reader;
+public record DEBSParser(BufferedReader reader) implements Parser {
 
     /**
-     * Constructor for the data parser of DEBS public dataset
+     * Constructor for the data parser of DEBS public dataset.
      *
      * @param reader the reader for the datafile
      */
-    public DEBSParser(BufferedReader reader) {
-        this.reader = reader;
+    public DEBSParser {
     }
 
     /**
      * Parses the datafile and returns a list of pairs, where a pair has a timestamp and the
-     * string representation of the signal
+     * string representation of the signal.
      *
      * @return a list of pairs, where a pair has a timestamp and the string representation of the
-     * signal, extracted from the data file
+     *     signal, extracted from the data file
      */
 
     @Override
     public List<SimpleEntry<Timestamp, String>> parse() throws IOException {
         List<SimpleEntry<Timestamp, String>> result = new ArrayList<>();
 
+        this.reader.readLine(); // skip first line
         String line = this.reader.readLine();
-        while ((line = this.reader.readLine()) != null) {
+
+        while (line != null) {
             String[] values = line.split(",");
             result.add(new SimpleEntry<>(parseDate(values[6]), parseAISSignal(values).toJson()));
+
+            line = this.reader.readLine();
         }
 
         return result;
     }
 
     /**
-     * Parse a line to an AIS signal object
+     * Parse a line to an AIS signal object.
      *
      * @param values array of strings corresponding to one line
      * @return AISSignal signal object
-     * @throws IOException
      */
-    public AISSignal parseAISSignal(String[] values) throws IOException {
-        String shipHash, date, departurePort;
-        float speed, lon, lat, course, heading;
+    public AISSignal parseAISSignal(String[] values) {
+        String shipHash = values[0];
+        float speed = Float.parseFloat(values[1]);
+        float lon = Float.parseFloat(values[2]);
+        float lat = Float.parseFloat(values[3]);
+        float course = Float.parseFloat(values[4]);
+        float heading = Float.parseFloat(values[5]);
+        String date = values[6];
 
-        shipHash = values[0];
-        speed = Float.parseFloat(values[1]);
-        lon = Float.parseFloat(values[2]);
-        lat = Float.parseFloat(values[3]);
-        course = Float.parseFloat(values[4]);
-        heading = Float.parseFloat(values[5]);
-        date = values[6];
-
-        departurePort = values[7];
+        String departurePort = values[7];
         if (departurePort.endsWith("\n")) departurePort = departurePort.substring(0, departurePort.length() - 1);
 
         return new AISSignal(shipHash, speed, lon, lat, course, heading, date, departurePort);
     }
 
     /**
-     * Extracts the timestamp from the timestamp string
+     * Extracts the timestamp from the timestamp string.
      *
      * @param line a string that corresponds to a time stamp in the data file
      * @return the Date object extracted from the line
@@ -87,12 +84,4 @@ public class DEBSParser implements Parser {
         return new Timestamp(year, month, day, hour, minute);
     }
 
-    /**
-     * Gets the reader.
-     *
-     * @return the buffered reader
-     */
-    public BufferedReader getReader() {
-        return this.reader;
-    }
 }

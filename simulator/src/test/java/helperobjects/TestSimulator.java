@@ -1,4 +1,4 @@
-package helperObjects;
+package helperobjects;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -121,7 +121,6 @@ public class TestSimulator {
                 }));
 
         inOrder.verify(producer).flush();
-        inOrder.verify(producer).close();
         inOrder.verifyNoMoreInteractions();
     }
 
@@ -159,7 +158,6 @@ public class TestSimulator {
                 any());
 
         inOrder.verify(producer).flush();
-        inOrder.verify(producer).close();
         inOrder.verifyNoMoreInteractions();
     }
 

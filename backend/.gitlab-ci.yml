@@ -46,3 +46,13 @@ backend_checkstyle:
     - chmod +x ./gradlew
   script:
     - ./gradlew checkstyleMain
+
+backend_pmd_static_analysis:
+  stage: code_quality
+  image: gradle:7.6.0-jdk17
+  needs: ["backend_build"]
+  before_script:
+    - cd simulator
+    - chmod +x ./gradlew
+  script:
+    - ./gradlew pmdMain
