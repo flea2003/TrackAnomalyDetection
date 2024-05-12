@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.serialization.Serde;
+import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 
@@ -19,7 +20,8 @@ import sp.dtos.AnomalyInformation;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 public class CurrentShipDetails implements Serializable {
-    private AnomalyInformation anomalyInformation;
+    private AnomalyInformation currentAnomalyInformation;
+    private AISSignal currentAISSignal;
     private List<ShipInformation> pastInformation;
 
     /**
