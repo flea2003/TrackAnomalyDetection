@@ -7,6 +7,12 @@ import AnomalyInformation from "../dtos/AnomalyInformation";
 class ShipService {
     static httpSender: HttpSender = new HttpSender();
 
+    // Backend API endpoints for retrieving (polling) the information about
+    // the latest AIS signals received for each ship
+    // and the latest computed Anomaly Scores for each ship
+    static shipsAISEndpoint = '/ships/ais';
+    static shipsAnomalyInfoEndpoint = '/ships/anomaly';
+
     /**
      * This method queries the backend for both the Ships Array and the Anomaly Scores Array.
      * The resulting array of type ShipDetails is the result of aggregating the retrieved arrays.
@@ -14,49 +20,12 @@ class ShipService {
      * @returns a promise that resolves to an array of ShipDetails.
      */
     static queryBackendForShipsArray : (() => Promise<ShipDetails[]>) = () => {
-        // Backend API endpoints for retrieving (polling) the information about
-        // the latest AIS signals received for each ship
-        // and the latest computed Anomaly Scores for each ship
-        let shipsAISEndpoint = '/ships/ais';
-        let shipsAnomalyInfoEndpoint = '/ships/anomaly';
 
         // Fetch the latest AIS signals of all monitored ships
-        let AISResults = ShipService.httpSender.get(shipsAISEndpoint)
-            .then(response => {
-                if(Array.isArray(response) && response.length > 0){
-               const aisResults: AISSignal[] = response.map((item: any) => {
-                   return {
-                       id: item.shipHash,
-                       speed: item.speed,
-                       long: item.longitude,
-                       lat: item.latitude,
-                       course: item.course,
-                       departurePort: item.departurePort,
-                       heading: item.heading,
-                       timestamp: item.timestamp
-                   }
-               })
-                return aisResults;}
-                else{
-                    return [];
-                }
-            });
+        let AISResults = ShipService.getAllAISResults();
 
         // Fetch the latest computed anomaly scores of all monitored ships
-        let AnomalyInfoResults = ShipService.httpSender.get(shipsAnomalyInfoEndpoint)
-            .then(response => {
-                if(Array.isArray(response) && response.length > 0){
-                const anomalyInfoResults: AnomalyInformation[] = response.map((item: any) => {
-                    return {
-                        id: item.shipHash,
-                        anomalyScore: item.score
-                    }
-                });
-                return anomalyInfoResults;}
-                else{
-                    return [];
-                }
-            })
+        let AnomalyInfoResults = ShipService.getAnomalyInfoResults();
 
         // As the resulting list of type ShipDetails is the result of an aggregation,
         // we have to wait for both Promise objects to resolve to lists as we can not
@@ -79,6 +48,46 @@ class ShipService {
             )
         return result;
     };
+
+    static getAllAISResults: (() => Promise<AISSignal[]>) = () => {
+        return ShipService.httpSender.get(ShipService.shipsAISEndpoint)
+            .then(response => {
+                if(Array.isArray(response) && response.length > 0){
+                    const aisResults: AISSignal[] = response.map((item: any) => {
+                        return {
+                            id: item.shipHash,
+                            speed: item.speed,
+                            long: item.longitude,
+                            lat: item.latitude,
+                            course: item.course,
+                            departurePort: item.departurePort,
+                            heading: item.heading,
+                            timestamp: item.timestamp
+                        }
+                    })
+                    return aisResults;}
+                else{
+                    return [];
+                }
+            });
+    }
+
+    static getAnomalyInfoResults: (() => Promise<AnomalyInformation[]>) = () => {
+        return ShipService.httpSender.get(ShipService.shipsAnomalyInfoEndpoint)
+            .then(response => {
+                if(Array.isArray(response) && response.length > 0){
+                    const anomalyInfoResults: AnomalyInformation[] = response.map((item: any) => {
+                        return {
+                            id: item.shipHash,
+                            anomalyScore: item.score
+                        }
+                    });
+                    return anomalyInfoResults;}
+                else{
+                    return [];
+                }
+            });
+    }
 
 }
 
