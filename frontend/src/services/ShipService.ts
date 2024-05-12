@@ -20,6 +20,7 @@ class ShipService {
         let shipsAISEndpoint = '/ships/ais';
         let shipsAnomalyInfoEndpoint = '/ships/anomaly';
 
+        // Fetch the latest AIS signals of all monitored ships
         let AISResults = ShipService.httpSender.get(shipsAISEndpoint)
             .then(response => {
                 if(Array.isArray(response) && response.length > 0){
@@ -41,6 +42,7 @@ class ShipService {
                 }
             });
 
+        // Fetch the latest computed anomaly scores of all monitored ships
         let AnomalyInfoResults = ShipService.httpSender.get(shipsAnomalyInfoEndpoint)
             .then(response => {
                 if(Array.isArray(response) && response.length > 0){
@@ -65,6 +67,7 @@ class ShipService {
                     // We match the items based on the ID (hash) of the ship
                     const matchingAnomalyInfo = anomalyInfoResults.find((item) => item["id"] === aisSignal["id"]);
                     if(matchingAnomalyInfo){
+                        // TODO: Modify the 'explanation' field of the ShipDetails instance
                         const shipDetailsItem = new ShipDetails(aisSignal.id,aisSignal.heading,aisSignal.lat, aisSignal.long,
                             matchingAnomalyInfo.anomalyScore,"",aisSignal.departurePort,aisSignal.course,
                             aisSignal.speed);
