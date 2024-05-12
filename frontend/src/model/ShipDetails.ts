@@ -6,14 +6,22 @@ class ShipDetails{
     lng: number;
     anomalyScore: number;
     explanation: string;
+    departurePort: string;
+    course: number;
+    speed: number;
 
-    constructor(id: string, heading: number, lat: number, lng: number, anomalyScore: number, explanation: string) {
+    constructor(id: string, heading: number, lat: number, lng: number, anomalyScore: number, explanation: string,
+                departurePort: string, course: number, speed: number) {
         this.id = id;
         this.heading = heading;
         this.lat = lat;
         this.lng = lng;
         this.anomalyScore = anomalyScore;
         this.explanation = explanation;
+        this.departurePort = departurePort;
+        this.course = course;
+        this.speed = speed;
+
     }
 
     /**
@@ -27,6 +35,10 @@ class ShipDetails{
             {type: "Object type", value: "Ship"},
             {type: "Anomaly score", value: this.anomalyScore + "%"},
             {type: "Explanation", value: this.explanation},
+            {type: "Heading", value: "" + this.heading},
+            {type: "Departure Port", value: "" + this.departurePort},
+            {type: "Course", value: "" + this.course},
+            {type: "Speed", value: "" + this.speed},
             {type: "Latitude", value: "" +  (Math.round(this.lat * ShipDetails.rounding) / ShipDetails.rounding) },
             {type: "Longitude", value: "" + (Math.round(this.lng * ShipDetails.rounding) / ShipDetails.rounding) },
             {type: "Heading", value: "" + this.heading}
