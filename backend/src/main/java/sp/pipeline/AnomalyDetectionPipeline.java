@@ -236,7 +236,7 @@ public class AnomalyDetectionPipeline {
                     StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
             );
 
-            // Create a copy of the state
+            // Create a copy of the state considering only the current AnomalyInformation values for each ship
             HashMap<String, AnomalyInformation> stateCopy = new HashMap<>();
             try (KeyValueIterator<String, CurrentShipDetails> iter = view.all()) {
                 iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAnomalyInformation()));
@@ -263,7 +263,7 @@ public class AnomalyDetectionPipeline {
                     StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
             );
 
-            // Create a copy of the state
+            // Create a copy of the state considering only the current AISSingnal values for each ship
             HashMap<String, AISSignal> stateCopy = new HashMap<>();
             try (KeyValueIterator<String, CurrentShipDetails> iter = view.all()) {
                 iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAISSignal()));
