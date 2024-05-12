@@ -2,7 +2,13 @@ package sp.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 
@@ -23,24 +29,17 @@ public class ShipInformation {
      *
      * @return the respective JSON string
      */
-    public String toJson(){
+    public String toJson() {
         // Assert that there are no flaws in the data
         if (!shipHash.isEmpty() && !shipHash.isBlank()) {
-            if (anomalyInformation != null) {
-                assert(anomalyInformation.getShipHash().equals(shipHash));
-            }
-            if (aisSignal != null) {
-                assert(aisSignal.getShipHash().equals(shipHash));
-            }
-            if (anomalyInformation != null && aisSignal != null) {
-                assert(anomalyInformation.getShipHash().equals(anomalyInformation.getShipHash()));
-            }
+            assert anomalyInformation == null || anomalyInformation.getShipHash().equals(shipHash);
+            assert aisSignal == null || aisSignal.getShipHash().equals(shipHash);
         }
 
         ObjectMapper mapper = new ObjectMapper();
         String json;
         try {
-            json = mapper.writeValueAsString( this );
+            json = mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

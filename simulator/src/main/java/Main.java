@@ -1,20 +1,20 @@
-import helperObjects.Simulator;
-import helperObjects.Timestamp;
+import helperobjects.Simulator;
+import helperobjects.Timestamp;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import parsers.DEBSParser;
 import parsers.Parser;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Properties;
-
 public class Main {
+
     /**
-     * Main method
+     * Main method.
      *
      * @param args arguments
      * @throws InterruptedException exception
@@ -26,19 +26,20 @@ public class Main {
         String topicName = "ships";
         String serverName  = "localhost:9092";
         String dataSetName = "DEBS_DATASET_PUBLIC_second.csv";
-        Timestamp startTime = new Timestamp(2015, 04, 1, 20, 25);
-        Timestamp endTimestamp = new Timestamp(2015, 04, 1, 20, 25);
+        Timestamp startTime = new Timestamp(2015, 4, 1, 20, 25);
+        Timestamp endTimestamp = new Timestamp(2015, 4, 1, 20, 25);
 
         Parser parser = new DEBSParser(getReader(dataSetName));
-        KafkaProducer<String, String> producer = createProducer(serverName);
-        Simulator simulator = new Simulator(parser, startTime, endTimestamp, topicName, producer);
-        simulator.setSpeed(60);
+        try (KafkaProducer<String, String> producer = createProducer(serverName)) {
+            Simulator simulator = new Simulator(parser, startTime, endTimestamp, topicName, producer);
+            simulator.setSpeed(60);
 
-        simulator.startStream();
+            simulator.startStream();
+        }
     }
 
     /**
-     * Returns a Kafka producer
+     * Returns a Kafka producer.
      *
      * @param server name of the server
      * @return Kafka producer with specified configurations
@@ -60,6 +61,6 @@ public class Main {
      * @throws FileNotFoundException throw in case the file is not found
      */
     private static BufferedReader getReader(String fileName) throws FileNotFoundException {
-        return new BufferedReader(new FileReader("simulator/streaming_data/"+ fileName));
+        return new BufferedReader(new FileReader("simulator/streaming_data/" + fileName));
     }
 }

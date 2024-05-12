@@ -1,4 +1,5 @@
 import L from "leaflet";
+import { calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
 
 
 /**
@@ -8,10 +9,7 @@ import L from "leaflet";
  * @return - the icon of the ship
  */
 function createShipIcon(weight: number, rotation: number): L.Icon {
-    const green = Math.floor(255 * (1 - weight));
-    const red = Math.floor(255 * weight);
-    const alpha = 0.7;
-    const color = `rgba(${red}, ${green}, 0, ${alpha})`;
+    const color = calculateAnomalyColor(weight * 100);
 
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');

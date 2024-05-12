@@ -1,8 +1,4 @@
-package helperObjects;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import parsers.Parser;
+package helperobjects;
 
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
@@ -10,7 +6,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import parsers.Parser;
 
+@Setter
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -21,7 +23,7 @@ public class Stream {
     private Timestamp streamEnd;
 
     /**
-     * Constructor for the Stream object
+     * Constructor for the Stream object.
      *
      * @param streamStart starting timestamp for the stream
      * @param streamEnd ending timestamp for the stream
@@ -34,7 +36,7 @@ public class Stream {
     }
 
     /**
-     * Parses the data for the data file
+     * Parses the data for the data file.
      *
      * @param parser parser for a needed data file
      * @return parsed data from the data file
@@ -45,7 +47,7 @@ public class Stream {
     }
 
     /**
-     * Sorts the parsed data according to it's timestamp
+     * Sorts the parsed data according to its timestamp.
      */
     public void sortStream() {
         if (data == null || data.isEmpty()) return;
@@ -53,26 +55,8 @@ public class Stream {
     }
 
     /**
-     * Sets the timestamp for the first signal that should be streamed.
-     *
-     * @param streamStart timestamp for the start of the stream.
-     */
-    public void setStreamStart(Timestamp streamStart) {
-        this.streamStart = streamStart;
-    }
-
-    /**
-     * Sets the timestamp for the last signal that should be streamed.
-     *
-     * @param streamEnd timestamp for the end of the stream.
-     */
-    public void setStreamEnd(Timestamp streamEnd) {
-        this.streamEnd = streamEnd;
-    }
-
-    /**
      * Returns the actual data that will be streamed, that corresponds to the signals that should be streamed in between
-     * the specified starting timestamp and ending timestamp
+     * the specified starting timestamp and ending timestamp.
      *
      * @return the actual data that will be streamed
      */
@@ -84,12 +68,4 @@ public class Stream {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Sets the data of the stream
-     *
-     * @param data data of the stream object
-     */
-    public void setData(List<SimpleEntry<Timestamp, String>> data) {
-        this.data = data;
-    }
 }

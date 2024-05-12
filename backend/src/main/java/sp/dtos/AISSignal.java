@@ -28,20 +28,21 @@ public class AISSignal implements Serializable {
     public final String departurePort;
 
     /**
-     * Returns the object in JSON format
+     * Returns the object in JSON format.
      *
      * @return json representation of the object
      */
     public String toJson() {
         ObjectMapper mapper = new ObjectMapper();
-        try {return mapper.writeValueAsString(this);}
-        catch (JsonProcessingException e) {
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Creates the AIS object from a given string
+     * Creates the AIS object from a given string.
      *
      * @param val string value (in JSON format) that is being converted to an AIS object
      * @return AIS object from a given string

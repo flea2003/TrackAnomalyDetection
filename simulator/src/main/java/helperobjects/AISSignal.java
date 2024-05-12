@@ -1,11 +1,14 @@
-package helperObjects;
+package helperobjects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.*;
-
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(force = true)
@@ -15,17 +18,17 @@ import java.io.Serializable;
 @JsonSerialize
 public class AISSignal implements Serializable {
 
-    public final String shipHash;
-    public final float speed;
-    public final float longitude;
-    public final float latitude;
-    public final float course;
-    public final float heading;
-    public final String timestamp;
-    public final String departurePort;
+    private final String shipHash;
+    private final float speed;
+    private final float longitude;
+    private final float latitude;
+    private final float course;
+    private final float heading;
+    private final String timestamp;
+    private final String departurePort;
 
     /**
-     * Returns the object in JSON format
+     * Returns the object in JSON format.
      *
      * @return json representation of the object
      */
@@ -35,7 +38,7 @@ public class AISSignal implements Serializable {
     }
 
     /**
-     * Creates the AIS object from a given string
+     * Creates the AIS object from a given string.
      *
      * @param val string value (in JSON format) that is being converted to an AIS object
      * @return AIS object from a given string

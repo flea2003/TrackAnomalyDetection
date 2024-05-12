@@ -46,3 +46,13 @@ simulator_checkstyle:
     - chmod +x ./gradlew
   script:
     - ./gradlew checkstyleMain
+
+simulator_pmd_static_analysis:
+  stage: code_quality
+  image: gradle:7.6.0-jdk17
+  needs: ["simulator_build"]
+  before_script:
+    - cd simulator
+    - chmod +x ./gradlew
+  script:
+    - ./gradlew pmdMain
