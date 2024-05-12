@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom';
 import ShipService from "../services/ShipService";
 
+// Mock the HttpSender static instance of the ShipService class
+// such that its get() method returns 2 proper arrays
 describe("Test successful execution", () => {
     jest.mock('../services/ShipService', () => ({
         __esModule: true,
@@ -39,7 +41,8 @@ describe("Test successful execution", () => {
     });
 });
 
-
+// Mock the HttpSender static instance of the ShipService class
+// such that its get() method returns 2 empty arrays
 describe('Execution with empty arrays', () => {
     jest.mock('../services/ShipService', () => ({
         __esModule: true,
@@ -65,7 +68,9 @@ describe('Execution with empty arrays', () => {
     });
 })
 
-
+// Mock the HttpSender static instance of the ShipService class
+// such that its get() method returns a proper array containing the anomaly information of 1 ship
+// and an empty array corresponding to the AIS signal of that ship
 describe('Execution with empty AIS array', () => {
     jest.mock('../services/ShipService', () => ({
         __esModule: true,
@@ -95,6 +100,10 @@ describe('Execution with empty AIS array', () => {
     });
 })
 
+
+// Mock the HttpSender static instance of the ShipService class
+// such that its get() method returns two proper arrays with AIS and anomaly information
+// for 2 different ships
 describe('Execution with un-matching arrays', () => {
     jest.mock('../services/ShipService', () => ({
         __esModule: true,
@@ -133,6 +142,10 @@ describe('Execution with un-matching arrays', () => {
     });
 });
 
+
+// Mock the HttpSender static instance of the ShipService class
+// such that its get() method returns a proper array containing the AIS information of 1 ship
+// and an empty array corresponding to the anomaly information of that ship
 describe('Execution with empty AnomalyInfo array', () => {
     jest.mock('../services/ShipService', () => ({
         __esModule: true,

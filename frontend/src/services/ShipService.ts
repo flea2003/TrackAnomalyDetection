@@ -33,13 +33,11 @@ class ShipService {
         const result =  Promise.all([AISResults, AnomalyInfoResults])
             .then(([aisResults, anomalyInfoResults]: [AISSignal[], AnomalyInformation[]]) => {
                 return aisResults.reduce((result: ShipDetails[], aisSignal: AISSignal) => {
-                    // We match the items based on the ID (hash) of the ship
+                    // We match the AISSignal items based on the ID (hash) of the ship
                     const matchingAnomalyInfo = anomalyInfoResults.find((item) => item["id"] === aisSignal["id"]);
                     if(matchingAnomalyInfo){
-                        // TODO: Modify the 'explanation' field of the ShipDetails instance
-                        const shipDetailsItem = new ShipDetails(aisSignal.id,aisSignal.heading,aisSignal.lat, aisSignal.long,
-                            matchingAnomalyInfo.anomalyScore,"",aisSignal.departurePort,aisSignal.course,
-                            aisSignal.speed);
+                        // Compose a ShipDetails instance given the matching AISSignal and AnomalyInformation items
+                        const shipDetailsItem = ShipService.createShipDetailsFromDTOs(aisSignal, matchingAnomalyInfo);
                         result.push(shipDetailsItem);
                     }
                     return result;
@@ -89,6 +87,11 @@ class ShipService {
             });
     }
 
+    static createShipDetailsFromDTOs(aisSignal: AISSignal, anomalyInfo: AnomalyInformation): ShipDetails {
+        // TODO: Modify the 'explanation' field of the ShipDetails instance
+        return new ShipDetails(aisSignal.id, aisSignal.heading, aisSignal.lat, aisSignal.long,
+            anomalyInfo.anomalyScore,"", aisSignal.departurePort, aisSignal.course,
+            aisSignal.speed);
+    }
 }
-
 export default ShipService;
