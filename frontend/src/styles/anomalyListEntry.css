@@ -9,6 +9,12 @@
 
     display: flex;
     justify-content: space-between;
+
+    /* Make sure when hovering it s like a link */
+    cursor: pointer;
+}
+.anomaly-list-entry:hover{
+    font-weight: 500;
 }
 
 .anomaly-list-entry-main-text {

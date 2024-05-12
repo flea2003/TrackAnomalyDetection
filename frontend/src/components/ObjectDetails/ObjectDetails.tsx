@@ -7,36 +7,55 @@ import ObjectDetailsEntry from "./ObjectDetailsEntry";
 import "../../styles/common.css";
 import "../../styles/objectDetails.css";
 
+interface ObjectDetailsProps {
+    ships: ShipDetails[],
+    shipId: string,
+    pageChanger: Function
+}
+
 /**
  * This component is the second column of the main view of the application. It displays the details of a selected object.
  * The object to whose details are to be displayed is passed as a prop.
+ *
+ * @param props properties passed to this component. Most importantly, it contains the ship object whose details to display.
  */
-function ObjectDetails(props: { ship: ShipDetails}): JSX.Element {
+function ObjectDetails(props: ObjectDetailsProps) {
 
-    const ship = props.ship;
+    // Extract the props
+    const allShips = props.ships;
+    const shipID = props.shipId;
+    const pageChanger = props.pageChanger;
 
-    const entries = [];
-    const entryCount = 40;
+    // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
+    const ship = allShips.find((ship) => ship.id === shipID);
+    if (ship === undefined) {
+        return (
+            <Stack id="object-details-container">
+                <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">Not found</span></span>
+            </Stack>
+        )
+    }
 
-    // Just an example. In fact, these details should be extracted from the ship object.
-    entries.push(<ObjectDetailsEntry type={"Object type"} value={"Ship"} />);
-    entries.push(<ObjectDetailsEntry type={"Anomaly score"} value={"95%"} />);
-    entries.push(<ObjectDetailsEntry type={"Explanation"} value={"The ship has been travelling faster than 30 knots for more than 15 minutes."} />);
-    entries.push(<ObjectDetailsEntry type={"Speed"} value={"10 knots"} />);
-    entries.push(<ObjectDetailsEntry type={"Longitude"} value={"" + ship.lng} />);
-    entries.push(<ObjectDetailsEntry type={"Latitude"} value={"" + ship.lat} />);
-    entries.push(<ObjectDetailsEntry type={"Heading"} value={"" + ship.heading} />);
+    // Create a list of properties to display
+    const properties = ship.getPropertyList();
+    const propertyList = properties.map((property) => {
+        return <ObjectDetailsEntry key={property.type} type={property.type} value={property.value} />
+    });
 
+    // Define the return icon and its click handler
     const returnIcon = require("../../assets/icons/back.svg").default;
+    const onReturnClicked = () => {
+        pageChanger({currentPage: "anomalyList", shownShipId: ""});
+    }
 
     return (
         <Stack id="object-details-container">
             <div className="object-details-title-container">
-                <img src={returnIcon} className="object-details-return-icon" />
-                <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">{ship.name}</span> </span>
+                <img src={returnIcon} className="object-details-return-icon" onClick={onReturnClicked}/>
+                <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">{ship.id}</span> </span>
             </div>
             <List style={{maxHeight: '100%', overflow: 'auto'}} className="object-details-list">
-                {entries}
+                {propertyList}
             </List>
         </Stack>
     )

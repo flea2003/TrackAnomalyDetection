@@ -5,10 +5,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 2px;
 }
 
 .sidebar-icon {
     width: var(--sidebar-icon-size);
     height: var(--sidebar-icon-size);
+}
+
+.sidebar-entry:hover {
+    cursor: pointer;
+    background-color: lightblue;
 }
