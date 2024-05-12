@@ -1,8 +1,8 @@
 // Create a class to get ship information from the server
 import ShipDetails from "../model/ShipDetails";
 import HttpSender from "../utils/HttpSender";
-import AISSignal from "../model/AISSignal";
-import AnomalyInformation from "../model/AnomalyInformation";
+import AISSignal from "../dtos/AISSignal";
+import AnomalyInformation from "../dtos/AnomalyInformation";
 
 class ShipService {
     static httpSender: HttpSender = new HttpSender();

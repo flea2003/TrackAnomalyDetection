@@ -35,12 +35,10 @@ class ShipDetails{
             {type: "Object type", value: "Ship"},
             {type: "Anomaly score", value: this.anomalyScore + "%"},
             {type: "Explanation", value: this.explanation},
-            {type: "Longitude", value: "" + this.lng},
-            {type: "Latitude", value: "" + this.lat},
             {type: "Heading", value: "" + this.heading},
             {type: "Departure Port", value: "" + this.departurePort},
             {type: "Course", value: "" + this.course},
-            {type: "Speed", value: "" + this.speed}
+            {type: "Speed", value: "" + this.speed},
             {type: "Latitude", value: "" +  (Math.round(this.lat * ShipDetails.rounding) / ShipDetails.rounding) },
             {type: "Longitude", value: "" + (Math.round(this.lng * ShipDetails.rounding) / ShipDetails.rounding) },
             {type: "Heading", value: "" + this.heading}
