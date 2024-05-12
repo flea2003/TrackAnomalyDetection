@@ -21,7 +21,10 @@ public class Timestamp implements Comparable<Timestamp> {
     private int hour;
     private String timestamp;
 
-
+    /**
+     * Method used for creating an object when deparsing a JSON object
+     * @param time - the string in the JSON object
+     */
     public Timestamp(String time) {
         String[] values = time.split(" ");
         String[] yearsMonthsDays = values[0].split("/");

@@ -16,8 +16,8 @@ import java.io.Serializable;
 public class AnomalyInformation implements Serializable {
     private final Float score;
     private final String explanation;
-//    @JsonProperty("timestamp")
-    private final String correspondingTimestamp;
+    @JsonProperty("timestamp")
+    private final Timestamp correspondingTimestamp;
     private final String shipHash;
 
     /**

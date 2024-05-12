@@ -23,10 +23,8 @@ public class AISSignal implements Serializable {
     public final float latitude;
     public final float course;
     public final float heading;
-
-//    @JsonProperty("timestamp")
-    public final String timestamp;
-
+    @JsonProperty("timestamp")
+    public final Timestamp timestamp;
     public final String departurePort;
 
     /**
