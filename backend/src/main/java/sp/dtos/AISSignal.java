@@ -1,4 +1,4 @@
-package sp.model;
+package sp.dtos;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,9 +30,12 @@ public class AISSignal implements Serializable {
      *
      * @return json representation of the object
      */
-    public String toJson() throws JsonProcessingException {
+    public String toJson() {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(this);
+        try {return mapper.writeValueAsString(this);}
+        catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -41,8 +44,12 @@ public class AISSignal implements Serializable {
      * @param val string value (in JSON format) that is being converted to an AIS object
      * @return AIS object from a given string
      */
-    public static AISSignal fromJson(String val) throws JsonProcessingException {
+    public static AISSignal fromJson(String val) {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(val, AISSignal.class);
+        try {
+            return mapper.readValue(val, AISSignal.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

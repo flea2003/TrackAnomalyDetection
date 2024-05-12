@@ -136,9 +136,28 @@ public class TestStream {
     }
 
     @Test
-    void testSortEmptyData(){
+    void testSortEmptyData1(){
         stream.setData(null);
         stream.sortStream();
         assertThat(stream.getData()).isEqualTo(new ArrayList<>());
+    }
+
+    @Test
+    void testSortEmptyData2(){
+        stream.setData(new ArrayList<>());
+        stream.sortStream();
+        assertThat(stream.getData()).isEqualTo(new ArrayList<>());
+    }
+
+    @Test
+    void testGetEmptyData(){
+        stream.setData(null);
+        assertThat(stream.getData()).isEqualTo(new ArrayList<>());
+    }
+
+    @Test
+    void testGetSimpleData(){
+        stream.setData(resultingData);
+        assertThat(stream.getData()).isEqualTo(resultingData);
     }
 }

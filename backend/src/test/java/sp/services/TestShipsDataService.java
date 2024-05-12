@@ -3,23 +3,22 @@ package sp.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
-import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
-import sp.model.Exceptions.NotExistingShipException;
-import sp.model.Exceptions.PipelineException;
+import sp.exceptions.NotExistingShipException;
+import sp.exceptions.PipelineException;
+import sp.model.ShipInformation;
 import sp.pipeline.AnomalyDetectionPipeline;
-
 import java.util.HashMap;
 import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
-public class ShipsDataServiceTest {
+public class TestShipsDataService {
 
     private ShipsDataService shipsDataService;
     private ShipsDataService shipsDataServiceBroken;
@@ -52,25 +51,26 @@ public class ShipsDataServiceTest {
                 20.0f, 60.0f, 80.0f,
                 "17/04/2015", "Beijing");
 
-        List<AISSignal> ship1 = List.of(signal1, signal3);
-        List<AISSignal> ship2 = List.of(signal2);
-        List<AISSignal> ship3 = List.of(signal4, signal5);
-        List<AISSignal> ship4 = List.of(signal6);
+        List<ShipInformation> ship1 = List.of(new ShipInformation("hash1", new AnomalyInformation(0.5f, "", "", ""), signal1), new ShipInformation("hash3", new AnomalyInformation(0.7f, "", "", ""), signal3));
+
+        List<ShipInformation> ship3 = List.of(new ShipInformation("hash3", new AnomalyInformation(0.7f, "", "", ""), signal4));
+
+
         CurrentShipDetails currentShipDetails1 = new CurrentShipDetails();
-        currentShipDetails1.setScore(0.5f);
-        currentShipDetails1.setPastSignals(ship1);
+        currentShipDetails1.setAnomalyInformation(new AnomalyInformation(0.5f, "", "", "hash1"));
+        currentShipDetails1.setPastInformation(ship1);
 
         CurrentShipDetails currentShipDetails2 = new CurrentShipDetails();
-        currentShipDetails2.setScore(0.2f);
-        currentShipDetails2.setPastSignals(ship2);
+        currentShipDetails2.setAnomalyInformation(new AnomalyInformation(0.2f, "", "", ""));
+        currentShipDetails2.setPastInformation(ship3);
 
         CurrentShipDetails currentShipDetails3 = new CurrentShipDetails();
-        currentShipDetails3.setScore(0.7f);
-        currentShipDetails3.setPastSignals(ship3);
+        currentShipDetails3.setAnomalyInformation(new AnomalyInformation(0.7f, "", "", ""));
+        currentShipDetails3.setPastInformation(ship1);
 
         CurrentShipDetails currentShipDetails4 = new CurrentShipDetails();
-        currentShipDetails4.setScore(0.1f);
-        currentShipDetails4.setPastSignals(ship4);
+        currentShipDetails4.setAnomalyInformation(new AnomalyInformation(0.1f, "", "", ""));
+        currentShipDetails4.setPastInformation(ship3);
 
         map = new HashMap<>(){{
             put("hash1", currentShipDetails1);
@@ -133,16 +133,6 @@ public class ShipsDataServiceTest {
     void getCurrentAnomalyInformationTestPipelineException(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAnomalyInformation("hash6"))
                 .isInstanceOf(PipelineException.class);
-    }
-
-    @Test
-    void getCurrentAISInformationOfAllShipsTest(){
-        try {
-            List<AISSignal> AISInformationOfAllShips = shipsDataService.getCurrentAISInformationOfAllShips();
-            assertThat(AISInformationOfAllShips).containsExactlyInAnyOrder(signal2, signal3, signal5, signal6);
-        }catch (Exception e){
-          fail("Expected result but error was thrown");
-        }
     }
 
     @Test

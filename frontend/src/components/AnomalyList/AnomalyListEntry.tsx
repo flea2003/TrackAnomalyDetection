@@ -3,6 +3,7 @@ import Stack from '@mui/material/Stack';
 import PropTypes from 'prop-types';
 
 import ShipDetails from '../../model/ShipDetails';
+import { calculateAnomalyColor } from '../../utils/AnomalyColorCalculator';
 
 import '../../styles/common.css';
 import '../../styles/anomalyListEntry.css';
@@ -14,24 +15,11 @@ interface AnomalyListEntryProps {
 }
 
 /**
- * Given an anomaly score, this function calculates the color of the anomaly list entry.
- *
- * @param shipAnomalyScore the anomaly score of the ship
- * @returns the color of the anomaly list entry
- */
-function calculateAnomalyColor(shipAnomalyScore : number) {
-    shipAnomalyScore /= 100.0;
-    const green = Math.floor(255 * (1 - shipAnomalyScore));
-    const red = Math.floor(255 * shipAnomalyScore);
-    const alpha = 0.4;
-    return `rgba(${red}, ${green}, 0, ${alpha})`;
-}
-
-/**
  * This component is a single entry in the Anomaly List. It displays the anomaly score and an icon of an object.
  * The object to render is passed as a prop.
  *
- * @param props properties passed to this component. Most importantly, it contains the ship details to display.
+ * @param shipDetails the specific details of the ship to display
+ * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 function AnomalyListEntry({ shipDetails, pageChanger } : AnomalyListEntryProps) {
 

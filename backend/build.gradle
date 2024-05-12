@@ -3,6 +3,8 @@ plugins {
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'checkstyle'
+	id 'jacoco'
+	id 'info.solidsoft.pitest' version '1.15.0'
 
 	// For Flink
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -115,7 +117,30 @@ shadowJar {
 	configurations = [project.configurations.flinkShadowJar]
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }
 
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+	dependsOn test // Ensures that the test task completes before generating the report.
+
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+pitest {
+	//adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
+	// check https://github.com/pitest/pitest-junit5-plugin?tab=readme-ov-file#gradle
+	junit5PluginVersion = '1.2.1'
+
+	targetClasses = ['sp.*']
+	threads = 4
+	timestampedReports = false
+	outputFormats = ['XML', 'HTML']
+}

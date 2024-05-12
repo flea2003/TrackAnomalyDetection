@@ -1,4 +1,5 @@
 class ShipDetails{
+    static rounding: number = 1000;
     id: string;
     heading: number;
     lat: number;
@@ -40,6 +41,9 @@ class ShipDetails{
             {type: "Departure Port", value: "" + this.departurePort},
             {type: "Course", value: "" + this.course},
             {type: "Speed", value: "" + this.speed}
+            {type: "Latitude", value: "" +  (Math.round(this.lat * ShipDetails.rounding) / ShipDetails.rounding) },
+            {type: "Longitude", value: "" + (Math.round(this.lng * ShipDetails.rounding) / ShipDetails.rounding) },
+            {type: "Heading", value: "" + this.heading}
         ];
     }
 }

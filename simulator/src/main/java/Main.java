@@ -1,3 +1,4 @@
+import helperObjects.Simulator;
 import helperObjects.Timestamp;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;

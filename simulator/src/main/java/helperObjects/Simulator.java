@@ -1,5 +1,5 @@
-import helperObjects.Stream;
-import helperObjects.Timestamp;
+package helperObjects;
+
 import parsers.Parser;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -15,9 +15,9 @@ public class Simulator {
     private int speed;
 
     /**
-     * Constructor for the Simulator object. It instantiates the Stream object, which calls a needed parser that
-     * parses the data file, then sorts the signals by their timestamp, and specifies the rest of the data needed
-     * for streaming the data.
+     * Constructor for the helperObjects.Simulator object. It instantiates the Stream object, which calls a needed
+     * parser that parses the data file, then sorts the signals by their timestamp, and specifies the rest of the
+     * data needed for streaming the data.
      *
      * @param parser        parser for the needed data file
      * @param streamStart   start timestamp of the stream

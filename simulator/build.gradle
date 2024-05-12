@@ -1,16 +1,12 @@
 plugins {
     id 'java'
     id 'checkstyle'
-    id 'info.solidsoft.pitest' version '1.5.2'
+    id 'info.solidsoft.pitest' version '1.15.0'
     id 'jacoco'
 }
 
-apply plugin: 'jacoco'
-
 group = 'org.example'
 version = '1.0-SNAPSHOT'
-
-
 
 repositories {
     mavenCentral()
@@ -41,31 +37,32 @@ test {
     useJUnitPlatform()
 }
 
-apply plugin: 'info.solidsoft.pitest'
 pitest {
     //adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
-    junit5PluginVersion = '0.12'
+    // check https://github.com/pitest/pitest-junit5-plugin?tab=readme-ov-file#gradle
+    junit5PluginVersion = '1.2.1'
 
-    targetClasses = ['helperObjects.*']
-    excludedClasses = []
-    pitestVersion = '1.5.1' //not needed when a default PIT version should be used
+    targetClasses = ['helperObjects.*', 'parsers.*']
     threads = 4
-    outputFormats = ['XML', 'HTML']
     timestampedReports = false
+    outputFormats = ['XML', 'HTML']
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.12"
 }
 
 jacocoTestReport {
     dependsOn test // Ensures that the test task completes before generating the report.
-
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "Main.class"
+            ])
+        }))
+    }
     reports {
         xml.required = true
         html.required = true
     }
 }
-
-
-

@@ -7,6 +7,7 @@ import parsers.Parser;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +77,7 @@ public class Stream {
      * @return the actual data that will be streamed
      */
     public List<SimpleEntry<Timestamp, String>> getData() {
-        if (this.data == null || this.data.isEmpty()) return new ArrayList<>();
+        if (this.data == null) return Collections.emptyList();
         else return this.data.stream()
                 .filter(entry -> entry.getKey().compareTo(this.streamStart) >= 0
                         && entry.getKey().compareTo(this.streamEnd) <= 0)

@@ -18,19 +18,20 @@ interface AnomalyListProps {
  * This component is the second column of the main view of the application. It essentially displays
  * the "Anomaly List" title and renders all the AnomalyListEntry components.
  *
- * @param props properties passed to this component. Most importantly, it contains the list of ships to display.
+ * @param ships a list of ships to display in the list
+ * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 function AnomalyList({ ships, pageChanger }: AnomalyListProps) {
 
     const listEntries = [];
     for (var i = 0; i < ships.length; i++) {
-        listEntries.push(<AnomalyListEntry shipDetails={ships[i]} pageChanger={pageChanger} />);
+        listEntries.push(<AnomalyListEntry key={i} shipDetails={ships[i]} pageChanger={pageChanger} />);
     }
 
     return (
         <Stack id="anomaly-list-container">
             <span id="anomaly-list-title">Anomaly list</span>
-            <List id="anomaly-list-internal-container"style={{maxHeight: '100%', overflow: 'auto', padding: '0'}}>
+            <List id="anomaly-list-internal-container" style={{maxHeight: '100%', overflow: 'auto', padding: '0'}}>
                 {listEntries}
             </List>
         </Stack>
