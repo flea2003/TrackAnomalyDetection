@@ -1,17 +1,22 @@
-package helperObjects;
+package helperobjects;
 
-import parsers.Parser;
+import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import java.io.IOException;
-import java.util.List;
-import java.util.AbstractMap.SimpleEntry;
-
+import parsers.Parser;
 
 public class Simulator {
-    private Stream stream;
-    private String topicName;
-    private KafkaProducer<String, String> producer;
+
+    @Getter
+    private final Stream stream;
+    private final String topicName;
+    private final KafkaProducer<String, String> producer;
+
+    @Setter
     private int speed;
 
     /**
@@ -36,14 +41,13 @@ public class Simulator {
     }
 
     /**
-     * Constructor for setting the wanted stream manually
+     * Constructor for setting the wanted stream manually.
      *
      * @param stream actual stream object containing the data that will be streamed
      * @param topicName the topic name
      * @param producer the Kafka producer
-     * @throws IOException
      */
-    public Simulator(Stream stream, String topicName, KafkaProducer<String, String> producer) throws IOException {
+    public Simulator(Stream stream, String topicName, KafkaProducer<String, String> producer) {
         this.stream = stream;
         this.topicName = topicName;
         this.producer = producer;
@@ -54,14 +58,14 @@ public class Simulator {
      * Method responsible to start the actual streaming of the data. Once called, it starts streaming AIS signals to
      * the specified topic.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException when interrupted
      */
     public void startStream() throws InterruptedException {
         // Get the stream data
         List<SimpleEntry<Timestamp, String>> data = stream.getData();
 
         // If the data is empty, return
-        if (data.size() == 0) return;
+        if (data.isEmpty()) return;
 
         // Set the previous signal as the first one
         SimpleEntry<Timestamp, String> previous = data.get(0);
@@ -78,7 +82,7 @@ public class Simulator {
                 long difference = entry.getKey().difference(previous.getKey());
 
                 // Note that in our case we assume that the signals are retrieved in minutes, not seconds.
-                Thread.sleep(difference*1000*60/this.speed);
+                Thread.sleep(difference * 1000 * 60 / this.speed);
                 producer.send(new ProducerRecord<>(this.topicName, entry.getValue()), (metadata, exception) -> {});
             }
 
@@ -86,24 +90,6 @@ public class Simulator {
             producer.flush();
             previous = entry;
         }
-        producer.close();
     }
 
-    /**
-     * Sets the speed of the stream. The higher the speed variable, the faster the stream will be streamed.
-     *
-     * @param speed speed factor
-     */
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    /**
-     * Returns the stream data (as a Stream object)
-     *
-     * @return the data that should be streamed
-     */
-    public Stream getStream() {
-        return stream;
-    }
 }

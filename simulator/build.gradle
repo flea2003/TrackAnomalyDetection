@@ -3,6 +3,7 @@ plugins {
     id 'checkstyle'
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'jacoco'
+    id 'pmd'
 }
 
 group = 'org.example'
@@ -28,9 +29,11 @@ dependencies {
 }
 
 checkstyle {
-    toolVersion = '10.15.0'
-    config = resources.text.fromFile('checkstyle.xml')
     sourceSets = [sourceSets.main]
+    toolVersion = '10.16.0'
+    config = resources.text.fromFile('../config/checkstyle.xml')
+    showViolations = true
+    ignoreFailures = false // makes the build fail on violations
 }
 
 test {
@@ -65,4 +68,14 @@ jacocoTestReport {
         xml.required = true
         html.required = true
     }
+}
+
+pmd {
+    sourceSets = [sourceSets.main]
+    ruleSets = []
+    ruleSetFiles = files('../config/pmd.xml')
+    incrementalAnalysis = true
+    ignoreFailures = false
+    consoleOutput = true
+    threads = 4
 }
