@@ -1,39 +1,24 @@
-package helperObjects;
+package helperobjects;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import lombok.*;
 
-@Getter
-@ToString
-@EqualsAndHashCode
-public class Timestamp implements Comparable<Timestamp> {
-
-    private int year;
-    private int month;
-    private int day;
-    private int minute;
-    private int hour;
+public record Timestamp(int year, int month, int day, int hour, int minute) implements Comparable<Timestamp> {
 
     /**
-     * Constructor for a helper object, that corresponds to the timestamp of an AIS signal
+     * Constructor for a helper object, that corresponds to the timestamp of an AIS signal.
      *
-     * @param year
-     * @param month
-     * @param day
-     * @param hour
-     * @param minute
+     * @param year   integer representing year
+     * @param month  integer representing month
+     * @param day    integer representing day
+     * @param hour   integer representing hour
+     * @param minute integer representing minute
      */
-    public Timestamp(int year, int month, int day, int hour, int minute) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.minute = minute;
-        this.hour = hour;
+    public Timestamp {
     }
 
     /**
-     * CompareTo method for comparing two timestamps
+     * CompareTo method for comparing two timestamps.
      *
      * @param timestamp the object to be compared.
      * @return integer that corresponds to weather the comparable timestamp corresponds to an earlier date
@@ -50,10 +35,10 @@ public class Timestamp implements Comparable<Timestamp> {
     }
 
     /**
-     * Returns the difference of two timestamps in minutes
+     * Returns the difference of two timestamps in minutes.
      *
      * @param timestamp timestamp to be compared
-     * @return  the difference of two timestamps in minutes
+     * @return the difference of two timestamps in minutes
      */
     public long difference(Timestamp timestamp) {
         LocalDateTime dateTime1 = LocalDateTime.of(year, month, day, hour, minute);

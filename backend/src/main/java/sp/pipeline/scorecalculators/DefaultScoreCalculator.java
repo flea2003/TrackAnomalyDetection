@@ -1,16 +1,17 @@
-package sp.pipeline.scoreCalculators;
+package sp.pipeline.scorecalculators;
 
-import sp.dtos.AnomalyInformation;
-import sp.dtos.AISSignal;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.stereotype.Component;
-import sp.pipeline.scoreCalculators.components.SampleStatefulMapFunction;
+import sp.dtos.AISSignal;
+import sp.dtos.AnomalyInformation;
+import sp.pipeline.scorecalculators.components.SampleStatefulMapFunction;
 
 @Component
-public class DefaultScoreCalculator implements ScoreCalculationStategy{
+public class DefaultScoreCalculator implements ScoreCalculationStrategy {
+
     /**
      * Simple example of Flink score calculation. Takes as input the AIS signals, keys by ship ID and for each
-     * incoming AIS signal per ship, increases the current score (done inside of the SampleStatefulMapFunction).
+     * incoming AIS signal per ship, increases the current score (done inside the SampleStatefulMapFunction).
      *
      * @param source the source stream of incoming AIS signals
      * @return a stream of score updates

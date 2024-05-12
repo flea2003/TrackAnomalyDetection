@@ -1,10 +1,10 @@
-package sp.pipeline.scoreCalculators;
+package sp.pipeline.scorecalculators;
 
-import sp.dtos.AnomalyInformation;
-import sp.dtos.AISSignal;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import sp.dtos.AISSignal;
+import sp.dtos.AnomalyInformation;
 
-public interface ScoreCalculationStategy {
+public interface ScoreCalculationStrategy {
     /**
      * The key method to implement when setting up the sp.pipeline. This method takes as argument a Flink
      * DataStream of AIS signals and is supposed to return a FlinkStream of AISUpdate objects. Everything

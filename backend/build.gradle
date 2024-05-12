@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'checkstyle'
+	id 'pmd'
 	id 'jacoco'
 	id 'info.solidsoft.pitest' version '1.15.0'
 
@@ -34,11 +35,12 @@ bootRun{
 }
 
 checkstyle {
-	toolVersion = '10.15.0'
-	config = resources.text.fromFile('checkstyle.xml')
 	sourceSets = [sourceSets.main]
+	toolVersion = '10.16.0'
+	config = resources.text.fromFile('../config/checkstyle.xml')
+	showViolations = true
+	ignoreFailures = false // makes the build fail on violations
 }
-
 
 repositories {
 	mavenCentral()
@@ -143,4 +145,15 @@ pitest {
 	threads = 4
 	timestampedReports = false
 	outputFormats = ['XML', 'HTML']
+}
+
+
+pmd {
+	sourceSets = [sourceSets.main]
+	ruleSets = []
+	ruleSetFiles = files('../config/pmd.xml')
+	incrementalAnalysis = true
+	ignoreFailures = false
+	consoleOutput = true
+	threads = 4
 }

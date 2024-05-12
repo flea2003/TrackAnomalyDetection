@@ -1,15 +1,19 @@
-package sp.pipeline.scoreCalculators.components;
+package sp.pipeline.scorecalculators.components;
 
-import sp.dtos.AnomalyInformation;
-import sp.dtos.AISSignal;
+import java.time.Duration;
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.api.common.state.*;
+import org.apache.flink.api.common.state.ListState;
+import org.apache.flink.api.common.state.ListStateDescriptor;
+import org.apache.flink.api.common.state.StateTtlConfig;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
+import sp.dtos.AISSignal;
+import sp.dtos.AnomalyInformation;
 
-import java.time.Duration;
 
 public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
 
@@ -18,28 +22,29 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, Anomal
 
     /**
      * The method initializes the state.
+     *
      * @param config The configuration containing the parameters attached to the contract.
      */
     @Override
     public void open(Configuration config) {
 
-        // Setup the time-to-live for the state (30 minutes)
+        // Set up the time-to-live for the state (30 minutes)
         StateTtlConfig ttlConfig = StateTtlConfig
                 .newBuilder(Time.fromDuration(Duration.ofMinutes(30)))
                 .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite)
                 .setStateVisibility(StateTtlConfig.StateVisibility.NeverReturnExpired)
                 .build();
 
-        // Setup the state descriptors
+        // Set up the state descriptors
         ValueStateDescriptor<Float> scoreDescriptor =
                 new ValueStateDescriptor<>(
                         "score",
-                        TypeInformation.of(new TypeHint<Float>() {})
+                        TypeInformation.of(new TypeHint<>() {})
                 );
         ListStateDescriptor<Float> latitudesDescriptor =
                 new ListStateDescriptor<>(
                         "latitudes",
-                        TypeInformation.of(new TypeHint<Float>() {})
+                        TypeInformation.of(new TypeHint<>() {})
                 );
 
         // Set time to live for both states
@@ -79,6 +84,6 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, Anomal
         latitudes.add(value.getLatitude());
 
         // Return the calculated score update
-        return new AnomalyInformation(currentScore, "", value.timestamp, value.shipHash);
+        return new AnomalyInformation(currentScore, "", value.getTimestamp(), value.getShipHash());
     }
 }
