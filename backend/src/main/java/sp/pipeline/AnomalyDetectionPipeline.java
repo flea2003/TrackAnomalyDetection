@@ -22,13 +22,14 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.exceptions.PipelineException;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
-import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
+import sp.pipeline.scoreCalculators.ScoreCalculationStrategy;
 
 @Service
 public class AnomalyDetectionPipeline {
@@ -59,7 +60,7 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy) throws IOException {
+    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy) throws IOException {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         buildPipeline();
     }

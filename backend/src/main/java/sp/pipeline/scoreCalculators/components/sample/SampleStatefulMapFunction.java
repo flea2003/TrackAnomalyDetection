@@ -1,4 +1,4 @@
-package sp.pipeline.scorecalculators.components;
+package sp.pipeline.scoreCalculators.components.sample;
 
 import java.time.Duration;
 import org.apache.flink.api.common.functions.RichMapFunction;

@@ -25,9 +25,9 @@ public class Main {
 
         String topicName = "ships";
         String serverName  = "localhost:9092";
-        String dataSetName = "DEBS_DATASET_PUBLIC_second.csv";
+        String dataSetName = "default_file.csv";
         Timestamp startTime = new Timestamp(2015, 4, 1, 20, 25);
-        Timestamp endTimestamp = new Timestamp(2015, 4, 1, 20, 25);
+        Timestamp endTimestamp = new Timestamp(2015, 4, 6, 20, 25);
 
         Parser parser = new DEBSParser(getReader(dataSetName));
         try (KafkaProducer<String, String> producer = createProducer(serverName)) {
@@ -61,6 +61,6 @@ public class Main {
      * @throws FileNotFoundException throw in case the file is not found
      */
     private static BufferedReader getReader(String fileName) throws FileNotFoundException {
-        return new BufferedReader(new FileReader("simulator/streaming_data/" + fileName));
+        return new BufferedReader(new FileReader("streaming_data/DEBS_DATASET_PUBLIC_second.csv"));
     }
 }

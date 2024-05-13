@@ -9,6 +9,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
@@ -17,15 +18,15 @@ import java.io.Serializable;
 @JsonSerialize
 public class AISSignal implements Serializable {
 
-    public final String shipHash;
-    public final float speed;
-    public final float longitude;
-    public final float latitude;
-    public final float course;
-    public final float heading;
+    public String shipHash;
+    public float speed;
+    public float longitude;
+    public float latitude;
+    public float course;
+    public float heading;
     @JsonProperty("timestamp")
-    public final Timestamp timestamp;
-    public final String departurePort;
+    public  Timestamp timestamp;
+    public  String departurePort;
 
     /**
      * Returns the object in JSON format.

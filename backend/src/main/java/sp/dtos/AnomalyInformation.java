@@ -20,11 +20,11 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class AnomalyInformation implements Serializable {
-    private final Float score;
-    private final String explanation;
+    private Float score;
+    private String explanation;
     @JsonProperty("timestamp")
-    private final Timestamp correspondingTimestamp;
-    private final String shipHash;
+    private Timestamp correspondingTimestamp;
+    private String shipHash;
 
     /**
      * Converts a particular AISUpdate object to a JSON string.
