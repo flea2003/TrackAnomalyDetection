@@ -23,16 +23,16 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
         // Example of creating a simulator
 
-        String topicName = "ships";
+        String topicName = "ships-AIS";
         String serverName  = "localhost:9092";
         String dataSetName = "default_file.csv";
-        Timestamp startTime = new Timestamp(2015, 4, 1, 20, 25);
-        Timestamp endTimestamp = new Timestamp(2015, 4, 6, 20, 25);
+        Timestamp startTime = new Timestamp(2015, 4, 26, 20, 25);
+        Timestamp endTimestamp = new Timestamp(2015, 4, 28, 20, 25);
 
         Parser parser = new DEBSParser(getReader(dataSetName));
         try (KafkaProducer<String, String> producer = createProducer(serverName)) {
             Simulator simulator = new Simulator(parser, startTime, endTimestamp, topicName, producer);
-            simulator.setSpeed(60);
+            simulator.setSpeed(3000);
 
             simulator.startStream();
         }

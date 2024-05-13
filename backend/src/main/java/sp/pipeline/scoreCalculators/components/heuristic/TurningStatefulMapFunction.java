@@ -26,8 +26,8 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
 
         if(pastAnomalyInformation != null && pastAISSignal != null){
 
-            double headingDifference = 180.0 - Math.abs(180 - (pastAISSignal.heading % 360 + value.heading % 360 + 360) % 360);
-            double corseDifference = 180.0 - Math.abs(180 - (pastAISSignal.course % 360 + value.course % 360 + 360) % 360);
+            double headingDifference = 180.0 - Math.abs(180 - (pastAISSignal.heading % 360 - value.heading % 360 + 360) % 360);
+            double corseDifference = 180.0 - Math.abs(180 - (pastAISSignal.course % 360 - value.course % 360 + 360) % 360);
 
             if(headingDifference >= 40 || corseDifference >= 40){
                 lastDetectedAnomalyTime.update(value.timestamp);
@@ -36,11 +36,11 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
             anomalyInformation.setShipHash(value.shipHash);
             anomalyInformation.setCorrespondingTimestamp(value.timestamp);
 
-            if(value.timestamp.difference(lastDetectedAnomalyTime.value()) > 30){
-                anomalyInformation.setScore(0.35f - pastAnomalyInformation.getScore());
+            if(lastDetectedAnomalyTime.value() != null && value.timestamp.difference(lastDetectedAnomalyTime.value()) <= 300){
+                anomalyInformation.setScore(34.0f);
                 anomalyInformation.setExplanation("Bad Turning");
             }else{
-                anomalyInformation.setScore(0 - pastAnomalyInformation.getScore());
+                anomalyInformation.setScore(0.0f);
                 anomalyInformation.setExplanation("Good Turning");
             }
         }
@@ -52,6 +52,8 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
         }
         anomalyInformationValueState.update(anomalyInformation);
         AISSignalValueState.update(value);
+
+        System.out.println(anomalyInformation.getExplanation());
 
         return anomalyInformation;
     }

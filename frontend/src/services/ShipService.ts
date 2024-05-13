@@ -87,7 +87,8 @@ class ShipService {
                     const anomalyInfoResults: AnomalyInformation[] = response.map((item: any) => {
                         return {
                             id: item.shipHash,
-                            anomalyScore: item.score
+                            description: item.explanation,
+                            anomalyScore: item.score,
                         }
                     });
                     return anomalyInfoResults;}
@@ -106,7 +107,7 @@ class ShipService {
     static createShipDetailsFromDTOs(aisSignal: AISSignal, anomalyInfo: AnomalyInformation): ShipDetails {
         // TODO: Modify the 'explanation' field of the ShipDetails instance
         return new ShipDetails(aisSignal.id, aisSignal.heading, aisSignal.lat, aisSignal.long,
-            anomalyInfo.anomalyScore,"", aisSignal.departurePort, aisSignal.course,
+            anomalyInfo.anomalyScore, anomalyInfo.description, aisSignal.departurePort, aisSignal.course,
             aisSignal.speed);
     }
 }

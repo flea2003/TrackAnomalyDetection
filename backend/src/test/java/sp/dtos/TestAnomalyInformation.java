@@ -8,7 +8,7 @@ public class TestAnomalyInformation {
 
     @BeforeEach
     void setUp() {
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", "12/12/12", "hash");
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", new Timestamp("01/04/2015 20:19"), "hash");
     }
 
     @Test

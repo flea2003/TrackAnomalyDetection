@@ -1,5 +1,6 @@
 interface AnomalyInformation{
     id: string;
+    description: string;
     anomalyScore: number;
 }
 

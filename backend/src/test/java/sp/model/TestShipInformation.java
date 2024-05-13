@@ -6,6 +6,8 @@ import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sp.dtos.Timestamp;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestShipInformation {
@@ -16,8 +18,9 @@ public class TestShipInformation {
 
     @BeforeEach
     void setUp() {
-        aisSignal = new AISSignal("hash1", 1, 2, 3, 4, 5, "timestamp1", "port");
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", "12/12/12", "hash1");
+        Timestamp timestamp = new Timestamp("01/04/2015 20:19");
+        aisSignal = new AISSignal("hash1", 1, 2, 3, 4, 5, timestamp, "port");
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", timestamp, "hash1");
         shipInformation = new ShipInformation("hash1",anomalyInformation, aisSignal);
     }
 

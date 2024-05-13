@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 public class TestAISSignal {
 
     String json = "{\"shipHash\":\"ship123\",\"speed\":22.5,\"longitude\":130.0,\"latitude\":45.0,\"course\":180.0,\"heading\":90.0,\"timestamp\":\"2024-05-03T12:00:00Z\",\"departurePort\":\"New York\"}";
-    AISSignal ais =  new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, "2024-05-03T12:00:00Z", "New York");
+    AISSignal ais =  new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, new Timestamp("2024-05-03T12:00:00Z"), "New York");
 
     @Test
     void testToJSON() throws JsonProcessingException {
@@ -27,8 +27,8 @@ public class TestAISSignal {
 
     @Test
     void testToStringActual() {
-        AISSignal ais = new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, "2024-05-03T12:00:00Z", "New York");
-        String expectedString = "AISSignal(shipHash=ship123, speed=22.5, longitude=130.0, latitude=45.0, course=180.0, heading=90.0, timestamp=2024-05-03T12:00:00Z, departurePort=New York)";
+        AISSignal ais = new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, new Timestamp("01/04/2015 20:19"), "New York");
+        String expectedString = "AISSignal(shipHash=ship123, speed=22.5, longitude=130.0, latitude=45.0, course=180.0, heading=90.0, timestamp=01/04/2015 20:19, departurePort=New York)";
         assertEquals(expectedString, ais.toString());
     }
 
@@ -37,7 +37,7 @@ public class TestAISSignal {
         assertEquals(ais, ais);
         assertNotEquals(ais, null);
         assertNotEquals(ais, new Object());
-        assertNotEquals(ais, new AISSignal("", 1,1,1,1,1,"",""));
+        assertNotEquals(ais, new AISSignal("", 1,1,1,1,1,new Timestamp("01/04/2015 20:19"),""));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class TestAISSignal {
 
     @Test
     void testGetTimestamp() {
-        assertEquals(ais.getTimestamp(), "2024-05-03T12:00:00Z");
+        assertEquals(ais.getTimestamp(), "01/04/2015 20:19");
     }
 
     @Test

@@ -45,11 +45,11 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
             anomalyInformation.setShipHash(value.shipHash);
             anomalyInformation.setCorrespondingTimestamp(value.timestamp);
 
-            if(value.timestamp.difference(lastDetectedAnomalyTime.value()) > 30){
-                anomalyInformation.setScore(0.25f - pastAnomalyInformation.getScore());
+            if(lastDetectedAnomalyTime.value() != null && value.timestamp.difference(lastDetectedAnomalyTime.value()) <= 300){
+                anomalyInformation.setScore(33.0f);
                 anomalyInformation.setExplanation("Bad Speed.");
             }else{
-                anomalyInformation.setScore(0 - pastAnomalyInformation.getScore());
+                anomalyInformation.setScore(0.0f);
                 anomalyInformation.setExplanation("Good Speed.");
             }
         }
@@ -61,6 +61,9 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         }
         anomalyInformationValueState.update(anomalyInformation);
         AISSignalValueState.update(value);
+
+        System.out.println(anomalyInformation.getExplanation());
+
 
         return anomalyInformation;
     }

@@ -33,11 +33,11 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
             anomalyInformation.setShipHash(value.shipHash);
             anomalyInformation.setCorrespondingTimestamp(value.timestamp);
 
-            if(value.timestamp.difference(lastDetectedAnomalyTime.value()) > 30){
-                anomalyInformation.setScore(0.4f - pastAnomalyInformation.getScore());
+            if(lastDetectedAnomalyTime.value() != null && value.timestamp.difference(lastDetectedAnomalyTime.value()) <= 300){
+                anomalyInformation.setScore(33.0f);
                 anomalyInformation.setExplanation("Bad Signals.");
             }else{
-                anomalyInformation.setScore(0 - pastAnomalyInformation.getScore());
+                anomalyInformation.setScore(0.0f);
                 anomalyInformation.setExplanation("Good Signals.");
             }
         }
