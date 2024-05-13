@@ -5,6 +5,23 @@
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
   <component name="PDMPlugin">
+    <option name="customRuleSets">
+      <list>
+        <option value="$PROJECT_DIR$/../config/pmd.xml" />
+      </list>
+    </option>
+    <option name="inEditorAnnotationRules">
+      <list>
+        <option value="category/java/codestyle.xml" />
+      </list>
+    </option>
+    <option name="optionKeyToValue">
+      <map>
+        <entry key="Statistics URL" value="" />
+        <entry key="Target JDK" value="20-preview" />
+        <entry key="Threads" value="12" />
+      </map>
+    </option>
     <option name="skipTestSources" value="false" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="corretto-17" project-jdk-type="JavaSDK" />
