@@ -82,3 +82,30 @@ test("When settings is clicked and then ships icon is clicked, only latter is pr
   expect(settingsTitle).toBeNull();
   expect(anomalyListTitle).toBeVisible();
 });
+
+test("When the close icon is clicked, the anomaly list is not present", async () => {
+  render(<App />);
+  const closeIcon = screen.getByTestId("anomaly-list-close-icon");
+  await userEvent.click(closeIcon);
+
+  const anomalyListTitle = screen.queryByText("Anomaly list");
+  await waitFor(() => {
+    expect(anomalyListTitle).toBeNull();
+  });
+});
+
+test("When the user closes the list and opens it again, it is present", async () => {
+  render(<App />);
+  // Close the list
+  const closeIcon = screen.getByTestId("anomaly-list-close-icon");
+  await userEvent.click(closeIcon);
+
+  // Open the list
+  const shipsIcon = screen.getByTestId("sidebar-ship-icon");
+  await userEvent.click(shipsIcon);
+
+  await waitFor(() => {
+    const anomalyListTitle = screen.queryByText("Anomaly list");
+    expect(anomalyListTitle).toBeVisible();
+  });
+});

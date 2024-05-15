@@ -46,6 +46,7 @@ function AnomalyList({
         <img
           src={closeIcon}
           id="anomaly-list-close-icon"
+          data-testid="anomaly-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownShipId: "" })}
         />
         <span id="anomaly-list-title">Anomaly list</span>
