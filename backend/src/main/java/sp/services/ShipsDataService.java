@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -38,8 +38,8 @@ public class ShipsDataService {
      * @param shipId the id of a ship
      * @return current AIS information for a specified ship
      */
-    public AISSignal getCurrentAISInformation(String shipId) throws NotExistingShipException, PipelineException {
-        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+    public AISSignal getCurrentAISInformation(Long shipId) throws NotExistingShipException, PipelineException {
+        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
         CurrentShipDetails shipDetails = shipsInfo.get(shipId);
 
         if (shipDetails == null) {
@@ -58,10 +58,10 @@ public class ShipsDataService {
      * @param shipId the id of the ship
      * @return anomaly information for a specified ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(String shipId)
+    public AnomalyInformation getCurrentAnomalyInformation(Long shipId)
             throws NotExistingShipException, PipelineException {
 
-        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
         CurrentShipDetails shipDetails = shipsInfo.get(shipId);
 
         if (shipDetails == null) {
@@ -78,7 +78,7 @@ public class ShipsDataService {
      * @return the current AIS data for all ships
      */
     public List<AISSignal> getCurrentAISInformationOfAllShips() throws PipelineException {
-        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
         List<AISSignal> aisInformation = new ArrayList<>();
 
         for (CurrentShipDetails currentShipDetails : shipsInfo.values()) {
@@ -97,10 +97,10 @@ public class ShipsDataService {
      * @return a list of anomaly information objects for all ships
      */
     public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException {
-        HashMap<String, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
         List<AnomalyInformation> anomalyInformation = new ArrayList<>();
 
-        for (Map.Entry<String, CurrentShipDetails> entry : shipsInfo.entrySet()) {
+        for (Map.Entry<Long, CurrentShipDetails> entry : shipsInfo.entrySet()) {
             anomalyInformation.add(shipsInfo.get(entry.getKey()).getAnomalyInformation());
         }
 

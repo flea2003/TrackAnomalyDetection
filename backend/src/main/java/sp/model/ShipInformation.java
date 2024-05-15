@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 @Getter
@@ -22,7 +21,7 @@ import sp.dtos.AnomalyInformation;
 @ToString
 @EqualsAndHashCode
 public class ShipInformation {
-    private String shipHash;
+    private long id;
     private AnomalyInformation anomalyInformation;
     private AISSignal aisSignal;
 
@@ -33,10 +32,8 @@ public class ShipInformation {
      */
     public String toJson() {
         // Assert that there are no flaws in the data
-        if (!shipHash.isEmpty() && !shipHash.isBlank()) {
-            assert anomalyInformation == null || anomalyInformation.getShipHash().equals(shipHash);
-            assert aisSignal == null || aisSignal.getShipHash().equals(shipHash);
-        }
+        assert anomalyInformation == null || anomalyInformation.getId() == getId();
+        assert aisSignal == null || aisSignal.getId() == id;
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

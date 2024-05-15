@@ -20,8 +20,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @JsonSerialize
-public class AISSignal implements Serializable {
-
+public class ExternalAISSignal implements Serializable {
+    private String producerID = "producerID";
     private final String shipHash;
     private final float speed;
     private final float longitude;
@@ -50,12 +50,12 @@ public class AISSignal implements Serializable {
      * @param val string value (in JSON format) that is being converted to an AIS object
      * @return AIS object from a given string
      */
-    public static AISSignal fromJson(String val) {
+    public static ExternalAISSignal fromJson(String val) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         try {
-            return mapper.readValue(val, AISSignal.class);
+            return mapper.readValue(val, ExternalAISSignal.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
