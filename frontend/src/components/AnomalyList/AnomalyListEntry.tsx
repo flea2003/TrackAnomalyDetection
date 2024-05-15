@@ -12,6 +12,7 @@ import { CurrentPage } from "../../App";
 interface AnomalyListEntryProps {
   shipDetails: ShipDetails;
   pageChanger: (currentPage: CurrentPage) => void;
+  mapCenteringFun: (details: ShipDetails) => void;
 }
 
 /**
@@ -20,8 +21,9 @@ interface AnomalyListEntryProps {
  *
  * @param shipDetails the specific details of the ship to display
  * @param pageChanger function that, when called, changes the page displayed in the second column.
+ * @param mapCenteringFun function that, when called, centers the map on a specific ship
  */
-function AnomalyListEntry({ shipDetails, pageChanger }: AnomalyListEntryProps) {
+function AnomalyListEntry({ shipDetails, pageChanger, mapCenteringFun }: AnomalyListEntryProps) {
   const shipIconAltText = "Ship Icon";
 
   const shipAnomalyScore = shipDetails.anomalyScore;
@@ -29,6 +31,7 @@ function AnomalyListEntry({ shipDetails, pageChanger }: AnomalyListEntryProps) {
 
   const onClick = () => {
     pageChanger({ currentPage: "objectDetails", shownShipId: shipDetails.id });
+    mapCenteringFun(shipDetails);
   };
 
   return (

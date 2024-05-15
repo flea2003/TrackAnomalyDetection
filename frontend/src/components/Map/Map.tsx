@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import L from "leaflet";
 import createShipIcon from "../ShipIcon/ShipIcon";
 import "../../styles/map.css";
@@ -40,6 +40,11 @@ function getInitialMap() {
   return initialMap;
 }
 
+// Define the type of the ref object
+interface MapExportedMethodsType {
+  centerMapOntoShip: (details: ShipDetails) => void;
+}
+
 /**
  * This component is the first column of the main view of the application. It displays the map with all the ships.
  * A list of ships is passed as a prop.
@@ -47,9 +52,23 @@ function getInitialMap() {
  * @param ships the ships to display on the map
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
-function Map({ ships, pageChanger }: MapProps) {
+const Map = forwardRef<MapExportedMethodsType, MapProps> (({ ships, pageChanger }, ref) => {
+
   // Initialize the map as state, since we want to have a single instance
   const [map, setMap] = useState<L.Map | null>(null);
+
+  // Define the methods that will be reachable from the parent
+  useImperativeHandle(ref, () => ({
+    centerMapOntoShip(ship: ShipDetails) {
+      if(map == null) {
+        return;
+      }
+      map.setView([ship.lat, ship.lng], 9, {
+        animate: true,
+        duration: 0.75,
+      });
+    }
+  }));
 
   // Everything to do with the map updates should be done inside useEffect
   useEffect(() => {
@@ -92,7 +111,12 @@ function Map({ ships, pageChanger }: MapProps) {
     <div id="map-container">
       <div id="map" data-testid="map"></div>
     </div>
-  );
-}
+  )
+});
+
+// Needed for Lint to work (React itself does not require this)
+Map.displayName = "Map";
+
 
 export default Map;
+export type { MapExportedMethodsType };
