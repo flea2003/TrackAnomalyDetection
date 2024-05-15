@@ -1,13 +1,7 @@
 package sp.dtos;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import java.io.Serializable;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -22,30 +16,32 @@ public class Timestamp implements Comparable<Timestamp> {
     private String timestamp;
 
     /**
-     * Method used for creating an object when deparsing a JSON object
-     * @param time - the string in the JSON object
+     * Method used to construct a Timestamp object when recieving an JSON object.
+     *
+     * @param time - the string of the timestamp
      */
     public Timestamp(String time) {
         String[] values = time.split(" ");
-        String[] yearsMonthsDays = values[0].split("/");
-        String[] minutesHours = values[1].split(":");
 
+        String[] yearsMonthsDays = values[0].split("/");
         this.year = Integer.parseInt(yearsMonthsDays[2]);
         this.month = Integer.parseInt(yearsMonthsDays[1]);
         this.day = Integer.parseInt(yearsMonthsDays[0]);
+
+        String[] minutesHours = values[1].split(":");
         this.hour = Integer.parseInt(minutesHours[0]);
         this.minute = Integer.parseInt(minutesHours[1]);
         this.timestamp = time;
     }
 
     /**
-     * Constructor for a helper object, that corresponds to the timestamp of an AIS signal
+     * Constructor for a helper object, that corresponds to the timestamp of an AIS signal.
      *
-     * @param year
-     * @param month
-     * @param day
-     * @param hour
-     * @param minute
+     * @param year - the year of the timestamp
+     * @param month - the month of the timestamp
+     * @param day - the day of the timestamp
+     * @param hour - the hour of the timestamp
+     * @param minute - the minute of the timestamp
      */
     public Timestamp(int year, int month, int day, int hour, int minute) {
         this.year = year;
@@ -56,7 +52,7 @@ public class Timestamp implements Comparable<Timestamp> {
     }
 
     /**
-     * CompareTo method for comparing two timestamps
+     * CompareTo method for comparing two timestamps.
      *
      * @param timestamp the object to be compared.
      * @return integer that corresponds to weather the comparable timestamp corresponds to an earlier date
@@ -73,7 +69,7 @@ public class Timestamp implements Comparable<Timestamp> {
     }
 
     /**
-     * Returns the difference of two timestamps in minutes
+     * Returns the difference of two timestamps in minutes.
      *
      * @param timestamp timestamp to be compared
      * @return  the difference of two timestamps in minutes
@@ -86,7 +82,7 @@ public class Timestamp implements Comparable<Timestamp> {
     }
 
     @JsonValue
-    public String getTimestamp(){
+    public String getTimestamp() {
         return this.timestamp;
     }
 

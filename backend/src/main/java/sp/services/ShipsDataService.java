@@ -69,6 +69,7 @@ public class ShipsDataService {
         }
 
         return shipDetails.getAnomalyInformation();
+
     }
 
 
@@ -84,6 +85,9 @@ public class ShipsDataService {
         for (CurrentShipDetails currentShipDetails : shipsInfo.values()) {
             List<ShipInformation> pastSignals = currentShipDetails.getPastInformation();
             if (pastSignals != null && !pastSignals.isEmpty()) {
+                if (pastSignals.get(pastSignals.size() - 1).getAisSignal() == null) {
+                    System.out.println("NULL AIS VALUE");
+                }
                 aisInformation.add(pastSignals.get(pastSignals.size() - 1).getAisSignal());
             }
         }
@@ -101,6 +105,9 @@ public class ShipsDataService {
         List<AnomalyInformation> anomalyInformation = new ArrayList<>();
 
         for (Map.Entry<String, CurrentShipDetails> entry : shipsInfo.entrySet()) {
+            if (shipsInfo.get(entry.getKey()).getAnomalyInformation() == null) {
+                System.out.println("NULL ANOMALY VALUE");
+            }
             anomalyInformation.add(shipsInfo.get(entry.getKey()).getAnomalyInformation());
         }
 

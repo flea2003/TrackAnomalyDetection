@@ -1,5 +1,6 @@
-package sp.pipeline.scoreCalculators.components.heuristic;
+package sp.pipeline.scorecalculators.components.heuristic;
 
+import lombok.Getter;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
@@ -10,11 +11,12 @@ import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.dtos.Timestamp;
 
+@Getter
 public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
 
-    transient ValueState<AnomalyInformation> anomalyInformationValueState;
-    transient ValueState<AISSignal> AISSignalValueState;
-    transient ValueState<Timestamp> lastDetectedAnomalyTime;
+    private transient ValueState<AnomalyInformation> anomalyInformationValueState;
+    private transient ValueState<AISSignal> aisSignalValueState;
+    private transient ValueState<Timestamp> lastDetectedAnomalyTime;
 
     @Override
     public void open(Configuration config) {
@@ -26,13 +28,13 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
                         TypeInformation.of(new TypeHint<Timestamp>() {})
                 );
 
-        ValueStateDescriptor<AISSignal> AISSignalValueStateDescriptor =
+        ValueStateDescriptor<AISSignal> aisSignalValueStateDescriptor =
                 new ValueStateDescriptor<>(
                         "AIS",
                         TypeInformation.of(new TypeHint<AISSignal>() {})
                 );
 
-        ValueStateDescriptor<AnomalyInformation> anomalyInformationValueStateDescriptor=
+        ValueStateDescriptor<AnomalyInformation> anomalyInformationValueStateDescriptor =
                 new ValueStateDescriptor<>(
                         "anomaly",
                         TypeInformation.of(new TypeHint<AnomalyInformation>() {})
@@ -40,7 +42,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
 
         // Initialize the states and set them to be accessible in the map function
         lastDetectedAnomalyTime = getRuntimeContext().getState(lastDetectedAnomalyTimeDescriptor);
-        AISSignalValueState = getRuntimeContext().getState(AISSignalValueStateDescriptor);
+        aisSignalValueState = getRuntimeContext().getState(aisSignalValueStateDescriptor);
         anomalyInformationValueState = getRuntimeContext().getState(anomalyInformationValueStateDescriptor);
     }
 

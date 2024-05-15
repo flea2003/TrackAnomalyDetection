@@ -29,7 +29,7 @@ import sp.dtos.AnomalyInformation;
 import sp.exceptions.PipelineException;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
-import sp.pipeline.scoreCalculators.ScoreCalculationStrategy;
+import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 
 @Service
 public class AnomalyDetectionPipeline {
@@ -60,7 +60,8 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy) throws IOException {
+    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy)
+        throws IOException {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         buildPipeline();
     }
@@ -92,7 +93,6 @@ public class AnomalyDetectionPipeline {
 
         // Map stream from JSON strings to AISSignal objects
         DataStream<AISSignal> source = sourceSerialized.map((x) -> {
-            System.out.println("Received AIS signal as JSON to topic ships-AIS. JSON: " + x);
             return AISSignal.fromJson(x);
         });
 
@@ -102,7 +102,6 @@ public class AnomalyDetectionPipeline {
 
         // Map the computed AnomalyInformation objects to JSON strings
         DataStream<String> updateStreamSerialized = updateStream.map(x -> {
-            System.out.println("Mapping the AnomalyInformation object to JSON (from the ships-AIS topic). Object: " + x);
             return x.toJson();
         });
 
@@ -182,7 +181,6 @@ public class AnomalyDetectionPipeline {
         KStream<String, String> streamAISSignalsJSON = builder.stream(INCOMING_AIS_TOPIC_NAME);
         KStream<String, ShipInformation> streamAISSignals = streamAISSignalsJSON
                 .mapValues(x -> {
-                    System.out.println("Received AIS signal as JSON to topic ship-AIS for the building part. JSON: " + x);
                     AISSignal aisSignal = AISSignal.fromJson(x);
                     return new ShipInformation(aisSignal.getShipHash(), null, aisSignal);
                 });
@@ -203,7 +201,6 @@ public class AnomalyDetectionPipeline {
         // so we could later merge the stream with wrapped simple AISSignal objects
         KStream<String, String> streamAnomalyInformationJSON = builder.stream(CALCULATED_SCORES_TOPIC_NAME);
         KStream<String, ShipInformation> streamAnomalyInformation  = streamAnomalyInformationJSON.mapValues(x -> {
-            System.out.println("Received AnomalyInformation object as JSON string in ship-scores. JSON: " + x);
             AnomalyInformation anomalyInformation = AnomalyInformation.fromJson(x);
             return new ShipInformation(anomalyInformation.getShipHash(), anomalyInformation, null);
         });
@@ -260,8 +257,6 @@ public class AnomalyDetectionPipeline {
      * @return updated object that stores all needed data for a ship
      */
     public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key) {
-        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
-
         // If this is the first signal received, instantiate the past information as an empty list
         if (aggregatedShipDetails.getPastInformation() == null)
             aggregatedShipDetails.setPastInformation(new ArrayList<>());
@@ -272,6 +267,10 @@ public class AnomalyDetectionPipeline {
         // If the signal is AIS signal, add it to past information
         if (shipInformation.getAnomalyInformation() == null) {
             aggregatedShipDetails.getPastInformation().add(shipInformation);
+            if (aggregatedShipDetails.getAnomalyInformation() == null) {
+                aggregatedShipDetails.setAnomalyInformation(new AnomalyInformation(0.0f, "Everything looks good",
+                    shipInformation.getAisSignal().getTimestamp(), shipInformation.getShipHash()));
+            }
         } else if (shipInformation.getAisSignal() == null) {
             // If the signal is Anomaly Information signal, attach it to a corresponding AIS signal
 
@@ -295,7 +294,6 @@ public class AnomalyDetectionPipeline {
             }
         } else throw new RuntimeException("Something went wrong");
 
-        System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
         return aggregatedShipDetails;
     }
 }
