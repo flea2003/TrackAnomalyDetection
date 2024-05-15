@@ -45,6 +45,7 @@ function AnomalyList({
       <Stack id="anomaly-list-title-container" direction="row">
         <img
           src={closeIcon}
+          alt="Close"
           id="anomaly-list-close-icon"
           data-testid="anomaly-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownShipId: "" })}
