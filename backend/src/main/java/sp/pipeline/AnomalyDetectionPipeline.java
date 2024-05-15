@@ -1,10 +1,5 @@
 package sp.pipeline;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -25,13 +20,17 @@ import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sp.dtos.ExternalAISSignal;
-import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
+import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
+import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 @Service
 public class AnomalyDetectionPipeline {
