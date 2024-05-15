@@ -12,11 +12,6 @@ import "../../styles/common.css";
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
 
-interface MapProps {
-  ships: ShipDetails[];
-  pageChanger: (currentPage: CurrentPage) => void;
-}
-
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
  * @returns the created map
@@ -45,9 +40,15 @@ function getInitialMap() {
   return initialMap;
 }
 
+interface MapProps {
+  ships: ShipDetails[];
+  pageChanger: (currentPage: CurrentPage) => void;
+}
+
 // Define the type of the ref object
 interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
+  updateMapOnResize: () => void;
 }
 
 /**
@@ -72,6 +73,12 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
           animate: true,
           duration: 0.75,
         });
+      },
+      updateMapOnResize() {
+        if (map == null) {
+          return;
+        }
+        map.invalidateSize();
       },
     }));
 

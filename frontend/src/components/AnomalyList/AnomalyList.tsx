@@ -3,8 +3,8 @@ import Stack from "@mui/material/Stack";
 import AnomalyListEntry from "./AnomalyListEntry";
 import List from "@mui/material/List";
 import { CurrentPage } from "../../App";
-
 import ShipDetails from "../../model/ShipDetails";
+import closeIcon from "../../assets/icons/close.svg";
 
 import "../../styles/common.css";
 import "../../styles/anomalyList.css";
@@ -42,7 +42,14 @@ function AnomalyList({
 
   return (
     <Stack id="anomaly-list-container">
-      <span id="anomaly-list-title">Anomaly list</span>
+      <Stack id="anomaly-list-title-container" direction="row">
+        <img
+          src={closeIcon}
+          id="anomaly-list-close-icon"
+          onClick={() => pageChanger({ currentPage: "none", shownShipId: "" })}
+        />
+        <span id="anomaly-list-title">Anomaly list</span>
+      </Stack>
       <List
         id="anomaly-list-internal-container"
         style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}

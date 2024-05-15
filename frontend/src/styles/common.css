@@ -2,6 +2,9 @@
 
 :root {
 
+    --anomaly-list-closing-icon-size: 20px;
+    --anomaly-list-closing-icon-margin: 10px;
+
     --anomaly-list-title-font-size: 1.0em;
     --anomaly-list-title-height: 50px;
 
@@ -11,7 +14,7 @@
 
     --sidebar-icon-size: 30px;
 
-    --object-details-return-icon-size: 30px;
+    --object-details-return-icon-size: 20px;
     --object-details-return-icon-margin: 10px;
 
     --object-details-entry-padding: 10px;
