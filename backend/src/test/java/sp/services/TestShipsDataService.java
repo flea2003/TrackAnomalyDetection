@@ -1,23 +1,8 @@
 package sp.services;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import sp.dtos.AISSignal;
-import sp.dtos.AnomalyInformation;
-import sp.model.CurrentShipDetails;
-import sp.exceptions.NotExistingShipException;
-import sp.exceptions.PipelineException;
-import sp.model.ShipInformation;
-import sp.pipeline.AnomalyDetectionPipeline;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.List;
-import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
