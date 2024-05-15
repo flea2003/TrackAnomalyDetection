@@ -1,4 +1,9 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import L from "leaflet";
 import createShipIcon from "../ShipIcon/ShipIcon";
 import "../../styles/map.css";
@@ -52,71 +57,71 @@ interface MapExportedMethodsType {
  * @param ships the ships to display on the map
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
-const Map = forwardRef<MapExportedMethodsType, MapProps> (({ ships, pageChanger }, ref) => {
+const Map = forwardRef<MapExportedMethodsType, MapProps>(
+  ({ ships, pageChanger }, ref) => {
+    // Initialize the map as state, since we want to have a single instance
+    const [map, setMap] = useState<L.Map | null>(null);
 
-  // Initialize the map as state, since we want to have a single instance
-  const [map, setMap] = useState<L.Map | null>(null);
+    // Define the methods that will be reachable from the parent
+    useImperativeHandle(ref, () => ({
+      centerMapOntoShip(ship: ShipDetails) {
+        if (map == null) {
+          return;
+        }
+        map.setView([ship.lat, ship.lng], 9, {
+          animate: true,
+          duration: 0.75,
+        });
+      },
+    }));
 
-  // Define the methods that will be reachable from the parent
-  useImperativeHandle(ref, () => ({
-    centerMapOntoShip(ship: ShipDetails) {
-      if(map == null) {
+    // Everything to do with the map updates should be done inside useEffect
+    useEffect(() => {
+      // If the map is null, we need to create it. We do it once, with state
+      if (map == null) {
+        const initialMap = getInitialMap();
+        setMap(initialMap);
+      }
+
+      // If not yet created, do not do anything, just wait
+      if (map == null) {
         return;
       }
-      map.setView([ship.lat, ship.lng], 9, {
-        animate: true,
-        duration: 0.75,
+
+      // Add all ship icons to the map
+      ships.forEach((ship) => {
+        L.marker([ship.lat, ship.lng], {
+          icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
+        })
+          .addTo(map)
+          .bindPopup(ship.id)
+          .on("click", (e) => {
+            map.setView(e.latlng, map.getZoom());
+            pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
+          });
       });
-    }
-  }));
 
-  // Everything to do with the map updates should be done inside useEffect
-  useEffect(() => {
-    // If the map is null, we need to create it. We do it once, with state
-    if (map == null) {
-      const initialMap = getInitialMap();
-      setMap(initialMap);
-    }
+      return () => {
+        if (map) {
+          map.eachLayer(function (layer: L.Layer) {
+            if (layer instanceof L.Marker) {
+              map.removeLayer(layer);
+            }
+          });
+        }
+      };
+    }, [map, pageChanger, ships]);
 
-    // If not yet created, do not do anything, just wait
-    if (map == null) {
-      return;
-    }
-
-    // Add all ship icons to the map
-    ships.forEach((ship) => {
-      L.marker([ship.lat, ship.lng], {
-        icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
-      })
-        .addTo(map)
-        .bindPopup(ship.id)
-        .on("click", (e) => {
-          map.setView(e.latlng, map.getZoom());
-          pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
-        });
-    });
-
-    return () => {
-      if (map) {
-        map.eachLayer(function (layer: L.Layer) {
-          if (layer instanceof L.Marker) {
-            map.removeLayer(layer);
-          }
-        });
-      }
-    };
-  }, [map, pageChanger, ships]);
-
-  return (
-    <div id="map-container">
-      <div id="map" data-testid="map"></div>
-    </div>
-  )
-});
+    return (
+      <div id="map-container">
+        <div id="map" data-testid="map"></div>
+      </div>
+    );
+  },
+);
 
 // Needed for Lint to work (React itself does not require this)
 Map.displayName = "Map";
-
 
 export default Map;
 export type { MapExportedMethodsType };

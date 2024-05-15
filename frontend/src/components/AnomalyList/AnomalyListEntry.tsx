@@ -23,7 +23,11 @@ interface AnomalyListEntryProps {
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  * @param mapCenteringFun function that, when called, centers the map on a specific ship
  */
-function AnomalyListEntry({ shipDetails, pageChanger, mapCenteringFun }: AnomalyListEntryProps) {
+function AnomalyListEntry({
+  shipDetails,
+  pageChanger,
+  mapCenteringFun,
+}: AnomalyListEntryProps) {
   const shipIconAltText = "Ship Icon";
 
   const shipAnomalyScore = shipDetails.anomalyScore;

@@ -23,7 +23,11 @@ interface AnomalyListProps {
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  * @param mapCenteringFun function that, when called, centers the map on a specific ship
  */
-function AnomalyList({ ships, pageChanger, mapCenteringFun }: AnomalyListProps) {
+function AnomalyList({
+  ships,
+  pageChanger,
+  mapCenteringFun,
+}: AnomalyListProps) {
   const listEntries = [];
   for (let i = 0; i < ships.length; i++) {
     listEntries.push(

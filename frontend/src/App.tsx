@@ -20,8 +20,6 @@ export interface CurrentPage {
 }
 
 function App() {
-
-
   // Create a reference to the map component
   const mapRef = React.useRef<MapExportedMethodsType>(null);
 
@@ -40,7 +38,13 @@ function App() {
   const middleColumn = () => {
     switch (currentPage.currentPage) {
       case "anomalyList":
-        return <AnomalyList ships={ships} pageChanger={setCurrentPage} mapCenteringFun={mapCenteringFun} />;
+        return (
+          <AnomalyList
+            ships={ships}
+            pageChanger={setCurrentPage}
+            mapCenteringFun={mapCenteringFun}
+          />
+        );
       case "objectDetails":
         return (
           <ObjectDetails
