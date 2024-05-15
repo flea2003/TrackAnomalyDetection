@@ -71,7 +71,8 @@ function Map({ ships, pageChanger }: MapProps) {
       })
         .addTo(map)
         .bindPopup(ship.id)
-        .on("click", () => {
+        .on("click", (e) => {
+          map.setView(e.latlng, map.getZoom());
           pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
         });
     });
