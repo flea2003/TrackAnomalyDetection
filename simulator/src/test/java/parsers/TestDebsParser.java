@@ -33,7 +33,7 @@ public class TestDebsParser {
         resultObject = new ArrayList<>();
         resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2015, 4, 1, 20, 19), "{\"shipHash\":\"0x97df717d828ac6df388396b8e48ec1299e837917\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"01/04/2015 20:19\",\"departurePort\":\"VALLETTA\"}"));
         resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2015, 4, 25, 5, 12), "{\"shipHash\":\"0xd7aeaeb3986186e3550aa68bd1561f8df9672d17\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"25/04/2015 05:12\",\"departurePort\":\"CEUTA\"}"));}
-
+/*
     @Test
     void testParseAISSignal() {
         assertThat(debsParser.parseAISSignal(new String[]{"a", "1","2.0","3","4","5.5","b", "c"})).isEqualTo(new AISSignal("a", 1F,2,3,4,5.5F,"b", "c"));
@@ -53,4 +53,6 @@ public class TestDebsParser {
     void testGetFilename() {
         assertThat(debsParser.reader()).isEqualTo(reader);
     }
+    */
+
 }

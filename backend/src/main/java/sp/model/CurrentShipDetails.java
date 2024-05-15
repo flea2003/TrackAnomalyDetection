@@ -1,7 +1,9 @@
 package sp.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import java.io.Serializable;
 import java.util.List;
@@ -30,6 +32,8 @@ public class CurrentShipDetails implements Serializable {
      */
     public static Serde<CurrentShipDetails> getSerde() {
         ObjectMapper jsonObjectMapper = new ObjectMapper();
+        jsonObjectMapper.registerModule(new JavaTimeModule());
+        jsonObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return new Jackson2Serde<>(jsonObjectMapper, CurrentShipDetails.class);
     }
 }

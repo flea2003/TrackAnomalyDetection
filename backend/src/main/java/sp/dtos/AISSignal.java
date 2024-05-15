@@ -1,19 +1,20 @@
 package sp.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-
 @Getter
-@Builder
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -27,7 +28,8 @@ public class AISSignal implements Serializable {
     private final float latitude;
     private final float course;
     private final float heading;
-    private final String timestamp;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final OffsetDateTime timestamp;
     private final String departurePort;
 
     /**
@@ -35,13 +37,11 @@ public class AISSignal implements Serializable {
      *
      * @return json representation of the object
      */
-    public String toJson() {
+    public String toJson() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return mapper.writeValueAsString(this);
     }
 
     /**
@@ -52,6 +52,8 @@ public class AISSignal implements Serializable {
      */
     public static AISSignal fromJson(String val) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         try {
             return mapper.readValue(val, AISSignal.class);
         } catch (JsonProcessingException e) {

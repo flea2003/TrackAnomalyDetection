@@ -1,6 +1,10 @@
 package sp.dtos;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAnomalyInformation {
@@ -8,7 +12,7 @@ public class TestAnomalyInformation {
 
     @BeforeEach
     void setUp() {
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", "12/12/12", "hash");
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", OffsetDateTime.of(2004, 01, 27, 1,1,0,0, ZoneOffset.ofHours(0)), "hash");
     }
 
     @Test

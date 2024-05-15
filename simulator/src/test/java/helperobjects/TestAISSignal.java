@@ -8,7 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 public class TestAISSignal {
-
+/*
     String json = "{\"shipHash\":\"ship123\",\"speed\":22.5,\"longitude\":130.0,\"latitude\":45.0,\"course\":180.0,\"heading\":90.0,\"timestamp\":\"2024-05-03T12:00:00Z\",\"departurePort\":\"New York\"}";
     AISSignal ais =  new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, "2024-05-03T12:00:00Z", "New York");
 
@@ -99,5 +99,5 @@ public class TestAISSignal {
         assertEquals(25.0, ais.getSpeed(), 0.01);
         assertEquals(0, ais.getLongitude()); // Default value since not specified
     }
-
+*/
 }

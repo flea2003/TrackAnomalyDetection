@@ -4,6 +4,8 @@ import helperobjects.AISSignal;
 import helperobjects.Timestamp;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +58,7 @@ public record DEBSParser(BufferedReader reader) implements Parser {
         float lat = Float.parseFloat(values[3]);
         float course = Float.parseFloat(values[4]);
         float heading = Float.parseFloat(values[5]);
-        String date = values[6];
+        OffsetDateTime date = parseToISO8601(values[6]);
 
         String departurePort = values[7];
         if (departurePort.endsWith("\n")) departurePort = departurePort.substring(0, departurePort.length() - 1);
@@ -84,4 +86,9 @@ public record DEBSParser(BufferedReader reader) implements Parser {
         return new Timestamp(year, month, day, hour, minute);
     }
 
+    private OffsetDateTime parseToISO8601(String date) {
+
+        Timestamp t = parseDate(date);
+        return OffsetDateTime.of(t.year(), t.month(), t.day(), t.hour(), t.minute(), 0, 0, ZoneOffset.ofHours(0));
+    }
 }
