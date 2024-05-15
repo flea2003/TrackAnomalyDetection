@@ -61,6 +61,6 @@ public class Main {
      * @throws FileNotFoundException throw in case the file is not found
      */
     private static BufferedReader getReader(String fileName) throws FileNotFoundException {
-        return new BufferedReader(new FileReader("/Users/justinas/Desktop/codebase123/simulator/streaming_data/" + fileName));
+        return new BufferedReader(new FileReader("simulator/streaming_data/" + fileName));
     }
 }
