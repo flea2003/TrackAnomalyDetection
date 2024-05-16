@@ -1,9 +1,12 @@
 package sp.pipeline.scorecalculators;
 
+import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamUtils;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
+import org.apache.flink.test.util.MiniClusterWithClientResource;
+import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
@@ -18,6 +21,14 @@ class DefaultScoreCalculatorTest {
 
     // Tests based on https://nightlies.apache.org/flink/flink-docs-master/docs/dev/datastream/testing/
 
+    @ClassRule
+    public static MiniClusterWithClientResource flinkCluster =
+            new MiniClusterWithClientResource(
+                    new MiniClusterResourceConfiguration.Builder()
+                            .setNumberSlotsPerTaskManager(2)
+                            .setNumberTaskManagers(1)
+                            .build());
+
     @Test
     void testSetupFlinkAnomalyScoreCalculationPart() throws Exception {
         // create initial AISSignal objects
@@ -28,7 +39,7 @@ class DefaultScoreCalculatorTest {
 
         // prepare flink environment and streams
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStream<AISSignal> aisStream = env.fromCollection(List.of(ais1, ais2, ais3));
+        DataStream<AISSignal> aisStream = env.fromData(List.of(ais1, ais2, ais3));
 
         DefaultScoreCalculator scoreCalculator = new DefaultScoreCalculator();
         DataStream<AnomalyInformation> resultStream = scoreCalculator.setupFlinkAnomalyScoreCalculationPart(aisStream);
@@ -36,6 +47,7 @@ class DefaultScoreCalculatorTest {
         CollectSink.anomalyInfoList.clear();
         resultStream.addSink(new CollectSink());
         env.execute();
+        env.close();
 
         // verify result
         List<AnomalyInformation> result = CollectSink.anomalyInfoList;
