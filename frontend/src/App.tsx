@@ -30,16 +30,9 @@ function App() {
     }
   };
 
-  // Create a function that tells the map to resize itself if the window is resized
-  const resizeMapFun = () => {
-    if (mapRef.current !== null) {
-      mapRef.current.updateMapOnResize();
-    }
-  };
-
   // Create state for current page
   const [currentPage, setCurrentPage] = useState({
-    currentPage: "anomalyList",
+    currentPage: "none",
     shownShipId: "",
   } as CurrentPage);
   const middleColumn = () => {
@@ -65,7 +58,6 @@ function App() {
       case "settings":
         return <div>Settings</div>;
       case "none":
-        resizeMapFun();
         return <div></div>;
     }
   };

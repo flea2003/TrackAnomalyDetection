@@ -12,6 +12,8 @@ import "../../styles/common.css";
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
 
+import mapStyleConfig from "../../styles/mapConfig.json";
+
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
  * @returns the created map
@@ -48,7 +50,6 @@ interface MapProps {
 // Define the type of the ref object
 interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
-  updateMapOnResize: () => void;
 }
 
 /**
@@ -69,17 +70,15 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
         if (map == null) {
           return;
         }
-        map.setView([ship.lat, ship.lng], 9, {
-          animate: true,
-          duration: 0.75,
-        });
-      },
-      updateMapOnResize() {
-        if (map == null) {
-          return;
-        }
-        map.invalidateSize();
-      },
+        map.flyTo(
+          [ship.lat, ship.lng],
+          mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
+          {
+            animate: true,
+            duration: mapStyleConfig["transition-time"],
+          },
+        );
+      }
     }));
 
     // Everything to do with the map updates should be done inside useEffect
