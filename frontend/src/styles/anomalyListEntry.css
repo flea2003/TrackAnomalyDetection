@@ -1,40 +1,40 @@
 .anomaly-list-entry {
-  /* background-color: aquamarine; */
+    /* background-color: aquamarine; */
 
-  width: 100%;
-  height: var(--anomaly-list-entry-height);
+    width: 100%;
+    height: var(--anomaly-list-entry-height);
 
-  border-bottom: 1px solid black;
-  align-items: center;
+    border-bottom: 1px solid black;
+    align-items: center;
 
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 
-  /* Make sure when hovering it s like a link */
-  cursor: pointer;
+    /* Make sure when hovering it s like a link */
+    cursor: pointer;
 }
 .anomaly-list-entry:hover{
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .anomaly-list-entry-main-text {
-  font-size: var(--anomaly-list-entry-font-size);
+    font-size: var(--anomaly-list-entry-font-size);
 }
 
 .anomaly-list-entry-score {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .anomaly-list-entry-icon-container {
-  font-size: var(--anomaly-list-entry-font-size);
-  height: 100%;
-  width: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    font-size: var(--anomaly-list-entry-font-size);
+    height: 100%;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .anomaly-list-entry-icon{
-  height: var(--anomaly-list-entry-icon-size);
-  width: var(--anomaly-list-entry-icon-size);
+    height: var(--anomaly-list-entry-icon-size);
+    width: var(--anomaly-list-entry-icon-size);
 }
