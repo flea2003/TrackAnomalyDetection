@@ -63,6 +63,12 @@ bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
 ```
 
+Sometimes Kafka might not start if the logs of the zoekeeper and the Kafka server. Assuming that `/tmp/kafka-logs` and `/tmp/zoekeeper` are the locations of the logs, run the following commands to delete them:
+```bash
+rm -rf /tmp/kafka-logs /tmp/zookeeper
+```
+
+
 ### Start the pipeline and web server
 Run the main project in IntelliJ (or just Gradle). This will start the pipeline and start listening for messages in the needed Kafka topics.
 
