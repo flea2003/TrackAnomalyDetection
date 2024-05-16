@@ -113,15 +113,12 @@ public class AnomalyDetectionPipeline {
         DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
 
         // Map stream from JSON strings to ExternalAISSignal objects
-        DataStream<ExternalAISSignal> sourceWithNoIDs = rawSourceSerialized.map((x) -> {
-            System.out.println("Received external AIS signal as JSON to topic ships-AIS. JSON: " + x);
-            return ExternalAISSignal.fromJson(x);
-        });
+        DataStream<ExternalAISSignal> sourceWithNoIDs = rawSourceSerialized.map(ExternalAISSignal::fromJson);
 
         // Map ExternalAISSignal objects to AISSignal objects by assigning an internal ID
         return sourceWithNoIDs.map(x -> {
-            int id = Objects.hash(x.getProducerID(), x.getShipHash()) & 0x7FFFFFFF; // Ensure positive ID
-            return new AISSignal(x, id);
+            int calculatedID = Objects.hash(x.getProducerID(), x.getShipHash()) & 0x7FFFFFFF; // Ensure positive ID
+            return new AISSignal(x, calculatedID);
         });
     }
 

@@ -22,12 +22,14 @@ bin/kafka-server-start.sh config/server.properties
 
 Finally, create the topics required for the project. In the third terminal, run the following commands:
 ```bash
+bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
 ```
 
 If needed to remove the topics, run the following command:
 ```bash
+bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
 ```
