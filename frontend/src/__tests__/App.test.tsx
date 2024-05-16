@@ -3,11 +3,21 @@ import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../App";
 import userEvent from "@testing-library/user-event";
+import exp from "constants";
 
-test("By default the anomaly list is loaded by default when page opens", () => {
+test("By default only the map is loaded when the page opens", () => {
   render(<App />);
-  const anomalyListTitle = screen.getByText("Anomaly list");
-  expect(anomalyListTitle).toBeVisible();
+
+  waitFor(() => {
+    const anomalyListTitle = screen.getByText("Anomaly list");
+    const notificationsTitle = screen.getByText("Notifications");
+    const settingsTitle = screen.getByText("Settings");
+    const map = screen.getByTestId("map");
+    expect(anomalyListTitle).toBeNull();
+    expect(notificationsTitle).toBeNull();
+    expect(settingsTitle).toBeNull();
+    expect(map).toBeVisible();
+  });
 });
 
 test("The map is present when the component loads", () => {
@@ -85,27 +95,55 @@ test("When settings is clicked and then ships icon is clicked, only latter is pr
 
 test("When the close icon is clicked, the anomaly list is not present", async () => {
   render(<App />);
+
+  // Open the list
+  const shipIcon = screen.getByTestId("sidebar-ship-icon");
+  await userEvent.click(shipIcon);
+
+  // Close the lsit
   const closeIcon = screen.getByTestId("anomaly-list-close-icon");
   await userEvent.click(closeIcon);
 
-  const anomalyListTitle = screen.queryByText("Anomaly list");
+  // Wait for the list to disappear
   await waitFor(() => {
+    const anomalyListTitle = screen.queryByText("Anomaly list");
     expect(anomalyListTitle).toBeNull();
   });
 });
 
 test("When the user closes the list and opens it again, it is present", async () => {
   render(<App />);
+
+  // Open the list
+  const shipIcon1 = screen.getByTestId("sidebar-ship-icon");
+  await userEvent.click(shipIcon1);
+
   // Close the list
   const closeIcon = screen.getByTestId("anomaly-list-close-icon");
   await userEvent.click(closeIcon);
 
   // Open the list
-  const shipsIcon = screen.getByTestId("sidebar-ship-icon");
-  await userEvent.click(shipsIcon);
+  const shipIcon2 = screen.getByTestId("sidebar-ship-icon");
+  await userEvent.click(shipIcon2);
 
   await waitFor(() => {
     const anomalyListTitle = screen.queryByText("Anomaly list");
     expect(anomalyListTitle).toBeVisible();
+  });
+});
+
+test("Double clicking the ship icon opens and closes the list", async () => {
+  render(<App />);
+
+  // Open the list
+  const shipIcon = screen.getByTestId("sidebar-ship-icon");
+  await userEvent.click(shipIcon);
+
+  // Close the list
+  await userEvent.click(shipIcon);
+
+  await waitFor(() => {
+    const anomalyListTitle = screen.queryByText("Anomaly list");
+    expect(anomalyListTitle).toBeNull();
   });
 });

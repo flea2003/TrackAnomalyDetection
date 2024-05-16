@@ -39,8 +39,8 @@ function App() {
   // Create function that is called when the current page needs to be changed
   const pageChanger = (newPage: CurrentPage) => {
     if (
-      currentPage.currentPage != "none" &&
-      newPage.currentPage == currentPage.currentPage
+      currentPage.currentPage !== "none" &&
+      newPage.currentPage === currentPage.currentPage
     ) {
       // If we clicked the same icon for the second time
       setCurrentPage({ currentPage: "none", shownShipId: "" });
