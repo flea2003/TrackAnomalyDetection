@@ -2,17 +2,15 @@ package sp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import sp.utils.UtilsObjectMapper;
 
 @Getter
 @NoArgsConstructor(force = true)
@@ -38,10 +36,7 @@ public class AISSignal implements Serializable {
      * @return json representation of the object
      */
     public String toJson() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return mapper.writeValueAsString(this);
+        return new UtilsObjectMapper().writeValueAsString(this);
     }
 
     /**
@@ -51,11 +46,8 @@ public class AISSignal implements Serializable {
      * @return AIS object from a given string
      */
     public static AISSignal fromJson(String val) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         try {
-            return mapper.readValue(val, AISSignal.class);
+            return new UtilsObjectMapper().readValue(val, AISSignal.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
