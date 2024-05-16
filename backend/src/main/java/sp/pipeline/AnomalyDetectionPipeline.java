@@ -282,7 +282,9 @@ public class AnomalyDetectionPipeline {
             // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
             for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
                 ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
-                if (information.getAisSignal().getTimestamp().equals(anomalyInformation.getCorrespondingTimestamp())) {
+
+                if (information.getAisSignal().getTimestamp().compareTo(anomalyInformation.getCorrespondingTimestamp()) == 0) {
+
                     // Check that there are no problems with the data
                     assert information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash());
                     assert information.getShipHash().equals(anomalyInformation.getShipHash());

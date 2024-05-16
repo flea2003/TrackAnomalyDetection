@@ -13,10 +13,6 @@ repositories {
     mavenCentral()
 }
 
-bootRun {
-    jvmArgs = ["--add-opens=java.base/java.util=ALL-UNNAMED", "add-opens java.base/java.time=ALL-UNNAMED"]
-}
-
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.assertj:assertj-core:3.21.0'
