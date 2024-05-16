@@ -1,8 +1,9 @@
 package sp.pipeline;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
+
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -45,6 +46,7 @@ public class AnomalyDetectionPipeline {
 
     private final ScoreCalculationStrategy scoreCalculationStrategy;
     private final StreamUtils streamUtils;
+    private final Aggregator aggregator;
 
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
@@ -57,25 +59,40 @@ public class AnomalyDetectionPipeline {
      */
     @Autowired
     public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy,
-                                    StreamUtils streamUtils) {
+                                    StreamUtils streamUtils, Aggregator aggregator) {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.streamUtils = streamUtils;
+        this.aggregator = aggregator;
+
         loadParametersFromConfigFile();
         buildPipeline();
+    }
+
+    public void closePipeline() throws Exception {
+        kafkaStreams.close();
+        kafkaStreams.cleanUp();
+        flinkEnv.close();
     }
 
     /**
      * Loads the needed parameters from the configuration file.
      */
     private void loadParametersFromConfigFile() {
+        Properties config;
         try {
-            incomingAisTopicName = streamUtils.loadConfig().getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
-            calculatedScoresTopicName = streamUtils.loadConfig().getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
-            kafkaServerAddress = streamUtils.loadConfig().getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
-            kafkaStoreName = streamUtils.loadConfig().getProperty(KAFKA_STORE_NAME_PROPERTY);
+            config = streamUtils.loadConfig();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        if (config == null) {
+            throw new RuntimeException("Properties file not found");
+        }
+
+        incomingAisTopicName = config.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
+        calculatedScoresTopicName = config.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
+        kafkaServerAddress = config.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
+        kafkaStoreName = config.getProperty(KAFKA_STORE_NAME_PROPERTY);
     }
 
     /**
@@ -168,7 +185,7 @@ public class AnomalyDetectionPipeline {
             .groupByKey()
             .aggregate(
             CurrentShipDetails::new,
-                (key, valueJson, aggregatedShipDetails) -> aggregateSignals(aggregatedShipDetails, valueJson, key),
+                (key, valueJson, aggregatedShipDetails) -> aggregator.aggregateSignals(aggregatedShipDetails, valueJson, key),
             Materialized
                     .<String, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(kafkaStoreName)
                     .withValueSerde(CurrentShipDetails.getSerde())
@@ -262,53 +279,5 @@ public class AnomalyDetectionPipeline {
             System.out.println(err);
             throw new PipelineException(err);
         }
-    }
-
-    /**
-     * Aggregates data to a resulting map.
-     *
-     * @param aggregatedShipDetails object that stores all needed data for a ship
-     * @param valueJson json value for a signal
-     * @param key hash value of the ship
-     * @return updated object that stores all needed data for a ship
-     */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key) {
-        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
-
-        // If this is the first signal received, instantiate the past information as an empty list
-        if (aggregatedShipDetails.getPastInformation() == null)
-            aggregatedShipDetails.setPastInformation(new ArrayList<>());
-
-        ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
-        AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
-
-        // If the signal is AIS signal, add it to past information
-        if (shipInformation.getAnomalyInformation() == null) {
-            aggregatedShipDetails.getPastInformation().add(shipInformation);
-        } else if (shipInformation.getAisSignal() == null) {
-            // If the signal is Anomaly Information signal, attach it to a corresponding AIS signal
-
-            // Set the anomaly information to be the most recent one
-            // TODO: take care of proper format for the date
-            // TODO: CONSIDER ANOMALY INFO ARRIVING EARLIER THAN AIS SIGNAL
-            aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
-
-            // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
-            for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
-                ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
-                if (information.getAisSignal().getTimestamp().equals(anomalyInformation.getCorrespondingTimestamp())) {
-                    // Check that there are no problems with the data
-                    assert information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash());
-                    assert information.getShipHash().equals(anomalyInformation.getShipHash());
-
-                    information.setAnomalyInformation(anomalyInformation);
-                    aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
-                    break;
-                }
-            }
-        } else throw new RuntimeException("Something went wrong");
-
-        System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
-        return aggregatedShipDetails;
     }
 }

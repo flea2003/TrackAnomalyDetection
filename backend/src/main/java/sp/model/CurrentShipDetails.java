@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import java.io.Serializable;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,7 @@ import sp.dtos.AnomalyInformation;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
