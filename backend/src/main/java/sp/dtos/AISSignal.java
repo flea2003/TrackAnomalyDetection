@@ -1,15 +1,18 @@
 package sp.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import sp.utils.UtilsObjectMapper;
 
 
 @Getter
@@ -27,7 +30,7 @@ public class AISSignal implements Serializable {
     private final float longitude;
     private final float latitude;
     private final float course;
-    private final float heading;
+    private float heading;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime timestamp;
     private final String departurePort;

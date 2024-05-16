@@ -1,5 +1,7 @@
 package sp.pipeline.scorecalculators.components.heuristic;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import lombok.Getter;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
@@ -9,7 +11,6 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
-import sp.dtos.Timestamp;
 
 @Getter
 public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
@@ -21,16 +22,16 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      */
     private transient ValueState<AnomalyInformation> anomalyInformationValueState;
     private transient ValueState<AISSignal> aisSignalValueState;
-    private transient ValueState<Timestamp> lastDetectedAnomalyTime;
+    private transient ValueState<OffsetDateTime> lastDetectedAnomalyTime;
 
     @Override
     public void open(Configuration config) {
 
         // Setup the state descriptors
-        ValueStateDescriptor<Timestamp> lastDetectedAnomalyTimeDescriptor =
+        ValueStateDescriptor<OffsetDateTime> lastDetectedAnomalyTimeDescriptor =
                 new ValueStateDescriptor<>(
                         "time",
-                        TypeInformation.of(new TypeHint<Timestamp>() {})
+                        TypeInformation.of(new TypeHint<OffsetDateTime>() {})
                 );
 
         ValueStateDescriptor<AISSignal> aisSignalValueStateDescriptor =
@@ -64,17 +65,13 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      */
     public AnomalyInformation setAnomalyInformationResult(AnomalyInformation anomalyInformation, AISSignal value,
                                             Float anomalyScore, String badMsg, String goodMsg) throws Exception {
-        anomalyInformation.setShipHash(value.getShipHash());
-        anomalyInformation.setCorrespondingTimestamp(value.getTimestamp());
         // The AIS signal is considered an anomaly only if the difference between the current time and the last detected anomaly
         // time is less than 30 minutes
         if (getLastDetectedAnomalyTime().value() != null
-            && value.getTimestamp().difference(getLastDetectedAnomalyTime().value()) <= 30) {
-            anomalyInformation.setScore(anomalyScore);
-            anomalyInformation.setExplanation(badMsg);
+            && Duration.between(getLastDetectedAnomalyTime().value(), value.getTimestamp()).toMinutes() <= 30) {
+            anomalyInformation = new AnomalyInformation(anomalyScore, badMsg, value.getTimestamp(), value.getShipHash());
         } else {
-            anomalyInformation.setScore(0f);
-            anomalyInformation.setExplanation(goodMsg);
+            anomalyInformation = new AnomalyInformation(0f, goodMsg, value.getTimestamp(), value.getShipHash());
         }
         getAnomalyInformationValueState().update(anomalyInformation);
         getAisSignalValueState().update(value);

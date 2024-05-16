@@ -23,6 +23,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
@@ -133,17 +134,14 @@ public class AnomalyDetectionPipeline {
     private void buildScoreAggregationPart() throws IOException {
         // Create a keyed Kafka Stream of incoming AISUpdate signals
         StreamsBuilder builder = new StreamsBuilder();
-
         // Construct two separate streams for AISSignals and computed AnomalyScores, and wrap each stream values into
         // ShipInformation object, so that we could later merge these two streams
         KStream<String, ShipInformation> streamAnomalyInformation  = streamAnomalyInformation(builder);
         KStream<String, ShipInformation> streamAISSignals = streamAISSignals(builder);
-
         // Merge two streams and select the ship hash as a key for the new stream.
         KStream<String, ShipInformation> mergedStream = streamAISSignals
                 .merge(streamAnomalyInformation)
                 .selectKey((key, value) -> value.getShipHash());
-
         // Construct the KTable (state that is stored) by aggregating the merged stream
         KTable<String, CurrentShipDetails> table = mergedStream
             .mapValues(x -> {
@@ -283,7 +281,6 @@ public class AnomalyDetectionPipeline {
 
         ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
-
         // If the signal is AIS signal, add it to past information
         if (shipInformation.getAnomalyInformation() == null) {
             aggregatedShipDetails.getPastInformation().add(shipInformation);

@@ -36,13 +36,11 @@ public class SimpleScoreCalculator implements ScoreCalculationStrategy {
             .flatMap(new TripleMergeFunction());
 
         return result.map(x -> {
-            AnomalyInformation combined = new AnomalyInformation();
-            combined.setScore(x.f0.getScore() + x.f1.getScore() + x.f2.getScore());
-            combined.setExplanation(x.f0.getExplanation() + '\n' + x.f1.getExplanation() + '\n' + x.f2.getExplanation());
-            combined.setShipHash(x.f0.getShipHash());
-            combined.setCorrespondingTimestamp(x.f0.getCorrespondingTimestamp());
 
-            return combined;
+            return new AnomalyInformation(x.f0.getScore() + x.f1.getScore() + x.f2.getScore(),
+                x.f0.getExplanation() + '\n' + x.f1.getExplanation() + '\n' + x.f2.getExplanation(),
+                x.f0.getCorrespondingTimestamp(),
+                x.f0.getShipHash());
         });
 
     }

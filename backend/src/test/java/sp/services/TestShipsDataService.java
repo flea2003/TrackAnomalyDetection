@@ -152,6 +152,6 @@ public class TestShipsDataService {
         assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAnomalyInformationOfAllShips())
                 .isInstanceOf(PipelineException.class);
     }
-
+*/
 }
 

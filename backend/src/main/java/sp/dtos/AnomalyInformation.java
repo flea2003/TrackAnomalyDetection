@@ -1,7 +1,6 @@
 package sp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.Serializable;
 import java.time.OffsetDateTime;

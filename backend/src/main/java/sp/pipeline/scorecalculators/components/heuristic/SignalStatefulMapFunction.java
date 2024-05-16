@@ -2,6 +2,7 @@ package sp.pipeline.scorecalculators.components.heuristic;
 
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.harvesineDistance;
 
+import java.time.Duration;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 
@@ -28,8 +29,7 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
         // In the case that our stateful map has encountered signals in the past
         if (pastAnomalyInformation != null && pastAISSignal != null) {
 
-            double time = value.getTimestamp().difference(pastAISSignal.getTimestamp());
-
+            double time = Duration.between(getAisSignalValueState().value().getTimestamp(), value.getTimestamp()).toMinutes();
             // If the difference between this and the last signal is more than 10 minutes and
             // the distance average speed it takes to travel from the last point to the current one
             // is greater than 6 km/h, then we update the last detected anomaly time.
