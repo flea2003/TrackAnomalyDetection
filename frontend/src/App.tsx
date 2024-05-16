@@ -15,14 +15,14 @@ import "./styles/common.css";
  */
 export interface CurrentPage {
   currentPage: string;
-  shownShipId: string;
+  shownShipId: number;
 }
 
 function App() {
   // Create state for current page
   const [currentPage, setCurrentPage] = useState({
     currentPage: "anomalyList",
-    shownShipId: "",
+    shownShipId: -1,
   } as CurrentPage);
   const middleColumn = () => {
     switch (currentPage.currentPage) {

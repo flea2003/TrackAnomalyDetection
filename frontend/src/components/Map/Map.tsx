@@ -70,7 +70,7 @@ function Map({ ships, pageChanger }: MapProps) {
         icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
       })
         .addTo(map)
-        .bindPopup(ship.id)
+        .bindPopup("ID: " + ship.id)
         .on("click", () => {
           pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
         });

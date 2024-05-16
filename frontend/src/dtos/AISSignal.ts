@@ -1,5 +1,5 @@
 interface AISSignal {
-  id: string;
+  id: number;
   speed: number;
   long: number;
   lat: number;
