@@ -72,6 +72,7 @@ public class Simulator {
 
         // Iterate through all signals that need to be streamed
         for (SimpleEntry<Timestamp, String> entry : data) {
+
             // Check if the current signal should be streamed at the same time as the previous one. If yes, stream it.
             if (previous.getKey().compareTo(entry.getKey()) == 0)
                 producer.send(new ProducerRecord<>(this.topicName, entry.getValue()), (metadata, exception) -> {});
@@ -83,7 +84,6 @@ public class Simulator {
                 // Note that in our case we assume that the signals are retrieved in minutes, not seconds.
                 Thread.sleep(difference * 1000 * 60 / this.speed);
                 producer.send(new ProducerRecord<>(this.topicName, entry.getValue()), (metadata, exception) -> {});
-                System.out.println("Sending: " + entry.getValue());
             }
 
             // Flush the data and update the previous signal value
