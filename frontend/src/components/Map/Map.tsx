@@ -78,7 +78,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
             duration: mapStyleConfig["transition-time"],
           },
         );
-      }
+      },
     }));
 
     // Everything to do with the map updates should be done inside useEffect

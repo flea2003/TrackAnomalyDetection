@@ -35,13 +35,28 @@ function App() {
     currentPage: "none",
     shownShipId: "",
   } as CurrentPage);
+
+  // Create function that is called when the current page needs to be changed
+  const pageChanger = (newPage: CurrentPage) => {
+    if (
+      currentPage.currentPage != "none" &&
+      newPage.currentPage == currentPage.currentPage
+    ) {
+      // If we clicked the same icon for the second time
+      setCurrentPage({ currentPage: "none", shownShipId: "" });
+    } else {
+      // Else, just set what was clicked
+      setCurrentPage(newPage);
+    }
+  };
+
   const middleColumn = () => {
     switch (currentPage.currentPage) {
       case "anomalyList":
         return (
           <AnomalyList
             ships={ships}
-            pageChanger={setCurrentPage}
+            pageChanger={pageChanger}
             mapCenteringFun={mapCenteringFun}
           />
         );
@@ -50,7 +65,7 @@ function App() {
           <ObjectDetails
             ships={ships}
             shipId={currentPage.shownShipId}
-            pageChanger={setCurrentPage}
+            pageChanger={pageChanger}
           />
         );
       case "notifications":
@@ -81,9 +96,9 @@ function App() {
   return (
     <div className="App" id="root-div">
       <Stack direction="row">
-        <Map ships={ships} pageChanger={setCurrentPage} ref={mapRef} />
+        <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
         {middleColumn()}
-        <Sidebar pageChanger={setCurrentPage} />
+        <Sidebar pageChanger={pageChanger} />
       </Stack>
     </div>
   );
