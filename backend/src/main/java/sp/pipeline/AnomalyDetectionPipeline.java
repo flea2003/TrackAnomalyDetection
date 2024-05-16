@@ -3,7 +3,6 @@ package sp.pipeline;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -69,9 +68,13 @@ public class AnomalyDetectionPipeline {
         buildPipeline();
     }
 
+    /**
+     * Closes the pipeline by closing KafkaStreams and Flink environment.
+     *
+     * @throws Exception when closing Flink environment throws exception
+     */
     public void closePipeline() throws Exception {
         kafkaStreams.close();
-        kafkaStreams.cleanUp();
         flinkEnv.close();
     }
 

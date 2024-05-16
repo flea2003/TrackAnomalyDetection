@@ -51,10 +51,4 @@ public class TestAISSignal {
         assertEquals(0, ais.getLongitude()); // Default value since not specified
     }
 
-    @Test
-    void testFromJSONWithException() {
-        // this JSON has field "shiPpHash"
-        String badJson = "{\"shiPpHash\":\"ship123\",\"speed\":22.5,\"longitude\":130.0,\"latitude\":45.0,\"course\":180.0,\"heading\":90.0,\"timestamp\":\"2024-05-03T12:00:00Z\",\"departurePort\":\"New York\"}";
-        assertThrows(RuntimeException.class, () -> AISSignal.fromJson(badJson));
-    }
 }

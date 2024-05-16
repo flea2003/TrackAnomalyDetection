@@ -11,6 +11,8 @@ import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.services.ShipsDataService;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +22,8 @@ class ShipsDataControllerTest {
 
     private ShipsDataService shipsDataService;
     private ShipsDataController shipsDataController;
+
+    private final OffsetDateTime time1 = OffsetDateTime.of(2004, 1, 27, 1,1,0,0, ZoneOffset.ofHours(0));
 
     @BeforeEach
     void setUp() {
@@ -37,14 +41,14 @@ class ShipsDataControllerTest {
     void getCurrentAISInformationSuccessful() throws PipelineException, NotExistingShipException {
         String shipId = "ship1";
         when(shipsDataService.getCurrentAISInformation(shipId)).thenReturn(
-                new AISSignal(shipId, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, "time1", "port1")
+                new AISSignal(shipId, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, time1, "port1")
         );
 
         ResponseEntity<AISSignal> response = shipsDataController.getCurrentAISInformation(shipId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(new AISSignal(
-                shipId, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, "time1", "port1"
+                shipId, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, time1, "port1"
         ), response.getBody());
     }
 
@@ -74,14 +78,14 @@ class ShipsDataControllerTest {
     void getCurrentAnomalyInformationSuccessful() throws PipelineException, NotExistingShipException {
         String shipId = "ship1";
         when(shipsDataService.getCurrentAnomalyInformation(shipId)).thenReturn(
-                new AnomalyInformation(1.0f, "explanation1", "time1", "ship1")
+                new AnomalyInformation(1.0f, "explanation1", time1, "ship1")
         );
 
         ResponseEntity<AnomalyInformation> response = shipsDataController.getCurrentAnomalyInformation(shipId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(new AnomalyInformation(
-                1.0f, "explanation1", "time1", "ship1"
+                1.0f, "explanation1", time1, "ship1"
         ), response.getBody());
     }
 
@@ -109,9 +113,9 @@ class ShipsDataControllerTest {
 
     @Test
     void getCurrentAISInformationOfAllShipsSuccessful() throws PipelineException {
-        AISSignal signal1 = new AISSignal("ship1", 1, 2, 3, 4, 5, "time1", "port1");
-        AISSignal signal2 = new AISSignal("ship2", 6, 7, 8, 9, 10, "time2", "port2");
-        AISSignal signal3 = new AISSignal("ship3", 11, 12, 13, 14, 15, "time3", "port3");
+        AISSignal signal1 = new AISSignal("ship1", 1, 2, 3, 4, 5, time1, "port1");
+        AISSignal signal2 = new AISSignal("ship2", 6, 7, 8, 9, 10, time1, "port2");
+        AISSignal signal3 = new AISSignal("ship3", 11, 12, 13, 14, 15, time1, "port3");
 
         when(shipsDataService.getCurrentAISInformationOfAllShips())
                 .thenReturn(List.of(signal1, signal2, signal3));
@@ -134,9 +138,9 @@ class ShipsDataControllerTest {
 
     @Test
     void getCurrentAnomalyInformationOfAllShipsSuccessful() throws PipelineException {
-        AnomalyInformation info1 = new AnomalyInformation(1, "explanation1", "time1", "ship1");
-        AnomalyInformation info2 = new AnomalyInformation(2, "explanation2", "time2", "ship2");
-        AnomalyInformation info3 = new AnomalyInformation(3, "explanation3", "time3", "ship3");
+        AnomalyInformation info1 = new AnomalyInformation(1, "explanation1", time1, "ship1");
+        AnomalyInformation info2 = new AnomalyInformation(2, "explanation2", time1, "ship2");
+        AnomalyInformation info3 = new AnomalyInformation(3, "explanation3", time1, "ship3");
 
         when(shipsDataService.getCurrentAnomalyInformationOfAllShips())
                 .thenReturn(List.of(info1, info2, info3));

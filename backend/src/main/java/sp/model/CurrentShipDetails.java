@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import java.io.Serializable;
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -13,7 +12,6 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgn
 import org.apache.kafka.common.serialization.Serde;
 import sp.dtos.AnomalyInformation;
 import sp.utils.UtilsObjectMapper;
-
 
 @Data
 @NoArgsConstructor

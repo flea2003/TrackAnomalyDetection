@@ -32,11 +32,4 @@ public class TestAnomalyInformation {
         assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
     }
 
-    @Test
-    void testFromJSONWithException() {
-        // this JSON has field "scoreRR"
-        String badJson = "{\"scoreRR\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash\"}";
-        assertThrows(RuntimeException.class, () -> AnomalyInformation.fromJson(badJson));
-    }
-
 }

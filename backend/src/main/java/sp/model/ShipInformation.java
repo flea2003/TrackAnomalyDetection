@@ -31,10 +31,8 @@ public class ShipInformation {
      */
     public String toJson() throws JsonProcessingException {
         // Assert that there are no flaws in the data
-        if (!shipHash.isEmpty() && !shipHash.isBlank()) {
-            assert anomalyInformation == null || anomalyInformation.getShipHash().equals(shipHash);
-            assert aisSignal == null || aisSignal.getShipHash().equals(shipHash);
-        }
+        assert anomalyInformation == null || anomalyInformation.getShipHash().equals(shipHash);
+        assert aisSignal == null || aisSignal.getShipHash().equals(shipHash);
 
         return new UtilsObjectMapper().writeValueAsString(this);
     }

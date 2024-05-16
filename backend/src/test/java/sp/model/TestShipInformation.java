@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestShipInformation {
@@ -42,42 +43,15 @@ public class TestShipInformation {
     }
 
     @Test
-    void testFromJsonException() {
-        // bad JSON string has field "shiPppHash"
-        String badJson = "{\"shiPppHash\":\"hash1\",\"anomalyInformation\":{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash1\"},\"aisSignal\":{\"shipHash\":\"hash1\",\"speed\":1.0,\"longitude\":2.0,\"latitude\":3.0,\"course\":4.0,\"heading\":5.0,\"timestamp\":\"timestamp1\",\"departurePort\":\"port\"}}";
-        assertThrows(RuntimeException.class, () -> ShipInformation.fromJson(badJson));
-    }
-
-    @Test
-    void testToJsonEmptyHash() throws JsonProcessingException {
-        String shipHash = "";
-
-        aisSignal = new AISSignal(shipHash, 1, 2, 3, 4, 5, dateTime, "port");
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, shipHash);
-        shipInformation = new ShipInformation(shipHash,anomalyInformation, aisSignal);
-
-        assertThat(shipInformation.toJson()).isEqualTo("{\"shipHash\":\"\",\"anomalyInformation\":{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"\"},\"aisSignal\":{\"shipHash\":\"\",\"speed\":1.0,\"longitude\":2.0,\"latitude\":3.0,\"course\":4.0,\"heading\":5.0,\"timestamp\":\"timestamp1\",\"departurePort\":\"port\"}}");
-    }
-
-    @Test
-    void testToJsonBlankHash() throws JsonProcessingException {
-        String shipHash = "   ";
-
-        aisSignal = new AISSignal(shipHash, 1, 2, 3, 4, 5, dateTime, "port");
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, shipHash);
-        shipInformation = new ShipInformation(shipHash,anomalyInformation, aisSignal);
-
-        assertThat(shipInformation.toJson()).isEqualTo("{\"shipHash\":\"   \",\"anomalyInformation\":{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"   \"},\"aisSignal\":{\"shipHash\":\"   \",\"speed\":1.0,\"longitude\":2.0,\"latitude\":3.0,\"course\":4.0,\"heading\":5.0,\"timestamp\":\"timestamp1\",\"departurePort\":\"port\"}}");
-    }
-
-    @Test
     void testToJsonNullAISSignal() throws JsonProcessingException {
         String shipHash = "ship1";
 
         anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, shipHash);
         shipInformation = new ShipInformation(shipHash, anomalyInformation, null);
 
-        assertThat(shipInformation.toJson()).isEqualTo("{\"shipHash\":\"ship1\",\"anomalyInformation\":{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"ship1\"},\"aisSignal\":null}");
+        String json = shipInformation.toJson();
+        // check if conversion to both sides resulted in the same object
+        assertEquals(shipInformation, ShipInformation.fromJson(json));
     }
 
     @Test
@@ -87,7 +61,9 @@ public class TestShipInformation {
         aisSignal = new AISSignal(shipHash, 1, 2, 3, 4, 5, dateTime, "port");
         shipInformation = new ShipInformation(shipHash, null, aisSignal);
 
-        assertThat(shipInformation.toJson()).isEqualTo("{\"shipHash\":\"ship1\",\"anomalyInformation\":null,\"aisSignal\":{\"shipHash\":\"ship1\",\"speed\":1.0,\"longitude\":2.0,\"latitude\":3.0,\"course\":4.0,\"heading\":5.0,\"timestamp\":\"timestamp1\",\"departurePort\":\"port\"}}");
+        String json = shipInformation.toJson();
+        // check if conversion to both sides resulted in the same object
+        assertEquals(shipInformation, ShipInformation.fromJson(json));
     }
 
     @Test

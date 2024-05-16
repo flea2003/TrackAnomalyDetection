@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import sp.dtos.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
-
 import java.util.ArrayList;
 
 @Service
@@ -19,8 +18,9 @@ public class Aggregator {
      * @param key hash value of the ship
      * @return updated object that stores all needed data for a ship
      */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key) throws JsonProcessingException {
-        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
+    public CurrentShipDetails aggregateSignals(
+            CurrentShipDetails aggregatedShipDetails, String valueJson, String key
+    ) throws JsonProcessingException {
 
         // If this is the first signal received, instantiate the past information as an empty list
         if (aggregatedShipDetails.getPastInformation() == null)
@@ -38,29 +38,51 @@ public class Aggregator {
             // Set the anomaly information to be the most recent one
             // TODO: take care of proper format for the date
             // TODO: CONSIDER ANOMALY INFO ARRIVING EARLIER THAN AIS SIGNAL
-            aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
 
+            aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
             updateCorrespondingShipInformation(aggregatedShipDetails, anomalyInformation);
         } else throw new RuntimeException("Something went wrong");
 
-        System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
         return aggregatedShipDetails;
     }
 
-    public void updateCorrespondingShipInformation(CurrentShipDetails aggregatedShipDetails, AnomalyInformation anomalyInformation) {
+    /**
+     * Finds and updates the corresponding AISSignal for the AnomalyInformation object,
+     * and also updates the ShipInformation object. Corresponding object here means the
+     * signal with the same timestamp.
+     *
+     * @param aggregatedShipDetails current ship details for which the AIS signal in the past will
+     *                              be updated with new anomaly information
+     * @param anomalyInformation anomaly information which is assigned to past AIS signal (with
+     *                           corresponding timestamp)
+     */
+    private void updateCorrespondingShipInformation(
+            CurrentShipDetails aggregatedShipDetails, AnomalyInformation anomalyInformation
+    ) {
         // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
         ShipInformation information = findCorrespondingAisSignal(aggregatedShipDetails, anomalyInformation);
         if (information == null) {
-            System.out.println("Corresponding AISSignal was not found. " +
-                    "Probably update reached the pipeline faster than the initial signal.");
+            System.out.println("Corresponding AISSignal was not found. "
+                    + "Probably update reached the pipeline faster than the initial signal.");
             return;
         }
 
         information.setAnomalyInformation(anomalyInformation);
-        aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
     }
 
-    public ShipInformation findCorrespondingAisSignal(CurrentShipDetails aggregatedShipDetails, AnomalyInformation anomalyInformation) {
+    /**
+     * Finds corresponding AIS signal based on the timestamp. Looks through the past signals
+     * in the past of aggregatedShipDetails (from the most recent one).
+     *
+     * @param aggregatedShipDetails current ship details where the past corresponding AIS signal
+     *                              is searched
+     * @param anomalyInformation the anomaly information for which the corresponding AIS signal
+     *                           is searched
+     * @return the ShipInformation object which corresponds to the anomalyInformation
+     */
+    private ShipInformation findCorrespondingAisSignal(
+            CurrentShipDetails aggregatedShipDetails, AnomalyInformation anomalyInformation
+    ) {
         for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
             ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
             if (information.getAisSignal().getTimestamp().isEqual(anomalyInformation.getCorrespondingTimestamp())) {
