@@ -17,7 +17,7 @@ public class TurningStatefulMapFunctionTest {
     private TurningStatefulMapFunction turningStatefulMapFunction;
 
     @Test
-    void testOneNonAnomalousSignal() { // More descriptive name
+    void testOneNonAnomalousSignal() {
 
         turningStatefulMapFunction = new TurningStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
@@ -38,7 +38,7 @@ public class TurningStatefulMapFunctionTest {
     }
 
     @Test
-    void testTwoNonAnomalousSignal() { // More descriptive name
+    void testTwoNonAnomalousSignal() {
 
         turningStatefulMapFunction = new TurningStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
@@ -63,7 +63,7 @@ public class TurningStatefulMapFunctionTest {
 
 
     @Test
-    void anomalyExpires() { // More descriptive name
+    void anomalyExpires() {
 
         turningStatefulMapFunction = new TurningStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");

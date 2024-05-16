@@ -28,4 +28,15 @@ public class Tools {
         return r * c;
     }
 
+    /**
+     * A metric used to compute the difference between the consecutive courses or headings.
+     *
+     * @param deg1 - the course/heading reported in one signal
+     * @param deg2 - the course/heading reported in another signal
+     * @return - the computer metric of the difference.
+     */
+    public static Double circularMetric(float deg1, float deg2) {
+        return 180.0 - Math.abs(180 - (deg1 % 360 - deg2 % 360 + 360) % 360);
+    }
+
 }

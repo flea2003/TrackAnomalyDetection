@@ -18,7 +18,8 @@ public class SpeedStatefulMapFunctionTest {
     private SpeedStatefulMapFunction speedStatefulMapFunction;
 
     @Test
-    void testOneNonAnomalousSignal() { // More descriptive name
+    void testOneNonAnomalousSignal() {
+        // Only one signal is received, and it can't be anomalous on it's own.
 
         speedStatefulMapFunction = new SpeedStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
@@ -39,8 +40,8 @@ public class SpeedStatefulMapFunctionTest {
     }
 
     @Test
-    void testTwoNonAnomalousSignal() { // More descriptive name
-
+    void testTwoNonAnomalousSignal() {
+        // There are two signals but they are not anomalous
         speedStatefulMapFunction = new SpeedStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
         Timestamp timestamp2 = new Timestamp("30/12/2024 05:30");
@@ -64,8 +65,11 @@ public class SpeedStatefulMapFunctionTest {
 
 
     @Test
-    void anomalyExpires() { // More descriptive name
-
+    void anomalyExpires() {
+        // The first signal received is not anomalous
+        // The second signal received is anomalous since the difference between the computed speed and actual speed
+        // is slightly greater than 10
+        // The third signal is not anomalous since more than 30 minutes have passed since it was received.
         speedStatefulMapFunction = new SpeedStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
         Timestamp timestamp2 = new Timestamp("30/12/2024 05:30");

@@ -13,7 +13,7 @@
   /* Make sure when hovering it s like a link */
   cursor: pointer;
 }
-.anomaly-list-entry:hover {
+.anomaly-list-entry:hover{
   font-weight: 500;
 }
 
@@ -34,7 +34,7 @@
   align-items: center;
 }
 
-.anomaly-list-entry-icon {
+.anomaly-list-entry-icon{
   height: var(--anomaly-list-entry-icon-size);
   width: var(--anomaly-list-entry-icon-size);
 }

@@ -6,11 +6,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 @JsonSerialize
 @EqualsAndHashCode
-@ToString
 public class Timestamp implements Comparable<Timestamp> {
 
     private int year;
@@ -94,4 +92,8 @@ public class Timestamp implements Comparable<Timestamp> {
         return this.timestamp;
     }
 
+    @Override
+    public String toString() {
+        return this.timestamp;
+    }
 }

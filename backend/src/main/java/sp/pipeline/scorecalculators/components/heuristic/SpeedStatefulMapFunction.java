@@ -7,8 +7,12 @@ import sp.dtos.AnomalyInformation;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
 
+    private static final String goodMsg = "The ship's speed is great.";
+    private static final String badMsg = "The ship's speed is anomalous.";
+
     /**
-     * Performs a stateful map operation from an incoming AISSignal to an Anomaly Information object.
+     * Performs a stateful map operation that receives an AIS signal and produces an
+     * AnomalyInformation based on the predefined heuristics for the speed of the ship.
      *
      * @param value The input value.
      * @return the computed Anomaly Information object
@@ -20,39 +24,25 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         AnomalyInformation pastAnomalyInformation = getAnomalyInformationValueState().value();
         AISSignal pastAISSignal = getAisSignalValueState().value();
 
+        boolean flag = false;
+
+        // In the case that our stateful map has encountered signals in the past
         if (pastAnomalyInformation != null && pastAISSignal != null) {
             double globeDistance = harvesineDistance(value.getLatitude(), value.getLongitude(),
-                    pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
+                pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
             double timeDifference = value.getTimestamp().difference(pastAISSignal.getTimestamp());
             double computedSpeed = globeDistance / (timeDifference + 0.00001);
-
-            if (computedSpeed > 40) {
-                getLastDetectedAnomalyTime().update(value.getTimestamp());
-            } else if (Math.abs(value.getSpeed() - computedSpeed) > 10) {
-                getLastDetectedAnomalyTime().update(value.getTimestamp());
-            } else if ((getAisSignalValueState().value().getSpeed() - value.getSpeed()) / (timeDifference + 0.00001) > 50) {
-                getLastDetectedAnomalyTime().update(value.getTimestamp());
+            // If any of these heuristics hold, we update our lastDetectedAnomalyTime:
+            // 1. Check if the computed speed is greater than 40 km/h
+            // 2. Check if the absolute difference between the computed and the reported speed is greater than 10 km/h
+            // 3. Check if the acceleration of the ship is greater than 50 km/h
+            if (computedSpeed > 40
+                || Math.abs(value.getSpeed() - computedSpeed) > 10
+                || (getAisSignalValueState().value().getSpeed() - value.getSpeed()) / (timeDifference + 0.00001) > 50) {
+                this.getLastDetectedAnomalyTime().update(value.getTimestamp());
             }
-            anomalyInformation.setShipHash(value.getShipHash());
-            anomalyInformation.setCorrespondingTimestamp(value.getTimestamp());
-
-            if (getLastDetectedAnomalyTime().value() != null && value.getTimestamp()
-                .difference(getLastDetectedAnomalyTime().value()) <= 30) {
-                anomalyInformation.setScore(33.0f);
-                anomalyInformation.setExplanation("The ship's speed is anomalous.");
-            } else {
-                anomalyInformation.setScore(0.0f);
-                anomalyInformation.setExplanation("The ship's speed is great.");
-            }
-        } else {
-            anomalyInformation.setScore(0.0f);
-            anomalyInformation.setExplanation("The ship's speed is great.");
-            anomalyInformation.setShipHash(value.getShipHash());
-            anomalyInformation.setCorrespondingTimestamp(value.getTimestamp());
         }
-        getAnomalyInformationValueState().update(anomalyInformation);
-        getAisSignalValueState().update(value);
-        return anomalyInformation;
+        return super.setAnomalyInformationResult(anomalyInformation, value, 33f, badMsg, goodMsg);
     }
 
 }

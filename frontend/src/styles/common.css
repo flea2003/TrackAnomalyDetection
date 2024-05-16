@@ -1,7 +1,8 @@
 /* This css file is meant for managing the root layout and the color shcemes */
 
 :root {
-  --anomaly-list-title-font-size: 1em;
+
+  --anomaly-list-title-font-size: 1.0em;
   --anomaly-list-title-height: 50px;
 
   --anomaly-list-entry-font-size: 0.8em;
@@ -14,6 +15,7 @@
   --object-details-return-icon-margin: 10px;
 
   --object-details-entry-padding: 10px;
+
 }
 
 #root-div {
@@ -26,8 +28,7 @@
   border-left: 1px solid black;
 }
 
-#anomaly-list-container,
-#object-details-container {
+#anomaly-list-container, #object-details-container {
   width: 17%;
   height: 100vh;
   border-left: 1px solid black;

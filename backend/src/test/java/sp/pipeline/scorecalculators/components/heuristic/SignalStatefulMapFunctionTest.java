@@ -18,11 +18,10 @@ public class SignalStatefulMapFunctionTest {
     private SignalStatefulMapFunction signalStatefulMapFunction;
 
     @Test
-    void testOneNonAnomalousSignal() { // More descriptive name
-
+    void testOneNonAnomalousSignal() {
+        // There is only one signal so it is not anomalous
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
-        Timestamp timestamp2 = new Timestamp("30/12/2024 04:52");
         AISSignal aisSignal1 = new AISSignal("1", 20, 10, 10, 20, 20, timestamp1, "Malta");
 
         try {
@@ -32,15 +31,15 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal1, 10);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }
     }
 
     @Test
-    void testTwoNonAnomalousSignal() { // More descriptive name
-
+    void testTwoNonAnomalousSignal() {
+        // There are two signals but they are not anomalous
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
         Timestamp timestamp2 = new Timestamp("30/12/2024 05:00");
@@ -54,9 +53,9 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal2, 40);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }
@@ -64,8 +63,9 @@ public class SignalStatefulMapFunctionTest {
 
 
     @Test
-    void secondAnomalousSignal() { // More descriptive name
-
+    void secondAnomalousSignal() {
+        // The second signal is anomalous and the first one isn't
+        // Reason: the difference is time of the signal is big and the globe distance is enormous
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
         Timestamp timestamp2 = new Timestamp("30/12/2024 05:01");
@@ -79,17 +79,18 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal2, 31);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The signal timing is anomalous.");
+            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }
     }
 
     @Test
-    void anomalyExpires() { // More descriptive name
-
+    void anomalyExpires() {
+        // The second signal is anomalous because the time difference between signals is big and the distance travelled also
+        // The third signal is not anomalous since more than 30 minutes past from the previous signal.
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
         Timestamp timestamp2 = new Timestamp("30/12/2024 05:01");
@@ -106,11 +107,11 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal3, 63);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The signal timing is anomalous.");
+            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
             assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }

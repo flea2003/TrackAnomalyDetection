@@ -11,6 +11,7 @@
   align-items: center;
   font-size: var(--anomaly-list-title-font-size);
   font-weight: bold;
+
 }
 
 .object-details-title-id {
@@ -19,7 +20,7 @@
 
 .object-details-title-container {
   display: flex;
-  justify-content: space-between;
+  justify-content:space-between;
   align-items: center;
   width: 100%;
 }
