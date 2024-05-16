@@ -29,20 +29,14 @@ public class ShipInformation {
      *
      * @return the respective JSON string
      */
-    public String toJson() {
+    public String toJson() throws JsonProcessingException {
         // Assert that there are no flaws in the data
         if (!shipHash.isEmpty() && !shipHash.isBlank()) {
             assert anomalyInformation == null || anomalyInformation.getShipHash().equals(shipHash);
             assert aisSignal == null || aisSignal.getShipHash().equals(shipHash);
         }
 
-        String json;
-        try {
-            json = new UtilsObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return json;
+        return new UtilsObjectMapper().writeValueAsString(this);
     }
 
     /**
@@ -51,11 +45,7 @@ public class ShipInformation {
      * @param val the JSON string to convert
      * @return the converted AISUpdate object
      */
-    public static ShipInformation fromJson(String val) {
-        try {
-            return new UtilsObjectMapper().readValue(val, ShipInformation.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public static ShipInformation fromJson(String val) throws JsonProcessingException {
+        return new UtilsObjectMapper().readValue(val, ShipInformation.class);
     }
 }

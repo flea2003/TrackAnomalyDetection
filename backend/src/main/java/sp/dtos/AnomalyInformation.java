@@ -32,14 +32,8 @@ public class AnomalyInformation implements Serializable {
      *
      * @return the respective JSON string
      */
-    public String toJson() {
-        String json;
-        try {
-            json = new UtilsObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return json;
+    public String toJson() throws JsonProcessingException {
+        return new UtilsObjectMapper().writeValueAsString(this);
     }
 
     /**
@@ -48,11 +42,7 @@ public class AnomalyInformation implements Serializable {
      * @param val the JSON string to convert
      * @return the converted AISUpdate object
      */
-    public static AnomalyInformation fromJson(String val) {
-        try {
-            return new UtilsObjectMapper().readValue(val, AnomalyInformation.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public static AnomalyInformation fromJson(String val) throws JsonProcessingException {
+        return new UtilsObjectMapper().readValue(val, AnomalyInformation.class);
     }
 }

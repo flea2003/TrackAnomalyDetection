@@ -1,4 +1,5 @@
 package sp.dtos;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,17 +17,17 @@ public class TestAnomalyInformation {
     }
 
     @Test
-    void testToJson() {
+    void testToJson() throws JsonProcessingException {
         assertThat(anomalyInformation.toJson()).isEqualTo("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}");
     }
 
     @Test
-    void testFromJson1() {
+    void testFromJson1() throws JsonProcessingException {
         assertThat(AnomalyInformation.fromJson(anomalyInformation.toJson())).isEqualTo(anomalyInformation);
     }
 
     @Test
-    void testFromJson2() {
+    void testFromJson2() throws JsonProcessingException {
         assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
     }
 
