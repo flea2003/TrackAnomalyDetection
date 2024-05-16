@@ -3,7 +3,6 @@
 ## Building the project
 
 In order to work with the frontend, one has to install the NodeJS programming environment. This can be done by running:
-
 ```
 sudo apt update
 sudo apt install nodejs
@@ -30,7 +29,6 @@ In order to run the project, one can use the following commands:
 
 This template project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 The command that was used to generate it is:
-
 ```
 npx create-react-app frontend --template typescript --use-npm
 ```
@@ -64,4 +62,5 @@ If this documentation wasn't clear enough, here is the [React documentation](htt
 - bell-notifiations.svg - taken from https://iconoir.com/
 - settings.svg - taken from https://iconoir.com/
 - ship.png - taken from https://www.freepik.com
-- back.svg - taken from https://www.svgrepo.com
+- back.svg - taken from https://flowbite.com/icons/
+- close.png - taken from https://flowbite.com/icons/
