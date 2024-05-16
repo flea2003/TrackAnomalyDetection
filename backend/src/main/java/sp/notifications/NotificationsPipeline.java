@@ -1,6 +1,8 @@
 package sp.notifications;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,13 +37,12 @@ import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 import sp.repositories.NotificationsRepository;
 import sp.services.NotificationService;
 
-@Service
 public class NotificationsPipeline {
+    /*
     private final NotificationService notificationService;
 
 
     private static final String CALCULATED_SCORES_TOPIC_NAME;
-    private static final String KAFKA_SERVER_ADDRESS;
     private static final String KAFKA_STORE_NAME;
     private KafkaStreams kafkaStreams;
     private KTable<String, CurrentShipDetails> state;
@@ -50,7 +51,6 @@ public class NotificationsPipeline {
     static {
         try {
             CALCULATED_SCORES_TOPIC_NAME = StreamUtils.loadConfig().getProperty("calculated.scores.topic.name");
-            KAFKA_SERVER_ADDRESS = StreamUtils.loadConfig().getProperty("kafka.server.address");
             KAFKA_STORE_NAME = StreamUtils.loadConfig().getProperty("kafka.store.name");
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -92,7 +92,7 @@ public class NotificationsPipeline {
                 })
                 .groupByKey()
                 .aggregate(
-                        null,
+                        AnomalyInformation::new,
                         (key, valueJson, lastInformation) -> {
                             try {
                                 return aggregateSignals(lastInformation, valueJson, key);
@@ -104,11 +104,6 @@ public class NotificationsPipeline {
                                 .<String, AnomalyInformation, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NAME)
                                 .withValueSerde(AnomalyInformation.getSerde())
                 );
-
-        builder.build();
-        this.kafkaStreams = StreamUtils.getKafkaStreamConsumingFromKafka(builder);
-        this.kafkaStreams.cleanUp();
-        this.kafkaStreams.start();
     }
 
     public AnomalyInformation aggregateSignals(AnomalyInformation currentNotification, String valueJson, String key) throws JsonProcessingException {
@@ -116,7 +111,7 @@ public class NotificationsPipeline {
 
         AnomalyInformation newNotification = AnomalyInformation.fromJson(valueJson);
 
-        if (currentNotification == null) {
+        if (currentNotification.getCorrespondingTimestamp() == null) {
             currentNotification = notificationService.getNotification(key).getAnomalyInformation();
 
             if (currentNotification.getExplanation().equals("NOT_COMPUTED"))
@@ -131,10 +126,12 @@ public class NotificationsPipeline {
             if (newNotification.getScore() < threshold) {
                 newNotification = currentNotification;
             } else {
-                // A QUERY TO THE AIS SIGNAL DATABASE, EXTRACT CORRESPONDING AIS SIGNAL
+                // BEFORE THAT, A QUERY TO THE AIS SIGNAL DATABASE, EXTRACTING THE CORRESPONDING AIS SIGNAL
                 notificationService.addNotification(new ShipInformation(key, newNotification, null));
             }
         }
         return newNotification;
     }
+
+     */
 }
