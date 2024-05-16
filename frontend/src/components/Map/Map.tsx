@@ -12,6 +12,8 @@ import "../../styles/common.css";
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
 
+import mapStyleConfig from "../../styles/mapConfig.json";
+
 interface MapProps {
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
@@ -68,10 +70,14 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
         if (map == null) {
           return;
         }
-        map.setView([ship.lat, ship.lng], 9, {
-          animate: true,
-          duration: 0.75,
-        });
+        map.flyTo(
+          [ship.lat, ship.lng],
+          mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
+          {
+            animate: true,
+            duration: mapStyleConfig["transition-time"],
+          },
+        );
       },
     }));
 
