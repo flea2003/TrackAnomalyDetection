@@ -28,7 +28,6 @@ import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -304,7 +303,8 @@ public class AnomalyDetectionPipeline {
      * @param key hash value of the ship
      * @return updated object that stores all needed data for a ship
      */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, Long key) throws JsonProcessingException {
+    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, Long key)
+            throws JsonProcessingException {
         System.out.println("Started aggregating JSON value. JSON: " + valueJson);
 
         // If this is the first signal received, instantiate the past information as an empty list

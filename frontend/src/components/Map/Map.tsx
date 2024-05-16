@@ -106,17 +106,17 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
             pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
           });
       });
-    // Add all ship icons to the map
-    ships.forEach((ship) => {
-      L.marker([ship.lat, ship.lng], {
-        icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
-      })
-        .addTo(map)
-        .bindPopup("ID: " + ship.id)
-        .on("click", () => {
-          pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
-        });
-    });
+      // Add all ship icons to the map
+      ships.forEach((ship) => {
+        L.marker([ship.lat, ship.lng], {
+          icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
+        })
+          .addTo(map)
+          .bindPopup("ID: " + ship.id)
+          .on("click", () => {
+            pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
+          });
+      });
 
       return () => {
         if (map) {
