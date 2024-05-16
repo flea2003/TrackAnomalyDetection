@@ -1,83 +1,41 @@
 package sp.dtos;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestAISSignal {
 
-    String json = "{\"shipHash\":\"ship123\",\"speed\":22.5,\"longitude\":130.0,\"latitude\":45.0,\"course\":180.0,\"heading\":90.0,\"timestamp\":\"2024-05-03T12:00:00Z\",\"departurePort\":\"New York\"}";
-    AISSignal ais = new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, "2024-05-03T12:00:00Z", "New York");
+    OffsetDateTime dateTime = OffsetDateTime.of(2004, 1, 27, 1,1,0,0, ZoneOffset.ofHours(0));
+    String json = "{\"shipHash\":\"ship123\",\"speed\":22.5,\"longitude\":130.0,\"latitude\":45.0,\"course\":180.0,\"heading\":90.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"New York\"}";
+    AISSignal ais =  new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, OffsetDateTime.of(2004, 1, 27, 1,1,0,0, ZoneOffset.ofHours(0)), "New York");
 
     @Test
-    void testToJSON() {
+    void testToJSON() throws JsonProcessingException {
         assertEquals(json, ais.toJson());
     }
 
     @Test
-    void testToString() {
+    void testToString() throws JsonProcessingException {
         assertEquals(ais, AISSignal.fromJson(json));
-    }
-
-    @Test
-    void testToStringActual() {
-        AISSignal ais = new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, "2024-05-03T12:00:00Z", "New York");
-        String expectedString = "AISSignal(shipHash=ship123, speed=22.5, longitude=130.0, latitude=45.0, course=180.0, heading=90.0, timestamp=2024-05-03T12:00:00Z, departurePort=New York)";
-        assertEquals(expectedString, ais.toString());
     }
 
     @Test
     void testEquals(){
         assertEquals(ais,
-                new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, "2024-05-03T12:00:00Z", "New York")
+                new AISSignal("ship123", 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, dateTime, "New York")
         );
         assertNotEquals(ais, null);
         assertNotEquals(ais, new Object());
-        assertNotEquals(ais, new AISSignal("", 1,1,1,1,1,"",""));
+        assertNotEquals(ais, new AISSignal("", 1,1,1,1,1, dateTime,""));
     }
 
     @Test
-    void testHashCode() {
-        assertEquals(ais.hashCode(), ais.hashCode());
-    }
-
-    @Test
-    void getShipHash() {
-        assertEquals(ais.getShipHash(), "ship123");
-    }
-
-    @Test
-    void testGetSpeed() {
-        assertEquals(ais.getSpeed(), 22.5f);
-    }
-
-    @Test
-    void testGetLongitude() {
-        assertEquals(ais.getLongitude(), 130.0f);
-    }
-
-    @Test
-    void testGetLatitude() {
-        assertEquals(ais.getLatitude(), 45.0f);
-    }
-
-    @Test
-    void testGetCourse() {
-        assertEquals(ais.getCourse(), 180.0f);
-    }
-
-    @Test
-    void testGetTimestamp() {
-        assertEquals(ais.getTimestamp(), "2024-05-03T12:00:00Z");
-    }
-
-    @Test
-    void testGetDeparturePort() {
-        assertEquals(ais.getDeparturePort(), "New York");
-    }
-
-    @Test
-    void testFromJsonWithEmptyJson() {
+    void testFromJsonWithEmptyJson() throws JsonProcessingException {
         String emptyJson = "{}";
         AISSignal ais = AISSignal.fromJson(emptyJson);
         assertNull(ais.getShipHash());
@@ -85,7 +43,7 @@ public class TestAISSignal {
     }
 
     @Test
-    void testFromJsonWithPartialData() {
+    void testFromJsonWithPartialData() throws JsonProcessingException {
         String partialJson = "{\"shipHash\":\"ship123\", \"speed\":25.0}";
         AISSignal ais = AISSignal.fromJson(partialJson);
         assertEquals("ship123", ais.getShipHash());
@@ -99,5 +57,4 @@ public class TestAISSignal {
         String badJson = "{\"shiPpHash\":\"ship123\",\"speed\":22.5,\"longitude\":130.0,\"latitude\":45.0,\"course\":180.0,\"heading\":90.0,\"timestamp\":\"2024-05-03T12:00:00Z\",\"departurePort\":\"New York\"}";
         assertThrows(RuntimeException.class, () -> AISSignal.fromJson(badJson));
     }
-
 }

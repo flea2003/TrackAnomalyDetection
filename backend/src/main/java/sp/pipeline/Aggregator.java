@@ -1,5 +1,6 @@
 package sp.pipeline;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 import sp.dtos.AnomalyInformation;
 import sp.model.CurrentShipDetails;
@@ -18,7 +19,7 @@ public class Aggregator {
      * @param key hash value of the ship
      * @return updated object that stores all needed data for a ship
      */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key) {
+    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key) throws JsonProcessingException {
         System.out.println("Started aggregating JSON value. JSON: " + valueJson);
 
         // If this is the first signal received, instantiate the past information as an empty list
@@ -62,7 +63,7 @@ public class Aggregator {
     public ShipInformation findCorrespondingAisSignal(CurrentShipDetails aggregatedShipDetails, AnomalyInformation anomalyInformation) {
         for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
             ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
-            if (information.getAisSignal().getTimestamp().equals(anomalyInformation.getCorrespondingTimestamp())) {
+            if (information.getAisSignal().getTimestamp().isEqual(anomalyInformation.getCorrespondingTimestamp())) {
                 // Check that there are no problems with the data
                 assert information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash());
                 assert information.getShipHash().equals(anomalyInformation.getShipHash());

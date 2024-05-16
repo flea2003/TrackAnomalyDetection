@@ -1,17 +1,22 @@
-import React, {useEffect, useState} from "react";
-import L, {bounds} from "leaflet";
+import React, {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import L from "leaflet";
 import createShipIcon from "../ShipIcon/ShipIcon";
-import config from "../../../config";
-import axios from "axios";
-import '../../styles/map.css'
-import '../../styles/common.css'
+import "../../styles/map.css";
+import "../../styles/common.css";
 
+import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
-import assert from "assert";
+
+import mapStyleConfig from "../../styles/mapConfig.json";
 
 interface MapProps {
-    ships: ShipDetails[],
-    pageChanger: Function
+  ships: ShipDetails[];
+  pageChanger: (currentPage: CurrentPage) => void;
 }
 
 /**
@@ -19,26 +24,32 @@ interface MapProps {
  * @returns the created map
  */
 function getInitialMap() {
-    const initialMap = L.map('map', {
-        minZoom: 2,
-        maxZoom: 17,
-    }).setView([47.0105, 28.8638], 8);
+  const initialMap = L.map("map", {
+    minZoom: 2,
+    maxZoom: 17,
+  }).setView([47.0105, 28.8638], 8);
 
-    let southWest = L.latLng(-90, -180);
-    let northEast = L.latLng(90, 180);
-    let bounds = L.latLngBounds(southWest, northEast);
+  const southWest = L.latLng(-90, -180);
+  const northEast = L.latLng(90, 180);
+  const bounds = L.latLngBounds(southWest, northEast);
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(initialMap);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(initialMap);
 
-    initialMap.setMaxBounds(bounds);
-    initialMap.on('drag', function() {
-        initialMap.panInsideBounds(bounds, { animate: false });
-    });
+  initialMap.setMaxBounds(bounds);
+  initialMap.on("drag", function () {
+    initialMap.panInsideBounds(bounds, { animate: false });
+  });
 
-    return initialMap
+  return initialMap;
+}
+
+// Define the type of the ref object
+interface MapExportedMethodsType {
+  centerMapOntoShip: (details: ShipDetails) => void;
 }
 
 /**
@@ -48,54 +59,75 @@ function getInitialMap() {
  * @param ships the ships to display on the map
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
-function Map({ ships, pageChanger } : MapProps){
-
+const Map = forwardRef<MapExportedMethodsType, MapProps>(
+  ({ ships, pageChanger }, ref) => {
     // Initialize the map as state, since we want to have a single instance
     const [map, setMap] = useState<L.Map | null>(null);
 
-    // Everthing to do with the map updates should be done inside of useEffect
-    useEffect(() => {
-
-        // If the map is null, we need to create it. We do it once, with state
+    // Define the methods that will be reachable from the parent
+    useImperativeHandle(ref, () => ({
+      centerMapOntoShip(ship: ShipDetails) {
         if (map == null) {
-            const initialMap = getInitialMap();
-            setMap(initialMap);
+          return;
         }
+        map.flyTo(
+          [ship.lat, ship.lng],
+          mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
+          {
+            animate: true,
+            duration: mapStyleConfig["transition-time"],
+          },
+        );
+      },
+    }));
 
-        // If not yet created, do not do anything, just wait
-        if(map == null) {
-            return;
-        }
+    // Everything to do with the map updates should be done inside useEffect
+    useEffect(() => {
+      // If the map is null, we need to create it. We do it once, with state
+      if (map == null) {
+        const initialMap = getInitialMap();
+        setMap(initialMap);
+      }
 
-        // Add all ship icons to the map
-        ships.forEach(ship => {
-            L.marker([ship.lat, ship.lng], {icon: createShipIcon(ship.anomalyScore / 100, ship.heading)})
-                .addTo(map)
-                .bindPopup(ship.id)
-                .on('click', () => {
-                    pageChanger({currentPage: 'objectDetails', shownShipId: ship.id});
-                });
-        });
+      // If not yet created, do not do anything, just wait
+      if (map == null) {
+        return;
+      }
 
-        return () => {
+      // Add all ship icons to the map
+      ships.forEach((ship) => {
+        L.marker([ship.lat, ship.lng], {
+          icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
+        })
+          .addTo(map)
+          .bindPopup(ship.id)
+          .on("click", (e) => {
+            map.setView(e.latlng, map.getZoom());
+            pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
+          });
+      });
 
-            if (map) {
-                map.eachLayer(function (layer : L.Layer) {
-                    if (layer instanceof L.Marker) {
-                        map.removeLayer(layer);
-                    }
-                });
+      return () => {
+        if (map) {
+          map.eachLayer(function (layer: L.Layer) {
+            if (layer instanceof L.Marker) {
+              map.removeLayer(layer);
             }
-        };
-
-    }, [ships]);
+          });
+        }
+      };
+    }, [map, pageChanger, ships]);
 
     return (
-        <div id="map-container">
-            <div id="map" data-testid="map"></div>
-        </div>
+      <div id="map-container">
+        <div id="map" data-testid="map"></div>
+      </div>
     );
-}
+  },
+);
 
+// Needed for Lint to work (React itself does not require this)
+Map.displayName = "Map";
 
 export default Map;
+export type { MapExportedMethodsType };

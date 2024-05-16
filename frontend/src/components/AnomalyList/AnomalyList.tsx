@@ -1,18 +1,19 @@
-import React from 'react';
-import Stack from '@mui/material/Stack';
-import AnomalyListEntry from './AnomalyListEntry';
-import List from '@mui/material/List';
+import React from "react";
+import Stack from "@mui/material/Stack";
+import AnomalyListEntry from "./AnomalyListEntry";
+import List from "@mui/material/List";
+import { CurrentPage } from "../../App";
 
-import ShipDetails from '../../model/ShipDetails';
+import ShipDetails from "../../model/ShipDetails";
 
-import '../../styles/common.css';
-import '../../styles/anomalyList.css';
+import "../../styles/common.css";
+import "../../styles/anomalyList.css";
 
 interface AnomalyListProps {
-    ships: ShipDetails[],
-    pageChanger: Function
+  ships: ShipDetails[];
+  pageChanger: (currentPage: CurrentPage) => void;
+  mapCenteringFun: (details: ShipDetails) => void;
 }
-
 
 /**
  * This component is the second column of the main view of the application. It essentially displays
@@ -20,22 +21,36 @@ interface AnomalyListProps {
  *
  * @param ships a list of ships to display in the list
  * @param pageChanger function that, when called, changes the page displayed in the second column.
+ * @param mapCenteringFun function that, when called, centers the map on a specific ship
  */
-function AnomalyList({ ships, pageChanger }: AnomalyListProps) {
+function AnomalyList({
+  ships,
+  pageChanger,
+  mapCenteringFun,
+}: AnomalyListProps) {
+  const listEntries = [];
+  for (let i = 0; i < ships.length; i++) {
+    listEntries.push(
+      <AnomalyListEntry
+        key={i}
+        shipDetails={ships[i]}
+        pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
+      />,
+    );
+  }
 
-    const listEntries = [];
-    for (var i = 0; i < ships.length; i++) {
-        listEntries.push(<AnomalyListEntry key={i} shipDetails={ships[i]} pageChanger={pageChanger} />);
-    }
-
-    return (
-        <Stack id="anomaly-list-container">
-            <span id="anomaly-list-title">Anomaly list</span>
-            <List id="anomaly-list-internal-container" style={{maxHeight: '100%', overflow: 'auto', padding: '0'}}>
-                {listEntries}
-            </List>
-        </Stack>
-    )
+  return (
+    <Stack id="anomaly-list-container">
+      <span id="anomaly-list-title">Anomaly list</span>
+      <List
+        id="anomaly-list-internal-container"
+        style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}
+      >
+        {listEntries}
+      </List>
+    </Stack>
+  );
 }
 
 export default AnomalyList;

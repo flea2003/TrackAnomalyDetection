@@ -6,11 +6,13 @@ import ObjectDetailsEntry from "./ObjectDetailsEntry";
 
 import "../../styles/common.css";
 import "../../styles/objectDetails.css";
+import returnIcon from "../../assets/icons/back.svg";
+import { CurrentPage } from "../../App";
 
 interface ObjectDetailsProps {
-    ships: ShipDetails[],
-    shipId: string,
-    pageChanger: Function
+  ships: ShipDetails[];
+  shipId: string;
+  pageChanger: (currentPage: CurrentPage) => void;
 }
 
 /**
@@ -20,45 +22,66 @@ interface ObjectDetailsProps {
  * @param props properties passed to this component. Most importantly, it contains the ship object whose details to display.
  */
 function ObjectDetails(props: ObjectDetailsProps) {
+  // Extract the props
+  const allShips = props.ships;
+  const shipID = props.shipId;
+  const pageChanger = props.pageChanger;
 
-    // Extract the props
-    const allShips = props.ships;
-    const shipID = props.shipId;
-    const pageChanger = props.pageChanger;
-
-    // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
-    const ship = allShips.find((ship) => ship.id === shipID);
-    if (ship === undefined) {
-        return (
-            <Stack id="object-details-container">
-                <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">Not found</span></span>
-            </Stack>
-        )
-    }
-
-    // Create a list of properties to display
-    const properties = ship.getPropertyList();
-    const propertyList = properties.map((property) => {
-        return <ObjectDetailsEntry key={property.type} type={property.type} value={property.value} />
-    });
-
-    // Define the return icon and its click handler
-    const returnIcon = require("../../assets/icons/back.svg").default;
-    const onReturnClicked = () => {
-        pageChanger({currentPage: "anomalyList", shownShipId: ""});
-    }
-
+  // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
+  const ship = allShips.find((ship) => ship.id === shipID);
+  if (ship === undefined) {
     return (
-        <Stack id="object-details-container">
-            <div className="object-details-title-container">
-                <img src={returnIcon} className="object-details-return-icon" onClick={onReturnClicked}/>
-                <span className="object-details-title">Object ID:&nbsp; <span className="object-details-title-id">{ship.id}</span> </span>
-            </div>
-            <List style={{maxHeight: '100%', overflow: 'auto'}} className="object-details-list">
-                {propertyList}
-            </List>
-        </Stack>
-    )
+      <Stack id="object-details-container">
+        <span className="object-details-title">
+          Object ID:&nbsp;{" "}
+          <span className="object-details-title-id">Not found</span>
+        </span>
+      </Stack>
+    );
+  }
+
+  // Create a list of properties to display
+  const properties = ship.getPropertyList();
+  const propertyList = properties.map((property) => {
+    return (
+      <ObjectDetailsEntry
+        key={property.type}
+        type={property.type}
+        value={property.value}
+      />
+    );
+  });
+
+  // Define the return icon and its click handler
+
+  const onReturnClicked = () => {
+    pageChanger({ currentPage: "anomalyList", shownShipId: "" });
+  };
+
+  const returnIconAlt = "Return Icon";
+
+  return (
+    <Stack id="object-details-container">
+      <div className="object-details-title-container">
+        <img
+          src={returnIcon}
+          className="object-details-return-icon"
+          onClick={onReturnClicked}
+          alt={returnIconAlt}
+        />
+        <span className="object-details-title">
+          Object ID:&nbsp;{" "}
+          <span className="object-details-title-id">{ship.id}</span>{" "}
+        </span>
+      </div>
+      <List
+        style={{ maxHeight: "100%", overflow: "auto" }}
+        className="object-details-list"
+      >
+        {propertyList}
+      </List>
+    </Stack>
+  );
 }
 
 export default ObjectDetails;
