@@ -1,9 +1,6 @@
 package sp.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.serialization.Serde;
 import sp.dtos.AnomalyInformation;
+import sp.utils.UtilsObjectMapper;
 
 
 @Data
@@ -31,9 +29,6 @@ public class CurrentShipDetails implements Serializable {
      * @return Serde object for this class.
      */
     public static Serde<CurrentShipDetails> getSerde() {
-        ObjectMapper jsonObjectMapper = new ObjectMapper();
-        jsonObjectMapper.registerModule(new JavaTimeModule());
-        jsonObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return new Jackson2Serde<>(jsonObjectMapper, CurrentShipDetails.class);
+        return new Jackson2Serde<>(new UtilsObjectMapper(), CurrentShipDetails.class);
     }
 }

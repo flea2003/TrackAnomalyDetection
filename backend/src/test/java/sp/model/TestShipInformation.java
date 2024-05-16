@@ -1,5 +1,6 @@
 package sp.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.dtos.AnomalyInformation;
@@ -24,17 +25,17 @@ public class TestShipInformation {
     }
 
     @Test
-    void testToJson() {
+    void testToJson() throws JsonProcessingException {
         assertThat(shipInformation.toJson()).isEqualTo("{\"id\":1,\"anomalyInformation\":{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"aisSignal\":{\"id\":1,\"speed\":1.0,\"longitude\":2.0,\"latitude\":3.0,\"course\":4.0,\"heading\":5.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"port\"}}");
     }
 
     @Test
-    void testFromJson1() {
+    void testFromJson1() throws JsonProcessingException {
         assertThat(ShipInformation.fromJson("{\"id\":1,\"anomalyInformation\":{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"aisSignal\":{\"id\":1,\"speed\":1.0,\"longitude\":2.0,\"latitude\":3.0,\"course\":4.0,\"heading\":5.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"port\"}}")).isEqualTo(shipInformation);
     }
 
     @Test
-    void testFromJson2() {
+    void testFromJson2() throws JsonProcessingException {
         assertThat(ShipInformation.fromJson(shipInformation.toJson())).isEqualTo(shipInformation);
     }
 

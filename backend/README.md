@@ -35,6 +35,7 @@ bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9
 Additionally, the following JVM argument needs to be added (Edit configurations -> Modify options -> (Java) Add VM options):
 ```
 --add-opens java.base/java.util=ALL-UNNAMED
+--add-opens java.base/java.time=ALL-UNNAMED
 ```
 ## Running the project
 In order to run the back-end of the project, multiple steps will have to be made.
@@ -64,6 +65,12 @@ bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:
 bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
 ```
+
+Sometimes Kafka might not start if the logs of Zookeeper and the Kafka server are not cleared. Assuming that `/tmp/kafka-logs` and `/tmp/zoekeeper` are the locations of the logs, run the following commands to delete them:
+```bash
+rm -rf /tmp/kafka-logs /tmp/zookeeper
+```
+
 
 ### Start the pipeline and web server
 Run the main project in IntelliJ (or just Gradle). This will start the pipeline and start listening for messages in the needed Kafka topics.
