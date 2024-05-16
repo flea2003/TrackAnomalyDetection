@@ -34,6 +34,7 @@ import java.util.Objects;
 
 @Service
 public class AnomalyDetectionPipeline {
+    private static final String RAW_INCOMING_AIS_TOPIC_NAME;
     private static final String INCOMING_AIS_TOPIC_NAME;
     private static final String CALCULATED_SCORES_TOPIC_NAME;
     private static final String KAFKA_SERVER_ADDRESS;
@@ -46,6 +47,7 @@ public class AnomalyDetectionPipeline {
     // Load the needed parameters from the configurations file
     static {
         try {
+            RAW_INCOMING_AIS_TOPIC_NAME = StreamUtils.loadConfig().getProperty("incoming.ais-raw.topic.name");
             INCOMING_AIS_TOPIC_NAME = StreamUtils.loadConfig().getProperty("incoming.ais.topic.name");
             CALCULATED_SCORES_TOPIC_NAME = StreamUtils.loadConfig().getProperty("calculated.scores.topic.name");
             KAFKA_SERVER_ADDRESS = StreamUtils.loadConfig().getProperty("kafka.server.address");
@@ -70,8 +72,56 @@ public class AnomalyDetectionPipeline {
      * Private helper method for building the sp.pipeline.
      */
     private void buildPipeline() throws IOException {
-        buildScoreCalculationPart();
+        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        // Build the pipeline
+        DataStream<AISSignal> streamWithAssignedIds = buildIdAssignmentPart();
+        buildScoreCalculationPart(streamWithAssignedIds);
         buildScoreAggregationPart();
+    }
+
+    /**
+     * Creates a sink from Flink to a Kafka topic.
+     *
+     * @param kafkaServerAddress Kafka server address
+     * @param topicName Kafka topic name to send the data to
+     * @return the created KafkaSink object
+     */
+    private KafkaSink<String> createSinkFlinkToKafka(String kafkaServerAddress, String topicName) {
+        return KafkaSink.<String>builder()
+                .setBootstrapServers(kafkaServerAddress)
+                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
+                        .setTopic(topicName)
+                        .setValueSerializationSchema(new SimpleStringSchema())
+                        .build()
+                )
+                .build();
+    }
+
+    /**
+     * Builds the first part of the pipeline - the part that takes as input the raw AIS signals from Kafka,
+     * assigns an internal ID to each signal and sends them to another Kafka topic.
+     * The internal ID is calculated as a hash of the producer ID and the ship hash.
+     *
+     * @return the DataStream with the AISSignal objects that have been assigned an internal ID.
+     *         Used in the next step of the pipeline.
+     */
+    private DataStream<AISSignal> buildIdAssignmentPart() {
+        // Create a Flink stream that consumes AIS signals from Kafka
+        KafkaSource<String> kafkaSource = StreamUtils.getFlinkStreamConsumingFromKafka(RAW_INCOMING_AIS_TOPIC_NAME);
+        DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
+
+        // Map stream from JSON strings to ExternalAISSignal objects
+        DataStream<ExternalAISSignal> sourceWithNoIDs = rawSourceSerialized.map((x) -> {
+            System.out.println("Received external AIS signal as JSON to topic ships-AIS. JSON: " + x);
+            return ExternalAISSignal.fromJson(x);
+        });
+
+        // Map ExternalAISSignal objects to AISSignal objects by assigning an internal ID
+        return sourceWithNoIDs.map(x -> {
+            int id = Objects.hash(x.getProducerID(), x.getShipHash()) & 0x7FFFFFFF; // Ensure positive ID
+            return new AISSignal(x, id);
+        });
     }
 
     /**
@@ -83,24 +133,11 @@ public class AnomalyDetectionPipeline {
      * injected scoreCalculationStrategy class. I.e., this part only calls that method. This way the
      * anomaly detection algorithm can be easily swapped out.
      */
-    private void buildScoreCalculationPart() {
-        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+    private void buildScoreCalculationPart(DataStream<AISSignal> source) {
 
-        // Create a Flink stream that consumes AIS signals from Kafka
-        KafkaSource<String> kafkaSource = StreamUtils.getFlinkStreamConsumingFromKafka(INCOMING_AIS_TOPIC_NAME);
-        DataStream<String> sourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
-
-        // Map stream from JSON strings to ExternalAISSignal objects
-        DataStream<ExternalAISSignal> sourceWithNoIDs = sourceSerialized.map((x) -> {
-            System.out.println("Received external AIS signal as JSON to topic ships-AIS. JSON: " + x);
-            return ExternalAISSignal.fromJson(x);
-        });
-
-        // Map ExternalAISSignal objects to AISSignal objects by assigning an internal ID
-        DataStream<AISSignal> source = sourceWithNoIDs.map(x -> {
-            int id = Objects.hash(x.getProducerID(), x.getShipHash());
-            return new AISSignal(x, id);
-        });
+        // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
+        KafkaSink<String> signalsSink = createSinkFlinkToKafka(KAFKA_SERVER_ADDRESS, INCOMING_AIS_TOPIC_NAME);
+        source.map(AISSignal::toJson).sinkTo(signalsSink);
 
         // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
         DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
@@ -112,16 +149,8 @@ public class AnomalyDetectionPipeline {
         });
 
         // Send the calculated AnomalyInformation objects to Kafka
-        KafkaSink<String> sink = KafkaSink.<String>builder()
-                .setBootstrapServers(KAFKA_SERVER_ADDRESS)
-                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                        .setTopic(CALCULATED_SCORES_TOPIC_NAME)
-                        .setValueSerializationSchema(new SimpleStringSchema())
-                        .build()
-                )
-                .build();
-
-        updateStreamSerialized.sinkTo(sink);
+        KafkaSink<String> scoresSink = createSinkFlinkToKafka(KAFKA_SERVER_ADDRESS, CALCULATED_SCORES_TOPIC_NAME);
+        updateStreamSerialized.sinkTo(scoresSink);
     }
 
     /**

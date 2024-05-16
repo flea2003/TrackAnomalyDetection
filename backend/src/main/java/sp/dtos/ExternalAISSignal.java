@@ -5,14 +5,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.io.Serializable;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import java.io.Serializable;
+import java.time.OffsetDateTime;
 
 @Getter
 @NoArgsConstructor(force = true)
@@ -21,7 +21,7 @@ import lombok.ToString;
 @ToString
 @JsonSerialize
 public class ExternalAISSignal implements Serializable {
-    private String producerID = "producerID";
+    private final String producerID;
     private final String shipHash;
     private final float speed;
     private final float longitude;
