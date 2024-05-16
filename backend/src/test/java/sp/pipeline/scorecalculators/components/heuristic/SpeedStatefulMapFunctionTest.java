@@ -70,14 +70,11 @@ public class SpeedStatefulMapFunctionTest {
         // The third signal is not anomalous since more than 30 minutes have passed since it was received.
         speedStatefulMapFunction = new SpeedStatefulMapFunction();
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
-        System.out.println(timestamp1);
-        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:01Z");
-        System.out.println(timestamp2);
-        OffsetDateTime timestamp3 = OffsetDateTime.parse("2024-12-30T05:33Z");
-        System.out.println(timestamp3);
-        AISSignal aisSignal1 = new AISSignal("1", 20, 60, 60, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp2, "Malta");
-        AISSignal aisSignal3 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp3, "Malta");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:30Z");
+        OffsetDateTime timestamp3 = OffsetDateTime.parse("2024-12-30T06:01Z");
+        AISSignal aisSignal1 = new AISSignal("1", 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal("1", 12.8f, 11, 10, 20, 20, timestamp2, "Malta");
+        AISSignal aisSignal3 = new AISSignal("1", 0.0f, 11, 10, 20, 20, timestamp3, "Malta");
         try {
             OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
                 new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(speedStatefulMapFunction), x -> "1", Types.STRING);
