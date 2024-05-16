@@ -40,7 +40,7 @@
         </module>
 
         <module name="MethodLength">
-            <property name="max" value="45"/>
+            <property name="max" value="40"/>
         </module>
 
         <module name="VisibilityModifier">

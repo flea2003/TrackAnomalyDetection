@@ -88,8 +88,7 @@ public class AnomalyDetectionPipeline {
 
         // Create a Flink stream that consumes AIS signals from Kafka
         KafkaSource<String> kafkaSource = StreamUtils.getFlinkStreamConsumingFromKafka(INCOMING_AIS_TOPIC_NAME);
-        DataStream<String> sourceSerialized = flinkEnv.fromSource(kafkaSource,
-                WatermarkStrategy.noWatermarks(), "AIS Source");
+        DataStream<String> sourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
 
         // Map stream from JSON strings to ExternalAISSignal objects
         DataStream<ExternalAISSignal> sourceWithNoIDs = sourceSerialized.map((x) -> {
@@ -104,8 +103,7 @@ public class AnomalyDetectionPipeline {
         });
 
         // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
-        DataStream<AnomalyInformation> updateStream =
-                scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
+        DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
 
         // Map the computed AnomalyInformation objects to JSON strings
         DataStream<String> updateStreamSerialized = updateStream.map(x -> {
@@ -121,8 +119,6 @@ public class AnomalyDetectionPipeline {
                         .setValueSerializationSchema(new SimpleStringSchema())
                         .build()
                 )
-                // TODO: Maybe we need this, maybe not. Not sure yet.
-                //  .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
                 .build();
 
         updateStreamSerialized.sinkTo(sink);
