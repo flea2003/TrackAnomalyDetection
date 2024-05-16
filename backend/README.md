@@ -35,6 +35,7 @@ bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9
 Additionally, the following JVM argument needs to be added (Edit configurations -> Modify options -> (Java) Add VM options):
 ```
 --add-opens java.base/java.util=ALL-UNNAMED
+--add-opens java.base/java.time=ALL-UNNAMED
 ```
 ## Running the project
 In order to run the back-end of the project, multiple steps will have to be made.

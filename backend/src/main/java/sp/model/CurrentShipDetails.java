@@ -1,6 +1,5 @@
 package sp.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import java.io.Serializable;
@@ -12,6 +11,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgn
 import org.apache.kafka.common.serialization.Serde;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
+import sp.utils.UtilsObjectMapper;
 
 
 @Data
@@ -31,7 +31,6 @@ public class CurrentShipDetails implements Serializable {
      * @return Serde object for this class.
      */
     public static Serde<CurrentShipDetails> getSerde() {
-        ObjectMapper jsonObjectMapper = new ObjectMapper();
-        return new Jackson2Serde<>(jsonObjectMapper, CurrentShipDetails.class);
+        return new Jackson2Serde<>(new UtilsObjectMapper(), CurrentShipDetails.class);
     }
 }
