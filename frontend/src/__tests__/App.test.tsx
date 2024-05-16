@@ -3,21 +3,23 @@ import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../App";
 import userEvent from "@testing-library/user-event";
-import exp from "constants";
 
-test("By default only the map is loaded when the page opens", () => {
+test("By default only the map is loaded when the page opens", async () => {
   render(<App />);
 
-  waitFor(() => {
-    const anomalyListTitle = screen.getByText("Anomaly list");
-    const notificationsTitle = screen.getByText("Notifications");
-    const settingsTitle = screen.getByText("Settings");
+  await waitFor(() => {
     const map = screen.getByTestId("map");
-    expect(anomalyListTitle).toBeNull();
-    expect(notificationsTitle).toBeNull();
-    expect(settingsTitle).toBeNull();
     expect(map).toBeVisible();
   });
+
+  // Make sure the other components are not present
+  const notificationsTitle = screen.queryByText("Notifications");
+  const settingsTitle = screen.queryByText("Settings");
+  const anomalyListTitle = screen.queryByText("Anomaly list");
+
+  expect(notificationsTitle).toBeNull();
+  expect(settingsTitle).toBeNull();
+  expect(anomalyListTitle).toBeNull();
 });
 
 test("The map is present when the component loads", () => {
