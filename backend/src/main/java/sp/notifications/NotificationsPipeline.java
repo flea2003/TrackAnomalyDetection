@@ -33,11 +33,11 @@ import sp.model.ShipInformation;
 import sp.pipeline.StreamUtils;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 import sp.repositories.NotificationsRepository;
+import sp.services.NotificationService;
 
 @Service
 public class NotificationsPipeline {
-    private final NotificationsRepository notificationsRepository;
-    private final HashMap<String, AnomalyInformation> notifications;
+    private final NotificationService notificationService;
 
 
     private static final String CALCULATED_SCORES_TOPIC_NAME;
@@ -58,8 +58,9 @@ public class NotificationsPipeline {
     }
 
     @Autowired
-    public NotificationsPipeline(NotificationsRepository notificationsRepository) throws IOException {
-        this.notificationsRepository = notificationsRepository;
+    public NotificationsPipeline(NotificationService notificationService) throws IOException {
+        this.notificationService = notificationService;
+        buildNotifications();
     }
 
     public void buildNotifications() {
@@ -91,10 +92,10 @@ public class NotificationsPipeline {
                 })
                 .groupByKey()
                 .aggregate(
-                        AnomalyInformation::new,
-                        (key, valueJson, aggregatedShipDetails) -> {
+                        null,
+                        (key, valueJson, lastInformation) -> {
                             try {
-                                return aggregateSignals(aggregatedShipDetails, valueJson, key);
+                                return aggregateSignals(lastInformation, valueJson, key);
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
@@ -107,16 +108,33 @@ public class NotificationsPipeline {
         builder.build();
         this.kafkaStreams = StreamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
+        this.kafkaStreams.start();
     }
 
+    public AnomalyInformation aggregateSignals(AnomalyInformation currentNotification, String valueJson, String key) throws JsonProcessingException {
+        int threshold = 30;
 
+        AnomalyInformation newNotification = AnomalyInformation.fromJson(valueJson);
 
-    public AnomalyInformation aggregateSignals(AnomalyInformation initialInformation, String valueJson, String key) throws JsonProcessingException {
-        AnomalyInformation anomalyInformation = AnomalyInformation.fromJson(valueJson);
+        if (currentNotification == null) {
+            currentNotification = notificationService.getNotification(key).getAnomalyInformation();
 
+            if (currentNotification.getExplanation().equals("NOT_COMPUTED"))
+                currentNotification = newNotification;
+        }
 
-
-
+        if (currentNotification.getScore() >= threshold) {
+            if (newNotification.getScore() >= threshold) {
+                newNotification = currentNotification;
+            }
+        } else {
+            if (newNotification.getScore() < threshold) {
+                newNotification = currentNotification;
+            } else {
+                // A QUERY TO THE AIS SIGNAL DATABASE, EXTRACT CORRESPONDING AIS SIGNAL
+                notificationService.addNotification(new ShipInformation(key, newNotification, null));
+            }
+        }
+        return newNotification;
     }
-
 }

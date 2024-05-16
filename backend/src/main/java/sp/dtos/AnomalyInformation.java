@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
