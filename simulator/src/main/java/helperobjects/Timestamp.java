@@ -1,6 +1,5 @@
 package helperobjects;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
