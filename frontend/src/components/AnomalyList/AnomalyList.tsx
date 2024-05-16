@@ -12,6 +12,7 @@ import "../../styles/anomalyList.css";
 interface AnomalyListProps {
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
+  mapCenteringFun: (details: ShipDetails) => void;
 }
 
 /**
@@ -20,8 +21,13 @@ interface AnomalyListProps {
  *
  * @param ships a list of ships to display in the list
  * @param pageChanger function that, when called, changes the page displayed in the second column.
+ * @param mapCenteringFun function that, when called, centers the map on a specific ship
  */
-function AnomalyList({ ships, pageChanger }: AnomalyListProps) {
+function AnomalyList({
+  ships,
+  pageChanger,
+  mapCenteringFun,
+}: AnomalyListProps) {
   const listEntries = [];
   for (let i = 0; i < ships.length; i++) {
     listEntries.push(
@@ -29,6 +35,7 @@ function AnomalyList({ ships, pageChanger }: AnomalyListProps) {
         key={i}
         shipDetails={ships[i]}
         pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
       />,
     );
   }
