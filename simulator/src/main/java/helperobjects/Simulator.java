@@ -83,6 +83,7 @@ public class Simulator {
                 // Note that in our case we assume that the signals are retrieved in minutes, not seconds.
                 Thread.sleep(difference * 1000 * 60 / this.speed);
                 producer.send(new ProducerRecord<>(this.topicName, entry.getValue()), (metadata, exception) -> {});
+                System.out.println("Sending: " + entry.getValue());
             }
 
             // Flush the data and update the previous signal value
