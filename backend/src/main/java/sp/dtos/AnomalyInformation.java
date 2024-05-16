@@ -19,7 +19,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class AnomalyInformation implements Serializable {
-    private final Float score;
+    private final float score;
     private final String explanation;
     private final String correspondingTimestamp;
     private final String shipHash;

@@ -1,0 +1,32 @@
+# Kafka Connection Properties
+incoming.ais.topic.name=ships-AIS
+calculated.scores.topic.name=ships-scores
+kafka.server.address=localhost:9092
+kafka.store.name=ships-score-store
+
+# Kafka server URL
+bootstrap.servers=localhost:9092
+spring.bootstrap.servers=localhost:9092
+
+# Kafka serializers/deserializers
+key.serializer=org.apache.kafka.common.serialization.StringSerializer
+value.serializer=org.apache.kafka.common.serialization.StringSerializer
+key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+# Logging information
+log4j.rootLogger=INFO, stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+
+# Flink queryable state
+queryable-state.enable=true
+queryable-state.server.ports=9067
+queryable-state.proxy.ports=9069
+
+# Kafka streams
+application.id=anomaly-detection-pipeline
+auto.offset.reset=earliest
+default.key.serde=org.apache.kafka.common.serialization.Serdes$StringSerde
+default.value.serde=org.apache.kafka.common.serialization.Serdes$StringSerde

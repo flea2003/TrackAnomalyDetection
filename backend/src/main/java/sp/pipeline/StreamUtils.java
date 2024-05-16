@@ -12,9 +12,17 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+@Service
 public class StreamUtils {
-    public static final String CONFIG_PATH = "kafka-connection.properties";
+
+    private final String configPath;
+
+    public StreamUtils(@Value("${kafka.config.file:kafka-connection.properties}") String configPath) {
+        this.configPath = configPath;
+    }
 
     /**
      * Loads the properties from the configuration file.
@@ -22,15 +30,15 @@ public class StreamUtils {
      * @return the loaded properties
      * @throws IOException if such file does not exist
      */
-    public static Properties loadConfig() throws IOException {
-        if (!Files.exists(Paths.get(CONFIG_PATH))) {
-            throw new IOException("Kafka configuration file '" + CONFIG_PATH + "' was not found.");
+    public Properties loadConfig() throws IOException {
+        if (!Files.exists(Paths.get(configPath))) {
+            throw new IOException("Kafka configuration file '" + configPath + "' was not found.");
         }
         Properties config = new Properties();
-        try (InputStream inputStream = new FileInputStream(CONFIG_PATH)) {
+        try (InputStream inputStream = new FileInputStream(configPath)) {
             config.load(inputStream);
         } catch (IOException e) {
-            throw new RuntimeException("Error loading configuration file '" + CONFIG_PATH + "'.", e);
+            throw new RuntimeException("Error loading configuration file '" + configPath + "'.", e);
         }
         return config;
     }
@@ -41,7 +49,7 @@ public class StreamUtils {
      * @param topic the name of the topic from which to consume
      * @return the created Flink stream
      */
-    public static KafkaSource<String> getFlinkStreamConsumingFromKafka(String topic) {
+    public KafkaSource<String> getFlinkStreamConsumingFromKafka(String topic) {
         // Load the properties of Kafka from the configuration file
         Properties props;
         try {
@@ -64,7 +72,7 @@ public class StreamUtils {
      * @param builder streams builder
      * @return created KafkaStreams object with the specified configuration
      */
-    public static KafkaStreams getKafkaStreamConsumingFromKafka(StreamsBuilder builder) {
+    public KafkaStreams getKafkaStreamConsumingFromKafka(StreamsBuilder builder) {
         // Load properties from the configuration file
         Properties props;
         try {

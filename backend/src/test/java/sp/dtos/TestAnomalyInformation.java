@@ -2,6 +2,7 @@ package sp.dtos;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestAnomalyInformation {
     AnomalyInformation anomalyInformation;
@@ -26,5 +27,11 @@ public class TestAnomalyInformation {
         assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
     }
 
+    @Test
+    void testFromJSONWithException() {
+        // this JSON has field "scoreRR"
+        String badJson = "{\"scoreRR\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash\"}";
+        assertThrows(RuntimeException.class, () -> AnomalyInformation.fromJson(badJson));
+    }
 
 }

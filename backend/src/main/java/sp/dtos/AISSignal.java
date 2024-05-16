@@ -58,4 +58,5 @@ public class AISSignal implements Serializable {
             throw new RuntimeException(e);
         }
     }
+
 }
