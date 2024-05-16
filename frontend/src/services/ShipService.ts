@@ -117,9 +117,9 @@ class ShipService {
                 };
               } else
                 return {
-                    id: item.shipHash,
-                    description: item.explanation,
-                    anomalyScore: item.score,
+                  id: item.shipHash,
+                  description: item.explanation,
+                  anomalyScore: item.score,
                 };
             },
           );

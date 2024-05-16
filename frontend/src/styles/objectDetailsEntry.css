@@ -1,15 +1,15 @@
 .object-details-entry {
-    width: 90%;
-    padding-top: var(--object-details-entry-padding);
-    padding-bottom: var(--object-details-entry-padding);
-    text-align: left;
-    padding-left: var(--object-details-entry-padding);
+  width: 90%;
+  padding-top: var(--object-details-entry-padding);
+  padding-bottom: var(--object-details-entry-padding);
+  text-align: left;
+  padding-left: var(--object-details-entry-padding);
 }
 
 .object-details-entry-type {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .object-details-entry-value {
-    font-weight: normal;
+  font-weight: normal;
 }

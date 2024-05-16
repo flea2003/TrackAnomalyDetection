@@ -8,7 +8,6 @@ react_build:
   script:
     - npm run build
 
-
 react_tests:
   stage: test
   image: node
