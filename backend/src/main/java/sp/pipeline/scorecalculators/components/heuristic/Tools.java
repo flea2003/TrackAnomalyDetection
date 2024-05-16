@@ -1,6 +1,6 @@
 package sp.pipeline.scorecalculators.components.heuristic;
 
-public class Utils {
+public class Tools {
 
     /**
      * Util static class that calculates the globe distance between 2 points.

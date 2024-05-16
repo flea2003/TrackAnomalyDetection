@@ -13,7 +13,7 @@ public class TestAnomalyInformation {
 
     @Test
     void testToJson() {
-        assertThat(anomalyInformation.toJson()).isEqualTo("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash\"}");
+        assertThat(anomalyInformation.toJson()).isEqualTo("{\"score\":0.5,\"explanation\":\"explanation\",\"shipHash\":\"hash\",\"timestamp\":\"01/04/2015 20:19\"}");
     }
 
     @Test
@@ -23,7 +23,7 @@ public class TestAnomalyInformation {
 
     @Test
     void testFromJson2() {
-        assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
+        assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"shipHash\":\"hash\",\"timestamp\":\"01/04/2015 20:19\"}")).isEqualTo(anomalyInformation);
     }
 
 

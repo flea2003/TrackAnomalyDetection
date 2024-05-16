@@ -34,6 +34,10 @@ bootRun{
 	jvmArgs = ["--add-opens=java.base/java.util=ALL-UNNAMED"]
 }
 
+test {
+	jvmArgs(['--add-opens', 'java.base/java.util=ALL-UNNAMED'])
+}
+
 checkstyle {
 	sourceSets = [sourceSets.main]
 	toolVersion = '10.16.0'
@@ -96,6 +100,9 @@ dependencies {
 	implementation 'org.apache.kafka:kafka-streams:3.4.0'
 	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.4.0'
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
+
+	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
+	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
 }
 
 // For Flink

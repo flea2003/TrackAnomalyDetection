@@ -34,7 +34,7 @@ public class SimpleScoreCalculator implements ScoreCalculationStrategy {
         return result.map(x -> {
             AnomalyInformation combined = new AnomalyInformation();
             combined.setScore(x.f0.getScore() + x.f1.getScore() + x.f2.getScore());
-            combined.setExplanation(x.f0.getExplanation() + x.f1.getExplanation() + x.f2.getExplanation());
+            combined.setExplanation(x.f0.getExplanation() + '\n' + x.f1.getExplanation() + '\n' + x.f2.getExplanation());
             combined.setShipHash(x.f0.getShipHash());
             combined.setCorrespondingTimestamp(x.f0.getCorrespondingTimestamp());
 

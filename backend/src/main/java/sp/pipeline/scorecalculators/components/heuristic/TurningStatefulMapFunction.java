@@ -29,14 +29,14 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
             if (getLastDetectedAnomalyTime().value() != null && value.getTimestamp()
                 .difference(getLastDetectedAnomalyTime().value()) <= 30) {
                 anomalyInformation.setScore(34.0f);
-                anomalyInformation.setExplanation("Bad Turning");
+                anomalyInformation.setExplanation("The ship's turning direction is anomalous.");
             } else {
                 anomalyInformation.setScore(0.0f);
-                anomalyInformation.setExplanation("Good Turning");
+                anomalyInformation.setExplanation("The ship's turning direction is great.");
             }
         } else {
             anomalyInformation.setScore(0.0f);
-            anomalyInformation.setExplanation("Good Turning");
+            anomalyInformation.setExplanation("The ship's turning direction is great.");
             anomalyInformation.setShipHash(value.getShipHash());
             anomalyInformation.setCorrespondingTimestamp(value.getTimestamp());
         }

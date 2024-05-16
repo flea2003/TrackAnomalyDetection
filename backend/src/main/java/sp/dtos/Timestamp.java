@@ -4,8 +4,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @JsonSerialize
+@EqualsAndHashCode
+@ToString
 public class Timestamp implements Comparable<Timestamp> {
 
     private int year;
@@ -49,6 +54,9 @@ public class Timestamp implements Comparable<Timestamp> {
         this.day = day;
         this.minute = minute;
         this.hour = hour;
+        LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        this.timestamp = dateTimeFormatter.format(dateTime);
     }
 
     /**

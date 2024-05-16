@@ -1,6 +1,6 @@
 package sp.pipeline.scorecalculators.components.heuristic;
 
-import static sp.pipeline.scorecalculators.components.heuristic.Utils.harvesineDistance;
+import static sp.pipeline.scorecalculators.components.heuristic.Tools.harvesineDistance;
 
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
@@ -29,14 +29,14 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
             if (getLastDetectedAnomalyTime().value() != null
                 && value.getTimestamp().difference(getLastDetectedAnomalyTime().value()) <= 30) {
                 anomalyInformation.setScore(33.0f);
-                anomalyInformation.setExplanation("Bad Signals.");
+                anomalyInformation.setExplanation("The signal timing is anomalous.");
             } else {
                 anomalyInformation.setScore(0.0f);
-                anomalyInformation.setExplanation("Good Signals.");
+                anomalyInformation.setExplanation("The signal timing is great.");
             }
         } else {
             anomalyInformation.setScore(0.0f);
-            anomalyInformation.setExplanation("Good Signals.");
+            anomalyInformation.setExplanation("The signal timing is great.");
             anomalyInformation.setShipHash(value.getShipHash());
             anomalyInformation.setCorrespondingTimestamp(value.getTimestamp());
         }

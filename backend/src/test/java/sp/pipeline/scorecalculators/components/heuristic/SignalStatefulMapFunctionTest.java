@@ -1,0 +1,120 @@
+package sp.pipeline.scorecalculators.components.heuristic;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
+
+import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.streaming.api.operators.StreamMap;
+import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
+import org.junit.jupiter.api.Test;
+import sp.dtos.AISSignal;
+import sp.dtos.AnomalyInformation;
+import sp.dtos.Timestamp;
+
+import org.apache.flink.streaming.util.OneInputStreamOperatorTestHarness;
+
+public class SignalStatefulMapFunctionTest {
+
+    private SignalStatefulMapFunction signalStatefulMapFunction;
+
+    @Test
+    void testOneNonAnomalousSignal() { // More descriptive name
+
+        signalStatefulMapFunction = new SignalStatefulMapFunction();
+        Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
+        Timestamp timestamp2 = new Timestamp("30/12/2024 04:52");
+        AISSignal aisSignal1 = new AISSignal("1", 20, 10, 10, 20, 20, timestamp1, "Malta");
+
+        try {
+            OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
+                new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(signalStatefulMapFunction), x -> "1", Types.STRING);
+            testHarness.open();
+            testHarness.processElement(aisSignal1, 10);
+            var anomalies = testHarness.extractOutputStreamRecords();
+            assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+        } catch (Exception e) {
+            fail("Exception during setup: " + e.getMessage()); // More specific fail message
+        }
+    }
+
+    @Test
+    void testTwoNonAnomalousSignal() { // More descriptive name
+
+        signalStatefulMapFunction = new SignalStatefulMapFunction();
+        Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
+        Timestamp timestamp2 = new Timestamp("30/12/2024 05:00");
+        AISSignal aisSignal1 = new AISSignal("1", 20, 90, 30, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp2, "Malta");
+        try {
+            OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
+                new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(signalStatefulMapFunction), x -> "1", Types.STRING);
+            testHarness.open();
+            testHarness.processElement(aisSignal1, 20);
+            testHarness.processElement(aisSignal2, 40);
+            var anomalies = testHarness.extractOutputStreamRecords();
+            assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0.0f);
+            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+        } catch (Exception e) {
+            fail("Exception during setup: " + e.getMessage()); // More specific fail message
+        }
+    }
+
+
+    @Test
+    void secondAnomalousSignal() { // More descriptive name
+
+        signalStatefulMapFunction = new SignalStatefulMapFunction();
+        Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
+        Timestamp timestamp2 = new Timestamp("30/12/2024 05:01");
+        AISSignal aisSignal1 = new AISSignal("1", 20, 60, 60, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp2, "Malta");
+        try {
+            OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
+                new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(signalStatefulMapFunction), x -> "1", Types.STRING);
+            testHarness.open();
+            testHarness.processElement(aisSignal1, 20);
+            testHarness.processElement(aisSignal2, 31);
+            var anomalies = testHarness.extractOutputStreamRecords();
+            assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The signal timing is anomalous.");
+        } catch (Exception e) {
+            fail("Exception during setup: " + e.getMessage()); // More specific fail message
+        }
+    }
+
+    @Test
+    void anomalyExpires() { // More descriptive name
+
+        signalStatefulMapFunction = new SignalStatefulMapFunction();
+        Timestamp timestamp1 = new Timestamp("30/12/2024 04:50");
+        Timestamp timestamp2 = new Timestamp("30/12/2024 05:01");
+        Timestamp timestamp3 = new Timestamp("30/12/2024 05:33");
+        AISSignal aisSignal1 = new AISSignal("1", 20, 60, 60, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp2, "Malta");
+        AISSignal aisSignal3 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp3, "Malta");
+        try {
+            OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
+                new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(signalStatefulMapFunction), x -> "1", Types.STRING);
+            testHarness.open();
+            testHarness.processElement(aisSignal1, 20);
+            testHarness.processElement(aisSignal2, 31);
+            testHarness.processElement(aisSignal3, 63);
+            var anomalies = testHarness.extractOutputStreamRecords();
+            assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+            assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The signal timing is anomalous.");
+            assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
+            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The signal timing is great.");
+        } catch (Exception e) {
+            fail("Exception during setup: " + e.getMessage()); // More specific fail message
+        }
+    }
+
+
+}

@@ -69,8 +69,6 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, Anomal
         // Thread.sleep(4000);
         // Access the current score for the ship. If it is empty, initialize it to 0
 
-        System.out.println("Received the AISSignal in the anomaly computation method. Object: " + value);
-
         Float currentScore = score.value();
         if (currentScore == null) {
             currentScore = 0F;
