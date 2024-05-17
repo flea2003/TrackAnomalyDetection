@@ -1,7 +1,10 @@
 package sp.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -11,6 +14,7 @@ import lombok.Setter;
 import lombok.ToString;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
+import sp.utils.UtilsObjectMapper;
 
 @Getter
 @Builder
@@ -21,6 +25,7 @@ import sp.dtos.AnomalyInformation;
 @EqualsAndHashCode
 public class ShipInformation {
     private String shipHash;
+
     private AnomalyInformation anomalyInformation;
     private AISSignal aisSignal;
 
@@ -29,21 +34,14 @@ public class ShipInformation {
      *
      * @return the respective JSON string
      */
-    public String toJson() {
+    public String toJson() throws JsonProcessingException {
         // Assert that there are no flaws in the data
         if (!shipHash.isEmpty() && !shipHash.isBlank()) {
             assert anomalyInformation == null || anomalyInformation.getShipHash().equals(shipHash);
             assert aisSignal == null || aisSignal.getShipHash().equals(shipHash);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json;
-        try {
-            json = mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return json;
+        return new UtilsObjectMapper().writeValueAsString(this);
     }
 
     /**
@@ -52,12 +50,7 @@ public class ShipInformation {
      * @param val the JSON string to convert
      * @return the converted AISUpdate object
      */
-    public static ShipInformation fromJson(String val) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(val, ShipInformation.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public static ShipInformation fromJson(String val) throws JsonProcessingException {
+        return new UtilsObjectMapper().readValue(val, ShipInformation.class);
     }
 }

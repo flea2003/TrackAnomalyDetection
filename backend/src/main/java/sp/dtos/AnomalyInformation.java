@@ -1,8 +1,15 @@
 package sp.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
+
+import com.giladam.kafka.jacksonserde.Jackson2Serde;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -10,6 +17,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.kafka.common.serialization.Serde;
+import sp.model.CurrentShipDetails;
+import sp.utils.UtilsObjectMapper;
 
 @Getter
 @Builder
@@ -21,7 +31,8 @@ import lombok.ToString;
 public class AnomalyInformation implements Serializable {
     private final Float score;
     private final String explanation;
-    private final String correspondingTimestamp;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final OffsetDateTime correspondingTimestamp;
     private final String shipHash;
 
     /**
@@ -29,15 +40,8 @@ public class AnomalyInformation implements Serializable {
      *
      * @return the respective JSON string
      */
-    public String toJson() {
-        ObjectMapper mapper = new ObjectMapper();
-        String json;
-        try {
-            json = mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        return json;
+    public String toJson() throws JsonProcessingException {
+        return new UtilsObjectMapper().writeValueAsString(this);
     }
 
     /**
@@ -46,12 +50,11 @@ public class AnomalyInformation implements Serializable {
      * @param val the JSON string to convert
      * @return the converted AISUpdate object
      */
-    public static AnomalyInformation fromJson(String val) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(val, AnomalyInformation.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public static AnomalyInformation fromJson(String val) throws JsonProcessingException {
+        return new UtilsObjectMapper().readValue(val, AnomalyInformation.class);
+    }
+
+    public static Serde<AnomalyInformation> getSerde() {
+        return new Jackson2Serde<>(new UtilsObjectMapper(), AnomalyInformation.class);
     }
 }
