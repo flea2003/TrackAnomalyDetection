@@ -37,9 +37,9 @@ public class TestSimulator {
     String date1 = "2004-01-27T01:01:00Z";
     String date2 = "2004-01-27T01:02:00Z";
 
-    String startSignal = "{\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"VALLETTA\"}";
-    String secondSignal = "{\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"CEUTA\"}";
-    String endSignal = "{\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2004-01-27T01:02:00Z\",\"departurePort\":\"CEUTA\"}";
+    String startSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"VALLETTA\"}";
+    String secondSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"CEUTA\"}";
+    String endSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2004-01-27T01:02:00Z\",\"departurePort\":\"CEUTA\"}";
 
 
     @BeforeEach
