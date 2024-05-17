@@ -6,7 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class UtilsObjectMapper extends ObjectMapper {
     /**
-     * Constructor of the ObjectMapper child class.
+     * Our manual Object mapper used in serialization to and from JSON.
      */
     public UtilsObjectMapper() {
         super();
