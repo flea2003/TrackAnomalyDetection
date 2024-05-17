@@ -6,6 +6,7 @@ class ShipDetails {
   lng: number;
   anomalyScore: number;
   explanation: string;
+  maxAnomalyScore: number;
   departurePort: string;
   course: number;
   speed: number;
@@ -17,6 +18,7 @@ class ShipDetails {
     lng: number,
     anomalyScore: number,
     explanation: string,
+    maxAnomalyScore: number,
     departurePort: string,
     course: number,
     speed: number,
@@ -27,6 +29,7 @@ class ShipDetails {
     this.lng = lng;
     this.anomalyScore = anomalyScore;
     this.explanation = explanation;
+    this.maxAnomalyScore = maxAnomalyScore;
     this.departurePort = departurePort;
     this.course = course;
     this.speed = speed;
@@ -43,6 +46,7 @@ class ShipDetails {
       { type: "Object type", value: "Ship" },
       { type: "Anomaly score", value: this.anomalyScore + "%" },
       { type: "Explanation", value: this.explanation },
+      { type: "Highest Recorded Anomaly Score", value: this.maxAnomalyScore },
       { type: "Heading", value: "" + this.heading },
       { type: "Departure Port", value: "" + this.departurePort },
       { type: "Course", value: "" + this.course },
