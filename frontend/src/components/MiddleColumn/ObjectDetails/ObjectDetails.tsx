@@ -38,7 +38,9 @@ function ObjectDetails(props: ObjectDetailsProps) {
     <Stack id="object-details-container">
       <div className="object-details-title-container">
         {getReturnIcon(pageChanger)}
-        <span className="object-details-title">Score: {ship.anomalyScore} %</span>
+        <span className="object-details-title">
+          Score: {ship.anomalyScore} %
+        </span>
       </div>
       <List
         style={{ maxHeight: "100%", overflow: "auto" }}
@@ -53,10 +55,10 @@ function ObjectDetails(props: ObjectDetailsProps) {
 function shipNotFoundElement() {
   return (
     <Stack id="object-details-container">
-        <span className="object-details-title">
-          Object ID:&nbsp;{" "}
-          <span className="object-details-title-id">Not found</span>
-        </span>
+      <span className="object-details-title">
+        Object ID:&nbsp;{" "}
+        <span className="object-details-title-id">Not found</span>
+      </span>
     </Stack>
   );
 }
@@ -72,7 +74,7 @@ function getPropertyElements(ship: ShipDetails) {
         value={property.value}
       />
     );
-  })
+  });
 }
 
 function getReturnIcon(pageChanger: (currentPage: CurrentPage) => void) {
@@ -82,12 +84,14 @@ function getReturnIcon(pageChanger: (currentPage: CurrentPage) => void) {
 
   const returnIconAlt = "Return Icon";
 
-  return <img
-    src={returnIcon}
-    className="object-details-return-icon"
-    onClick={onReturnClicked}
-    alt={returnIconAlt}
-  />
+  return (
+    <img
+      src={returnIcon}
+      className="object-details-return-icon"
+      onClick={onReturnClicked}
+      alt={returnIconAlt}
+    />
+  );
 }
 
 export default ObjectDetails;

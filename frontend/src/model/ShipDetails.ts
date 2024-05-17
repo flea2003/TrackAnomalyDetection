@@ -44,23 +44,22 @@ class ShipDetails {
       { type: "Explanation", value: this.explanation },
       {
         type: "Position",
-        value: this.getPositionString()
+        value: this.getPositionString(),
       },
       { type: "Speed", value: this.speed.toString() },
       { type: "Heading", value: this.heading.toString() },
       { type: "Departure", value: this.departurePort.toString() },
       { type: "Course", value: this.course.toString() },
-
     ];
   }
 
   getPositionString() {
-    return roundShipDetail(this.lat) + ", " + roundShipDetail(this.lng)
+    return roundShipDetail(this.lat) + ", " + roundShipDetail(this.lng);
   }
 }
 
 function roundShipDetail(x: number) {
-  return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding
+  return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding;
 }
 
 export default ShipDetails;

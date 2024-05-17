@@ -41,7 +41,7 @@ function AnomalyList({
   }
 
   return (
-    <Stack id="anomaly-list-container">
+    <Stack id="anomaly-list-container" data-testid="anomaly-list-container">
       <Stack id="anomaly-list-title-container" direction="row">
         <img
           src={closeIcon}

@@ -23,6 +23,8 @@
 
 .anomaly-list-entry-score {
     font-size: var(--anomaly-list-entry-font-size);
+    width: 30px;
+    text-align: center;
 }
 
 .anomaly-list-entry-icon-container {

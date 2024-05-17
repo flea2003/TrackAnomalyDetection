@@ -11,10 +11,15 @@ interface MiddleColumnProps {
   mapCenteringFun: (details: ShipDetails) => void;
 }
 
-function MiddleColumn({ currentPage, ships, pageChanger, mapCenteringFun }: MiddleColumnProps): JSX.Element {
+function MiddleColumn({
+  currentPage,
+  ships,
+  pageChanger,
+  mapCenteringFun,
+}: MiddleColumnProps): JSX.Element {
   switch (currentPage.currentPage) {
     case "anomalyList":
-       return (
+      return (
         <AnomalyList
           ships={ships}
           pageChanger={pageChanger}
@@ -22,7 +27,7 @@ function MiddleColumn({ currentPage, ships, pageChanger, mapCenteringFun }: Midd
         />
       );
     case "objectDetails":
-       return (
+      return (
         <ObjectDetails
           ships={ships}
           shipId={currentPage.shownShipId}
@@ -30,11 +35,11 @@ function MiddleColumn({ currentPage, ships, pageChanger, mapCenteringFun }: Midd
         />
       );
     case "notifications":
-       return <div>Notifications</div>;
+      return <div>Notifications</div>;
     case "settings":
-       return <div>Settings</div>;
+      return <div>Settings</div>;
     default:
-       return <div></div>;
+      return <div></div>;
   }
 }
 

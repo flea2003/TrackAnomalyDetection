@@ -39,7 +39,8 @@ function App() {
   const pageChanger = (newPage: CurrentPage) => {
     if (
       currentPage.currentPage !== "none" &&
-      newPage.currentPage === currentPage.currentPage
+      newPage.currentPage === currentPage.currentPage &&
+      !areShipDetailsOpened(currentPage)
     ) {
       // If we clicked the same icon for the second time
       setCurrentPage({ currentPage: "none", shownShipId: -1 });
@@ -69,10 +70,22 @@ function App() {
     <div className="App" id="root-div">
       <Stack direction="row">
         <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
-        <MiddleColumn currentPage={currentPage} ships={ships} pageChanger={pageChanger} mapCenteringFun={mapCenteringFun} />
+        <MiddleColumn
+          currentPage={currentPage}
+          ships={ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+        />
         <Sidebar pageChanger={pageChanger} />
       </Stack>
     </div>
+  );
+}
+
+function areShipDetailsOpened(currentPage: CurrentPage) {
+  return (
+    currentPage.currentPage === "objectDetails" &&
+    currentPage.shownShipId !== -1
   );
 }
 
