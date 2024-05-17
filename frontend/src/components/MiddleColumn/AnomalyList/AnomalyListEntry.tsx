@@ -54,8 +54,7 @@ function AnomalyListEntry({
         />
       </span>
       <span className="anomaly-list-entry-score">
-        100 %
-        {/*{shipAnomalyScore} %*/}
+        {shipAnomalyScore} %
       </span>
     </Stack>
   );

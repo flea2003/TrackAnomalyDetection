@@ -10,13 +10,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: var(--anomaly-list-title-font-size);
+    font-size: var(--object-details-title-font-size);
     font-weight: bold;
-
-}
-
-.object-details-title-id {
-    font-weight: normal;
 }
 
 .object-details-title-container {

@@ -40,28 +40,27 @@ class ShipDetails {
    */
   getPropertyList() {
     return [
-      { type: "Object type", value: "Ship" },
-      { type: "Anomaly score", value: this.anomalyScore + "%" },
+      { type: "Ship ID", value: this.id.toString() },
       { type: "Explanation", value: this.explanation },
-      { type: "Heading", value: "" + this.heading },
-      { type: "Departure Port", value: "" + this.departurePort },
-      { type: "Course", value: "" + this.course },
-      { type: "Speed", value: "" + this.speed },
       {
-        type: "Latitude",
-        value:
-          "" +
-          Math.round(this.lat * ShipDetails.rounding) / ShipDetails.rounding,
+        type: "Position",
+        value: this.getPositionString()
       },
-      {
-        type: "Longitude",
-        value:
-          "" +
-          Math.round(this.lng * ShipDetails.rounding) / ShipDetails.rounding,
-      },
-      { type: "Heading", value: "" + this.heading },
+      { type: "Speed", value: this.speed.toString() },
+      { type: "Heading", value: this.heading.toString() },
+      { type: "Departure", value: this.departurePort.toString() },
+      { type: "Course", value: this.course.toString() },
+
     ];
   }
+
+  getPositionString() {
+    return roundShipDetail(this.lat) + ", " + roundShipDetail(this.lng)
+  }
+}
+
+function roundShipDetail(x: number) {
+  return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding
 }
 
 export default ShipDetails;
