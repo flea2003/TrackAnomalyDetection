@@ -238,11 +238,11 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Returns the current scores of the ships in the system.
+     * Returns the current (last updated) anomaly scores of the ships in the system.
      *
-     * @return the current scores of the ships in the system.
+     * @return the current (last updated) anomaly scores of the ships in the system.
      */
-    public HashMap<String, CurrentShipDetails> getCurrentScores() throws PipelineException {
+    public HashMap<String, AnomalyInformation> getCurrentScores() throws PipelineException {
         try {
             // Get the current state of the KTable
             final String storeName = this.state.queryableStoreName();
@@ -250,10 +250,37 @@ public class AnomalyDetectionPipeline {
                     StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
             );
 
-            // Create a copy of the state
-            HashMap<String, CurrentShipDetails> stateCopy = new HashMap<>();
+            // Create a copy of the state considering only the current AnomalyInformation values for each ship
+            HashMap<String, AnomalyInformation> stateCopy = new HashMap<>();
             try (KeyValueIterator<String, CurrentShipDetails> iter = view.all()) {
-                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value));
+                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAnomalyInformation()));
+            }
+            return stateCopy;
+
+        } catch (Exception e) {
+            String err = "Failed to query store: " + e.getMessage() + ", continuing";
+            System.out.println(err);
+            throw new PipelineException(err);
+        }
+    }
+
+    /**
+     * Returns the current (last updated) AIS signals of the ships in the system.
+     *
+     * @return the current (last updated) AIS signals of the ships in the system.
+     */
+    public HashMap<String, AISSignal> getCurrentAISSignals() throws PipelineException {
+        try {
+            // Get the current state of the KTable
+            final String storeName = this.state.queryableStoreName();
+            ReadOnlyKeyValueStore<String, CurrentShipDetails> view = this.kafkaStreams.store(
+                    StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
+            );
+
+            // Create a copy of the state considering only the current AISSingnal values for each ship
+            HashMap<String, AISSignal> stateCopy = new HashMap<>();
+            try (KeyValueIterator<String, CurrentShipDetails> iter = view.all()) {
+                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAISSignal()));
             }
             return stateCopy;
 
@@ -267,7 +294,7 @@ public class AnomalyDetectionPipeline {
     /**
      * Aggregates data to a resulting map.
      *
-     * @param aggregatedShipDetails object that stores all needed data for a ship
+     * @param aggregatedShipDetails object that stores the latest received data for a ship
      * @param valueJson json value for a signal
      * @param key hash value of the ship
      * @return updated object that stores all needed data for a ship
@@ -275,50 +302,34 @@ public class AnomalyDetectionPipeline {
     public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key)
             throws JsonProcessingException {
 
-        // If this is the first signal received, instantiate the past information as an empty list
-        if (aggregatedShipDetails.getPastInformation() == null)
-            aggregatedShipDetails.setPastInformation(new ArrayList<>());
 
         ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
-        // If the signal is AIS signal, add it to past information
-        if (shipInformation.getAnomalyInformation() == null) {
-            aggregatedShipDetails.getPastInformation().add(shipInformation);
-            if (aggregatedShipDetails.getAnomalyInformation() == null) {
-                aggregatedShipDetails.setAnomalyInformation(new AnomalyInformation(0.0f, "Everything looks good",
-                    shipInformation.getAisSignal().getTimestamp(), shipInformation.getShipHash()));
-            }
-        } else if (shipInformation.getAisSignal() == null) {
-            // If the signal is Anomaly Information signal, attach it to a corresponding AIS signal
+        AISSignal aisSignal = shipInformation.getAisSignal();
 
-            // Set the anomaly information to be the most recent one
-            // TODO: take care of proper format for the date
-            // TODO: CONSIDER ANOMALY INFO ARRIVING EARLIER THAN AIS SIGNAL
-            aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
+        // If the processed ShipInformation instance encapsulates a AISSignal instance:
+        // update the current value of the AISSignal field
+        if (aisSignal != null
+                && aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp())) {
+            aggregatedShipDetails.setCurrentAISSignal(aisSignal);
+        }
 
-            // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
-            for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
-                ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
-                if (information.getAisSignal().getTimestamp().equals(anomalyInformation.getCorrespondingTimestamp())) {
-                    // Check that there are no problems with the data
-                    assert information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash());
-                    assert information.getShipHash().equals(anomalyInformation.getShipHash());
-
-                    information.setAnomalyInformation(anomalyInformation);
-                    aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
-                    break;
-                }
-            }
-        } else throw new RuntimeException("Something went wrong");
+        // If the processed ShipInformation instance encapsulates a AnomalyInformation instance:
+        // update the current value of the AnomalyInformation field
+        if (anomalyInformation != null
+                && anomalyInformation.getCorrespondingTimestamp()
+                .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp())) {
+            aggregatedShipDetails.setCurrentAnomalyInformation(anomalyInformation);
+        }
 
         return aggregatedShipDetails;
     }
 
-
     /**
-     * Method that constructs a unified stream of anomaly information and AIS signals, wrapped in ShipInformation class.
+     * Method that constructs a unified stream of AnomalyInformation and AISSignal instances,
+     * wrapped inside a ShipInformation class.
      *
-     * @param builder Streams builder
+     * @param builder - StreamsBuilder instance responsible for configuring the KStream instances
      * @return unified stream
      */
     private KStream<String, ShipInformation> mergeStreams(StreamsBuilder builder) {
@@ -328,8 +339,7 @@ public class AnomalyDetectionPipeline {
         KStream<String, ShipInformation> streamAISSignals = streamAISSignals(builder);
 
         // Merge two streams and select the ship hash as a key for the new stream.
-        return streamAISSignals
-                .merge(streamAnomalyInformation)
+        return streamAISSignals.merge(streamAnomalyInformation)
                 .selectKey((key, value) -> value.getShipHash());
     }
 }
