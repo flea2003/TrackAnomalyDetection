@@ -5,6 +5,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,7 +24,6 @@ import sp.utils.UtilsObjectMapper;
 @ToString
 @JsonSerialize
 public class AISSignal implements Serializable {
-
     private final String shipHash;
     private final float speed;
     private final float longitude;

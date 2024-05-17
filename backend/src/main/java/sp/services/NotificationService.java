@@ -5,41 +5,58 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.dtos.AnomalyInformation;
+import sp.model.Notification;
 import sp.model.NotificationsList;
 import sp.model.ShipInformation;
-import sp.repositories.NotificationsRepository;
+import sp.repositories.NotificationsListRepository;
 
-import java.beans.Transient;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class NotificationService {
 
-    private final NotificationsRepository notificationsRepository;
+    private final NotificationsListRepository notificationsListRepository;
 
     @Autowired
-    public NotificationService(NotificationsRepository notificationsRepository ) {
-        this.notificationsRepository = notificationsRepository;
+    public NotificationService(NotificationsListRepository notificationsListRepository) {
+        this.notificationsListRepository = notificationsListRepository;
     }
 
     @Transactional
-    public ShipInformation getNotification(String id) {
-        Optional<NotificationsList> allNotifications = notificationsRepository.findById(id);
+    public Notification getNewestNotification(String id) {
+        Optional<NotificationsList> allNotifications = notificationsListRepository.findById(id);
         if (allNotifications.isPresent()) {
-            List<ShipInformation> notificationsList = allNotifications.get().getNotifications();
+            List<Notification> notificationsList = allNotifications.get().getNotifications();
             if (notificationsList.isEmpty()) throw new EntityNotFoundException("List is empty");
             else return notificationsList.get(notificationsList.size() - 1);
-        } else throw new EntityNotFoundException("ListNotification object is not found");
+        } else throw new EntityNotFoundException("NotificationsList object is not found");
     }
 
-    public void addNotification(ShipInformation notification) {
-        if (notificationsRepository.findById(notification.getShipHash()).isEmpty()) {
-            notificationsRepository.save(new NotificationsList(notification.getShipHash(), List.of(notification)));
+    public void addNotification(Notification notification) {
+        System.out.println("Gavau addNotification service klaseje:" + notification);
+        if (notificationsListRepository.findById(notification.getShipHash()).isEmpty()) {
+            notificationsListRepository.save(new NotificationsList(notification.getShipHash(), List.of(notification)));
         } else {
-            NotificationsList notifications = notificationsRepository.findById(notification.getShipHash()).get();
+            NotificationsList notifications = notificationsListRepository.findById(notification.getShipHash()).get();
             notifications.addNotification(notification);
-            notificationsRepository.save(notifications);
+            notificationsListRepository.save(notifications);
+        }
+    }
+
+    /**
+     * Temproary method until there is no timestamp database
+     * @param anomalyInformation
+     */
+    public void addNotification(AnomalyInformation anomalyInformation) {
+        System.out.println("Gavau addNotification service klaseje:" + anomalyInformation);
+        if (notificationsListRepository.findById(anomalyInformation.getShipHash()).isEmpty()) {
+            notificationsListRepository.save(new NotificationsList(anomalyInformation.getShipHash(),
+                    List.of(new Notification(anomalyInformation))));
+        } else {
+            NotificationsList notifications = notificationsListRepository.findById(anomalyInformation.getShipHash()).get();
+            notifications.addNotification(new Notification(anomalyInformation));
+            notificationsListRepository.save(notifications);
         }
     }
 }

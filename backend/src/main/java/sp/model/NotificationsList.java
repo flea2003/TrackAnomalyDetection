@@ -17,15 +17,15 @@ public class NotificationsList {
     private String shipHash;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<ShipInformation> notifications;
+    private List<Notification> notifications;
 
-    public NotificationsList(String shipHash, List<ShipInformation> notifications) {
+    public NotificationsList(String shipHash, List<Notification> notifications) {
         this.shipHash = shipHash;
         this.notifications = notifications;
     }
 
-    public void addNotification(ShipInformation shipInformation) {
-        notifications.add(shipInformation);
+    public void addNotification(Notification notification) {
+        notifications.add(notification);
     }
 
 }

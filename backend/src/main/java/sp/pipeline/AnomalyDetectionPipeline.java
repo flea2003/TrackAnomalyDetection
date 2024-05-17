@@ -386,38 +386,38 @@ public class AnomalyDetectionPipeline {
         this.kafkaStreams.cleanUp();
     }
 
-    public AnomalyInformation aggregateSignals(AnomalyInformation currentNotification, String valueJson, String key) throws JsonProcessingException {
+    public AnomalyInformation aggregateSignals(AnomalyInformation currentAnomaly, String valueJson, String key) throws JsonProcessingException {
         int threshold = 30;
 
-        AnomalyInformation newNotification = AnomalyInformation.fromJson(valueJson);
+        AnomalyInformation newAnomaly = AnomalyInformation.fromJson(valueJson);
         System.out.println("gavau: " + valueJson);
-
-        if (currentNotification.getCorrespondingTimestamp() == null) {
+        System.out.println("current anomaly: " + currentAnomaly);
+        if (currentAnomaly.getCorrespondingTimestamp() == null) {
             try {
-                currentNotification = notificationService.getNotification(key).getAnomalyInformation();
+                currentAnomaly = notificationService.getNewestNotification(key).getAnomalyInformation();
             } catch (EntityNotFoundException e ) {
-                currentNotification = newNotification;
-                if (currentNotification.getScore() >= threshold) notificationService.addNotification(new ShipInformation(key, newNotification, null));
+                currentAnomaly = newAnomaly;
+                if (currentAnomaly.getScore() >= threshold) {
+                    System.out.println("daugiau, siunciu i service");
+                    notificationService.addNotification(newAnomaly);
+                }
             }
         }
 
-        if (currentNotification.getScore() >= threshold) {
-            if (newNotification.getScore() >= threshold) {
-                newNotification = currentNotification;
+        if (currentAnomaly.getScore() >= threshold) {
+            if (newAnomaly.getScore() >= threshold) {
+                newAnomaly = currentAnomaly;
             }
         } else {
-            if (newNotification.getScore() < threshold) {
-                newNotification = currentNotification;
+            if (newAnomaly.getScore() < threshold) {
+                newAnomaly = currentAnomaly;
             } else {
                 // BEFORE THAT, A QUERY TO THE AIS SIGNAL DATABASE, EXTRACTING THE CORRESPONDING AIS SIGNAL
-                notificationService.addNotification(new ShipInformation(key, newNotification, null));
+                notificationService.addNotification(newAnomaly);
             }
         }
 
-        System.out.println(newNotification);
-        return newNotification;
+        System.out.println(newAnomaly);
+        return newAnomaly;
     }
-
-
-
 }

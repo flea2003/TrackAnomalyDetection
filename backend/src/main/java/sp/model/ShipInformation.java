@@ -2,6 +2,8 @@ package sp.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,10 +23,9 @@ import sp.utils.UtilsObjectMapper;
 @Setter
 @ToString
 @EqualsAndHashCode
-@Entity
 public class ShipInformation {
-    @Id
     private String shipHash;
+
     private AnomalyInformation anomalyInformation;
     private AISSignal aisSignal;
 
