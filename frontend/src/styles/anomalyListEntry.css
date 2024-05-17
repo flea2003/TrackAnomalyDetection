@@ -8,7 +8,7 @@
     align-items: center;
 
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 
     /* Make sure when hovering it s like a link */
     cursor: pointer;
@@ -17,21 +17,20 @@
     font-weight: 500;
 }
 
-.anomaly-list-entry-main-text {
-    font-size: var(--anomaly-list-entry-font-size);
-}
-
 .anomaly-list-entry-score {
-    font-weight: bold;
+    /*flex-grow: 3;*/
+    font-size: var(--anomaly-list-entry-font-size);
 }
 
 .anomaly-list-entry-icon-container {
+    /*flex-grow: 1;*/
     font-size: var(--anomaly-list-entry-font-size);
     height: 100%;
     width: 50px;
-    display: flex;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
     justify-content: center;
-    align-items: center;
 }
 
 .anomaly-list-entry-icon{

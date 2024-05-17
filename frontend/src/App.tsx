@@ -3,13 +3,14 @@ import Stack from "@mui/material/Stack";
 import { useState, useEffect } from "react";
 import Map from "./components/Map/Map";
 import { MapExportedMethodsType } from "./components/Map/Map";
-import AnomalyList from "./components/AnomalyList/AnomalyList";
+import AnomalyList from "./components/MiddleColumn/AnomalyList/AnomalyList";
 import Sidebar from "./components/Sidebar/Sidebar";
-import ObjectDetails from "./components/ObjectDetails/ObjectDetails";
+import ObjectDetails from "./components/MiddleColumn/ObjectDetails/ObjectDetails";
 import ShipDetails from "./model/ShipDetails";
 import ShipService from "./services/ShipService";
 
 import "./styles/common.css";
+import MiddleColumn from "./components/MiddleColumn/MiddleColumn";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -50,33 +51,6 @@ function App() {
     }
   };
 
-  const middleColumn = () => {
-    switch (currentPage.currentPage) {
-      case "anomalyList":
-        return (
-          <AnomalyList
-            ships={ships}
-            pageChanger={pageChanger}
-            mapCenteringFun={mapCenteringFun}
-          />
-        );
-      case "objectDetails":
-        return (
-          <ObjectDetails
-            ships={ships}
-            shipId={currentPage.shownShipId}
-            pageChanger={pageChanger}
-          />
-        );
-      case "notifications":
-        return <div>Notifications</div>;
-      case "settings":
-        return <div>Settings</div>;
-      case "none":
-        return <div></div>;
-    }
-  };
-
   // Put the ships as state
   const [ships, setShips] = useState<ShipDetails[]>([]);
 
@@ -97,7 +71,7 @@ function App() {
     <div className="App" id="root-div">
       <Stack direction="row">
         <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
-        {middleColumn()}
+        <MiddleColumn currentPage={currentPage} ships={ships} pageChanger={pageChanger} mapCenteringFun={mapCenteringFun} />
         <Sidebar pageChanger={pageChanger} />
       </Stack>
     </div>

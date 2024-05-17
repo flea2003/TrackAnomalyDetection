@@ -1,13 +1,13 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
-import ShipDetails from "../../model/ShipDetails";
+import ShipDetails from "../../../model/ShipDetails";
 import ObjectDetailsEntry from "./ObjectDetailsEntry";
 
-import "../../styles/common.css";
-import "../../styles/objectDetails.css";
-import returnIcon from "../../assets/icons/back.svg";
-import { CurrentPage } from "../../App";
+import "../../../styles/common.css";
+import "../../../styles/objectDetails.css";
+import returnIcon from "../../../assets/icons/back.svg";
+import { CurrentPage } from "../../../App";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];

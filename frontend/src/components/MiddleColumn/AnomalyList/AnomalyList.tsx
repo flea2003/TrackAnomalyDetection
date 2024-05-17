@@ -2,12 +2,12 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import AnomalyListEntry from "./AnomalyListEntry";
 import List from "@mui/material/List";
-import { CurrentPage } from "../../App";
-import ShipDetails from "../../model/ShipDetails";
-import closeIcon from "../../assets/icons/close.svg";
+import { CurrentPage } from "../../../App";
+import ShipDetails from "../../../model/ShipDetails";
+import closeIcon from "../../../assets/icons/close.svg";
 
-import "../../styles/common.css";
-import "../../styles/anomalyList.css";
+import "../../../styles/common.css";
+import "../../../styles/anomalyList.css";
 
 interface AnomalyListProps {
   ships: ShipDetails[];
@@ -50,7 +50,6 @@ function AnomalyList({
           data-testid="anomaly-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownShipId: "" })}
         />
-        <span id="anomaly-list-title">Anomaly list</span>
       </Stack>
       <List
         id="anomaly-list-internal-container"

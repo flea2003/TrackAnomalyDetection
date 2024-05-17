@@ -5,9 +5,6 @@
     --anomaly-list-closing-icon-size: 20px;
     --anomaly-list-closing-icon-margin: 10px;
 
-    --anomaly-list-title-font-size: 1.0em;
-    --anomaly-list-title-height: 50px;
-
     --anomaly-list-entry-font-size: 0.8em;
     --anomaly-list-entry-height: 36px;
     --anomaly-list-entry-icon-size: 20px;
@@ -32,7 +29,6 @@
 }
 
 #anomaly-list-container, #object-details-container {
-    width: 17%;
     height: 100vh;
     border-left: 1px solid black;
 }
