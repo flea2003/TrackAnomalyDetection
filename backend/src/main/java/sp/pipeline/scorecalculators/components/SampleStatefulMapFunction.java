@@ -11,7 +11,7 @@ import org.apache.flink.api.common.time.Time;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 
@@ -84,6 +84,6 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, Anomal
         latitudes.add(value.getLatitude());
 
         // Return the calculated score update
-        return new AnomalyInformation(currentScore, "", -1F, value.getTimestamp(), value.getShipHash());
+        return new AnomalyInformation(currentScore, "", -1F, value.getTimestamp(), value.getId());
     }
 }

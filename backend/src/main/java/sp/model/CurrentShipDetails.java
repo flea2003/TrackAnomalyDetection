@@ -2,15 +2,14 @@ package sp.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.serialization.Serde;
-import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.utils.UtilsObjectMapper;
+import java.io.Serializable;
 
 
 @Data

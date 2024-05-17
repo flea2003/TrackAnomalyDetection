@@ -1,5 +1,5 @@
 interface AnomalyInformation {
-  id: string;
+  id: number;
   anomalyScore: number;
   maxAnomalyScore: number;
 }

@@ -1,6 +1,6 @@
 class ShipDetails {
   static rounding = 1000;
-  id: string;
+  id: number;
   heading: number;
   lat: number;
   lng: number;
@@ -12,7 +12,7 @@ class ShipDetails {
   speed: number;
 
   constructor(
-    id: string,
+    id: number,
     heading: number,
     lat: number,
     lng: number,

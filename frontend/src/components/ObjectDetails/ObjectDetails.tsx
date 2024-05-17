@@ -11,7 +11,7 @@ import { CurrentPage } from "../../App";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
-  shipId: string;
+  shipId: number;
   pageChanger: (currentPage: CurrentPage) => void;
 }
 
@@ -55,7 +55,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
   // Define the return icon and its click handler
 
   const onReturnClicked = () => {
-    pageChanger({ currentPage: "anomalyList", shownShipId: "" });
+    pageChanger({ currentPage: "anomalyList", shownShipId: -1 });
   };
 
   const returnIconAlt = "Return Icon";

@@ -28,7 +28,7 @@ public class AnomalyInformation implements Serializable {
     private final Float maxAnomalyScore;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime correspondingTimestamp;
-    private final String shipHash;
+    private final Long id;
 
     /**
      * Converts a particular AnomalyInformation object to a JSON string.
