@@ -46,7 +46,7 @@ class ShipDetails {
       { type: "Object type", value: "Ship" },
       { type: "Anomaly score", value: this.anomalyScore + "%" },
       { type: "Explanation", value: this.explanation },
-      { type: "Highest Recorded Anomaly Score", value: this.maxAnomalyScore },
+      { type: "Highest Recorded Anomaly Score", value: this.maxAnomalyScore + "%" },
       { type: "Heading", value: "" + this.heading },
       { type: "Departure Port", value: "" + this.departurePort },
       { type: "Course", value: "" + this.course },
