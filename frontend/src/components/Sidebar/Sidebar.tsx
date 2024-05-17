@@ -28,11 +28,11 @@ function Sidebar({ pageChanger }: SidebarProps) {
 
   // Define the click handlers for the icons
   const onShipIconClicked = () =>
-    pageChanger({ currentPage: "anomalyList", shownShipId: "" });
+    pageChanger({ currentPage: "anomalyList", shownShipId: -1 });
   const onBellIconClicked = () =>
-    pageChanger({ currentPage: "notifications", shownShipId: "" });
+    pageChanger({ currentPage: "notifications", shownShipId: -1 });
   const onSettingsIconClicked = () =>
-    pageChanger({ currentPage: "settings", shownShipId: "" });
+    pageChanger({ currentPage: "settings", shownShipId: -1 });
 
   return (
     <Stack id="sidebar" data-testid="sidebar">
