@@ -113,13 +113,13 @@ class ShipService {
                 return {
                   id: "null ship",
                   anomalyScore: -1,
-                  maxAnomalyScore: -1
+                  maxAnomalyScore: -1,
                 };
               } else
                 return {
                   id: item.shipHash,
                   anomalyScore: item.score,
-                  maxAnomalyScore: item.maxAnomalyScore
+                  maxAnomalyScore: item.maxAnomalyScore,
                 };
             },
           );
