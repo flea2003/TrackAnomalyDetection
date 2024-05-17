@@ -1,18 +1,14 @@
 package sp.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
-import sp.model.CurrentShipDetails;
-import sp.model.ShipInformation;
+import sp.model.AISSignal;
 import sp.pipeline.AnomalyDetectionPipeline;
+import java.util.HashMap;
+import java.util.List;
 
 
 @Service
@@ -39,17 +35,14 @@ public class ShipsDataService {
      * @return current AIS information for a specified ship
      */
     public AISSignal getCurrentAISInformation(Long shipId) throws NotExistingShipException, PipelineException {
-        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
-        CurrentShipDetails shipDetails = shipsInfo.get(shipId);
+        AISSignal currentAISSignal = anomalyDetectionPipeline.getCurrentAISSignals().get(shipId);
 
-        if (shipDetails == null) {
+        if (currentAISSignal == null) {
             throw new NotExistingShipException("Couldn't find such ship.");
         }
 
-        List<ShipInformation> pastSignals = shipDetails.getPastInformation();
+        return currentAISSignal;
 
-        int size = pastSignals.size();
-        return pastSignals.get(size - 1).getAisSignal();
     }
 
     /**
@@ -58,17 +51,12 @@ public class ShipsDataService {
      * @param shipId the id of the ship
      * @return anomaly information for a specified ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(Long shipId)
-            throws NotExistingShipException, PipelineException {
-
-        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
-        CurrentShipDetails shipDetails = shipsInfo.get(shipId);
-
-        if (shipDetails == null) {
+    public AnomalyInformation getCurrentAnomalyInformation(Long shipId) throws NotExistingShipException, PipelineException {
+        AnomalyInformation currentAnomalyInfo = anomalyDetectionPipeline.getCurrentScores().get(shipId);
+        if (currentAnomalyInfo == null) {
             throw new NotExistingShipException("Couldn't find such ship.");
         }
-
-        return shipDetails.getAnomalyInformation();
+        return currentAnomalyInfo;
     }
 
 
@@ -78,17 +66,8 @@ public class ShipsDataService {
      * @return the current AIS data for all ships
      */
     public List<AISSignal> getCurrentAISInformationOfAllShips() throws PipelineException {
-        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
-        List<AISSignal> aisInformation = new ArrayList<>();
-
-        for (CurrentShipDetails currentShipDetails : shipsInfo.values()) {
-            List<ShipInformation> pastSignals = currentShipDetails.getPastInformation();
-            if (pastSignals != null && !pastSignals.isEmpty()) {
-                aisInformation.add(pastSignals.get(pastSignals.size() - 1).getAisSignal());
-            }
-        }
-
-        return aisInformation;
+        HashMap<Long, AISSignal> shipsInfo = anomalyDetectionPipeline.getCurrentAISSignals();
+        return shipsInfo.values().stream().toList();
     }
 
     /**
@@ -97,13 +76,8 @@ public class ShipsDataService {
      * @return a list of anomaly information objects for all ships
      */
     public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException {
-        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
-        List<AnomalyInformation> anomalyInformation = new ArrayList<>();
+        HashMap<Long, AnomalyInformation> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
 
-        for (Map.Entry<Long, CurrentShipDetails> entry : shipsInfo.entrySet()) {
-            anomalyInformation.add(shipsInfo.get(entry.getKey()).getAnomalyInformation());
-        }
-
-        return anomalyInformation;
+        return shipsInfo.values().stream().toList();
     }
 }
