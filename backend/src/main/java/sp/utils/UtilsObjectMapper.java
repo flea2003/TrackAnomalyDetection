@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class UtilsObjectMapper extends ObjectMapper {
+    /**
+     * Constructor of the ObjectMapper child class.
+     */
     public UtilsObjectMapper() {
         super();
         this.registerModule(new JavaTimeModule());

@@ -35,13 +35,24 @@ public class ShipsDataService {
      * @return current AIS information for a specified ship
      */
     public AISSignal getCurrentAISInformation(String shipId) throws NotExistingShipException, PipelineException {
-        AISSignal currentAISSignal = anomalyDetectionPipeline.getCurrentAISSignals(shipId).get(shipId);
+        try {
+            AISSignal currentAISSignal = anomalyDetectionPipeline.getCurrentAISSignals().get(shipId);
 
-        if (currentAISSignal == null) {
-            throw new NotExistingShipException("Couldn't find such ship.");
+            if (currentAISSignal == null) {
+                throw new NotExistingShipException("Couldn't find such ship.");
+            }
+
+            return currentAISSignal;
+
+        } catch (Exception e) {
+            if (e instanceof NotExistingShipException) {
+                throw (NotExistingShipException) e;
+            } else if (e instanceof PipelineException) {
+                throw (PipelineException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
         }
-
-        return currentAISSignal;
     }
 
     /**
@@ -53,12 +64,23 @@ public class ShipsDataService {
     public AnomalyInformation getCurrentAnomalyInformation(String shipId)
             throws NotExistingShipException, PipelineException {
 
-        AnomalyInformation currentAnomalyInfo = anomalyDetectionPipeline.getCurrentScores(shipId).get(shipId);
-        if (currentAnomalyInfo == null) {
-            throw new NotExistingShipException("Couldn't find such ship.");
-        }
+        try {
+            AnomalyInformation currentAnomalyInfo = anomalyDetectionPipeline.getCurrentScores().get(shipId);
 
-        return currentAnomalyInfo;
+            if (currentAnomalyInfo == null) {
+                throw new NotExistingShipException("Couldn't find such ship.");
+            }
+
+            return currentAnomalyInfo;
+        } catch (Exception e) {
+            if (e instanceof NotExistingShipException) {
+                throw (NotExistingShipException) e;
+            } else if (e instanceof PipelineException) {
+                throw (PipelineException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 
@@ -68,9 +90,17 @@ public class ShipsDataService {
      * @return the current AIS data for all ships
      */
     public List<AISSignal> getCurrentAISInformationOfAllShips() throws PipelineException {
-        HashMap<String, AISSignal> shipsInfo = anomalyDetectionPipeline.getCurrentAISSignals("all");
+        try {
+            HashMap<String, AISSignal> shipsInfo = anomalyDetectionPipeline.getCurrentAISSignals();
 
-        return shipsInfo.values().stream().toList();
+            return shipsInfo.values().stream().toList();
+        } catch (Exception e) {
+            if (e instanceof PipelineException) {
+                throw (PipelineException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -79,8 +109,16 @@ public class ShipsDataService {
      * @return a list of anomaly information objects for all ships
      */
     public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException {
-        HashMap<String, AnomalyInformation> shipsInfo = anomalyDetectionPipeline.getCurrentScores("all");
+        try {
+            HashMap<String, AnomalyInformation> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
 
-        return shipsInfo.values().stream().toList();
+            return shipsInfo.values().stream().toList();
+        } catch (Exception e) {
+            if (e instanceof PipelineException) {
+                throw (PipelineException) e;
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

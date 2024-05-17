@@ -2,33 +2,26 @@ package sp.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
-import sp.model.ShipInformation;
 import sp.pipeline.AnomalyDetectionPipeline;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-
-@SpringBootTest
 public class TestShipsDataService {
-// Refactoring this was so much pain, but since once Marius merges, we will need to redo the whole testing,
-// I commented it out, as then there is no point to refactor for now.
 
-/*
     private ShipsDataService shipsDataService;
     private ShipsDataService shipsDataServiceBroken;
-    private HashMap<String, CurrentShipDetails> map;
+    private HashMap<String, AnomalyInformation> mapAnomalyInformation;
+    private HashMap<String, AISSignal> mapAISSignal;
     private AISSignal signal1;
     private AISSignal signal2;
     private AISSignal signal3;
@@ -57,45 +50,43 @@ public class TestShipsDataService {
                 20.0f, 60.0f, 80.0f,
                 OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "Beijing");
 
-        List<ShipInformation> ship1 = List.of(
-                new ShipInformation("hash1", new AnomalyInformation(0.5f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""), signal1),
-                new ShipInformation("hash3", new AnomalyInformation(0.7f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""), signal3)
-        );
-
-        List<ShipInformation> ship3 = List.of(new ShipInformation("hash3", new AnomalyInformation(0.7f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""), signal4));
-
-
         CurrentShipDetails currentShipDetails1 = new CurrentShipDetails();
-        currentShipDetails1.setAnomalyInformation(new AnomalyInformation(0.5f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "hash1"));
-        currentShipDetails1.setPastInformation(ship1);
+        currentShipDetails1.setCurrentAnomalyInformation(new AnomalyInformation(0.5f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "hash1"));
 
         CurrentShipDetails currentShipDetails2 = new CurrentShipDetails();
-        currentShipDetails2.setAnomalyInformation(new AnomalyInformation(0.2f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
-        currentShipDetails2.setPastInformation(ship3);
+        currentShipDetails2.setCurrentAnomalyInformation(new AnomalyInformation(0.2f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
 
         CurrentShipDetails currentShipDetails3 = new CurrentShipDetails();
-        currentShipDetails3.setAnomalyInformation(new AnomalyInformation(0.7f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
-        currentShipDetails3.setPastInformation(ship1);
+        currentShipDetails3.setCurrentAnomalyInformation(new AnomalyInformation(0.7f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
 
         CurrentShipDetails currentShipDetails4 = new CurrentShipDetails();
-        currentShipDetails4.setAnomalyInformation(new AnomalyInformation(0.1f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
-        currentShipDetails4.setPastInformation(ship3);
+        currentShipDetails4.setCurrentAnomalyInformation(new AnomalyInformation(0.1f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
 
-        map = new HashMap<>(){{
-            put("hash1", currentShipDetails1);
-            put("hash2", currentShipDetails2);
-            put("hash3", currentShipDetails3);
-            put("hash4", currentShipDetails4);
+        mapAnomalyInformation = new HashMap<>(){{
+            put("hash1", currentShipDetails1.getCurrentAnomalyInformation());
+            put("hash2", currentShipDetails2.getCurrentAnomalyInformation());
+            put("hash3", currentShipDetails3.getCurrentAnomalyInformation());
+            put("hash4", currentShipDetails4.getCurrentAnomalyInformation());
+        }};
+
+        mapAISSignal = new HashMap<>(){{
+            put("hash1", signal3);
+            put("hash2", signal2);
+            put("hash3", signal5);
+            put("hash4", signal6);
         }};
 
         AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
 
-        doReturn(map).when(anomalyDetectionPipeline).getCurrentScores();
+        doReturn(mapAnomalyInformation).when(anomalyDetectionPipeline).getCurrentScores();
+        doReturn(mapAISSignal).when(anomalyDetectionPipeline).getCurrentAISSignals();
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
         shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
+
         doThrow(PipelineException.class).when(anomalyDetectionPipelineBroken).getCurrentScores();
+        doThrow(PipelineException.class).when(anomalyDetectionPipelineBroken).getCurrentAISSignals();
     }
 
     @Test
@@ -153,6 +144,6 @@ public class TestShipsDataService {
         assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAnomalyInformationOfAllShips())
                 .isInstanceOf(PipelineException.class);
     }
-*/
+
 }
 
