@@ -2,7 +2,7 @@ import ShipDetails from "../../model/ShipDetails";
 
 test("Rounding of latitude and longitude", () => {
   const fake = new ShipDetails(
-    "1",
+    1,
     0,
     0.123456,
     0.12034,
@@ -21,7 +21,7 @@ test("Rounding of latitude and longitude", () => {
 
 test("getPropertyList returns a list of correct size", () => {
   const fake = new ShipDetails(
-    "1",
+    1,
     0,
     0.123456,
     0.12034,
@@ -39,7 +39,7 @@ test("getPropertyList returns a list of correct size", () => {
 
 test("getPropertyList returns correct id", () => {
   const fake = new ShipDetails(
-    "1",
+    1,
     0,
     0.123456,
     0.12034,
@@ -57,7 +57,7 @@ test("getPropertyList returns correct id", () => {
 
 test("getPropertyList returns correct anomaly score", () => {
   const fake = new ShipDetails(
-    "1",
+    1,
     0,
     0.123456,
     0.12034,
@@ -75,7 +75,7 @@ test("getPropertyList returns correct anomaly score", () => {
 
 test("getPropertyList returns correct explanation", () => {
   const fake = new ShipDetails(
-    "1",
+    1,
     0,
     0.123456,
     0.12034,
@@ -93,7 +93,7 @@ test("getPropertyList returns correct explanation", () => {
 
 test("getPropertyList returns correct heading", () => {
   const fake = new ShipDetails(
-    "1",
+    1,
     0,
     0.123456,
     0.12034,

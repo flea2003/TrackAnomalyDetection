@@ -359,7 +359,7 @@ public class AnomalyDetectionPipeline {
                     ? anomalyInformation.getScore() : currentMaxAnomalyScore;
             aggregatedShipDetails.setCurrentAnomalyInformation(
                     new AnomalyInformation(anomalyInformation.getScore(), anomalyInformation.getExplanation(),
-                            newMaxAnomalyScore, anomalyInformation.getCorrespondingTimestamp(), anomalyInformation.getShipHash())
+                            newMaxAnomalyScore, anomalyInformation.getCorrespondingTimestamp(), anomalyInformation.getId())
             );
         }
 
