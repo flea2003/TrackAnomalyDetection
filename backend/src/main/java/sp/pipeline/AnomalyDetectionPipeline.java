@@ -34,6 +34,7 @@ import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 import sp.services.NotificationService;
+import sp.services.NotificationsListService;
 
 @Service
 public class AnomalyDetectionPipeline {
@@ -46,7 +47,7 @@ public class AnomalyDetectionPipeline {
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
     private KTable<String, CurrentShipDetails> state;
-    private NotificationService notificationService;
+    private NotificationsListService notificationService;
 
     // Load the needed parameters from the configurations file
     static {
@@ -67,7 +68,7 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy, NotificationService notificationService) throws IOException {
+    public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy, NotificationsListService notificationService) throws IOException {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.notificationService = notificationService;
         buildPipeline();

@@ -27,5 +27,4 @@ public class NotificationsList {
     public void addNotification(Notification notification) {
         notifications.add(notification);
     }
-
 }
