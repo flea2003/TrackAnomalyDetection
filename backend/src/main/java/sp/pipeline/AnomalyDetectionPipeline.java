@@ -302,26 +302,39 @@ public class AnomalyDetectionPipeline {
      */
     public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key)
             throws JsonProcessingException {
-        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
-
 
         ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
         AISSignal aisSignal = shipInformation.getAisSignal();
 
+
         // If the processed ShipInformation instance encapsulates a AISSignal instance:
         // update the current value of the AISSignal field
         if (aisSignal != null
-                && aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp())) {
+                && (aggregatedShipDetails.getCurrentAISSignal() == null
+                || aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp()))) {
+
             aggregatedShipDetails.setCurrentAISSignal(aisSignal);
         }
 
         // If the processed ShipInformation instance encapsulates a AnomalyInformation instance:
-        // update the current value of the AnomalyInformation field
+        // update the current value of the AnomalyInformation field, additionally modifying the value
+        // of the highest recorder Anomaly Score for the ship
         if (anomalyInformation != null
-                && anomalyInformation.getCorrespondingTimestamp()
-                .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp())) {
-            aggregatedShipDetails.setCurrentAnomalyInformation(anomalyInformation);
+                && (aggregatedShipDetails.getCurrentAnomalyInformation() == null
+                || anomalyInformation.getCorrespondingTimestamp()
+                .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp()))) {
+
+            // If the field currentAnomalyInformation of the aggregating object is not initialized
+            // consider the value of the highest recorded score to be -1
+            Float currentMaxAnomalyScore = aggregatedShipDetails.getCurrentAnomalyInformation() == null
+                    ? -1 : aggregatedShipDetails.getCurrentAnomalyInformation().getMaxAnomalyScore();
+            Float newMaxAnomalyScore = anomalyInformation.getScore() > currentMaxAnomalyScore
+                    ? anomalyInformation.getScore() : currentMaxAnomalyScore;
+            aggregatedShipDetails.setCurrentAnomalyInformation(
+                    new AnomalyInformation(anomalyInformation.getScore(), anomalyInformation.getExplanation(),
+                            newMaxAnomalyScore, anomalyInformation.getCorrespondingTimestamp(), anomalyInformation.getShipHash())
+            );
         }
 
         return aggregatedShipDetails;

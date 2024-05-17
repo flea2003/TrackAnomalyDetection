@@ -51,16 +51,16 @@ public class TestShipsDataService {
                 OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "Beijing");
 
         CurrentShipDetails currentShipDetails1 = new CurrentShipDetails();
-        currentShipDetails1.setCurrentAnomalyInformation(new AnomalyInformation(0.5f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "hash1"));
+        currentShipDetails1.setCurrentAnomalyInformation(new AnomalyInformation(0.5f, "", -1f, OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "hash1"));
 
         CurrentShipDetails currentShipDetails2 = new CurrentShipDetails();
-        currentShipDetails2.setCurrentAnomalyInformation(new AnomalyInformation(0.2f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
+        currentShipDetails2.setCurrentAnomalyInformation(new AnomalyInformation(0.2f, "", -1f, OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
 
         CurrentShipDetails currentShipDetails3 = new CurrentShipDetails();
-        currentShipDetails3.setCurrentAnomalyInformation(new AnomalyInformation(0.7f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
+        currentShipDetails3.setCurrentAnomalyInformation(new AnomalyInformation(0.7f, "", -1f, OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
 
         CurrentShipDetails currentShipDetails4 = new CurrentShipDetails();
-        currentShipDetails4.setCurrentAnomalyInformation(new AnomalyInformation(0.1f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
+        currentShipDetails4.setCurrentAnomalyInformation(new AnomalyInformation(0.1f, "", -1f, OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), ""));
 
         mapAnomalyInformation = new HashMap<>(){{
             put("hash1", currentShipDetails1.getCurrentAnomalyInformation());

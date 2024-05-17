@@ -84,6 +84,6 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, Anomal
         latitudes.add(value.getLatitude());
 
         // Return the calculated score update
-        return new AnomalyInformation(currentScore, "", value.getTimestamp(), value.getShipHash());
+        return new AnomalyInformation(currentScore, "", -1F, value.getTimestamp(), value.getShipHash());
     }
 }

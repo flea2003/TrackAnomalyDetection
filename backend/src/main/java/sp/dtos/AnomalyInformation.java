@@ -23,12 +23,15 @@ import sp.utils.UtilsObjectMapper;
 public class AnomalyInformation implements Serializable {
     private final Float score;
     private final String explanation;
+    // Field required by the aggregating CurrentShipDetails object
+    // Instantiated with -1 for a regular AnomalyInformation instance
+    private final Float maxAnomalyScore;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime correspondingTimestamp;
     private final String shipHash;
 
     /**
-     * Converts a particular AISUpdate object to a JSON string.
+     * Converts a particular AnomalyInformation object to a JSON string.
      *
      * @return the respective JSON string
      */
@@ -37,7 +40,7 @@ public class AnomalyInformation implements Serializable {
     }
 
     /**
-     * Converts a JSON string to an AISUpdate object.
+     * Converts a JSON string to an AnomalyInformation object.
      *
      * @param val the JSON string to convert
      * @return the converted AISUpdate object

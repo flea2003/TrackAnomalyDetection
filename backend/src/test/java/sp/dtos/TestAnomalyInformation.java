@@ -13,12 +13,12 @@ public class TestAnomalyInformation {
 
     @BeforeEach
     void setUp() {
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", OffsetDateTime.of(2004, 01, 27, 1,1,0,0, ZoneOffset.ofHours(0)), "hash");
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", -1F, OffsetDateTime.of(2004, 01, 27, 1,1,0,0, ZoneOffset.ofHours(0)), "hash");
     }
 
     @Test
     void testToJson() throws JsonProcessingException {
-        assertThat(anomalyInformation.toJson()).isEqualTo("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}");
+        assertThat(anomalyInformation.toJson()).isEqualTo("{\"score\":0.5,\"explanation\":\"explanation\",\"maxAnomalyScore\":-1.0,\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}");
     }
 
     @Test
@@ -28,7 +28,7 @@ public class TestAnomalyInformation {
 
     @Test
     void testFromJson2() throws JsonProcessingException {
-        assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
+        assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"maxAnomalyScore\":-1.0,\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
     }
 
 
