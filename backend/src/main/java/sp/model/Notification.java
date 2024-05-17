@@ -27,7 +27,7 @@ public class Notification {
     private Long id;
 
     /**
-     * Constructor for the notification object
+     * Constructor for the notification object.
      *
      * @param score anomaly score
      * @param explanation anomaly explanation
@@ -36,7 +36,8 @@ public class Notification {
      * @param longitude longitude
      * @param latitude longitude
      */
-    public Notification(Float score, String explanation, OffsetDateTime correspondingTimestamp, String shipHash, float longitude, float latitude) {
+    public Notification(Float score, String explanation, OffsetDateTime correspondingTimestamp, String shipHash,
+                        float longitude, float latitude) {
         this.score = score;
         this.explanation = explanation;
         this.correspondingTimestamp = correspondingTimestamp;
@@ -63,7 +64,7 @@ public class Notification {
     }
 
     /**
-     * Method that is used by the pipeline
+     * Method that is used by the pipeline.
      *
      * @return AnomalyInformation object
      */

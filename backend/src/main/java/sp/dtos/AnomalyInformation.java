@@ -4,12 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,7 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.kafka.common.serialization.Serde;
-import sp.model.CurrentShipDetails;
 import sp.utils.UtilsObjectMapper;
 
 @Getter

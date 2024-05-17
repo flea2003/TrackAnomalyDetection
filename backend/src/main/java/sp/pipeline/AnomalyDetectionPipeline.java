@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.persistence.EntityNotFoundException;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -27,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
+import sp.exceptions.NotFoundNotificationException;
 import sp.exceptions.PipelineException;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
@@ -66,7 +66,8 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy, NotificationService notificationService) throws IOException {
+    public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy,
+                                    NotificationService notificationService) throws IOException {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.notificationService = notificationService;
         notificationThreshold = 30;
@@ -350,11 +351,10 @@ public class AnomalyDetectionPipeline {
      * constantly being retrieved. The aggregation part is responsible for the logic of computing when a new
      * notification should be created, and once it has to be created, querying the notificationService class, which
      * handles it. It then also updates the most recent notification that is stored for that particular ship.
-     *
      * Note that to decide whether a new notification for a particular ship should be created, it is enough to have the
      * information of the mosrt recent notification for that ship, and a new AnomalyInformation signal.
      *
-     * @param builder
+     * @param builder StreamsBuilder object
      */
     public void buildNotifications(StreamsBuilder builder) {
         // Construct a stream for computed AnomalyInformation objects
@@ -367,7 +367,8 @@ public class AnomalyDetectionPipeline {
             }
         });
         // Key the stream
-        KStream<String, AnomalyInformation> streamAnomalyInformationKeyed = streamAnomalyInformation.selectKey((key, value) -> value.getShipHash());
+        KStream<String, AnomalyInformation> streamAnomalyInformationKeyed = streamAnomalyInformation
+                .selectKey((key, value) -> value.getShipHash());
 
         // Construct the KTable (state that is stored) by aggregating the merged stream
         KTable<String, AnomalyInformation> notificationsState = streamAnomalyInformationKeyed
@@ -392,23 +393,23 @@ public class AnomalyDetectionPipeline {
                                 .<String, AnomalyInformation, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
                                 .withValueSerde(AnomalyInformation.getSerde())
                 );
-
         this.kafkaStreams = StreamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
     }
 
     /**
      * Method that is responsible for aggregating the AnomalyInformation signals, and creating and storing new
-     * notifications
+     * notifications.
      *
      * @param currentAnomaly AnomalyInformation object that corresponds to the most recently created notification
      * @param valueJson JSON value of the AnomalyInformation object that just arrived
      * @param key hash of the ship
      * @return anomaly information that corresponds to the newest notification (so either the new anomaly information,
-     * or the old one)
-     * @throws JsonProcessingException
+     *      or the old one)
+     * @throws JsonProcessingException in case JSON value does not correspond to an AnomalyInformation object
      */
-    public AnomalyInformation aggregateSignals(AnomalyInformation currentAnomaly, String valueJson, String key) throws JsonProcessingException {
+    public AnomalyInformation aggregateSignals(AnomalyInformation currentAnomaly, String valueJson, String key)
+            throws JsonProcessingException {
         // TODO: perhaps add the threshold to some configurations file!
 
         // Convert the new anomaly information object from JSON
@@ -421,7 +422,7 @@ public class AnomalyDetectionPipeline {
                 // Fetch the anomaly information that corresponds to the most recently saved notification
                 currentAnomaly = notificationService.getNewestNotificationForShip(key).getAnomalyInformation();
 
-            } catch (EntityNotFoundException e ) {
+            } catch (NotFoundNotificationException e) {
 
                 // If there were no notifications saved (meaning that ship never became anomalous), save the current
                 // state as the newest anomaly object
