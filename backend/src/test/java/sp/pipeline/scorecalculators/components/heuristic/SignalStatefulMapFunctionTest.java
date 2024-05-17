@@ -34,7 +34,7 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal1, 10);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }
@@ -45,7 +45,7 @@ public class SignalStatefulMapFunctionTest {
         // There are two signals but they are not anomalous
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
-        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:00Z");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:59Z");
         AISSignal aisSignal1 = new AISSignal("1", 20, 90, 30, 20, 20, timestamp1, "Malta");
         AISSignal aisSignal2 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp2, "Malta");
         try {
@@ -56,9 +56,9 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal2, 40);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
+            assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }
@@ -82,7 +82,7 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal2, 31);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
             assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
         } catch (Exception e) {
@@ -110,11 +110,11 @@ public class SignalStatefulMapFunctionTest {
             testHarness.processElement(aisSignal3, 63);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
             assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
             assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is great.");
+            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }

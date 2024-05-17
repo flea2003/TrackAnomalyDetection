@@ -7,7 +7,7 @@ import sp.dtos.AnomalyInformation;
 
 public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
 
-    private static final String goodMsg = "The ship's turning direction is great.";
+    private static final String goodMsg = "The ship's turning direction is ok.";
     private static final String badMsg = "The ship's turning direction is anomalous.";
 
     /**
@@ -29,12 +29,10 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
         AISSignal pastAISSignal = getAisSignalValueState().value();
         // In the case that our stateful map has encountered signals in the past
         if (pastAnomalyInformation != null && pastAISSignal != null) {
-            // If any of these heuristics hold, then we update our lastDetectedAnomalyTime:
-            // 1. Check if the absolute difference modulo difference between consecutive headings is greater than 40.
-            // 2. Check if the absolute difference modulo difference between consecutive courses is greater than 40.
-            double headingDifference = circularMetric(pastAISSignal.getHeading(), value.getHeading());
-            double corseDifference = circularMetric(pastAISSignal.getCourse(), value.getCourse());
-            if (headingDifference >= 40 || corseDifference >= 40) {
+            boolean headingDifferenceIsGood = circularMetric(pastAISSignal.getHeading(), value.getHeading()) < 40;
+            boolean courseDifferenceIsGood = circularMetric(pastAISSignal.getCourse(), value.getCourse()) < 40;
+
+            if (!headingDifferenceIsGood || !courseDifferenceIsGood) {
                 getLastDetectedAnomalyTime().update(value.getTimestamp());
             }
         }

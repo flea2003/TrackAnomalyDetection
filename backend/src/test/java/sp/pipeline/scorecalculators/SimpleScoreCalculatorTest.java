@@ -62,10 +62,10 @@ class SimpleScoreCalculatorTest {
         assertThat(result).containsAll(List.of(
             new AnomalyInformation(67f, "The ship's turning direction is anomalous.\n" +
                 "The time difference between consecutive AIS signals is anomalous.\n" +
-                "The ship's speed is great.", time3, "ship1"),
-            new AnomalyInformation(0.0f, "The ship's turning direction is great.\n" +
-                "The time difference between consecutive AIS signals is great.\n" +
-                "The ship's speed is great.", time3, "ship2")
+                "The ship's speed is ok.", time3, "ship1"),
+            new AnomalyInformation(0.0f, "The ship's turning direction is ok.\n" +
+                "The time difference between consecutive AIS signals is ok.\n" +
+                "The ship's speed is ok.", time3, "ship2")
         ));
 
     }

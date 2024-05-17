@@ -31,7 +31,7 @@ public class SpeedStatefulMapFunctionTest {
             testHarness.processElement(aisSignal1, 10);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }
@@ -53,7 +53,7 @@ public class SpeedStatefulMapFunctionTest {
             testHarness.processElement(aisSignal2, 60);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
             assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's speed is anomalous.");
         } catch (Exception e) {
@@ -84,11 +84,11 @@ public class SpeedStatefulMapFunctionTest {
             testHarness.processElement(aisSignal3, 91);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
             assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's speed is anomalous.");
             assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's speed is great.");
+            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage());
         }

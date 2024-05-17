@@ -11,7 +11,7 @@ public class Tools {
      * @param lon2 - the longitude of the second point.
      * @return - the distance on the globe between the 2 points.
      */
-    public static Double harvesineDistance(float lat1, float lon1, float lat2, float lon2) {
+    public static float harvesineDistance(float lat1, float lon1, float lat2, float lon2) {
         double lat1Rad = Math.toRadians(lat1);
         double lon1Rad = Math.toRadians(lon1);
         double lat2Rad = Math.toRadians(lat2);
@@ -25,7 +25,7 @@ public class Tools {
 
         double r = 6371;
 
-        return r * c;
+        return (float)(r * c);
     }
 
     /**
@@ -35,8 +35,8 @@ public class Tools {
      * @param deg2 - the course/heading reported in another signal
      * @return - the computer metric of the difference.
      */
-    public static Double circularMetric(float deg1, float deg2) {
-        return 180.0 - Math.abs(180 - (deg1 % 360 - deg2 % 360 + 360) % 360);
+    public static float circularMetric(float deg1, float deg2) {
+        return (float)(180.0 - Math.abs(180 - (deg1 % 360 - deg2 % 360 + 360) % 360));
     }
 
 }

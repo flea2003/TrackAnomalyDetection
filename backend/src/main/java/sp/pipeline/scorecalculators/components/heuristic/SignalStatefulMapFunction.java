@@ -8,7 +8,7 @@ import sp.dtos.AnomalyInformation;
 
 public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
 
-    private static final String goodMsg = "The time difference between consecutive AIS signals is great.";
+    private static final String goodMsg = "The time difference between consecutive AIS signals is ok.";
     private static final String badMsg = "The time difference between consecutive AIS signals is anomalous.";
 
     /**
@@ -28,13 +28,13 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
 
         // In the case that our stateful map has encountered signals in the past
         if (pastAnomalyInformation != null && pastAISSignal != null) {
-
             double time = Duration.between(getAisSignalValueState().value().getTimestamp(), value.getTimestamp()).toMinutes();
-            // If the difference between this and the last signal is more than 10 minutes and
-            // the distance average speed it takes to travel from the last point to the current one
-            // is greater than 6 km/h, then we update the last detected anomaly time.
-            if (time > 10 && harvesineDistance(value.getLatitude(), value.getLongitude(),
-                    pastAISSignal.getLatitude(), pastAISSignal.getLongitude()) > time / 60 * 6) {
+
+            boolean signalTimingIsGood = time < 10;
+            boolean shipDidntTravelTooMuch = harvesineDistance(value.getLatitude(), value.getLongitude(),
+                pastAISSignal.getLatitude(), pastAISSignal.getLongitude()) / (time / 60) < 6;
+
+            if (!signalTimingIsGood && !shipDidntTravelTooMuch) {
                 getLastDetectedAnomalyTime().update(value.getTimestamp());
             }
         }

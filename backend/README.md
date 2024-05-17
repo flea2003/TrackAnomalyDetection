@@ -36,6 +36,7 @@ Additionally, the following JVM argument needs to be added (Edit configurations 
 ```
 --add-opens java.base/java.util=ALL-UNNAMED
 --add-opens java.base/java.time=ALL-UNNAMED
+--add-opens=java.base/java.lang=ALL-UNNAMED
 ```
 ## Running the project
 In order to run the back-end of the project, multiple steps will have to be made.

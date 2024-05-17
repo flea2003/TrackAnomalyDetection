@@ -30,7 +30,7 @@ public class TurningStatefulMapFunctionTest {
             testHarness.processElement(aisSignal1, 10);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }
@@ -52,7 +52,7 @@ public class TurningStatefulMapFunctionTest {
             testHarness.processElement(aisSignal2, 60);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
             assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's turning direction is anomalous.");
         } catch (Exception e) {
@@ -80,11 +80,11 @@ public class TurningStatefulMapFunctionTest {
             testHarness.processElement(aisSignal3, 91);
             var anomalies = testHarness.extractOutputStreamRecords();
             assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is great.");
+            assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
             assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
             assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's turning direction is anomalous.");
             assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's turning direction is great.");
+            assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
         } catch (Exception e) {
             fail("Exception during setup: " + e.getMessage()); // More specific fail message
         }

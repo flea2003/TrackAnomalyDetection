@@ -8,7 +8,7 @@ import sp.dtos.AnomalyInformation;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
 
-    private static final String goodMsg = "The ship's speed is great.";
+    private static final String goodMsg = "The ship's speed is ok.";
     private static final String badMsg = "The ship's speed is anomalous.";
 
     /**
@@ -31,13 +31,12 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
                 pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
             double time = Duration.between(getAisSignalValueState().value().getTimestamp(), value.getTimestamp()).toMinutes();
             double computedSpeed = globeDistance / (time + 0.00001);
-            // If any of these heuristics hold, we update our lastDetectedAnomalyTime:
-            // 1. Check if the computed speed is greater than 40 km/h
-            // 2. Check if the absolute difference between the computed and the reported speed is greater than 10 km/h
-            // 3. Check if the acceleration of the ship is greater than 50 km/h
-            if (computedSpeed > 40
-                || Math.abs(value.getSpeed() - computedSpeed) > 10
-                || (getAisSignalValueState().value().getSpeed() - value.getSpeed()) / (time + 0.00001) > 50) {
+
+            boolean speedIsLow = computedSpeed <= 55.5;
+            boolean reportedSpeedIsAccurate = Math.abs(value.getSpeed() - computedSpeed) <= 10;
+            boolean accelerationIsLow = (getAisSignalValueState().value().getSpeed() - value.getSpeed()) / (time + 0.00001) < 50;
+
+            if (!speedIsLow || !reportedSpeedIsAccurate || !accelerationIsLow) {
                 this.getLastDetectedAnomalyTime().update(value.getTimestamp());
             }
         }
