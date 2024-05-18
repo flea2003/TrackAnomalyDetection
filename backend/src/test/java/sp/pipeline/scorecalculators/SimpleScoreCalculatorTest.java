@@ -60,11 +60,11 @@ class SimpleScoreCalculatorTest {
         List<AnomalyInformation> result = CollectSink.anomalyInfoList;
 
         assertThat(result).containsAll(List.of(
-            new AnomalyInformation(100f, "The time difference between consecutive AIS signals is anomalous." +
-                "The ship's speed is anomalous." +
+            new AnomalyInformation(100f, "The time difference between consecutive AIS signals is anomalous. " +
+                "The ship's speed is anomalous. " +
                 "The ship's turning direction is anomalous.", time3, (long)1),
-            new AnomalyInformation(0.0f, "The time difference between consecutive AIS signals is ok." +
-                "The ship's speed is ok." +
+            new AnomalyInformation(0.0f, "The time difference between consecutive AIS signals is ok. " +
+                "The ship's speed is ok. " +
                 "The ship's turning direction is ok.", time3, (long)2)
         ));
 
