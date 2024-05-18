@@ -3,6 +3,7 @@ import AnomalyList from "./AnomalyList/AnomalyList";
 import ObjectDetails from "./ObjectDetails/ObjectDetails";
 import React, { JSX } from "react";
 import ShipDetails from "../../model/ShipDetails";
+import ErrorList from "./ErrorNotifications/ErrorList";
 
 interface MiddleColumnProps {
   currentPage: CurrentPage;
@@ -39,7 +40,7 @@ function MiddleColumn({
     case "settings":
       return <div>Settings</div>;
     case "errors":
-      return <div>Errors</div>;
+      return <ErrorList pageChanger={pageChanger} />
     default:
       return <div></div>;
   }

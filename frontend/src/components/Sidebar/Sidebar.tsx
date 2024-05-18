@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Stack from "@mui/material/Stack";
 
 import "../../styles/common.css";
@@ -9,6 +9,7 @@ import bellIcon from "../../assets/icons/bell-notification.svg";
 import settingsIcon from "../../assets/icons/settings.svg";
 import bugIcon from "../../assets/icons/bug.svg";
 import { CurrentPage } from "../../App";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -69,11 +70,19 @@ function Sidebar({ pageChanger }: SidebarProps) {
         data-testid="sidebar-bug-icon"
         className="sidebar-entry"
         onClick={onBugIconClicked}
+        style={{ backgroundColor: getBugBackgroundColor() }}
       >
         <img src={bugIcon} className="sidebar-icon" alt={bugIconAlt} />
       </span>
     </Stack>
   );
+}
+
+function getBugBackgroundColor() {
+  if (ErrorNotificationService.areAllRead()) {
+    return "transparent";
+  }
+  return "lightcoral";
 }
 
 export default Sidebar;

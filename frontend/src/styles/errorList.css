@@ -1,0 +1,31 @@
+#error-list-container {
+    width: 20%;
+    text-align: center;
+    display: flex;
+}
+
+#error-list-internal-container {
+    height: 100%;
+}
+
+#error-list-close-icon {
+    height: var(--error-list-closing-icon-size);
+    width: var(--error-list-closing-icon-size);
+    padding: var(--error-list-closing-icon-margin);
+}
+
+#error-list-close-icon:hover {
+    cursor: pointer;
+}
+
+#error-list-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black;
+
+}
+
+#error-list-title-container button{
+    margin-right: 5px;
+}

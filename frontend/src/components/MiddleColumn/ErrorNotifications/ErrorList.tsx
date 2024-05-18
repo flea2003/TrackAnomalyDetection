@@ -6,7 +6,8 @@ import { CurrentPage } from "../../../App";
 import closeIcon from "../../../assets/icons/close.svg";
 
 import "../../../styles/common.css";
-import "../../../styles/anomalyList.css";
+import "../../../styles/errorList.css";
+import ErrorNotificationService, { ErrorNotification } from "../../../services/ErrorNotificationService";
 
 interface ErrorListProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -22,17 +23,6 @@ interface ErrorListProps {
 function ErrorList({
   pageChanger
 }: ErrorListProps) {
-  const listEntries = [];
-  for (let i = 0; i < ships.length; i++) {
-    listEntries.push(
-      <ErrorListEntry
-        key={i}
-        shipDetails={ships[i]}
-        pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-      />,
-    );
-  }
 
   return (
     <Stack id="error-list-container" data-testid="error-list-container">
@@ -44,15 +34,27 @@ function ErrorList({
           data-testid="error-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
         />
+
+        <button onClick={() => ErrorNotificationService.markAllAsRead()}>
+          Mark all as read
+        </button>
       </Stack>
       <List
         id="error-list-internal-container"
         style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}
       >
-        {listEntries}
+        {getErrorListEntries()}
       </List>
     </Stack>
   );
+}
+
+function getErrorListEntries() {
+  return ErrorNotificationService
+    .getAllNotifications()
+    .slice().reverse()
+    .map((notification: ErrorNotification, i: number) =>
+        <ErrorListEntry key={i} notification={notification} />)
 }
 
 export default ErrorList;

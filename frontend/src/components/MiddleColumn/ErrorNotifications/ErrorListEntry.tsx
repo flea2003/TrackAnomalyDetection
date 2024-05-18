@@ -1,61 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 
-import ShipDetails from "../../../model/ShipDetails";
-import { calculateAnomalyColor } from "../../../utils/AnomalyColorCalculator";
-import shipIcon from "../../../assets/icons/ship.png";
-
 import "../../../styles/common.css";
-import "../../../styles/anomalyListEntry.css";
-import { CurrentPage } from "../../../App";
+import "../../../styles/errorListEntry.css";
+import ErrorNotificationService, { ErrorNotification } from "../../../services/ErrorNotificationService";
+import trashIcon from '../../../assets/icons/trash.svg';
 
-interface AnomalyListEntryProps {
-  shipDetails: ShipDetails;
-  pageChanger: (currentPage: CurrentPage) => void;
-  mapCenteringFun: (details: ShipDetails) => void;
+interface ErrorListEntryProps {
+  notification: ErrorNotification;
 }
 
 /**
- * This component is a single entry in the Anomaly List. It displays the anomaly score and an icon of an object.
+ * This component is a single entry in the Error Notifications List.
+ * It displays the (software) error that occurred.
  * The object to render is passed as a prop.
  *
- * @param shipDetails the specific details of the ship to display
- * @param pageChanger function that, when called, changes the page displayed in the second column.
- * @param mapCenteringFun function that, when called, centers the map on a specific ship
+ * @param notification ErrorNotification object which will be shown in this entry.
  */
 function ErrorListEntry({
-  shipDetails,
-  pageChanger,
-  mapCenteringFun,
-}: AnomalyListEntryProps) {
-  const shipIconAltText = "Ship Icon";
-
-  const shipAnomalyScore = shipDetails.anomalyScore;
-  const color = calculateAnomalyColor(shipAnomalyScore);
-
-  const onClick = () => {
-    pageChanger({ currentPage: "objectDetails", shownShipId: shipDetails.id });
-    mapCenteringFun(shipDetails);
-  };
-
+  notification,
+}: ErrorListEntryProps) {
   return (
     <Stack
       direction="row"
-      className="anomaly-list-entry"
+      className="error-list-entry"
       spacing={0}
-      style={{ backgroundColor: color }}
-      onClick={onClick}
+      // style={{ backgroundColor: color }}
+      onClick={() => notification.wasRead = true}
     >
-      <span className="anomaly-list-entry-icon-container">
+      <span className="error-list-entry-icon-container">
         <img
-          src={shipIcon}
-          className="anomaly-list-entry-icon"
-          alt={shipIconAltText}
+          src={notification.getIcon()}
+          className="error-list-entry-icon"
+          alt={notification.severity}
         />
       </span>
-      <span className="anomaly-list-entry-score">{shipAnomalyScore} %</span>
+      <span className="error-list-entry-text">
+        <div className={notification.wasRead ? "error-list-entry-read" : "error-list-entry-not-read"}>
+        {notification.message}
+        </div>
+      </span>
+      <span className="error-list-entry-icon-container">
+        <img
+          src={trashIcon}
+          className="error-list-entry-trash-icon"
+          alt="Trash Icon"
+          onClick={() => ErrorNotificationService.removeNotification(notification.id)}
+        />
+      </span>
     </Stack>
   );
+
 }
 
 export default ErrorListEntry;

@@ -1,4 +1,4 @@
-/* This css file is meant for managing the root layout and the color shcemes */
+/* This css file is meant for managing the root layout and the color schemes. */
 
 :root {
 
@@ -17,6 +17,14 @@
 
     --object-details-entry-padding: 10px;
     --object-details-title-font-size: 1.4em;
+
+    --error-list-closing-icon-size: 20px;
+    --error-list-closing-icon-margin: 10px;
+
+    --error-list-entry-font-size: 0.8em;
+    --error-list-entry-height: 36px;
+    --error-list-entry-icon-size: 20px;
+    --error-list-entry-icon-container-width: 25px;
 
 }
 
