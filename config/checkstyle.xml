@@ -52,7 +52,6 @@
         </module>
 
         <module name="OuterTypeFilename"/>
-        <module name="AvoidStarImport"/>
         <module name="OneTopLevelClass"/>
         <module name="NoLineWrap"/>
         <module name="LeftCurly"/>
@@ -221,8 +220,7 @@
             <property name="throwsIndent" value="4"/>
             <property name="lineWrappingIndentation" value="4"/>
             <property name="arrayInitIndent" value="4"/>
-        </module>
-        <module name="OverloadMethodsDeclarationOrder"/>
+        </module
         <module name="VariableDeclarationUsageDistance"/>
         <module name="CustomImportOrder">
             <property name="separateLineBetweenGroups" value="true"/>
