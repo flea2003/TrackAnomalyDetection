@@ -9,6 +9,7 @@ import { MapExportedMethodsType } from "./components/Map/Map";
 
 import "./styles/common.css";
 import MiddleColumn from "./components/MiddleColumn/MiddleColumn";
+import ErrorNotificationService from "./services/ErrorNotificationService";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -22,10 +23,14 @@ function App() {
   // Create a reference to the map component
   const mapRef = React.useRef<MapExportedMethodsType>(null);
 
+  ErrorNotificationService.addInformation("App started");
+
   // Create a function that passes a ship-centering function call to the map component
   const mapCenteringFun = (details: ShipDetails) => {
     if (mapRef.current !== null) {
       mapRef.current.centerMapOntoShip(details);
+    } else {
+      ErrorNotificationService.addError("mapRef is null");
     }
   };
 

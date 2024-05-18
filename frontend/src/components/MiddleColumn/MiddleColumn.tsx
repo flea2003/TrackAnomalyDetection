@@ -38,6 +38,8 @@ function MiddleColumn({
       return <div>Notifications</div>;
     case "settings":
       return <div>Settings</div>;
+    case "errors":
+      return <div>Errors</div>;
     default:
       return <div></div>;
   }

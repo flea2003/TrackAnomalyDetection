@@ -7,6 +7,7 @@ import "../../styles/sidebar.css";
 import shipIcon from "../../assets/icons/ship.png";
 import bellIcon from "../../assets/icons/bell-notification.svg";
 import settingsIcon from "../../assets/icons/settings.svg";
+import bugIcon from "../../assets/icons/bug.svg";
 import { CurrentPage } from "../../App";
 
 interface SidebarProps {
@@ -25,6 +26,7 @@ function Sidebar({ pageChanger }: SidebarProps) {
   const shipIconAlt = "Ship Icon";
   const bellIconAlt = "Bell Icon";
   const settingsIconAlt = "Settings Icon";
+  const bugIconAlt = "Bug Icon";
 
   // Define the click handlers for the icons
   const onShipIconClicked = () =>
@@ -33,6 +35,8 @@ function Sidebar({ pageChanger }: SidebarProps) {
     pageChanger({ currentPage: "notifications", shownShipId: -1 });
   const onSettingsIconClicked = () =>
     pageChanger({ currentPage: "settings", shownShipId: -1 });
+  const onBugIconClicked = () =>
+    pageChanger({ currentPage: "errors", shownShipId: -1 });
 
   return (
     <Stack id="sidebar" data-testid="sidebar">
@@ -60,6 +64,13 @@ function Sidebar({ pageChanger }: SidebarProps) {
           className="sidebar-icon"
           alt={settingsIconAlt}
         />
+      </span>
+      <span
+        data-testid="sidebar-bug-icon"
+        className="sidebar-entry"
+        onClick={onBugIconClicked}
+      >
+        <img src={bugIcon} className="sidebar-icon" alt={bugIconAlt} />
       </span>
     </Stack>
   );
