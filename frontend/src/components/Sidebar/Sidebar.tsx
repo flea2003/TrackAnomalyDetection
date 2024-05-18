@@ -78,6 +78,11 @@ function Sidebar({ pageChanger }: SidebarProps) {
   );
 }
 
+/**
+ * Returns the colour that should be used for the bug icon in the sidebar.
+ * The background is transparent when there are no unread notifications,
+ * and has a light red (light coral) colour otherwise.
+ */
 function getBugBackgroundColor() {
   if (ErrorNotificationService.areAllRead()) {
     return "transparent";

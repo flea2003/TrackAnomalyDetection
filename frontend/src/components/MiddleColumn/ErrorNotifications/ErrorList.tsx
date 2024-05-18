@@ -52,6 +52,10 @@ function ErrorList({ pageChanger }: ErrorListProps) {
   );
 }
 
+/**
+ * Gets all error notifications, reverses them (so that the newest one is the first
+ * one), and returns a list of corresponding ErrorListEntry.
+ */
 function getErrorListEntries() {
   return ErrorNotificationService.getAllNotifications()
     .slice()
