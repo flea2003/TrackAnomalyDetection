@@ -39,7 +39,7 @@ public class SimpleScoreCalculator implements ScoreCalculationStrategy {
      */
     private DataStream<AnomalyInformation> consume(DataStream<Tuple2<AnomalyInformation, AnomalyInformation>> input) {
         return input.map(x -> new AnomalyInformation(x.f0.getScore() + x.f1.getScore(),
-            x.f0.getExplanation() + x.f1.getExplanation(),
+            x.f0.getExplanation() + " " + x.f1.getExplanation(),
             x.f0.getCorrespondingTimestamp(),
             x.f0.getId()));
     }
