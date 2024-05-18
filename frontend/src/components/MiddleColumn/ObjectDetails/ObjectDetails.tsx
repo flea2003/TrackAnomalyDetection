@@ -56,7 +56,7 @@ function shipNotFoundElement() {
   return (
     <Stack id="object-details-container">
       <span className="object-details-title">
-        Object ID:&nbsp;{" "}
+        Object ID:&nbsp;&nbsp;
         <span className="object-details-title-id">Not found</span>
       </span>
     </Stack>
