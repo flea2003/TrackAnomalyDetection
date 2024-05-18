@@ -275,57 +275,6 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Aggregates data to a resulting map.
-     *
-     * @param aggregatedShipDetails object that stores all needed data for a ship
-     * @param valueJson json value for a signal
-     * @param key hash value of the ship
-     * @return updated object that stores all needed data for a ship
-     */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key)
-            throws JsonProcessingException {
-        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
-
-        // If this is the first signal received, instantiate the past information as an empty list
-        if (aggregatedShipDetails.getPastInformation() == null)
-            aggregatedShipDetails.setPastInformation(new ArrayList<>());
-
-        ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
-        AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
-
-        // If the signal is AIS signal, add it to past information
-        if (shipInformation.getAnomalyInformation() == null) {
-            aggregatedShipDetails.getPastInformation().add(shipInformation);
-        } else if (shipInformation.getAisSignal() == null) {
-            // If the signal is Anomaly Information signal, attach it to a corresponding AIS signal
-
-            // Set the anomaly information to be the most recent one
-            // TODO: take care of proper format for the date
-            // TODO: CONSIDER ANOMALY INFO ARRIVING EARLIER THAN AIS SIGNAL
-            aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
-
-            // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
-            for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
-                ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
-
-                if (information.getAisSignal().getTimestamp().isEqual(anomalyInformation.getCorrespondingTimestamp())) {
-                    // Check that there are no problems with the data
-                    assert information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash());
-                    assert information.getShipHash().equals(anomalyInformation.getShipHash());
-
-                    information.setAnomalyInformation(anomalyInformation);
-                    aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
-                    break;
-                }
-            }
-        } else throw new RuntimeException("Something went wrong");
-
-        System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
-        return aggregatedShipDetails;
-    }
-
-
-    /**
      * Method that constructs a unified stream of anomaly information and AIS signals, wrapped in ShipInformation class.
      *
      * @param builder Streams builder
@@ -410,58 +359,94 @@ public class AnomalyDetectionPipeline {
      */
     public AnomalyInformation aggregateSignals(AnomalyInformation currentAnomaly, String valueJson, String key)
             throws JsonProcessingException {
-        // TODO: perhaps add the threshold to some configurations file!
-
-        // Convert the new anomaly information object from JSON
+        // Convert the new anomaly information object from JSON TODO: perhaps add the threshold to some conf file!
         AnomalyInformation newAnomaly = AnomalyInformation.fromJson(valueJson);
-
         // Check if the stored current anomaly object has null fields (meaning that the backend has restarted!)
         if (currentAnomaly.getCorrespondingTimestamp() == null) {
             try {
-
                 // Fetch the anomaly information that corresponds to the most recently saved notification
                 currentAnomaly = notificationService.getNewestNotificationForShip(key).getAnomalyInformation();
-
             } catch (NotFoundNotificationException e) {
-
                 // If there were no notifications saved (meaning that ship never became anomalous), save the current
                 // state as the newest anomaly object
                 currentAnomaly = newAnomaly;
-
                 if (currentAnomaly.getScore() >= notificationThreshold) {
-
                     // If that newest anomaly score exceeds the threshold, add a new notification to the database
                     // TODO: here also a query to the AIS signals database will have to take place, to retrieve a
                     //  corresponding AIS signal
-
                     notificationService.addNotification(newAnomaly);
                 }
             }
         }
-
         // If the current anomaly score exceeds the threshold, then we will for
         // TODO: when Victor merges, also logic for checking if new TYPES of anomalies emerged will need to be added
         if (currentAnomaly.getScore() >= notificationThreshold) {
-
             // Store the same anomaly object (although it does not matter which is stored currently)
             if (newAnomaly.getScore() >= notificationThreshold) {
                 newAnomaly = currentAnomaly;
             }
-
             // Otherwise, if the new anomaly score is lower, in the state we will store the new one.
         } else {
-
-            // Store the old anomaly object
             if (newAnomaly.getScore() < notificationThreshold) {
                 newAnomaly = currentAnomaly;
             } else {
-
                 // Otherwise, if now the anomaly exceeds the threshold, we need to store it in the database
-                // TODO: here also a query to the AIS signals database will have to take place, to retrieve a
-                //  corresponding AIS signal
+                // TODO: here also a query to the AIS signals database will have to take place, to retrieve
+                //  a corresponding AIS signal
                 notificationService.addNotification(newAnomaly);
             }
         }
         return newAnomaly;
     }
+
+    /**
+     * Aggregates data to a resulting map.
+     *
+     * @param aggregatedShipDetails object that stores all needed data for a ship
+     * @param valueJson json value for a signal
+     * @param key hash value of the ship
+     * @return updated object that stores all needed data for a ship
+     */
+    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key)
+            throws JsonProcessingException {
+        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
+
+        // If this is the first signal received, instantiate the past information as an empty list
+        if (aggregatedShipDetails.getPastInformation() == null)
+            aggregatedShipDetails.setPastInformation(new ArrayList<>());
+
+        ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
+        AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
+
+        // If the signal is AIS signal, add it to past information
+        if (shipInformation.getAnomalyInformation() == null) {
+            aggregatedShipDetails.getPastInformation().add(shipInformation);
+        } else if (shipInformation.getAisSignal() == null) {
+            // If the signal is Anomaly Information signal, attach it to a corresponding AIS signal
+
+            // Set the anomaly information to be the most recent one
+            // TODO: take care of proper format for the date
+            // TODO: CONSIDER ANOMALY INFO ARRIVING EARLIER THAN AIS SIGNAL
+            aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
+
+            // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
+            for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
+                ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
+
+                if (information.getAisSignal().getTimestamp().isEqual(anomalyInformation.getCorrespondingTimestamp())) {
+                    // Check that there are no problems with the data
+                    assert information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash());
+                    assert information.getShipHash().equals(anomalyInformation.getShipHash());
+
+                    information.setAnomalyInformation(anomalyInformation);
+                    aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
+                    break;
+                }
+            }
+        } else throw new RuntimeException("Something went wrong");
+
+        System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
+        return aggregatedShipDetails;
+    }
+
 }

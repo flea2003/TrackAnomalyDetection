@@ -12,6 +12,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
+@ToString
 @Getter
 @Setter
 public class Notification {

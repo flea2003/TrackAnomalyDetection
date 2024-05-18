@@ -7,6 +7,7 @@ import sp.exceptions.NotFoundNotificationException;
 import sp.model.Notification;
 import sp.repositories.NotificationRepository;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NotificationService {
@@ -37,7 +38,10 @@ public class NotificationService {
      * @return notification object
      */
     public Notification getNotificationById(Long id) throws NotFoundNotificationException {
-        return notificationRepository.findById(id).orElseThrow(NotFoundNotificationException::new);
+        Optional<Notification> notification = notificationRepository.findById(id);
+        if (notification.isPresent()) {
+            return notification.get();
+        } else throw new NotFoundNotificationException();
     }
 
     /**
@@ -76,7 +80,9 @@ public class NotificationService {
 
         Notification result = allNotifications.get(0);
         for (Notification notification : allNotifications) {
-            if (notification.getCorrespondingTimestamp().isAfter(result.getCorrespondingTimestamp())) {
+            if (notification.getCorrespondingTimestamp().isAfter(result.getCorrespondingTimestamp())
+                    || notification.getCorrespondingTimestamp().isEqual(result.getCorrespondingTimestamp())
+            ) {
                 result = notification;
             }
         }

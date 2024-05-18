@@ -2,17 +2,15 @@ package sp.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import sp.exceptions.NotFoundNotificationException;
 import sp.model.Notification;
 import sp.services.NotificationService;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,11 +56,16 @@ public class TestNotificationController {
 
     @Test
     void testGetNotificationByIdProper() throws NotFoundNotificationException {
-        assertThat(notificationController.getNotificationById(0L)).isEqualTo(ResponseEntity.ok(List.of(notification1)));
+        assertThat(notificationController.getNotificationById(0L)).isEqualTo(ResponseEntity.ok(notification1));
     }
 
     @Test
     void testGetNotificationByIdThrows() throws NotFoundNotificationException {
-        assertThat(notificationController.getNotificationById(4L)).isEqualTo(ResponseEntity.notFound());
+        assertThat(notificationController.getNotificationById(4L)).isEqualTo(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @Test
+    void testGetNotificationForAShip() throws NotFoundNotificationException {
+        assertThat(notificationController.getAllNotificationsForShip("hash2")).isEqualTo(ResponseEntity.ok(List.of(notification2, notification3)));
     }
 }
