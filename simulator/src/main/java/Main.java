@@ -23,7 +23,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
         // Example of creating a simulator
 
-        String topicName = "ships-AIS";
+        String topicName = "ships-raw-AIS";
         String serverName  = "localhost:9092";
         String dataSetName = "DEBS_DATASET_PUBLIC_second.csv";
         Timestamp startTime = new Timestamp(2015, 4, 15, 20, 25);

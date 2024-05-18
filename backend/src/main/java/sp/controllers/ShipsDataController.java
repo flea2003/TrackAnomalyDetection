@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -37,7 +37,7 @@ public class ShipsDataController {
      * @return AIS class object of the ship
      */
     @GetMapping("/ships/ais/{id}")
-    public ResponseEntity<AISSignal> getCurrentAISInformation(@PathVariable String id) {
+    public ResponseEntity<AISSignal> getCurrentAISInformation(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(this.shipsDataService.getCurrentAISInformation(id));
         } catch (NotExistingShipException e) {
@@ -54,7 +54,7 @@ public class ShipsDataController {
      * @return AnomalyInformation object for a specified ship
      */
     @GetMapping("/ships/anomaly/{id}")
-    public ResponseEntity<AnomalyInformation> getCurrentAnomalyInformation(@PathVariable String id) {
+    public ResponseEntity<AnomalyInformation> getCurrentAnomalyInformation(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(this.shipsDataService.getCurrentAnomalyInformation(id));
         } catch (NotExistingShipException e) {

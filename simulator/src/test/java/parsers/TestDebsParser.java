@@ -34,12 +34,12 @@ public class TestDebsParser {
                 .thenReturn(null);  // It could be common to return null t
         debsParser = new DEBSParser(reader);
         resultObject = new ArrayList<>();
-        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2024, 1, 27, 10, 10), "{\"shipHash\":\"0x97df717d828ac6df388396b8e48ec1299e837917\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"2024-01-27T10:10:00Z\",\"departurePort\":\"VALLETTA\"}"));
-        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2024, 1, 28, 10, 10), "{\"shipHash\":\"0xd7aeaeb3986186e3550aa68bd1561f8df9672d17\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2024-01-28T10:10:00Z\",\"departurePort\":\"CEUTA\"}"));}
+        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2024, 1, 27, 10, 10), "{\"producerID\":\"simulator\",\"shipHash\":\"0x97df717d828ac6df388396b8e48ec1299e837917\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"2024-01-27T10:10:00Z\",\"departurePort\":\"VALLETTA\"}"));
+        resultObject.add(new AbstractMap.SimpleEntry<>(new Timestamp(2024, 1, 28, 10, 10), "{\"producerID\":\"simulator\",\"shipHash\":\"0xd7aeaeb3986186e3550aa68bd1561f8df9672d17\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2024-01-28T10:10:00Z\",\"departurePort\":\"CEUTA\"}"));}
 
     @Test
     void testParseAISSignal() {
-        assertThat(debsParser.parseAISSignal(new String[]{"a", "1","2.0","3","4","5.5","27/01/2024 10:10", "c"})).isEqualTo(new AISSignal("a", 1F,2,3,4,5.5F,dateTime, "c"));
+        assertThat(debsParser.parseAISSignal(new String[]{"a", "1","2.0","3","4","5.5","27/01/2024 10:10", "c"})).isEqualTo(new AISSignal("simulator", "a", 1F,2,3,4,5.5F,dateTime, "c"));
     }
 
     @Test

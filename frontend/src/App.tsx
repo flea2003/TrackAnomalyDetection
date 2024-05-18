@@ -2,12 +2,12 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import { useState, useEffect } from "react";
 import Map from "./components/Map/Map";
-import { MapExportedMethodsType } from "./components/Map/Map";
 import AnomalyList from "./components/AnomalyList/AnomalyList";
 import Sidebar from "./components/Sidebar/Sidebar";
 import ObjectDetails from "./components/ObjectDetails/ObjectDetails";
 import ShipDetails from "./model/ShipDetails";
 import ShipService from "./services/ShipService";
+import { MapExportedMethodsType } from "./components/Map/Map";
 
 import "./styles/common.css";
 
@@ -16,7 +16,7 @@ import "./styles/common.css";
  */
 export interface CurrentPage {
   currentPage: string;
-  shownShipId: string;
+  shownShipId: number;
 }
 
 function App() {
@@ -33,7 +33,7 @@ function App() {
   // Create state for current page
   const [currentPage, setCurrentPage] = useState({
     currentPage: "none",
-    shownShipId: "",
+    shownShipId: -1,
   } as CurrentPage);
 
   // Create function that is called when the current page needs to be changed
@@ -43,7 +43,7 @@ function App() {
       newPage.currentPage === currentPage.currentPage
     ) {
       // If we clicked the same icon for the second time
-      setCurrentPage({ currentPage: "none", shownShipId: "" });
+      setCurrentPage({ currentPage: "none", shownShipId: -1 });
     } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);

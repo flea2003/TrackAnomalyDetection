@@ -78,7 +78,7 @@ class ShipService {
           // eslint-disable-next-line
           const aisResults: AISSignal[] = response.map((item: any) => {
             return {
-              id: item.shipHash,
+              id: item.id,
               speed: item.speed,
               long: item.longitude,
               lat: item.latitude,
@@ -112,12 +112,11 @@ class ShipService {
               if (item == null) {
                 return {
                   id: "null ship",
-                  description: "",
                   anomalyScore: -1,
                 };
               } else
                 return {
-                  id: item.shipHash,
+                  id: item.id,
                   description: item.explanation,
                   anomalyScore: item.score,
                 };
