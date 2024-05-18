@@ -1,7 +1,5 @@
 package sp.pipeline.scorecalculators.utils;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import org.apache.flink.api.java.tuple.Tuple2;

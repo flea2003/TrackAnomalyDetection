@@ -29,7 +29,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         if (pastAnomalyInformation != null && pastAISSignal != null) {
             double globeDistance = harvesineDistance(value.getLatitude(), value.getLongitude(),
                 pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
-            double time = Duration.between(getAisSignalValueState().value().getTimestamp(), value.getTimestamp()).toMinutes();
+            double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
             double computedSpeed = globeDistance / (time + 0.00001);
 
             boolean speedIsLow = computedSpeed <= 55.5;
