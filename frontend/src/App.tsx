@@ -55,7 +55,7 @@ function App() {
       case "anomalyList":
         return (
           <AnomalyList
-            ships={ships}
+            ships={Array.from(shipsWS.values())}
             pageChanger={pageChanger}
             mapCenteringFun={mapCenteringFun}
           />
@@ -63,7 +63,7 @@ function App() {
       case "objectDetails":
         return (
           <ObjectDetails
-            ships={ships}
+            ships={Array.from(shipsWS.values())}
             shipId={currentPage.shownShipId}
             pageChanger={pageChanger}
           />
@@ -77,26 +77,63 @@ function App() {
     }
   };
 
-  // Put the ships as state
-  const [ships, setShips] = useState<ShipDetails[]>([]);
+  // // Put the ships as state
+  // const [ships, setShips] = useState<ShipDetails[]>([]);
+  //
+  // // Every 1s update the anomaly score of all ships by querying the server
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     // Query for ships. When the results arrive, update the state
+  //     ShipService.queryBackendForShipsArray().then(
+  //       (shipsArray: ShipDetails[]) => {
+  //         setShips(shipsArray);
+  //       },
+  //     );
+  //   }, 1000);
+  // }, []);
 
-  // Every 1s update the anomaly score of all ships by querying the server
+  const [shipsWS, setShipsWS] = useState<Map<number, ShipDetails>>(new Map());
   useEffect(() => {
-    setInterval(() => {
-      // Query for ships. When the results arrive, update the state
-      ShipService.queryBackendForShipsArray().then(
-        (shipsArray: ShipDetails[]) => {
-          setShips(shipsArray);
-        },
-      );
-    }, 1000);
+    const socket = new WebSocket('ws://localhost:8081/ws');
+
+    socket.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data) as ShipDetails;
+        setShipsWS((prevShips) => {
+          const updatedShipsMap: Map<number, ShipDetails> = new Map(prevShips);
+          updatedShipsMap.set(message.id, message);
+          return updatedShipsMap;
+        });
+
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    socket.onopen = () => {
+      console.log("WebSocket connection openned");
+    }
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    }
+
+    socket.onerror = (error) => {
+      console.log("Websocket connection error", error);
+    }
+
+    return () => {
+      socket.close();
+    }
+
   }, []);
+
 
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
       <Stack direction="row">
-        <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
+        <Map ships={Array.from(shipsWS.values())} pageChanger={pageChanger} ref={mapRef} />
         {middleColumn()}
         <Sidebar pageChanger={pageChanger} />
       </Stack>
