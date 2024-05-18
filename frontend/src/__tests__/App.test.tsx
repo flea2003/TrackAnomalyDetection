@@ -102,7 +102,7 @@ test("When the close icon is clicked, the anomaly list is not present", async ()
   const shipIcon = screen.getByTestId("sidebar-ship-icon");
   await userEvent.click(shipIcon);
 
-  // Close the lsit
+  // Close the list
   const closeIcon = screen.getByTestId("anomaly-list-close-icon");
   await userEvent.click(closeIcon);
 

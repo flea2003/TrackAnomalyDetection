@@ -18,17 +18,11 @@ export interface CurrentPage {
   currentPage: string;
   shownShipId: number;
 }
-let tmp = false;
 
 function App() {
   // Create a reference to the map component
   const mapRef = React.useRef<MapExportedMethodsType>(null);
-  if (!tmp) {
-  ErrorNotificationService.addInformation("App started (info) a a a aa a a a a a aaaaa a aaaa aa aa aaaa aaa");
-  ErrorNotificationService.addWarning("App started (warning)");
-  ErrorNotificationService.addError("App started (error)");
-  tmp=true;
-  }
+
   // Create a function that passes a ship-centering function call to the map component
   const mapCenteringFun = (details: ShipDetails) => {
     if (mapRef.current !== null) {

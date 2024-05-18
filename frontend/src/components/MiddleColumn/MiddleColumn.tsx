@@ -4,6 +4,7 @@ import ObjectDetails from "./ObjectDetails/ObjectDetails";
 import React, { JSX } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import ErrorList from "./ErrorNotifications/ErrorList";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
 
 interface MiddleColumnProps {
   currentPage: CurrentPage;
@@ -40,9 +41,15 @@ function MiddleColumn({
     case "settings":
       return <div>Settings</div>;
     case "errors":
-      return <ErrorList pageChanger={pageChanger} />
-    default:
+      return <ErrorList pageChanger={pageChanger} />;
+    case "none":
       return <div></div>;
+    default: {
+      ErrorNotificationService.addWarning(
+        "MiddleColumn required page not found: " + currentPage.currentPage,
+      );
+      return <div></div>;
+    }
   }
 }
 

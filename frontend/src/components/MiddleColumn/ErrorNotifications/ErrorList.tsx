@@ -7,7 +7,9 @@ import closeIcon from "../../../assets/icons/close.svg";
 
 import "../../../styles/common.css";
 import "../../../styles/errorList.css";
-import ErrorNotificationService, { ErrorNotification } from "../../../services/ErrorNotificationService";
+import ErrorNotificationService, {
+  ErrorNotification,
+} from "../../../services/ErrorNotificationService";
 
 interface ErrorListProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -20,10 +22,7 @@ interface ErrorListProps {
  *
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
-function ErrorList({
-  pageChanger
-}: ErrorListProps) {
-
+function ErrorList({ pageChanger }: ErrorListProps) {
   return (
     <Stack id="error-list-container" data-testid="error-list-container">
       <Stack id="error-list-title-container" direction="row">
@@ -35,7 +34,11 @@ function ErrorList({
           onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
         />
 
-        <button onClick={() => ErrorNotificationService.markAllAsRead()}>
+        <button
+          id="error-list-mark-all-button"
+          data-testid="error-list-mark-all-button"
+          onClick={() => ErrorNotificationService.markAllAsRead()}
+        >
           Mark all as read
         </button>
       </Stack>
@@ -50,11 +53,12 @@ function ErrorList({
 }
 
 function getErrorListEntries() {
-  return ErrorNotificationService
-    .getAllNotifications()
-    .slice().reverse()
-    .map((notification: ErrorNotification, i: number) =>
-        <ErrorListEntry key={i} notification={notification} />)
+  return ErrorNotificationService.getAllNotifications()
+    .slice()
+    .reverse()
+    .map((notification: ErrorNotification, i: number) => (
+      <ErrorListEntry key={i} notification={notification} />
+    ));
 }
 
 export default ErrorList;

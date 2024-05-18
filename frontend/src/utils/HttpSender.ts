@@ -1,3 +1,5 @@
+import ErrorNotificationService from "../services/ErrorNotificationService";
+
 /**
  * Utility class that handles request sending to the backend
  */
@@ -14,13 +16,14 @@ class HttpSender {
     try {
       const response = await fetch(this.url + endpoint);
       if (!response.ok) {
-        throw new Error("Internal server error");
+        ErrorNotificationService.addError("Internal server error");
       }
       return await response.json();
     } catch (error) {
-      // Error handling
-      // TODO: Implement a smarter way to handle errors
-      console.log("Error: " + error);
+      if (error instanceof Error)
+        ErrorNotificationService.addError(error.message);
+
+      return null;
     }
   }
 }

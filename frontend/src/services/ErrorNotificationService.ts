@@ -1,11 +1,11 @@
-import errorSymbol from '../assets/icons/error-notifications/error.svg'
-import warningSymbol from '../assets/icons/error-notifications/warning.svg'
-import infoSymbol from '../assets/icons/error-notifications/info.svg'
+import errorSymbol from "../assets/icons/error-notifications/error.svg";
+import warningSymbol from "../assets/icons/error-notifications/warning.svg";
+import infoSymbol from "../assets/icons/error-notifications/info.svg";
 
 export enum ErrorSeverity {
   ERROR = "error",
   WARNING = "warning",
-  INFO = "information"
+  INFO = "information",
 }
 
 export class ErrorNotification {
@@ -36,7 +36,7 @@ export class ErrorNotification {
 }
 
 class ErrorNotificationService {
-  private static notifications: ErrorNotification[] = []
+  private static notifications: ErrorNotification[] = [];
 
   static addError(message: string) {
     this.addNotification(new ErrorNotification(message, ErrorSeverity.ERROR));
@@ -59,11 +59,13 @@ class ErrorNotificationService {
   }
 
   static markAllAsRead() {
-    this.notifications.forEach((notification) => {notification.wasRead = true})
+    this.notifications.forEach((notification) => {
+      notification.wasRead = true;
+    });
   }
 
   static areAllRead() {
-    return this.notifications.every(notification => notification.wasRead);
+    return this.notifications.every((notification) => notification.wasRead);
   }
 
   /**
@@ -72,9 +74,14 @@ class ErrorNotificationService {
    * @param id the id of the notification to remove.
    */
   static removeNotification(id: number) {
-    this.notifications = this.notifications.filter(notification => notification.id !== id);
+    this.notifications = this.notifications.filter(
+      (notification) => notification.id !== id,
+    );
   }
 
+  static clearAllNotifications() {
+    this.notifications = [];
+  }
 }
 
 export default ErrorNotificationService;

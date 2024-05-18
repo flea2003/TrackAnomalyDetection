@@ -3,6 +3,7 @@ import ShipDetails from "../model/ShipDetails";
 import HttpSender from "../utils/HttpSender";
 import AISSignal from "../dtos/AISSignal";
 import AnomalyInformation from "../dtos/AnomalyInformation";
+import ErrorNotificationService from "./ErrorNotificationService";
 
 class ShipService {
   static httpSender: HttpSender = new HttpSender();
@@ -19,7 +20,7 @@ class ShipService {
    * The method returns a promise that resolves to an array of ShipDetails.
    * @returns a promise that resolves to an array of ShipDetails.
    */
-  static queryBackendForShipsArray: () => Promise<ShipDetails[]> = () => {
+  static queryBackendForShipsArray: () => Promise<ShipDetails[]> = async () => {
     // Fetch the latest AIS signals of all monitored ships
     const AISResults = ShipService.getAllAISResults();
 
@@ -29,40 +30,27 @@ class ShipService {
     // As the resulting list of type ShipDetails is the result of an aggregation,
     // we have to wait for both Promise objects to resolve to lists as we can not
     // aggregate unresolved Promise objects
-    const result = Promise.all([AISResults, AnomalyInfoResults]).then(
-      ([aisResults, anomalyInfoResults]: [
-        AISSignal[],
-        AnomalyInformation[],
-      ]) => {
-        return aisResults.reduce(
-          (result: ShipDetails[], aisSignal: AISSignal) => {
-            // We match the AISSignal items based on the ID (hash) of the ship
-            const matchingAnomalyInfo = anomalyInfoResults.find(
-              (item) => item["id"] === aisSignal["id"],
-            );
-            if (matchingAnomalyInfo) {
-              // Compose a ShipDetails instance given the matching AISSignal and AnomalyInformation items
-              const shipDetailsItem = ShipService.createShipDetailsFromDTOs(
-                aisSignal,
-                matchingAnomalyInfo,
-              );
-              result.push(shipDetailsItem);
-            } else {
-              // no matching anomaly info
-              // TODO fix the handling of this case
-              const shipDetailsItem = ShipService.createShipDetailsFromDTOs(
-                aisSignal,
-                { id: aisSignal.id, anomalyScore: -1 },
-              );
-              result.push(shipDetailsItem);
-            }
-            return result;
-          },
-          [],
+    const result0 = await Promise.all([AISResults, AnomalyInfoResults]);
+    const [aisResults, anomalyInfoResults] = result0;
+    return aisResults.reduce((result: ShipDetails[], aisSignal: AISSignal) => {
+      // We match the AISSignal items based on the ID (hash) of the ship
+      const matchingAnomalyInfo = anomalyInfoResults.find(
+        (item) => item["id"] === aisSignal["id"],
+      );
+      if (matchingAnomalyInfo) {
+        // Compose a ShipDetails instance given the matching AISSignal and AnomalyInformation items
+        const shipDetailsItem = ShipService.createShipDetailsFromDTOs(
+          aisSignal,
+          matchingAnomalyInfo,
         );
-      },
-    );
-    return result;
+        result.push(shipDetailsItem);
+      } else {
+        ErrorNotificationService.addError(
+          "No matching anomaly info was found.",
+        );
+      }
+      return result;
+    }, []);
   };
 
   /**
@@ -70,29 +58,22 @@ class ShipService {
    * @returns - array of the latest DTOs that encapsulate the last received AIS info of the ships
    */
   static getAllAISResults: () => Promise<AISSignal[]> = () => {
-    return ShipService.httpSender
-      .get(ShipService.shipsAISEndpoint)
-      .then((response) => {
-        // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
-        if (Array.isArray(response) && response.length > 0) {
-          // eslint-disable-next-line
-          const aisResults: AISSignal[] = response.map((item: any) => {
-            return {
-              id: item.id,
-              speed: item.speed,
-              long: item.longitude,
-              lat: item.latitude,
-              course: item.course,
-              departurePort: item.departurePort,
-              heading: item.heading,
-              timestamp: item.timestamp,
-            };
-          });
-          return aisResults;
-        } else {
-          return [];
-        }
-      });
+    return getResponseMappedToArray(
+      ShipService.shipsAISEndpoint,
+      // eslint-disable-next-line
+      (item: any) => {
+        return {
+          id: item.id,
+          speed: item.speed,
+          long: item.longitude,
+          lat: item.latitude,
+          course: item.course,
+          departurePort: item.departurePort,
+          heading: item.heading,
+          timestamp: item.timestamp,
+        };
+      },
+    );
   };
 
   /**
@@ -100,32 +81,16 @@ class ShipService {
    * @returns - array of the latest DTOs that encapsulate the last anomaly info of the ships
    */
   static getAnomalyInfoResults: () => Promise<AnomalyInformation[]> = () => {
-    return ShipService.httpSender
-      .get(ShipService.shipsAnomalyInfoEndpoint)
-      .then((response) => {
-        // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
-        if (Array.isArray(response) && response.length > 0) {
-          const anomalyInfoResults: AnomalyInformation[] = response.map(
-            // eslint-disable-next-line
-            (item: any) => {
-              // TODO: fix this place (better handling of this case)
-              if (item == null) {
-                return {
-                  id: "null ship",
-                  anomalyScore: -1,
-                };
-              } else
-                return {
-                  id: item.id,
-                  anomalyScore: item.score,
-                };
-            },
-          );
-          return anomalyInfoResults;
-        } else {
-          return [];
-        }
-      });
+    return getResponseMappedToArray(
+      ShipService.shipsAnomalyInfoEndpoint,
+      // eslint-disable-next-line
+      (item: any) => {
+        return {
+          id: item.id,
+          anomalyScore: item.score,
+        };
+      },
+    );
   };
 
   /**
@@ -152,4 +117,43 @@ class ShipService {
     );
   }
 }
+
+/**
+ * Helper function that gets the response, and then checks if the response
+ * is an array which is non-empty. If it is an array and non-empty, then it
+ * calls the callback function.
+ *
+ * In case the result is not an array, or it is empty, then the notification
+ * is sent to ErrorNotificationService, and this method returns just an empty array.
+ *
+ * @param endpoint The path of the API endpoint which will be called.
+ * @param mapCallback The callback function that will be applied to each item in the array,
+ *  in order to map response elements to resulting array.
+ */
+async function getResponseMappedToArray<T, K>(
+  endpoint: string,
+  mapCallback: (item: T) => K,
+) {
+  const response = await ShipService.httpSender.get(endpoint);
+
+  if (!Array.isArray(response)) {
+    ErrorNotificationService.addError("Server returned not an array.");
+    return [];
+  }
+
+  if (response.length === 0) {
+    ErrorNotificationService.addInformation("Ship array is empty.");
+    return [];
+  }
+
+  const responseWithoutNulls = response.filter((item) => item != null);
+  if (responseWithoutNulls.length !== response.length) {
+    ErrorNotificationService.addError("Ship array contained null items.");
+  }
+
+  return responseWithoutNulls.map((item: T) => {
+    return mapCallback(item);
+  });
+}
+
 export default ShipService;
