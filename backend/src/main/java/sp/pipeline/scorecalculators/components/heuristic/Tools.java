@@ -25,7 +25,7 @@ public class Tools {
 
         double r = 6371;
 
-        return (float)(r * c);
+        return (float) (r * c);
     }
 
     /**
@@ -36,7 +36,7 @@ public class Tools {
      * @return - the computer metric of the difference.
      */
     public static float circularMetric(float deg1, float deg2) {
-        return (float)(180.0 - Math.abs(180 - (deg1 % 360 - deg2 % 360 + 360) % 360));
+        return (float) (180.0 - Math.abs(180 - (deg1 % 360 - deg2 % 360 + 360) % 360));
     }
 
 }

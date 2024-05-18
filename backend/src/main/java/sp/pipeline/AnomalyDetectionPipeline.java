@@ -309,16 +309,17 @@ public class AnomalyDetectionPipeline {
 
         // If the processed ShipInformation instance encapsulates a AISSignal instance:
         // update the current value of the AISSignal field
-        if (aisSignal != null
-                && aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp())) {
-            aggregatedShipDetails.setCurrentAISSignal(aisSignal);
+        if (aisSignal != null){
+            if(aggregatedShipDetails.getCurrentAISSignal() == null
+                || aggregatedShipDetails.getCurrentAISSignal().getTimestamp() == null
+                || aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp())){
+                aggregatedShipDetails.setCurrentAISSignal(aisSignal);
+            }
         }
 
         // If the processed ShipInformation instance encapsulates a AnomalyInformation instance:
         // update the current value of the AnomalyInformation field
-        if (anomalyInformation != null
-                && anomalyInformation.getCorrespondingTimestamp()
-                .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp())) {
+        if (anomalyInformation != null){
             aggregatedShipDetails.setCurrentAnomalyInformation(anomalyInformation);
         }
 
