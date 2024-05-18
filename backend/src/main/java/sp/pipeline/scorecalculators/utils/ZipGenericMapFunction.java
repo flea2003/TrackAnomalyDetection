@@ -27,7 +27,7 @@ public class ZipGenericMapFunction<T> {
     }
 
     /**
-     * Produces the class with one more neste merge.
+     * Produces the class with one more nested merge.
      *
      * @param stream - The stream we merge our currently tuple with
      * @return - The current class

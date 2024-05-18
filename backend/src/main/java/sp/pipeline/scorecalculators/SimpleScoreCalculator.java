@@ -4,7 +4,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.springframework.stereotype.Component;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.pipeline.scorecalculators.components.heuristic.SignalStatefulMapFunction;
 import sp.pipeline.scorecalculators.components.heuristic.SpeedStatefulMapFunction;
@@ -22,7 +22,7 @@ public class SimpleScoreCalculator implements ScoreCalculationStrategy {
      */
     @Override
     public DataStream<AnomalyInformation> setupFlinkAnomalyScoreCalculationPart(DataStream<AISSignal> source) {
-        KeyedStream<AISSignal, String> keyedStream = source.keyBy(AISSignal::getShipHash);
+        KeyedStream<AISSignal, Long> keyedStream = source.keyBy(AISSignal::getId);
 
         DataStream<AnomalyInformation> signalUpdates = keyedStream.map(new SignalStatefulMapFunction());
         DataStream<AnomalyInformation> speedUpdates = keyedStream.map(new SpeedStatefulMapFunction());
@@ -41,7 +41,7 @@ public class SimpleScoreCalculator implements ScoreCalculationStrategy {
         return input.map(x -> new AnomalyInformation(x.f0.getScore() + x.f1.getScore(),
             x.f0.getExplanation() + x.f1.getExplanation(),
             x.f0.getCorrespondingTimestamp(),
-            x.f0.getShipHash()));
+            x.f0.getId()));
     }
 
 }

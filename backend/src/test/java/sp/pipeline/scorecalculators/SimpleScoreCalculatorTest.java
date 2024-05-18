@@ -7,7 +7,7 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 import java.time.OffsetDateTime;
@@ -39,10 +39,10 @@ class SimpleScoreCalculatorTest {
     void testSetupFlinkAnomalyScoreCalculationPart() throws Exception {
         // create initial AISSignal objects
         // ais1 and ais2 are from the same ship
-        AISSignal ais1 = new AISSignal("ship1", 1, 2, 3, 4, 5, time1, "port1");
-        AISSignal ais2 = new AISSignal("ship1", 5, 20, 30, 40, 50, time2, "port1");
-        AISSignal ais3 = new AISSignal("ship1", 5, 20, 70, 0, 50, time3, "port1");
-        AISSignal ais4 = new AISSignal("ship2", 3, 200, 300, 400, 500, time3, "port2");
+        AISSignal ais1 = new AISSignal(1, 1, 2, 3, 4, 5, time1, "port1");
+        AISSignal ais2 = new AISSignal(1, 5, 20, 30, 20, 10, time2, "port1");
+        AISSignal ais3 = new AISSignal(1, 5, 20, 70, 0, 50, time3, "port1");
+        AISSignal ais4 = new AISSignal(2, 3, 200, 300, 400, 500, time3, "port2");
 
         // prepare flink environment and streams
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -60,12 +60,12 @@ class SimpleScoreCalculatorTest {
         List<AnomalyInformation> result = CollectSink.anomalyInfoList;
 
         assertThat(result).containsAll(List.of(
-            new AnomalyInformation(67f, "The ship's turning direction is anomalous.\n" +
-                "The time difference between consecutive AIS signals is anomalous.\n" +
-                "The ship's speed is ok.", time3, "ship1"),
-            new AnomalyInformation(0.0f, "The ship's turning direction is ok.\n" +
-                "The time difference between consecutive AIS signals is ok.\n" +
-                "The ship's speed is ok.", time3, "ship2")
+            new AnomalyInformation(100f, "The time difference between consecutive AIS signals is anomalous." +
+                "The ship's speed is anomalous." +
+                "The ship's turning direction is anomalous.", time3, (long)1),
+            new AnomalyInformation(0.0f, "The time difference between consecutive AIS signals is ok." +
+                "The ship's speed is ok." +
+                "The ship's turning direction is ok.", time3, (long)2)
         ));
 
     }

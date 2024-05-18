@@ -9,8 +9,8 @@ import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
-import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
+import sp.model.AISSignal;
 
 @Getter
 public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
@@ -69,9 +69,9 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
         // time is less than 30 minutes
         if (getLastDetectedAnomalyTime().value() != null
             && Duration.between(getLastDetectedAnomalyTime().value(), value.getTimestamp()).toMinutes() <= 30) {
-            anomalyInformation = new AnomalyInformation(anomalyScore, badMsg, value.getTimestamp(), value.getShipHash());
+            anomalyInformation = new AnomalyInformation(anomalyScore, badMsg, value.getTimestamp(), value.getId());
         } else {
-            anomalyInformation = new AnomalyInformation(0f, goodMsg, value.getTimestamp(), value.getShipHash());
+            anomalyInformation = new AnomalyInformation(0f, goodMsg, value.getTimestamp(), value.getId());
         }
         getAnomalyInformationValueState().update(anomalyInformation);
         getAisSignalValueState().update(value);

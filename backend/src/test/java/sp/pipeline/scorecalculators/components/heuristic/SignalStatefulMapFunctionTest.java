@@ -11,7 +11,7 @@ import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.operators.StreamMap;
 import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 import org.apache.flink.streaming.util.OneInputStreamOperatorTestHarness;
@@ -25,7 +25,7 @@ public class SignalStatefulMapFunctionTest {
         // There is only one signal so it is not anomalous
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
-        AISSignal aisSignal1 = new AISSignal("1", 20, 10, 10, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal1 = new AISSignal(1, 20, 10, 10, 20, 20, timestamp1, "Malta");
 
         try {
             OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
@@ -46,8 +46,8 @@ public class SignalStatefulMapFunctionTest {
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
         OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:59Z");
-        AISSignal aisSignal1 = new AISSignal("1", 20, 90, 30, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp2, "Malta");
+        AISSignal aisSignal1 = new AISSignal(1, 20, 90, 30, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 22, 11, 10, 20, 20, timestamp2, "Malta");
         try {
             OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
                 new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(signalStatefulMapFunction), x -> "1", Types.STRING);
@@ -72,8 +72,8 @@ public class SignalStatefulMapFunctionTest {
         signalStatefulMapFunction = new SignalStatefulMapFunction();
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
         OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:01Z");
-        AISSignal aisSignal1 = new AISSignal("1", 20, 60, 60, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal("1", 22, 11, 10, 20, 20, timestamp2, "Malta");
+        AISSignal aisSignal1 = new AISSignal(1, 20, 60, 60, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 22, 11, 10, 20, 20, timestamp2, "Malta");
         try {
             OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
                 new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(signalStatefulMapFunction), x -> "1", Types.STRING);
@@ -98,9 +98,9 @@ public class SignalStatefulMapFunctionTest {
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
         OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:01Z");
         OffsetDateTime timestamp3 = OffsetDateTime.parse("2024-12-30T05:33Z");
-        AISSignal aisSignal1 = new AISSignal("1", 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal("1", 12.8f, 11, 10, 20, 20, timestamp2, "Malta");
-        AISSignal aisSignal3 = new AISSignal("1", 0.0f, 11, 10, 20, 20, timestamp3, "Malta");
+        AISSignal aisSignal1 = new AISSignal(1, 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 12.8f, 11, 10, 20, 20, timestamp2, "Malta");
+        AISSignal aisSignal3 = new AISSignal(1, 0.0f, 11, 10, 20, 20, timestamp3, "Malta");
         try {
             OneInputStreamOperatorTestHarness<AISSignal, AnomalyInformation> testHarness =
                 new KeyedOneInputStreamOperatorTestHarness<>(new StreamMap<>(signalStatefulMapFunction), x -> "1", Types.STRING);

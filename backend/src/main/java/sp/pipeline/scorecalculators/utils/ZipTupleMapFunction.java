@@ -1,5 +1,7 @@
 package sp.pipeline.scorecalculators.utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -26,12 +28,14 @@ public class ZipTupleMapFunction {
 
             @Override
             public void flatMap1(AnomalyInformation value, Collector<Tuple2<AnomalyInformation, AnomalyInformation>> out) {
+                System.out.println("LIST1 - " + value);
                 list1.add(value);
                 emitTuple(out);
             }
 
             @Override
             public void flatMap2(AnomalyInformation value, Collector<Tuple2<AnomalyInformation, AnomalyInformation>> out) {
+                System.out.println("LIST2 - " + value);
                 list2.add(value);
                 emitTuple(out);
             }

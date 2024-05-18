@@ -112,6 +112,7 @@ class ShipService {
               if (item == null) {
                 return {
                   id: "null ship",
+                  description: "",
                   anomalyScore: -1,
                 };
               } else
