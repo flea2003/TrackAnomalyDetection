@@ -14,7 +14,6 @@ import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.services.ShipsDataService;
 
-
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 public class ShipsDataController {
