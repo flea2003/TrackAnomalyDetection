@@ -1,7 +1,6 @@
 package sp.pipeline;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;

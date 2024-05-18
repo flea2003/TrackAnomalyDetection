@@ -40,8 +40,7 @@
   },
   "eslintConfig": {
     "plugins": [
-      "@typescript-eslint",
-      "prettier"
+      "@typescript-eslint", "prettier"
     ],
     "extends": [
       "react-app",
@@ -52,7 +51,9 @@
       "prettier"
     ]
   },
-  "prettier": {},
+  "prettier": {
+
+  },
   "browserslist": {
     "production": [
       ">0.2%",
