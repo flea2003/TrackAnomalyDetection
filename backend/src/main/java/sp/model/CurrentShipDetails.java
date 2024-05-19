@@ -12,6 +12,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgn
 import org.apache.kafka.common.serialization.Serde;
 import sp.dtos.AnomalyInformation;
 import sp.utils.UtilsObjectMapper;
+import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
@@ -20,8 +21,8 @@ import sp.utils.UtilsObjectMapper;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 public class CurrentShipDetails implements Serializable {
-    private AnomalyInformation anomalyInformation;
-    private List<ShipInformation> pastInformation;
+    private AnomalyInformation currentAnomalyInformation;
+    private AISSignal currentAISSignal;
 
     /**
      * Get serializer+deserializer for CurrentShipDetails. I am using simple JSON serialization here.

@@ -1,6 +1,6 @@
 class ShipDetails {
   static rounding = 1000;
-  id: string;
+  id: number;
   heading: number;
   lat: number;
   lng: number;
@@ -11,12 +11,12 @@ class ShipDetails {
   speed: number;
 
   constructor(
-    id: string,
+    id: number,
     heading: number,
     lat: number,
     lng: number,
     anomalyScore: number,
-    explanation: string,
+    description: string,
     departurePort: string,
     course: number,
     speed: number,
@@ -26,7 +26,7 @@ class ShipDetails {
     this.lat = lat;
     this.lng = lng;
     this.anomalyScore = anomalyScore;
-    this.explanation = explanation;
+    this.explanation = description;
     this.departurePort = departurePort;
     this.course = course;
     this.speed = speed;

@@ -23,9 +23,9 @@ public class TestStream {
     Timestamp endTime;
     List<SimpleEntry<Timestamp, String>> resultingData;
     Stream stream;
-    String startSignal = "{\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"2024-01-27T10:10:00Z\",\"departurePort\":\"VALLETTA\"}";
-    String endSignal = "{\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2024-02-26T10:10:00Z\",\"departurePort\":\"CEUTA\"}";
-    String thirdSignal = "{\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2024-02-26T10:09:00Z\",\"departurePort\":\"CEUTA\"}";
+    String startSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"2024-01-27T10:10:00Z\",\"departurePort\":\"VALLETTA\"}";
+    String endSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2024-02-26T10:10:00Z\",\"departurePort\":\"CEUTA\"}";
+    String thirdSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2024-02-26T10:09:00Z\",\"departurePort\":\"CEUTA\"}";
 
     @BeforeEach
     void setUp() throws IOException {

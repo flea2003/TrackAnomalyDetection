@@ -14,11 +14,6 @@ import ShipDetails from "../../model/ShipDetails";
 
 import mapStyleConfig from "../../styles/mapConfig.json";
 
-interface MapProps {
-  ships: ShipDetails[];
-  pageChanger: (currentPage: CurrentPage) => void;
-}
-
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
  * @returns the created map
@@ -45,6 +40,11 @@ function getInitialMap() {
   });
 
   return initialMap;
+}
+
+interface MapProps {
+  ships: ShipDetails[];
+  pageChanger: (currentPage: CurrentPage) => void;
 }
 
 // Define the type of the ref object
@@ -100,9 +100,9 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
           icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
         })
           .addTo(map)
-          .bindPopup(ship.id)
+          .bindPopup("ID: " + ship.id)
           .on("click", (e) => {
-            map.setView(e.latlng, map.getZoom());
+            map.flyTo(e.latlng, map.getZoom());
             pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
           });
       });

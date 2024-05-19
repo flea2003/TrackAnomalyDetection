@@ -63,7 +63,7 @@ public record DEBSParser(BufferedReader reader) implements Parser {
         String departurePort = values[7];
         if (departurePort.endsWith("\n")) departurePort = departurePort.substring(0, departurePort.length() - 1);
 
-        return new AISSignal(shipHash, speed, lon, lat, course, heading, date, departurePort);
+        return new AISSignal("simulator", shipHash, speed, lon, lat, course, heading, date, departurePort);
     }
 
     /**

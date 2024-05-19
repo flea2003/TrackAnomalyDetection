@@ -16,7 +16,7 @@ ext {
 	scalaBinaryVersion = '_2.12'
 	slf4jVersion = '1.7.36'
 	log4jVersion = '2.17.1'
-	jacksonVersion = '2.17.0'
+	jacksonVersion = '2.15.0'
 }
 
 tasks.withType(JavaCompile) {
@@ -31,7 +31,19 @@ java {
 }
 
 bootRun{
-	jvmArgs = ["--add-opens=java.base/java.util=ALL-UNNAMED", "--add-opens=java.base/java.time=ALL-UNNAMED"]
+	jvmArgs = [
+			'--add-opens=java.base/java.util=ALL-UNNAMED',
+			'--add-opens=java.base/java.lang=ALL-UNNAMED',
+			'--add-opens=java.base/java.time=ALL-UNNAMED'
+	]
+}
+
+test {
+	jvmArgs += [
+			'--add-opens=java.base/java.util=ALL-UNNAMED',
+			'--add-opens=java.base/java.lang=ALL-UNNAMED',
+			'--add-opens=java.base/java.time=ALL-UNNAMED'
+	]
 }
 
 checkstyle {
@@ -56,15 +68,6 @@ configurations {
 }
 
 dependencies {
-	// https://mvnrepository.com/artifact/org.apache.kafka/kafka
-//	implementation group: 'org.apache.kafka', name: 'kafka_2.13', version: '3.7.0'
-
-//	implementation 'org.apache.kafka:kafka_2.13:3.7.0'
-//	implementation 'org.apache.kafka:kafka-clients:3.6.2'
-//	implementation 'org.springframework.kafka:spring-kafka:3.0.1'
-
-
-	// https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams-test-utils
 	testImplementation group: 'org.apache.kafka', name: 'kafka-streams-test-utils', version: '3.7.0'
 
 	implementation 'io.r2dbc:r2dbc-spi:0.9.0.RELEASE' // Check for the latest version
@@ -111,9 +114,12 @@ dependencies {
 	implementation group: 'org.apache.flink', name: 'flink-core', version: "${flinkVersion}"
 	implementation group: 'org.apache.flink', name: 'flink-queryable-state-client-java', version: "${flinkVersion}"
 	implementation "org.apache.flink:flink-queryable-state-runtime:${flinkVersion}"
-//	implementation 'org.apache.kafka:kafka-streams:3.7.0'
 	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.7.0'
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
+
+	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
+	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
+
 }
 
 // For Flink
