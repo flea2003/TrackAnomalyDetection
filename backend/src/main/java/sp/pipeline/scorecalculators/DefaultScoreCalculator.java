@@ -2,9 +2,9 @@ package sp.pipeline.scorecalculators;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.stereotype.Component;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
-import sp.pipeline.scorecalculators.components.SampleStatefulMapFunction;
+import sp.pipeline.scorecalculators.components.sample.SampleStatefulMapFunction;
 
 @Component
 public class DefaultScoreCalculator implements ScoreCalculationStrategy {
@@ -19,7 +19,7 @@ public class DefaultScoreCalculator implements ScoreCalculationStrategy {
     @Override
     public DataStream<AnomalyInformation> setupFlinkAnomalyScoreCalculationPart(DataStream<AISSignal> source) {
         return source
-                .keyBy(AISSignal::getShipHash)          // Group AIS signals by their ship hash
+                .keyBy(AISSignal::getId)                // Group AIS signals by their id
                 .map(new SampleStatefulMapFunction());  // Map each item to an AISUpdate object
     }
 }

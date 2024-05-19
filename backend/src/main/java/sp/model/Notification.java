@@ -12,13 +12,14 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
+@ToString
 @Getter
 @Setter
 public class Notification {
     private final Float score;
     private final String explanation;
     private final OffsetDateTime correspondingTimestamp;
-    private final String shipHash;
+    private final Long shipID;
     private final float longitude;
     private final float latitude;
 
@@ -27,20 +28,21 @@ public class Notification {
     private Long id;
 
     /**
-     * Constructor for the notification object
+     * Constructor for the notification object.
      *
      * @param score anomaly score
      * @param explanation anomaly explanation
      * @param correspondingTimestamp timestamp for the notification
-     * @param shipHash hash of the ship
+     * @param shipID id of the ship
      * @param longitude longitude
      * @param latitude longitude
      */
-    public Notification(Float score, String explanation, OffsetDateTime correspondingTimestamp, String shipHash, float longitude, float latitude) {
+    public Notification(Float score, String explanation, OffsetDateTime correspondingTimestamp, Long shipID,
+                        float longitude, float latitude) {
         this.score = score;
         this.explanation = explanation;
         this.correspondingTimestamp = correspondingTimestamp;
-        this.shipHash = shipHash;
+        this.shipID = shipID;
         this.longitude = longitude;
         this.latitude = latitude;
     }
@@ -57,17 +59,17 @@ public class Notification {
         this.score = anomalyInformation.getScore();
         this.explanation = anomalyInformation.getExplanation();
         this.correspondingTimestamp = anomalyInformation.getCorrespondingTimestamp();
-        this.shipHash = anomalyInformation.getShipHash();
+        this.shipID = anomalyInformation.getId();
         this.longitude = 0;
         this.latitude = 0;
     }
 
     /**
-     * Method that is used by the pipeline
+     * Method that is used by the pipeline.
      *
      * @return AnomalyInformation object
      */
     public AnomalyInformation getAnomalyInformation() {
-        return new AnomalyInformation(score, explanation, correspondingTimestamp, shipHash);
+        return new AnomalyInformation(score, explanation, correspondingTimestamp, shipID);
     }
 }
