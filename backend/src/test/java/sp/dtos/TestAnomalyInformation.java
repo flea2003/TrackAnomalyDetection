@@ -14,7 +14,7 @@ public class TestAnomalyInformation {
 
     @BeforeEach
     void setUp() {
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", -1F, OffsetDateTime.of(2004, 01, 27, 1,1,0,0, ZoneOffset.ofHours(0)), 1L);
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", OffsetDateTime.of(2004, 01, 27, 1,1,0,0, ZoneOffset.ofHours(0)), 1L);
     }
 
     @Test

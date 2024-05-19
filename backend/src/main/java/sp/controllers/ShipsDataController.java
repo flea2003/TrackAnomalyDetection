@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import sp.dtos.ExtendedAnomalyInformation;
 import sp.model.AISSignal;
-import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.services.ShipsDataService;
@@ -48,13 +48,14 @@ public class ShipsDataController {
     }
 
     /**
-     * Gets the anomaly score object of a specified ship.
+     * Gets the current and the max anomaly score object of a specified ship.
      *
      * @param id the id of the ship
      * @return AnomalyInformation object for a specified ship
      */
     @GetMapping("/ships/anomaly/{id}")
-    public ResponseEntity<AnomalyInformation> getCurrentAnomalyInformation(@PathVariable Long id) {
+    public ResponseEntity<ExtendedAnomalyInformation> getCurrentAnomalyInformation(
+            @PathVariable Long id) {
         try {
             return ResponseEntity.ok(this.shipsDataService.getCurrentAnomalyInformation(id));
         } catch (NotExistingShipException e) {
@@ -79,12 +80,12 @@ public class ShipsDataController {
     }
 
     /**
-     * Gets the current anomaly information of all ships.
+     * Gets the current and the max anomaly information of all ships.
      *
      * @return a list of anomaly information objects for all ships
      */
     @GetMapping("/ships/anomaly")
-    public ResponseEntity<List<AnomalyInformation>> getCurrentAnomalyInformationOfAllShips() {
+    public ResponseEntity<List<ExtendedAnomalyInformation>> getCurrentAnomalyInformationOfAllShips() {
         try {
             return ResponseEntity.ok(this.shipsDataService.getCurrentAnomalyInformationOfAllShips());
         } catch (PipelineException e) {

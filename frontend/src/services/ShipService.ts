@@ -2,7 +2,7 @@
 import ShipDetails from "../model/ShipDetails";
 import HttpSender from "../utils/HttpSender";
 import AISSignal from "../dtos/AISSignal";
-import AnomalyInformation from "../dtos/AnomalyInformation";
+import ExtendedAnomalyInformation from "../dtos/ExtendedAnomalyInformation";
 
 class ShipService {
   static httpSender: HttpSender = new HttpSender();
@@ -23,7 +23,7 @@ class ShipService {
     // Fetch the latest AIS signals of all monitored ships
     const AISResults = ShipService.getAllAISResults();
 
-    // Fetch the latest computed anomaly scores of all monitored ships
+    // Fetch the latest computed extended anomaly information of all monitored ships
     const AnomalyInfoResults = ShipService.getAnomalyInfoResults();
 
     // As the resulting list of type ShipDetails is the result of an aggregation,
@@ -32,13 +32,13 @@ class ShipService {
     const result = Promise.all([AISResults, AnomalyInfoResults]).then(
       ([aisResults, anomalyInfoResults]: [
         AISSignal[],
-        AnomalyInformation[],
+        ExtendedAnomalyInformation[],
       ]) => {
         return aisResults.reduce(
           (result: ShipDetails[], aisSignal: AISSignal) => {
             // We match the AISSignal items based on the ID (hash) of the ship
             const matchingAnomalyInfo = anomalyInfoResults.find(
-              (item) => item["id"] === aisSignal["id"],
+              (item) => item.anomalyInformation["id"] === aisSignal["id"],
             );
             if (matchingAnomalyInfo) {
               // Compose a ShipDetails instance given the matching AISSignal and AnomalyInformation items
@@ -52,7 +52,17 @@ class ShipService {
               // TODO fix the handling of this case
               const shipDetailsItem = ShipService.createShipDetailsFromDTOs(
                 aisSignal,
-                { id: aisSignal.id, description: "", anomalyScore: -1, maxAnomalyScore: -1 },
+                {
+                  anomalyInformation: {
+                    id: aisSignal.id,
+                    description: "",
+                    anomalyScore: -1,
+                  },
+                  maxAnomalyScoreInfo: {
+                    maxAnomalyScore: 0,
+                    correspondingTimestamp: "",
+                  },
+                },
               );
               result.push(shipDetailsItem);
             }
@@ -97,50 +107,64 @@ class ShipService {
 
   /**
    * Helper function that leverages the static instance of HttpSender in order to query the backend server
-   * @returns - array of the latest DTOs that encapsulate the last anomaly info of the ships
+   * @returns - array of the latest DTOs that encapsulate the last extended anomaly info of the ships
    */
-  static getAnomalyInfoResults: () => Promise<AnomalyInformation[]> = () => {
-    return ShipService.httpSender
-      .get(ShipService.shipsAnomalyInfoEndpoint)
-      .then((response) => {
-        // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
-        if (Array.isArray(response) && response.length > 0) {
-          const anomalyInfoResults: AnomalyInformation[] = response.map(
-            // eslint-disable-next-line
-            (item: any) => {
-              // TODO: fix this place (better handling of this case)
-              if (item == null) {
-                return {
-                  id: "null ship",
-                  description: "",
-                  anomalyScore: -1,
-                  maxAnomalyScore: -1,
-                };
-              } else
-                return {
-                  id: item.id,
-                  description: item.explanation,
-                  anomalyScore: item.score,
-                  maxAnomalyScore: item.maxAnomalyScore,
-                };
-            },
-          );
-          return anomalyInfoResults;
-        } else {
-          return [];
-        }
-      });
-  };
+  static getAnomalyInfoResults: () => Promise<ExtendedAnomalyInformation[]> =
+    () => {
+      return ShipService.httpSender
+        .get(ShipService.shipsAnomalyInfoEndpoint)
+        .then((response) => {
+          // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
+          if (Array.isArray(response) && response.length > 0) {
+            const anomalyInfoResults: ExtendedAnomalyInformation[] =
+              response.map(
+                // eslint-disable-next-line
+                (item: any) => {
+                  // TODO: fix this place (better handling of this case)
+                  if (item == null) {
+                    return {
+                      anomalyInformation: {
+                        id: "null ship",
+                        description: "",
+                        anomalyScore: -1,
+                      },
+                      maxAnomalyScoreInfo: {
+                        maxAnomalyScore: 0,
+                        correspondingTimestamp: "",
+                      },
+                    };
+                  } else
+                    return {
+                      anomalyInformation: {
+                        id: item.anomalyInformation.id,
+                        description: item.anomalyInformation.explanation,
+                        anomalyScore: item.anomalyInformation.score,
+                      },
+                      maxAnomalyScoreInfo: {
+                        maxAnomalyScore:
+                          item.maxAnomalyScoreInfo.maxAnomalyScore,
+                        correspondingTimestamp:
+                          item.maxAnomalyScoreInfo.correspondingTimestamp,
+                      },
+                    };
+                },
+              );
+            return anomalyInfoResults;
+          } else {
+            return [];
+          }
+        });
+    };
 
   /**
    * Helper function that takes 2 matching instances of AISSignal and AnomalyInformation
    * and creates a new instance of ShipDetails that incorporates the information from them.
    * @param aisSignal - the instance that encapsulates the AIS info of a ship
-   * @param anomalyInfo - the instance that encapsulates the anomaly info of a ship
+   * @param extAnomalyInfo - the instance that encapsulates the extended anomaly info of a ship
    */
   static createShipDetailsFromDTOs(
     aisSignal: AISSignal,
-    anomalyInfo: AnomalyInformation,
+    extAnomalyInfo: ExtendedAnomalyInformation,
   ): ShipDetails {
     // TODO: Modify the 'explanation' field of the ShipDetails instance
     return new ShipDetails(
@@ -148,9 +172,10 @@ class ShipService {
       aisSignal.heading,
       aisSignal.lat,
       aisSignal.long,
-      anomalyInfo.anomalyScore,
-      anomalyInfo.description,
-      anomalyInfo.maxAnomalyScore,
+      extAnomalyInfo.anomalyInformation.anomalyScore,
+      extAnomalyInfo.anomalyInformation.description,
+      extAnomalyInfo.maxAnomalyScoreInfo.maxAnomalyScore,
+      extAnomalyInfo.maxAnomalyScoreInfo.correspondingTimestamp,
       aisSignal.departurePort,
       aisSignal.course,
       aisSignal.speed,

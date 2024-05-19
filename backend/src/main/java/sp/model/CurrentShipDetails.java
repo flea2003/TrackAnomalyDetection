@@ -20,6 +20,7 @@ import java.io.Serializable;
 public class CurrentShipDetails implements Serializable {
     private AnomalyInformation currentAnomalyInformation;
     private AISSignal currentAISSignal;
+    private MaxAnomalyScoreDetails maxAnomalyScoreInfo;
 
     /**
      * Get serializer+deserializer for CurrentShipDetails. I am using simple JSON serialization here.

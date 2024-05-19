@@ -8,15 +8,16 @@ test("Rounding of latitude and longitude", () => {
     0.12034,
     0,
     "test",
-    -1,
+    0,
+    "time",
     "p1",
     1,
-    350.0,
+    350.0
   );
 
   // Test that the rounding is done correctly. Assumes that the rounding is 1000
-  expect(fake.getPropertyList()[8].value).toBe("0.123");
-  expect(fake.getPropertyList()[9].value).toBe("0.12");
+  expect(fake.getPropertyList()[9].value).toBe("0.123");
+  expect(fake.getPropertyList()[10].value).toBe("0.12");
 });
 
 test("getPropertyList returns a list of correct size", () => {
@@ -27,14 +28,15 @@ test("getPropertyList returns a list of correct size", () => {
     0.12034,
     0,
     "test",
-    -1,
+    0,
+    "time",
     "p1",
     1,
     350.0,
   );
 
   // Test that the list has the correct size
-  expect(fake.getPropertyList().length).toBe(11);
+  expect(fake.getPropertyList().length).toBe(12);
 });
 
 test("getPropertyList returns correct id", () => {
@@ -45,7 +47,8 @@ test("getPropertyList returns correct id", () => {
     0.12034,
     0,
     "test",
-    -1,
+    0,
+    "time",
     "p1",
     1,
     350.0,
@@ -63,7 +66,8 @@ test("getPropertyList returns correct anomaly score", () => {
     0.12034,
     0,
     "test",
-    -1,
+    0,
+    "time",
     "p1",
     1,
     350.0,
@@ -81,7 +85,8 @@ test("getPropertyList returns correct explanation", () => {
     0.12034,
     0,
     "test",
-    -1,
+    0,
+    "time",
     "p1",
     1,
     350.0,
@@ -99,12 +104,13 @@ test("getPropertyList returns correct heading", () => {
     0.12034,
     0,
     "test",
-    -1,
+    0,
+    "time",
     "p1",
     1,
     350.0,
   );
 
   // Test that the heading is correct
-  expect(fake.getPropertyList()[10].value).toBe("0");
+  expect(fake.getPropertyList()[11].value).toBe("0");
 });

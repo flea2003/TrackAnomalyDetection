@@ -7,6 +7,7 @@ class ShipDetails {
   anomalyScore: number;
   explanation: string;
   maxAnomalyScore: number;
+  correspondingTimestamp: string;
   departurePort: string;
   course: number;
   speed: number;
@@ -19,6 +20,7 @@ class ShipDetails {
     anomalyScore: number,
     description: string,
     maxAnomalyScore: number,
+    correspondingTimestamp: string,
     departurePort: string,
     course: number,
     speed: number,
@@ -30,7 +32,7 @@ class ShipDetails {
     this.anomalyScore = anomalyScore;
     this.explanation = description;
     this.maxAnomalyScore = maxAnomalyScore;
-    this.departurePort = departurePort;
+    this.correspondingTimestamp = this.departurePort = departurePort;
     this.course = course;
     this.speed = speed;
   }
@@ -49,6 +51,10 @@ class ShipDetails {
       {
         type: "Highest Recorded Anomaly Score",
         value: this.maxAnomalyScore + "%",
+      },
+      {
+        type: "Timestamp of the Highest Anomaly Score",
+        value: this.correspondingTimestamp,
       },
       { type: "Heading", value: "" + this.heading },
       { type: "Departure Port", value: "" + this.departurePort },

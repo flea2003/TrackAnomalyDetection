@@ -1,6 +1,7 @@
 package sp.pipeline;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -25,14 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.dtos.AnomalyInformation;
+import sp.dtos.ExtendedAnomalyInformation;
 import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
+import sp.model.MaxAnomalyScoreDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Objects;
 
 @Service
@@ -265,10 +266,11 @@ public class AnomalyDetectionPipeline {
 
     /**
      * Returns the current (last updated) anomaly scores of the ships in the system.
+     * Additionally return the current max anomaly score information of the ships in the system.
      *
-     * @return the current scores of the ships in the system.
+     * @return the current and max scores of the ships in the system.
      */
-    public HashMap<Long, AnomalyInformation> getCurrentScores() throws PipelineException {
+    public HashMap<Long, ExtendedAnomalyInformation> getCurrentScores() throws PipelineException {
         try {
             // Get the current state of the KTable
             final String storeName = this.state.queryableStoreName();
@@ -277,9 +279,11 @@ public class AnomalyDetectionPipeline {
             );
 
             // Create a copy of the state considering only the current AnomalyInformation values for each ship
-            HashMap<Long, AnomalyInformation> stateCopy = new HashMap<>();
+            HashMap<Long, ExtendedAnomalyInformation> stateCopy = new HashMap<>();
             try (KeyValueIterator<Long, CurrentShipDetails> iter = view.all()) {
-                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAnomalyInformation()));
+                iter.forEachRemaining(kv -> stateCopy
+                        .put(kv.key, new ExtendedAnomalyInformation(kv.value.getCurrentAnomalyInformation(),
+                                kv.value.getMaxAnomalyScoreInfo())));
             }
             return stateCopy;
 
@@ -317,6 +321,7 @@ public class AnomalyDetectionPipeline {
         }
     }
 
+
     /**
      * Aggregates data to a resulting map.
      *
@@ -349,19 +354,46 @@ public class AnomalyDetectionPipeline {
                 || anomalyInformation.getCorrespondingTimestamp()
                 .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp()))) {
 
-            // If the field currentAnomalyInformation of the aggregating object is not initialized
-            // consider the value of the highest recorded score to be -1
-            Float currentMaxAnomalyScore = aggregatedShipDetails.getCurrentAnomalyInformation() == null
-                    ? 0 : aggregatedShipDetails.getCurrentAnomalyInformation().getMaxAnomalyScore();
-            Float newMaxAnomalyScore = anomalyInformation.getScore() > currentMaxAnomalyScore
-                    ? anomalyInformation.getScore() : currentMaxAnomalyScore;
-            aggregatedShipDetails.setCurrentAnomalyInformation(
-                    new AnomalyInformation(anomalyInformation.getScore(), anomalyInformation.getExplanation(),
-                            newMaxAnomalyScore, anomalyInformation.getCorrespondingTimestamp(), anomalyInformation.getId())
-            );
+            aggregatedShipDetails.setCurrentAnomalyInformation(anomalyInformation);
+
+            // Update the value of the maxAnomalyScoreInfo field
+            MaxAnomalyScoreDetails updatedMaxAnomalyScoreDetails = updateMaxScoreDetails(aggregatedShipDetails,
+                    anomalyInformation);
+
+            aggregatedShipDetails.setMaxAnomalyScoreInfo(updatedMaxAnomalyScoreDetails);
+
         }
 
         return aggregatedShipDetails;
+    }
+
+    /**
+     * Utility method for updating the maxAnomalyScoreInfo filed of the streams aggregating object.
+     *
+     * @return - the updated MaxAnomalyScoreDetails instance
+     */
+    private MaxAnomalyScoreDetails updateMaxScoreDetails(CurrentShipDetails aggregatedShipDetails,
+                                                         AnomalyInformation anomalyInformation) {
+        // Given that we received a new AnomalyInformation signal we have to update
+        // the MaxAnomalyScoreDetails field
+        // If the field maxAnomalyScoreInfo of the aggregating object is not initialized:
+        // consider the value of the highest recorded score to be 0
+        // consider the value of the corresponding timestamp to be null
+        boolean isMaxScoreInitialized = aggregatedShipDetails.getMaxAnomalyScoreInfo() == null;
+
+        float currentMaxScore = isMaxScoreInitialized
+                ? 0 : aggregatedShipDetails.getMaxAnomalyScoreInfo().getMaxAnomalyScore();
+
+        float newMaxScore = currentMaxScore < anomalyInformation.getScore()
+                ? anomalyInformation.getScore() : currentMaxScore;
+
+        OffsetDateTime currentTimestamp = isMaxScoreInitialized
+                ? null : aggregatedShipDetails.getMaxAnomalyScoreInfo().getCorrespondingTimestamp();
+
+        OffsetDateTime newTimestamp = newMaxScore == anomalyInformation.getScore()
+                ? anomalyInformation.getCorrespondingTimestamp() : currentTimestamp;
+
+        return new MaxAnomalyScoreDetails(newMaxScore, newTimestamp);
     }
 
     /**

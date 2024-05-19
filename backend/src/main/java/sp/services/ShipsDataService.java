@@ -2,7 +2,7 @@ package sp.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sp.dtos.AnomalyInformation;
+import sp.dtos.ExtendedAnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
@@ -46,17 +46,18 @@ public class ShipsDataService {
     }
 
     /**
-     * Computes the current anomaly information for a specified ship.
+     * Computes the current and max anomaly score information for a specified ship.
      *
      * @param shipId the id of the ship
      * @return anomaly information for a specified ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(Long shipId) throws NotExistingShipException, PipelineException {
-        AnomalyInformation currentAnomalyInfo = anomalyDetectionPipeline.getCurrentScores().get(shipId);
-        if (currentAnomalyInfo == null) {
+    public ExtendedAnomalyInformation getCurrentAnomalyInformation(Long shipId)
+            throws NotExistingShipException, PipelineException {
+        ExtendedAnomalyInformation anomalyInfo = anomalyDetectionPipeline.getCurrentScores().get(shipId);
+        if (anomalyInfo == null) {
             throw new NotExistingShipException("Couldn't find such ship.");
         }
-        return currentAnomalyInfo;
+        return anomalyInfo;
     }
 
 
@@ -71,12 +72,12 @@ public class ShipsDataService {
     }
 
     /**
-     * Computes the current anomaly information of all ships.
+     * Computes the current and max anomaly score information of all ships.
      *
      * @return a list of anomaly information objects for all ships
      */
-    public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException {
-        HashMap<Long, AnomalyInformation> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
+    public List<ExtendedAnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException {
+        HashMap<Long, ExtendedAnomalyInformation> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
 
         return shipsInfo.values().stream().toList();
     }
