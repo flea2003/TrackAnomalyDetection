@@ -46,7 +46,7 @@ class ShipService {
         result.push(shipDetailsItem);
       } else {
         ErrorNotificationService.addError(
-          "No matching anomaly info was found.",
+          "No matching anomaly info was found",
         );
       }
       return result;
@@ -138,18 +138,18 @@ async function getResponseMappedToArray<T, K>(
   const response = await ShipService.httpSender.get(endpoint);
 
   if (!Array.isArray(response)) {
-    ErrorNotificationService.addError("Server returned not an array.");
+    ErrorNotificationService.addError("Server returned not an array");
     return [];
   }
 
   if (response.length === 0) {
-    ErrorNotificationService.addInformation("Ship array is empty.");
+    ErrorNotificationService.addInformation("Ship array is empty");
     return [];
   }
 
   const responseWithoutNulls = response.filter((item) => item != null);
   if (responseWithoutNulls.length !== response.length) {
-    ErrorNotificationService.addError("Ship array contained null items.");
+    ErrorNotificationService.addError("Ship array contained null items");
   }
 
   return responseWithoutNulls.map((item: T) => {

@@ -21,7 +21,7 @@ class HttpSender {
       return await response.json();
     } catch (error) {
       if (error instanceof Error)
-        ErrorNotificationService.addError(error.message);
+        ErrorNotificationService.addError("Error while fetching " + endpoint + ": " + error.message);
 
       return null;
     }

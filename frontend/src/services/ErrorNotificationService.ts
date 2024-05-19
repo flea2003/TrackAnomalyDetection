@@ -47,7 +47,11 @@ export class ErrorNotification {
  * the side of the map.
  */
 class ErrorNotificationService {
+
   private static notifications: ErrorNotification[] = [];
+
+  static savedNotificationsLimit = 100000; // will not store more notifications than this number
+  static returnedNotificationsLimit = 100; // will not return more notifications than this number
 
   /**
    * Adds an error to current list of notifications.
@@ -84,13 +88,29 @@ class ErrorNotificationService {
    */
   private static addNotification(notification: ErrorNotification) {
     this.notifications.push(notification);
+    this.checkNotificationLimit();
+  }
+
+  /**
+   * Checks if there are not too many notifications, and if there are,
+   * removes the oldest one (the first in the list).
+   */
+  public static checkNotificationLimit() {
+    if (this.notifications.length <= this.savedNotificationsLimit) {
+      return; // everything is fine
+    }
+
+    // remove the oldest notification
+    this.removeNotification(this.notifications[0].id);
   }
 
   /**
    * Gets all current notifications.
+   * If there are more notifications that the returnedNotificationsLimit, then
+   * only the most recent ones are returned.
    */
   static getAllNotifications() {
-    return this.notifications;
+    return this.notifications.slice(-this.returnedNotificationsLimit);
   }
 
   /**

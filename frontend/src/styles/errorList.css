@@ -2,9 +2,11 @@
     width: 20%;
     text-align: center;
     display: flex;
+    height: 100vh;
 }
 
 #error-list-internal-container {
+    overflow: scroll;
     height: 100%;
 }
 

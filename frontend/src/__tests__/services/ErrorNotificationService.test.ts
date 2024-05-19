@@ -5,6 +5,8 @@ import ErrorNotificationService, {
 
 afterEach(() => {
   ErrorNotificationService.clearAllNotifications();
+  ErrorNotificationService.savedNotificationsLimit = 100000; // bring back the limit if it was changed
+  ErrorNotificationService.returnedNotificationsLimit = 100; // in case it was changed
 });
 
 test("Notifications get assigned different IDs", () => {
@@ -83,6 +85,31 @@ test("removeNotification test", () => {
 
   notifications = ErrorNotificationService.getAllNotifications();
 
+  expect(notifications.length).toBe(1);
+  expect(notifications[0].message).toBe("warning");
+});
+
+test("the oldest notification is removed when called checkNotificationLimit", () => {
+  ErrorNotificationService.savedNotificationsLimit = 1; // arbitrarily lower the limit
+
+  ErrorNotificationService.addError("error");
+  ErrorNotificationService.addWarning("warning");
+
+  const notifications = ErrorNotificationService.getAllNotifications();
+
+  expect(notifications.length).toBe(1);
+  expect(notifications[0].message).toBe("warning");
+});
+
+test("get all notifications does not return more than the limit", () => {
+  ErrorNotificationService.returnedNotificationsLimit = 1; // arbitrarily lower the limit
+
+  ErrorNotificationService.addError("error");
+  ErrorNotificationService.addWarning("warning");
+
+  const notifications = ErrorNotificationService.getAllNotifications();
+
+  // should return the one most recent one
   expect(notifications.length).toBe(1);
   expect(notifications[0].message).toBe("warning");
 });
