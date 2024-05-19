@@ -1,13 +1,13 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
-import ShipDetails from "../../model/ShipDetails";
+import ShipDetails from "../../../model/ShipDetails";
 import ObjectDetailsEntry from "./ObjectDetailsEntry";
 
-import "../../styles/common.css";
-import "../../styles/objectDetails.css";
-import returnIcon from "../../assets/icons/back.svg";
-import { CurrentPage } from "../../App";
+import "../../../styles/common.css";
+import "../../../styles/objectDetails.css";
+import returnIcon from "../../../assets/icons/back.svg";
+import { CurrentPage } from "../../../App";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
@@ -29,20 +29,42 @@ function ObjectDetails(props: ObjectDetailsProps) {
 
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = allShips.find((ship) => ship.id === shipID);
+
   if (ship === undefined) {
-    return (
-      <Stack id="object-details-container">
-        <span className="object-details-title">
-          Object ID:&nbsp;{" "}
-          <span className="object-details-title-id">Not found</span>
-        </span>
-      </Stack>
-    );
+    return shipNotFoundElement();
   }
 
-  // Create a list of properties to display
+  return (
+    <Stack id="object-details-container">
+      <div className="object-details-title-container">
+        {getReturnIcon(pageChanger)}
+        <span className="object-details-title">Score {ship.anomalyScore}%</span>
+      </div>
+      <List
+        style={{ maxHeight: "100%", overflow: "auto" }}
+        className="object-details-list"
+      >
+        {getPropertyElements(ship)}
+      </List>
+    </Stack>
+  );
+}
+
+function shipNotFoundElement() {
+  return (
+    <Stack id="object-details-container">
+      <span className="object-details-title">
+        Object ID:&nbsp;&nbsp;
+        <span className="object-details-title-id">Not found</span>
+      </span>
+    </Stack>
+  );
+}
+
+function getPropertyElements(ship: ShipDetails) {
   const properties = ship.getPropertyList();
-  const propertyList = properties.map((property) => {
+
+  return properties.map((property) => {
     return (
       <ObjectDetailsEntry
         key={property.type}
@@ -51,9 +73,9 @@ function ObjectDetails(props: ObjectDetailsProps) {
       />
     );
   });
+}
 
-  // Define the return icon and its click handler
-
+function getReturnIcon(pageChanger: (currentPage: CurrentPage) => void) {
   const onReturnClicked = () => {
     pageChanger({ currentPage: "anomalyList", shownShipId: -1 });
   };
@@ -61,26 +83,12 @@ function ObjectDetails(props: ObjectDetailsProps) {
   const returnIconAlt = "Return Icon";
 
   return (
-    <Stack id="object-details-container">
-      <div className="object-details-title-container">
-        <img
-          src={returnIcon}
-          className="object-details-return-icon"
-          onClick={onReturnClicked}
-          alt={returnIconAlt}
-        />
-        <span className="object-details-title">
-          Object ID:&nbsp;{" "}
-          <span className="object-details-title-id">{ship.id}</span>{" "}
-        </span>
-      </div>
-      <List
-        style={{ maxHeight: "100%", overflow: "auto" }}
-        className="object-details-list"
-      >
-        {propertyList}
-      </List>
-    </Stack>
+    <img
+      src={returnIcon}
+      className="object-details-return-icon"
+      onClick={onReturnClicked}
+      alt={returnIconAlt}
+    />
   );
 }
 

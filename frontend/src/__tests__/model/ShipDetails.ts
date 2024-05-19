@@ -2,7 +2,7 @@ import ShipDetails from "../../model/ShipDetails";
 
 test("Rounding of latitude and longitude", () => {
   const fake = new ShipDetails(
-    "1",
+    1,
     0,
     0.123456,
     0.12034,
@@ -14,13 +14,12 @@ test("Rounding of latitude and longitude", () => {
   );
 
   // Test that the rounding is done correctly. Assumes that the rounding is 1000
-  expect(fake.getPropertyList()[7].value).toBe("0.123");
-  expect(fake.getPropertyList()[8].value).toBe("0.12");
+  expect(fake.getPropertyList()[2].value).toBe("0.123, 0.12");
 });
 
-test("getPropertyList returns a list of correct size", () => {
-  const fake = new ShipDetails(
-    "1",
+test("getPropertyList returns an expected list", () => {
+  const shipDetails = new ShipDetails(
+    1,
     0,
     0.123456,
     0.12034,
@@ -30,75 +29,21 @@ test("getPropertyList returns a list of correct size", () => {
     1,
     350.0,
   );
+
+  const properties = shipDetails.getPropertyList();
 
   // Test that the list has the correct size
-  expect(fake.getPropertyList().length).toBe(10);
-});
+  expect(properties.length).toBe(7);
 
-test("getPropertyList returns correct id", () => {
-  const fake = new ShipDetails(
-    "1",
-    0,
-    0.123456,
-    0.12034,
-    0,
-    "test",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the id is correct
-  expect(fake.getPropertyList()[0].value).toBe("Ship");
-});
-
-test("getPropertyList returns correct anomaly score", () => {
-  const fake = new ShipDetails(
-    "1",
-    0,
-    0.123456,
-    0.12034,
-    0,
-    "test",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the anomaly score is correct
-  expect(fake.getPropertyList()[1].value).toBe("0%");
-});
-
-test("getPropertyList returns correct explanation", () => {
-  const fake = new ShipDetails(
-    "1",
-    0,
-    0.123456,
-    0.12034,
-    0,
-    "test",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the explanation is correct
-  expect(fake.getPropertyList()[2].value).toBe("test");
-});
-
-test("getPropertyList returns correct heading", () => {
-  const fake = new ShipDetails(
-    "1",
-    0,
-    0.123456,
-    0.12034,
-    0,
-    "test",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the heading is correct
-  expect(fake.getPropertyList()[9].value).toBe("0");
+  // check each property
+  expect(properties[0]).toStrictEqual({ type: "Ship ID", value: "1" });
+  expect(properties[1]).toStrictEqual({ type: "Explanation", value: "test" });
+  expect(properties[2]).toStrictEqual({
+    type: "Position",
+    value: "0.123, 0.12",
+  });
+  expect(properties[3]).toStrictEqual({ type: "Speed", value: "350" });
+  expect(properties[4]).toStrictEqual({ type: "Heading", value: "0" });
+  expect(properties[5]).toStrictEqual({ type: "Departure", value: "p1" });
+  expect(properties[6]).toStrictEqual({ type: "Course", value: "1" });
 });
