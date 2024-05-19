@@ -38,9 +38,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
     <Stack id="object-details-container">
       <div className="object-details-title-container">
         {getReturnIcon(pageChanger)}
-        <span className="object-details-title">
-          Score {ship.anomalyScore}%
-        </span>
+        <span className="object-details-title">Score {ship.anomalyScore}%</span>
       </div>
       <List
         style={{ maxHeight: "100%", overflow: "auto" }}
