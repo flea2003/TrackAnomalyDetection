@@ -34,7 +34,6 @@ import sp.model.ShipInformation;
 import sp.pipeline.aggregators.CurrentStateAggregator;
 import sp.pipeline.aggregators.NotificationsAggregator;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
-
 import java.util.Objects;
 
 @Service

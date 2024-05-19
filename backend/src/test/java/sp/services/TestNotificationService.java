@@ -1,5 +1,6 @@
 package sp.services;
 
+import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.dtos.AnomalyInformation;
@@ -91,11 +92,26 @@ public class TestNotificationService {
     }
 
     @Test
+    void testGetNewestNotificationForShipValidEqualTime() throws NotFoundNotificationException {
+        Notification notification4 = new Notification(1F, "explanation",
+                OffsetDateTime.of(2004, 01, 27, 0, 3, 0, 0, ZoneOffset.ofHours(0)),
+                2L, 0, 0);
+        when(notificationRepository.findNotificationByShipID(2L)).thenReturn(List.of(notification2, notification4));
+
+
+        Notification notification = notificationService.getNewestNotificationForShip(2L);
+        assertThat(notification).isEqualTo(notification2);
+    }
+
+    @Test
     void testGetNewestNotificationForShipException() throws NotFoundNotificationException {
         assertThrows(NotFoundNotificationException.class, () -> notificationService.getNewestNotificationForShip(3L));
     }
 
     @Test
     void getAllNotifications() throws NotFoundNotificationException {
-        assertThat(notificationService.getAllNotifications()).isEqualTo(List.of(notification1, notification2, notification3));    }
+        assertThat(notificationService.getAllNotifications()).isEqualTo(List.of(notification1, notification2, notification3));
+    }
+
+
 }

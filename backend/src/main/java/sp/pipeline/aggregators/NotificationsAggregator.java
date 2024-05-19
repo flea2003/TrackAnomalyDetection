@@ -16,7 +16,7 @@ public class NotificationsAggregator {
     private final int notificationThreshold;
 
     /**
-     * Constructor for aggregator class
+     * Constructor for aggregator class.
      *
      * @param notificationService notifications service
      */
