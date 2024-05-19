@@ -53,7 +53,7 @@ function AnomalyListEntry({
           alt={shipIconAltText}
         />
       </span>
-      <span className="anomaly-list-entry-score">{shipAnomalyScore} %</span>
+      <span className="anomaly-list-entry-score">{shipAnomalyScore}%</span>
     </Stack>
   );
 }

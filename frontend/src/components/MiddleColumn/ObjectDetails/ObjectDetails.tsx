@@ -39,7 +39,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
       <div className="object-details-title-container">
         {getReturnIcon(pageChanger)}
         <span className="object-details-title">
-          Score: {ship.anomalyScore} %
+          Score {ship.anomalyScore}%
         </span>
       </div>
       <List
