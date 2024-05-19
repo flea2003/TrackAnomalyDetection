@@ -3,7 +3,7 @@ import MaxAnomalyScoreDetails from "./MaxAnomalyScoreDetails";
 
 interface ExtendedAnomalyInformation {
   anomalyInformation: AnomalyInformation;
-  maxAnomalyScoreInfo: MaxAnomalyScoreDetails;
+  maxAnomalyScoreDetails: MaxAnomalyScoreDetails;
 }
 
 export default ExtendedAnomalyInformation;

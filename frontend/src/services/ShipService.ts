@@ -58,7 +58,7 @@ class ShipService {
                     description: "",
                     anomalyScore: -1,
                   },
-                  maxAnomalyScoreInfo: {
+                  maxAnomalyScoreDetails: {
                     maxAnomalyScore: 0,
                     correspondingTimestamp: "",
                   },
@@ -116,7 +116,8 @@ class ShipService {
         .then((response) => {
           // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
           if (Array.isArray(response) && response.length > 0) {
-            const anomalyInfoResults: ExtendedAnomalyInformation[] =
+
+              const anomalyInfoResults: ExtendedAnomalyInformation[] =
               response.map(
                 // eslint-disable-next-line
                 (item: any) => {
@@ -128,25 +129,30 @@ class ShipService {
                         description: "",
                         anomalyScore: -1,
                       },
-                      maxAnomalyScoreInfo: {
+                      maxAnomalyScoreDetails: {
                         maxAnomalyScore: 0,
                         correspondingTimestamp: "",
                       },
                     };
-                  } else
-                    return {
-                      anomalyInformation: {
-                        id: item.anomalyInformation.id,
-                        description: item.anomalyInformation.explanation,
-                        anomalyScore: item.anomalyInformation.score,
-                      },
-                      maxAnomalyScoreInfo: {
-                        maxAnomalyScore:
-                          item.maxAnomalyScoreInfo.maxAnomalyScore,
-                        correspondingTimestamp:
-                          item.maxAnomalyScoreInfo.correspondingTimestamp,
-                      },
-                    };
+                  } else {
+                      const maxAnomScoreDet = item.maxAnomalyScoreDetails;
+                      console.log(maxAnomScoreDet);
+                      return {
+                          anomalyInformation: {
+                              id: item.anomalyInformation.id,
+                              description: item.anomalyInformation.explanation,
+                              anomalyScore: item.anomalyInformation.score,
+                          },
+                          maxAnomalyScoreDetails: {
+                              maxAnomalyScore:
+                              item.maxAnomalyScoreDetails
+                                  .maxAnomalyScore,
+                              correspondingTimestamp:
+                              item.maxAnomalyScoreDetails
+                                  .correspondingTimestamp,
+                          },
+                      };
+                  }
                 },
               );
             return anomalyInfoResults;
@@ -174,8 +180,8 @@ class ShipService {
       aisSignal.long,
       extAnomalyInfo.anomalyInformation.anomalyScore,
       extAnomalyInfo.anomalyInformation.description,
-      extAnomalyInfo.maxAnomalyScoreInfo.maxAnomalyScore,
-      extAnomalyInfo.maxAnomalyScoreInfo.correspondingTimestamp,
+      extAnomalyInfo.maxAnomalyScoreDetails.maxAnomalyScore,
+      extAnomalyInfo.maxAnomalyScoreDetails.correspondingTimestamp,
       aisSignal.departurePort,
       aisSignal.course,
       aisSignal.speed,

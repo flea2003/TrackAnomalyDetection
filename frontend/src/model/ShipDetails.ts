@@ -32,7 +32,8 @@ class ShipDetails {
     this.anomalyScore = anomalyScore;
     this.explanation = description;
     this.maxAnomalyScore = maxAnomalyScore;
-    this.correspondingTimestamp = this.departurePort = departurePort;
+    this.correspondingTimestamp = correspondingTimestamp;
+    this.departurePort = departurePort;
     this.course = course;
     this.speed = speed;
   }

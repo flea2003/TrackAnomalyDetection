@@ -78,7 +78,7 @@ public class ShipsDataService {
      */
     public List<ExtendedAnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException {
         HashMap<Long, ExtendedAnomalyInformation> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
-
+        System.out.println(shipsInfo);
         return shipsInfo.values().stream().toList();
     }
 }
