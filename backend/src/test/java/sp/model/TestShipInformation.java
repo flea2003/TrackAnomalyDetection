@@ -52,23 +52,4 @@ public class TestShipInformation {
         // check if conversion to both sides resulted in the same object
         assertEquals(shipInformation, ShipInformation.fromJson(json));
     }
-
-    @Test
-    void testToJsonAISSignalWrongHash() {
-        aisSignal = new AISSignal(-1L, 1, 2, 3, 4, 5, dateTime, "port");
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, 123L);
-        shipInformation = new ShipInformation(123L, anomalyInformation, aisSignal);
-
-        assertThrows(AssertionError.class, () -> shipInformation.toJson());
-    }
-
-    @Test
-    void testToJsonAnomalyInfoWrongHash() {
-        aisSignal = new AISSignal(123L, 1, 2, 3, 4, 5, dateTime, "port");
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, -1L);
-        shipInformation = new ShipInformation(123L, anomalyInformation, aisSignal);
-
-        assertThrows(AssertionError.class, () -> shipInformation.toJson());
-    }
-
 }

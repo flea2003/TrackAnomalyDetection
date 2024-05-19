@@ -26,16 +26,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.dtos.AnomalyInformation;
-import sp.exceptions.NotFoundNotificationException;
 import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
+import sp.pipeline.aggregators.CurrentStateAggregator;
+import sp.pipeline.aggregators.NotificationsAggregator;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
-import sp.services.NotificationService;
-import java.io.IOException;
-import java.util.HashMap;
+
 import java.util.Objects;
 
 @Service
@@ -53,15 +52,13 @@ public class AnomalyDetectionPipeline {
     private String kafkaServerAddress;
     private String kafkaStoreName;
 
-
     private final ScoreCalculationStrategy scoreCalculationStrategy;
     private final StreamUtils streamUtils;
-    private final Aggregator aggregator;
+    private final CurrentStateAggregator currentStateAggregator;
+    private final NotificationsAggregator notificationsAggregator;
 
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
-    private NotificationService notificationService;
-    private final int notificationThreshold;
     private KTable<Long, CurrentShipDetails> state;
 
 
@@ -72,14 +69,14 @@ public class AnomalyDetectionPipeline {
      */
     @Autowired
     public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy,
-                                    NotificationService notificationService, StreamUtils streamUtils, Aggregator aggregator)
+                                    StreamUtils streamUtils, CurrentStateAggregator currentStateAggregator,
+                                    NotificationsAggregator notificationsAggregator)
         throws IOException {
 
-        this.notificationService = notificationService;
-        notificationThreshold = 30;
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.streamUtils = streamUtils;
-        this.aggregator = aggregator;
+        this.currentStateAggregator = currentStateAggregator;
+        this.notificationsAggregator = notificationsAggregator;
 
         loadParametersFromConfigFile();
         buildPipeline();
@@ -121,6 +118,7 @@ public class AnomalyDetectionPipeline {
         StreamsBuilder builder = new StreamsBuilder();
 
         DataStream<AISSignal> streamWithAssignedIds = buildIdAssignmentPart();
+
         buildScoreCalculationPart(streamWithAssignedIds);
         buildScoreAggregationPart(builder);
         buildNotifications(builder);
@@ -225,7 +223,7 @@ public class AnomalyDetectionPipeline {
                         CurrentShipDetails::new,
                         (key, valueJson, aggregatedShipDetails) -> {
                             try {
-                                return aggregator.aggregateSignals(aggregatedShipDetails, valueJson);
+                                return currentStateAggregator.aggregateSignals(aggregatedShipDetails, valueJson);
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
@@ -397,7 +395,7 @@ public class AnomalyDetectionPipeline {
                         AnomalyInformation::new,
                         (key, valueJson, lastInformation) -> {
                             try {
-                                return aggregateNotificationSignals(lastInformation, valueJson, key);
+                                return notificationsAggregator.aggregateSignals(lastInformation, valueJson, key);
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
@@ -408,99 +406,6 @@ public class AnomalyDetectionPipeline {
                 );
         this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
-    }
-
-    /**
-     * Method that is responsible for aggregating the AnomalyInformation signals, and creating and storing new
-     * notifications.
-     *
-     * @param currentAnomaly AnomalyInformation object that corresponds to the most recently created notification
-     * @param valueJson JSON value of the AnomalyInformation object that just arrived
-     * @param key hash of the ship
-     * @return anomaly information that corresponds to the newest notification (so either the new anomaly information,
-     *      or the old one)
-     * @throws JsonProcessingException in case JSON value does not correspond to an AnomalyInformation object
-     */
-    public AnomalyInformation aggregateNotificationSignals(AnomalyInformation currentAnomaly, String valueJson, Long key)
-            throws JsonProcessingException {
-        // Convert the new anomaly information object from JSON TODO: perhaps add the threshold to some conf file!
-        AnomalyInformation newAnomaly = AnomalyInformation.fromJson(valueJson);
-        // Check if the stored current anomaly object has null fields (meaning that the backend has restarted!)
-        if (currentAnomaly.getCorrespondingTimestamp() == null) {
-            try {
-                // Fetch the anomaly information that corresponds to the most recently saved notification
-                currentAnomaly = notificationService.getNewestNotificationForShip(key).getAnomalyInformation();
-            } catch (NotFoundNotificationException e) {
-                // If there were no notifications saved (meaning that ship never became anomalous), save the current
-                // state as the newest anomaly object
-                currentAnomaly = newAnomaly;
-                if (currentAnomaly.getScore() >= notificationThreshold) {
-                    // If that newest anomaly score exceeds the threshold, add a new notification to the database
-                    // TODO: here also a query to the AIS signals database will have to take place, to retrieve a
-                    //  corresponding AIS signal
-                    notificationService.addNotification(newAnomaly);
-                }
-            }
-        }
-        // If the current anomaly score exceeds the threshold, then we will for
-        // TODO: when Victor merges, also logic for checking if new TYPES of anomalies emerged will need to be added
-        if (currentAnomaly.getScore() >= notificationThreshold) {
-            // Store the same anomaly object (although it does not matter which is stored currently)
-            if (newAnomaly.getScore() >= notificationThreshold) {
-                newAnomaly = currentAnomaly;
-            }
-            // Otherwise, if the new anomaly score is lower, in the state we will store the new one.
-        } else {
-            if (newAnomaly.getScore() < notificationThreshold) {
-                newAnomaly = currentAnomaly;
-            } else {
-                // Otherwise, if now the anomaly exceeds the threshold, we need to store it in the database
-                // TODO: here also a query to the AIS signals database will have to take place, to retrieve
-                //  a corresponding AIS signal
-                notificationService.addNotification(newAnomaly);
-            }
-        }
-        return newAnomaly;
-    }
-
-    /**
-     * Aggregates data to a resulting map.
-     *
-     * @param aggregatedShipDetails object that stores the latest received data for a ship
-     * @param valueJson json value for a signal
-     * @param key hash value of the ship
-     * @return updated object that stores all needed data for a ship
-     */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, Long key)
-            throws JsonProcessingException {
-
-        ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
-        AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
-        AISSignal aisSignal = shipInformation.getAisSignal();
-
-        // Boolean to check if the current aggregated ship details object has not yet been fully initialized
-        // i.e., if either no AISSignal or AnomalyInformation has been set yet
-        boolean shipDetailsNotInitialized = aggregatedShipDetails.getCurrentAISSignal() == null
-                || aggregatedShipDetails.getCurrentAnomalyInformation() == null;
-
-        // If the processed ShipInformation instance encapsulates a AISSignal instance:
-        // update the current value of the AISSignal field
-        if (aisSignal != null && (shipDetailsNotInitialized
-                || aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp()))
-        ) {
-            aggregatedShipDetails.setCurrentAISSignal(aisSignal);
-        }
-
-        // If the processed ShipInformation instance encapsulates a AnomalyInformation instance:
-        // update the current value of the AnomalyInformation field
-        if (anomalyInformation != null
-                && (shipDetailsNotInitialized || anomalyInformation.getCorrespondingTimestamp()
-                .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp()))
-        ) {
-            aggregatedShipDetails.setCurrentAnomalyInformation(anomalyInformation);
-        }
-
-        return aggregatedShipDetails;
     }
 
     /**

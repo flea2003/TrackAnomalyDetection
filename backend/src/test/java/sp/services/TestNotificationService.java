@@ -94,4 +94,8 @@ public class TestNotificationService {
     void testGetNewestNotificationForShipException() throws NotFoundNotificationException {
         assertThrows(NotFoundNotificationException.class, () -> notificationService.getNewestNotificationForShip(3L));
     }
+
+    @Test
+    void getAllNotifications() throws NotFoundNotificationException {
+        assertThat(notificationService.getAllNotifications()).isEqualTo(List.of(notification1, notification2, notification3));    }
 }

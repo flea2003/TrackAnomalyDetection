@@ -3,8 +3,11 @@ package sp.pipeline;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import sp.pipeline.aggregators.CurrentStateAggregator;
+import sp.pipeline.aggregators.NotificationsAggregator;
 import sp.pipeline.scorecalculators.DefaultScoreCalculator;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
+import sp.services.NotificationService;
 
 import java.io.IOException;
 
@@ -18,9 +21,9 @@ class AnomalyDetectionPipelineTest {
     void successfulLoad() throws Exception {
         ScoreCalculationStrategy scoreCalculationStrategy = new DefaultScoreCalculator();
         StreamUtils streamUtils = new StreamUtils("kafka-connection.properties");
-        Aggregator aggregator = new Aggregator();
+        CurrentStateAggregator currentStateAggregator = new CurrentStateAggregator();
         AnomalyDetectionPipeline pipeline = new AnomalyDetectionPipeline(
-                scoreCalculationStrategy, streamUtils, aggregator
+                scoreCalculationStrategy, streamUtils, currentStateAggregator,  new NotificationsAggregator(mock(NotificationService.class))
         );
 
         assertNotNull(pipeline);
@@ -35,7 +38,7 @@ class AnomalyDetectionPipelineTest {
         when(streamUtils.loadConfig()).thenThrow(new IOException());
 
         assertThrows(IOException.class, () -> new AnomalyDetectionPipeline(
-                scoreCalculationStrategy, streamUtils, new Aggregator()
+                scoreCalculationStrategy, streamUtils, new CurrentStateAggregator(),  new NotificationsAggregator(mock(NotificationService.class))
         ));
     }
 
@@ -47,7 +50,7 @@ class AnomalyDetectionPipelineTest {
         when(streamUtils.loadConfig()).thenReturn(null);
 
         assertThrows(IOException.class, () -> new AnomalyDetectionPipeline(
-                scoreCalculationStrategy, streamUtils, new Aggregator()
+                scoreCalculationStrategy, streamUtils, new CurrentStateAggregator(), new NotificationsAggregator(mock(NotificationService.class))
         ));
     }
 }
