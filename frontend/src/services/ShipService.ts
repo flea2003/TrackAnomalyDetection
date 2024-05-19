@@ -62,11 +62,11 @@ class ShipService {
    * @param item - the received JSON object
    * @return - dummy ShipDetails object
    */
-  static extractCurrentShipDetails: (item: any) => ShipDetails = (item) => {
+  static extractCurrentShipDetails: (item: APIResponseItem) => ShipDetails = (item) => {
     if (
       !item.aisInformation &&
-      item.anomalyInformation &&
-      item.maxAnomalyScoreDetails
+        (item.anomalyInformation &&
+        item.maxAnomalyScoreDetails)
     ) {
       return new ShipDetails(
         item.anomalyInformation.id,
@@ -74,7 +74,7 @@ class ShipService {
         0,
         0,
         item.anomalyInformation.anomalyScore,
-        item.anomalyInformation.description,
+        item.anomalyInformation.explanation,
         item.maxAnomalyScoreDetails.maxAnomalyScore,
         item.maxAnomalyScoreDetails.correspondingTimestamp,
         "",
@@ -89,8 +89,8 @@ class ShipService {
       return new ShipDetails(
         item.aisInformation.id,
         item.aisInformation.heading,
-        item.aisInformation.lat,
-        item.aisInformation.lng,
+        item.aisInformation.latitude,
+        item.aisInformation.longitude,
         -1,
         "",
         0,
@@ -100,7 +100,19 @@ class ShipService {
         item.aisInformation.speed,
       );
     } else {
-      return ShipService.dummyShipDetails();
+      return new ShipDetails(
+          item.aisInformation.id,
+          item.aisInformation.heading,
+          item.aisInformation.latitude,
+          item.aisInformation.longitude,
+          item.anomalyInformation.anomalyScore,
+          item.anomalyInformation.explanation,
+          item.maxAnomalyScoreDetails.maxAnomalyScore,
+          item.maxAnomalyScoreDetails.correspondingTimestamp,
+          item.aisInformation.departurePort,
+          item.aisInformation.course,
+          item.aisInformation.speed,
+      );
     }
   };
 }
