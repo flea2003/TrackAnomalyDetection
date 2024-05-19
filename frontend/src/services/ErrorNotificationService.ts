@@ -47,7 +47,6 @@ export class ErrorNotification {
  * the side of the map.
  */
 class ErrorNotificationService {
-
   private static notifications: ErrorNotification[] = [];
 
   static savedNotificationsLimit = 100000; // will not store more notifications than this number
