@@ -5,6 +5,8 @@
     text-align: left;
     padding-left: var(--object-details-entry-padding);
     border-bottom: 1px dotted gray;
+
+    font-size: var(--object-details-entry-font-size);
 }
 
 .object-details-entry-type {

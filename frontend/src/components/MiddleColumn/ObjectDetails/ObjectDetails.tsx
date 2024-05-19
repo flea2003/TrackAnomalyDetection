@@ -40,9 +40,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
     <Stack id="object-details-container">
       <div className="object-details-title-container">
         {getReturnIcon(pageChanger)}
-        <span className="object-details-title">
-          Score: {ship.anomalyScore} %
-        </span>
+        <span className="object-details-title">Score {ship.anomalyScore}%</span>
       </div>
       <List
         style={{ maxHeight: "100%", overflow: "auto" }}
@@ -58,7 +56,7 @@ function shipNotFoundElement() {
   return (
     <Stack id="object-details-container">
       <span className="object-details-title">
-        Object ID:&nbsp;{" "}
+        Object ID:&nbsp;&nbsp;
         <span className="object-details-title-id">Not found</span>
       </span>
     </Stack>

@@ -87,6 +87,7 @@ class ShipService {
       (item: any) => {
         return {
           id: item.id,
+          description: item.explanation,
           anomalyScore: item.score,
         };
       },
@@ -110,7 +111,7 @@ class ShipService {
       aisSignal.lat,
       aisSignal.long,
       anomalyInfo.anomalyScore,
-      "",
+      anomalyInfo.description,
       aisSignal.departurePort,
       aisSignal.course,
       aisSignal.speed,

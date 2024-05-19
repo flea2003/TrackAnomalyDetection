@@ -3,13 +3,13 @@ import Stack from "@mui/material/Stack";
 import { useState, useEffect } from "react";
 import Map from "./components/Map/Map";
 import Sidebar from "./components/Sidebar/Sidebar";
+import MiddleColumn from "./components/MiddleColumn/MiddleColumn";
 import ShipDetails from "./model/ShipDetails";
 import ShipService from "./services/ShipService";
 import { MapExportedMethodsType } from "./components/Map/Map";
+import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
-import MiddleColumn from "./components/MiddleColumn/MiddleColumn";
-import ErrorNotificationService from "./services/ErrorNotificationService";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.

@@ -4,7 +4,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
-import sp.pipeline.scorecalculators.components.SampleStatefulMapFunction;
+import sp.pipeline.scorecalculators.components.sample.SampleStatefulMapFunction;
 
 @Component
 public class DefaultScoreCalculator implements ScoreCalculationStrategy {

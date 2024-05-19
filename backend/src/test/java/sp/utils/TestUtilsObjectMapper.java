@@ -1,7 +1,6 @@
 package sp.utils;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

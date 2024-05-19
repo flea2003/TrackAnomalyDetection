@@ -16,7 +16,9 @@
     --object-details-return-icon-margin: 10px;
 
     --object-details-entry-padding: 10px;
-    --object-details-title-font-size: 1.4em;
+    --object-details-title-font-size: 1.2em;
+    --object-details-title-height: 50px;
+    --object-details-entry-font-size: 0.8em;
 
     --error-list-closing-icon-size: 20px;
     --error-list-closing-icon-margin: 10px;

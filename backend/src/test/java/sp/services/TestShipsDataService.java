@@ -12,6 +12,7 @@ import sp.pipeline.AnomalyDetectionPipeline;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -145,6 +146,18 @@ public class TestShipsDataService {
     void CurrentAnomalyInformationOfAllShipsExceptionTest(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentAnomalyInformationOfAllShips())
                 .isInstanceOf(PipelineException.class);
+    }
+
+    @Test
+    void testGetCurrentAISInformationOfAllShips() throws PipelineException {
+        List<AISSignal> result = shipsDataService.getCurrentAISInformationOfAllShips();
+        assertThat(result).containsExactly(signal3, signal2, signal5, signal6);
+    }
+
+    @Test
+    void testGetCurrentAnomalyInformationOfAllShips() throws PipelineException {
+        List<AnomalyInformation> result = shipsDataService.getCurrentAnomalyInformationOfAllShips();
+        assertThat(result).containsExactly(mapAnomalyInformation.values().toArray(new AnomalyInformation[0]));
     }
 }
 
