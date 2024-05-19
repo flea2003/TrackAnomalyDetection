@@ -116,8 +116,7 @@ class ShipService {
         .then((response) => {
           // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
           if (Array.isArray(response) && response.length > 0) {
-
-              const anomalyInfoResults: ExtendedAnomalyInformation[] =
+            const anomalyInfoResults: ExtendedAnomalyInformation[] =
               response.map(
                 // eslint-disable-next-line
                 (item: any) => {
@@ -135,23 +134,21 @@ class ShipService {
                       },
                     };
                   } else {
-                      const maxAnomScoreDet = item.maxAnomalyScoreDetails;
-                      console.log(maxAnomScoreDet);
-                      return {
-                          anomalyInformation: {
-                              id: item.anomalyInformation.id,
-                              description: item.anomalyInformation.explanation,
-                              anomalyScore: item.anomalyInformation.score,
-                          },
-                          maxAnomalyScoreDetails: {
-                              maxAnomalyScore:
-                              item.maxAnomalyScoreDetails
-                                  .maxAnomalyScore,
-                              correspondingTimestamp:
-                              item.maxAnomalyScoreDetails
-                                  .correspondingTimestamp,
-                          },
-                      };
+                    const maxAnomScoreDet = item.maxAnomalyScoreDetails;
+                    console.log(maxAnomScoreDet);
+                    return {
+                      anomalyInformation: {
+                        id: item.anomalyInformation.id,
+                        description: item.anomalyInformation.explanation,
+                        anomalyScore: item.anomalyInformation.score,
+                      },
+                      maxAnomalyScoreDetails: {
+                        maxAnomalyScore:
+                          item.maxAnomalyScoreDetails.maxAnomalyScore,
+                        correspondingTimestamp:
+                          item.maxAnomalyScoreDetails.correspondingTimestamp,
+                      },
+                    };
                   }
                 },
               );
