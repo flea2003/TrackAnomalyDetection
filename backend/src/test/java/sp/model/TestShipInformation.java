@@ -43,10 +43,8 @@ public class TestShipInformation {
 
     @Test
     void testToJsonNullAISSignal() throws JsonProcessingException {
-        String shipHash = "ship1";
-
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, shipHash);
-        shipInformation = new ShipInformation(shipHash, anomalyInformation, null);
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, 123L);
+        shipInformation = new ShipInformation(123L, anomalyInformation, null);
 
         String json = shipInformation.toJson();
         // check if conversion to both sides resulted in the same object
@@ -55,7 +53,7 @@ public class TestShipInformation {
 
     @Test
     void testToJsonNullAnomalyInformation() throws JsonProcessingException {
-        String shipHash = "ship1";
+        long shipHash = 123L;
 
         aisSignal = new AISSignal(shipHash, 1, 2, 3, 4, 5, dateTime, "port");
         shipInformation = new ShipInformation(shipHash, null, aisSignal);
@@ -67,18 +65,18 @@ public class TestShipInformation {
 
     @Test
     void testToJsonAISSignalWrongHash() {
-        aisSignal = new AISSignal("wrongShip", 1, 2, 3, 4, 5, dateTime, "port");
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, "ship1");
-        shipInformation = new ShipInformation("ship1", anomalyInformation, aisSignal);
+        aisSignal = new AISSignal(-1L, 1, 2, 3, 4, 5, dateTime, "port");
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, 123L);
+        shipInformation = new ShipInformation(123L, anomalyInformation, aisSignal);
 
         assertThrows(AssertionError.class, () -> shipInformation.toJson());
     }
 
     @Test
     void testToJsonAnomalyInfoWrongHash() {
-        aisSignal = new AISSignal("ship1", 1, 2, 3, 4, 5, dateTime, "port");
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, "wrongShip");
-        shipInformation = new ShipInformation("ship1", anomalyInformation, aisSignal);
+        aisSignal = new AISSignal(123L, 1, 2, 3, 4, 5, dateTime, "port");
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, -1L);
+        shipInformation = new ShipInformation(123L, anomalyInformation, aisSignal);
 
         assertThrows(AssertionError.class, () -> shipInformation.toJson());
     }

@@ -7,7 +7,7 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 import java.time.OffsetDateTime;
@@ -35,9 +35,9 @@ class DefaultScoreCalculatorTest {
     void testSetupFlinkAnomalyScoreCalculationPart() throws Exception {
         // create initial AISSignal objects
         // ais1 and ais2 are from the same ship
-        AISSignal ais1 = new AISSignal("ship1", 1, 2, 3, 4, 5, time1, "port1");
-        AISSignal ais2 = new AISSignal("ship1", 10, 20, 30, 40, 50, time1, "port1");
-        AISSignal ais3 = new AISSignal("ship2", 100, 200, 300, 400, 500, time1, "port2");
+        AISSignal ais1 = new AISSignal(1L, 1, 2, 3, 4, 5, time1, "port1");
+        AISSignal ais2 = new AISSignal(1L, 10, 20, 30, 40, 50, time1, "port1");
+        AISSignal ais3 = new AISSignal(2L, 100, 200, 300, 400, 500, time1, "port2");
 
         // prepare flink environment and streams
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -54,8 +54,8 @@ class DefaultScoreCalculatorTest {
         // verify result
         List<AnomalyInformation> result = CollectSink.anomalyInfoList;
         assertTrue(result.containsAll(List.of(
-                new AnomalyInformation(2, "", time1, "ship1"),
-                new AnomalyInformation(1, "", time1, "ship2")
+                new AnomalyInformation(2, "", time1, 1L),
+                new AnomalyInformation(1, "", time1, 2L)
         )));
     }
 

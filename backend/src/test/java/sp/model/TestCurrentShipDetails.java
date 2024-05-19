@@ -1,7 +1,6 @@
 package sp.model;
 
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
-import org.apache.kafka.common.serialization.Serde;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 

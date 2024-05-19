@@ -1,7 +1,5 @@
 package sp.pipeline;
 
-import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.junit.jupiter.api.Test;
 

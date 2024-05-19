@@ -1,15 +1,14 @@
-package sp.pipeline.scorecalculators.components;
+package sp.pipeline.scorecalculators.components.sample;
 
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.operators.StreamMap;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 
 
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SampleStatefulMapFunctionTest {
 
     private SampleStatefulMapFunction sampleStatefulMapFunction;
-    private KeyedOneInputStreamOperatorTestHarness<String, AISSignal, AnomalyInformation> testHarness;
+    private KeyedOneInputStreamOperatorTestHarness<Long, AISSignal, AnomalyInformation> testHarness;
 
     private final OffsetDateTime time1 = OffsetDateTime.of(2004, 1, 27, 1,1,0,0, ZoneOffset.ofHours(0));
 
@@ -33,7 +32,7 @@ class SampleStatefulMapFunctionTest {
 
         testHarness = new KeyedOneInputStreamOperatorTestHarness<>(
                 new StreamMap<>(sampleStatefulMapFunction),
-                AISSignal::getShipHash,
+                AISSignal::getId,
                 TypeInformation.of(new TypeHint<>() {})
         );
 
@@ -50,9 +49,9 @@ class SampleStatefulMapFunctionTest {
     @Test
     void testSimpleMapping() throws Exception {
         // Simple signals. signal1 and signal2 have the same ship hash
-        AISSignal signal1 = new AISSignal("ship1", 1, 2, 3, 4, 5, time1, "port1");
-        AISSignal signal2 = new AISSignal("ship1", 10, 20, 30, 40, 50, time1, "port1");
-        AISSignal signal3 = new AISSignal("ship2", 100, 200, 300, 400, 500, time1, "port2");
+        AISSignal signal1 = new AISSignal(1L, 1, 2, 3, 4, 5, time1, "port1");
+        AISSignal signal2 = new AISSignal(1L, 10, 20, 30, 40, 50, time1, "port1");
+        AISSignal signal3 = new AISSignal(2L, 100, 200, 300, 400, 500, time1, "port2");
 
         // Process elements
         testHarness.processElement(signal1, 1L);
@@ -73,19 +72,19 @@ class SampleStatefulMapFunctionTest {
 
         // Check first result. ship1
         assertEquals(
-                new AnomalyInformation(1, "", time1, "ship1"),
+                new AnomalyInformation(1, "", time1, 1L),
                 results.get(0)
         );
 
         // Check second result. ship1 again
         assertEquals(
-                new AnomalyInformation(2, "", time1, "ship1"),
+                new AnomalyInformation(2, "", time1, 1L),
                 results.get(1)
         );
 
         // Check third result. ship2
         assertEquals(
-                new AnomalyInformation(1, "", time1, "ship2"),
+                new AnomalyInformation(1, "", time1, 2L),
                 results.get(2)
         );
     }

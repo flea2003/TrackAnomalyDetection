@@ -6,28 +6,18 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
-import org.assertj.core.api.DateAssert;
 import org.junit.ClassRule;
 import org.junit.Test;
 import sp.dtos.AnomalyInformation;
 
 
 public class ZipTupleMapFunctionTest {
-    private final OffsetDateTime time1 = OffsetDateTime.of(2004, 1, 27, 1,1,0,0,
-        ZoneOffset.ofHours(0));
-    private final OffsetDateTime time2 = OffsetDateTime.of(2004, 1, 27, 1,15,0,0,
-        ZoneOffset.ofHours(0));
-    private final OffsetDateTime time3 = OffsetDateTime.of(2004, 1, 27, 1,17,0,0,
-        ZoneOffset.ofHours(0));
-
 
     @ClassRule
     public static MiniClusterWithClientResource flinkCluster =

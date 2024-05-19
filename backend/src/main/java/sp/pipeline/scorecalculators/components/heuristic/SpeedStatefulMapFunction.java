@@ -21,7 +21,6 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     public AnomalyInformation map(AISSignal value) throws Exception {
-        AnomalyInformation anomalyInformation = new AnomalyInformation();
         AnomalyInformation pastAnomalyInformation = getAnomalyInformationValueState().value();
         AISSignal pastAISSignal = getAisSignalValueState().value();
 
@@ -40,7 +39,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
                 this.getLastDetectedAnomalyTime().update(value.getTimestamp());
             }
         }
-        return super.setAnomalyInformationResult(anomalyInformation, value, 33f, badMsg, goodMsg);
+        return super.setAnomalyInformationResult(value, 33f, badMsg, goodMsg);
     }
 
 }

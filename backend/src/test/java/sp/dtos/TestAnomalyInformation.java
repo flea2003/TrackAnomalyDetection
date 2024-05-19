@@ -8,7 +8,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestAnomalyInformation {
     AnomalyInformation anomalyInformation;
@@ -23,9 +22,5 @@ public class TestAnomalyInformation {
         assertThat(AnomalyInformation.fromJson(anomalyInformation.toJson())).isEqualTo(anomalyInformation);
     }
 
-    @Test
-    void testFromJson2() throws JsonProcessingException {
-        assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
-    }
-
 }
+

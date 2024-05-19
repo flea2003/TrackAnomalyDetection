@@ -24,7 +24,6 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
         if (value.getHeading() == 511) {
             value.setHeading(value.getCourse());
         }
-        AnomalyInformation anomalyInformation = new AnomalyInformation();
         AnomalyInformation pastAnomalyInformation = getAnomalyInformationValueState().value();
         AISSignal pastAISSignal = getAisSignalValueState().value();
         // In the case that our stateful map has encountered signals in the past
@@ -36,6 +35,6 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
                 getLastDetectedAnomalyTime().update(value.getTimestamp());
             }
         }
-        return super.setAnomalyInformationResult(anomalyInformation, value, 34f, badMsg, goodMsg);
+        return super.setAnomalyInformationResult(value, 34f, badMsg, goodMsg);
     }
 }
