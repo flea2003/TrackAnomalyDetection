@@ -1,5 +1,7 @@
 package sp.pipeline;
 
+import java.io.IOException;
+import java.util.HashMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -20,6 +22,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.dtos.AnomalyInformation;
 import sp.dtos.ExternalAISSignal;
@@ -63,7 +66,8 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy) throws IOException {
+    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy)
+        throws IOException {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         buildPipeline();
     }
@@ -140,10 +144,7 @@ public class AnomalyDetectionPipeline {
         DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
 
         // Map the computed AnomalyInformation objects to JSON strings
-        DataStream<String> updateStreamSerialized = updateStream.map(x -> {
-            System.out.println("Mapping the AnomalyInformation object to JSON (from the ships-AIS topic). Object: " + x);
-            return x.toJson();
-        });
+        DataStream<String> updateStreamSerialized = updateStream.map(AnomalyInformation::toJson);
 
         // Send the calculated AnomalyInformation objects to Kafka
         KafkaSink<String> scoresSink = createSinkFlinkToKafka(KAFKA_SERVER_ADDRESS, CALCULATED_SCORES_TOPIC_NAME);
@@ -216,7 +217,6 @@ public class AnomalyDetectionPipeline {
         KStream<Long, String> streamAISSignalsJSON = builder.stream(INCOMING_AIS_TOPIC_NAME);
         KStream<Long, ShipInformation> streamAISSignals = streamAISSignalsJSON
                 .mapValues(x -> {
-                    System.out.println("Received AIS signal as JSON to topic ship-AIS for the building part. JSON: " + x);
                     AISSignal aisSignal;
                     aisSignal = AISSignal.fromJson(x);
                     return new ShipInformation(aisSignal.getId(), null, aisSignal);
@@ -238,7 +238,6 @@ public class AnomalyDetectionPipeline {
         // so we could later merge the stream with wrapped simple AISSignal objects
         KStream<Long, String> streamAnomalyInformationJSON = builder.stream(CALCULATED_SCORES_TOPIC_NAME);
         KStream<Long, ShipInformation> streamAnomalyInformation  = streamAnomalyInformationJSON.mapValues(x -> {
-            System.out.println("Received AnomalyInformation object as JSON string in ship-scores. JSON: " + x);
             AnomalyInformation anomalyInformation = null;
             try {
                 anomalyInformation = AnomalyInformation.fromJson(x);
@@ -328,7 +327,6 @@ public class AnomalyDetectionPipeline {
      */
     public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, Long key)
             throws JsonProcessingException {
-        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
 
         ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
