@@ -2,6 +2,7 @@ package sp.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
+import sp.dtos.ExternalAISSignal;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -20,7 +21,7 @@ public class TestAISSignal {
     }
 
     @Test
-    void testToString() {
+    void testToString() throws JsonProcessingException {
         assertEquals(ais, AISSignal.fromJson(json));
     }
 
@@ -32,6 +33,17 @@ public class TestAISSignal {
         assertNotEquals(ais, null);
         assertNotEquals(ais, new Object());
         assertNotEquals(ais, new AISSignal(0L, 1,1,1,1,1,dateTime,""));
+    }
+
+    @Test
+    void testConversionFromExternal() {
+        ExternalAISSignal external = new ExternalAISSignal("producerId", "shipHash", 1f, 2f, 3f, 4f, 5f, dateTime, "port");
+
+        assertEquals(
+                new AISSignal(123, 1f, 2f, 3f, 4f, 5f, dateTime, "port"),
+                new AISSignal(external, 123)
+        );
+
     }
 
 }

@@ -34,8 +34,8 @@ class StreamUtilsTest {
 
         // Check that exceptions are thrown in all three methods due to FileNotFoundException
         assertThrows(IOException.class, streamUtils::loadConfig);
-        assertThrows(RuntimeException.class, () -> streamUtils.getFlinkStreamConsumingFromKafka("topic"));
-        assertThrows(RuntimeException.class, () ->
+        assertThrows(IOException.class, () -> streamUtils.getFlinkStreamConsumingFromKafka("topic"));
+        assertThrows(IOException.class, () ->
                 streamUtils.getKafkaStreamConsumingFromKafka(new StreamsBuilder())
         );
     }

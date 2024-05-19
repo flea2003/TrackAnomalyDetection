@@ -24,10 +24,11 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
         if (value.getHeading() == 511) {
             value.setHeading(value.getCourse());
         }
-        AnomalyInformation pastAnomalyInformation = getAnomalyInformationValueState().value();
+
         AISSignal pastAISSignal = getAisSignalValueState().value();
+
         // In the case that our stateful map has encountered signals in the past
-        if (pastAnomalyInformation != null && pastAISSignal != null) {
+        if (pastAISSignal != null) {
             boolean headingDifferenceIsGood = circularMetric(pastAISSignal.getHeading(), value.getHeading()) < 40;
             boolean courseDifferenceIsGood = circularMetric(pastAISSignal.getCourse(), value.getCourse()) < 40;
 

@@ -22,11 +22,10 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     public AnomalyInformation map(AISSignal value) throws Exception {
-        AnomalyInformation pastAnomalyInformation = getAnomalyInformationValueState().value();
         AISSignal pastAISSignal = getAisSignalValueState().value();
 
         // In the case that our stateful map has encountered signals in the past
-        if (pastAnomalyInformation != null && pastAISSignal != null) {
+        if (pastAISSignal != null) {
             double time = Duration.between(getAisSignalValueState().value().getTimestamp(), value.getTimestamp()).toMinutes();
 
             boolean signalTimingIsGood = time < 10;

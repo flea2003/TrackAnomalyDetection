@@ -48,12 +48,8 @@ public class AISSignal implements Serializable {
      * @param val string value (in JSON format) that is being converted to an AIS object
      * @return AIS object from a given string
      */
-    public static AISSignal fromJson(String val) {
-        try {
-            return new UtilsObjectMapper().readValue(val, AISSignal.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public static AISSignal fromJson(String val) throws JsonProcessingException {
+        return new UtilsObjectMapper().readValue(val, AISSignal.class);
     }
 
 

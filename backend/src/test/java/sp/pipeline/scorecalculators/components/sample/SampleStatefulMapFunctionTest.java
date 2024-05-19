@@ -1,7 +1,6 @@
 package sp.pipeline.scorecalculators.components.sample;
 
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.operators.StreamMap;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
@@ -33,7 +32,7 @@ class SampleStatefulMapFunctionTest {
         testHarness = new KeyedOneInputStreamOperatorTestHarness<>(
                 new StreamMap<>(sampleStatefulMapFunction),
                 AISSignal::getId,
-                TypeInformation.of(new TypeHint<>() {})
+                Types.LONG
         );
 
         testHarness.open();

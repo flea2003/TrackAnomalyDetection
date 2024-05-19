@@ -92,7 +92,7 @@ public class AnomalyDetectionPipeline {
         Properties config = streamUtils.loadConfig();
 
         if (config == null) {
-            throw new RuntimeException("Properties file not found");
+            throw new IOException("Properties file not found");
         }
 
         rawIncomingAisTopicName = config.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
@@ -105,7 +105,7 @@ public class AnomalyDetectionPipeline {
     /**
      * Private helper method for building the sp.pipeline.
      */
-    private void buildPipeline() {
+    private void buildPipeline() throws IOException {
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Build the pipeline
@@ -140,7 +140,7 @@ public class AnomalyDetectionPipeline {
      * @return the DataStream with the AISSignal objects that have been assigned an internal ID.
      *         Used in the next step of the pipeline.
      */
-    private DataStream<AISSignal> buildIdAssignmentPart() {
+    private DataStream<AISSignal> buildIdAssignmentPart() throws IOException {
         // Create a Flink stream that consumes AIS signals from Kafka
         KafkaSource<String> kafkaSource = streamUtils.getFlinkStreamConsumingFromKafka(rawIncomingAisTopicName);
         DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
@@ -195,7 +195,7 @@ public class AnomalyDetectionPipeline {
      * anomaly score field in the corresponding places.
      * </p>
      */
-    private void buildScoreAggregationPart() {
+    private void buildScoreAggregationPart() throws IOException {
         StreamsBuilder builder = new StreamsBuilder();
 
         // Construct and merge two streams and select the ship hash as a key for the new stream.
@@ -247,7 +247,11 @@ public class AnomalyDetectionPipeline {
         return streamAISSignalsJSON
                 .mapValues(x -> {
                     AISSignal aisSignal;
-                    aisSignal = AISSignal.fromJson(x);
+                    try {
+                        aisSignal = AISSignal.fromJson(x);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
                     return new ShipInformation(aisSignal.getId(), null, aisSignal);
                 });
     }

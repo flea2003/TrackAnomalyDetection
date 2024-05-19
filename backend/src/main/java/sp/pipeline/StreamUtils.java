@@ -34,12 +34,12 @@ public class StreamUtils {
         if (!Files.exists(Paths.get(configPath))) {
             throw new IOException("Kafka configuration file '" + configPath + "' was not found.");
         }
+
         Properties config = new Properties();
         try (InputStream inputStream = new FileInputStream(configPath)) {
             config.load(inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException("Error loading configuration file '" + configPath + "'.", e);
         }
+
         return config;
     }
 
@@ -49,14 +49,9 @@ public class StreamUtils {
      * @param topic the name of the topic from which to consume
      * @return the created Flink stream
      */
-    public KafkaSource<String> getFlinkStreamConsumingFromKafka(String topic) {
+    public KafkaSource<String> getFlinkStreamConsumingFromKafka(String topic) throws IOException {
         // Load the properties of Kafka from the configuration file
-        Properties props;
-        try {
-            props = loadConfig();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Properties props = loadConfig();
 
         return KafkaSource.<String>builder()
                 .setProperties(props)
@@ -72,14 +67,9 @@ public class StreamUtils {
      * @param builder streams builder
      * @return created KafkaStreams object with the specified configuration
      */
-    public KafkaStreams getKafkaStreamConsumingFromKafka(StreamsBuilder builder) {
+    public KafkaStreams getKafkaStreamConsumingFromKafka(StreamsBuilder builder) throws IOException {
         // Load properties from the configuration file
-        Properties props;
-        try {
-            props = loadConfig();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Properties props = loadConfig();
 
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
