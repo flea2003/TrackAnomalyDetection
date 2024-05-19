@@ -17,7 +17,7 @@ class ShipDetails {
     lat: number,
     lng: number,
     anomalyScore: number,
-    explanation: string,
+    description: string,
     maxAnomalyScore: number,
     departurePort: string,
     course: number,
@@ -28,7 +28,7 @@ class ShipDetails {
     this.lat = lat;
     this.lng = lng;
     this.anomalyScore = anomalyScore;
-    this.explanation = explanation;
+    this.explanation = description;
     this.maxAnomalyScore = maxAnomalyScore;
     this.departurePort = departurePort;
     this.course = course;

@@ -52,7 +52,7 @@ class ShipService {
               // TODO fix the handling of this case
               const shipDetailsItem = ShipService.createShipDetailsFromDTOs(
                 aisSignal,
-                { id: aisSignal.id, anomalyScore: -1, maxAnomalyScore: -1 },
+                { id: aisSignal.id, description: "", anomalyScore: -1, maxAnomalyScore: -1 },
               );
               result.push(shipDetailsItem);
             }
@@ -112,12 +112,14 @@ class ShipService {
               if (item == null) {
                 return {
                   id: "null ship",
+                  description: "",
                   anomalyScore: -1,
                   maxAnomalyScore: -1,
                 };
               } else
                 return {
                   id: item.id,
+                  description: item.explanation,
                   anomalyScore: item.score,
                   maxAnomalyScore: item.maxAnomalyScore,
                 };
@@ -147,7 +149,7 @@ class ShipService {
       aisSignal.lat,
       aisSignal.long,
       anomalyInfo.anomalyScore,
-      "",
+      anomalyInfo.description,
       anomalyInfo.maxAnomalyScore,
       aisSignal.departurePort,
       aisSignal.course,
