@@ -53,4 +53,5 @@ public class ExternalAISSignal implements Serializable {
     public static ExternalAISSignal fromJson(String val) throws JsonProcessingException {
         return new UtilsObjectMapper().readValue(val, ExternalAISSignal.class);
     }
+
 }
