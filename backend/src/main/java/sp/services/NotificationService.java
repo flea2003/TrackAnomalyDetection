@@ -62,20 +62,20 @@ public class NotificationService {
         notificationRepository.save(new Notification(anomalyInformation));
     }
 
-    public List<Notification> getAllNotificationForShip(String shipHash) {
-        return notificationRepository.findByShipHash(shipHash);
+    public List<Notification> getAllNotificationForShip(Long shipID) {
+        return notificationRepository.findNotificationByShipID(shipID);
     }
 
     /**
      * Method used by the notification pipeline: it fetches the newest notification for a particular ship.
      *
-     * @param shipHash hash of the ship
+     * @param shipID id of the ship
      * @return notification object of the newest ship
      */
     @Transactional
-    public Notification getNewestNotificationForShip(String shipHash) throws NotFoundNotificationException {
+    public Notification getNewestNotificationForShip(Long shipID) throws NotFoundNotificationException {
 
-        List<Notification> allNotifications = notificationRepository.findByShipHash(shipHash);
+        List<Notification> allNotifications = notificationRepository.findNotificationByShipID(shipID);
         if (allNotifications.isEmpty()) throw new NotFoundNotificationException();
 
         Notification result = allNotifications.get(0);

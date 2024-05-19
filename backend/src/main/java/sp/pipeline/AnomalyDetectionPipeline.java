@@ -1,7 +1,6 @@
 package sp.pipeline;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -23,18 +22,24 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import sp.dtos.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotFoundNotificationException;
+import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
+import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 import sp.services.NotificationService;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Objects;
 
 @Service
 public class AnomalyDetectionPipeline {
+    private static final String RAW_INCOMING_AIS_TOPIC_NAME;
     private static final String INCOMING_AIS_TOPIC_NAME;
     private static final String CALCULATED_SCORES_TOPIC_NAME;
     private static final String KAFKA_SERVER_ADDRESS;
@@ -43,13 +48,15 @@ public class AnomalyDetectionPipeline {
     private final ScoreCalculationStrategy scoreCalculationStrategy;
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
-    private KTable<String, CurrentShipDetails> state;
     private NotificationService notificationService;
     private final int notificationThreshold;
+    private KTable<Long, CurrentShipDetails> state;
+
 
     // Load the needed parameters from the configurations file
     static {
         try {
+            RAW_INCOMING_AIS_TOPIC_NAME = StreamUtils.loadConfig().getProperty("incoming.ais-raw.topic.name");
             INCOMING_AIS_TOPIC_NAME = StreamUtils.loadConfig().getProperty("incoming.ais.topic.name");
             CALCULATED_SCORES_TOPIC_NAME = StreamUtils.loadConfig().getProperty("calculated.scores.topic.name");
             KAFKA_SERVER_ADDRESS = StreamUtils.loadConfig().getProperty("kafka.server.address");
@@ -66,8 +73,11 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(ScoreCalculationStrategy scoreCalculationStrategy,
-                                    NotificationService notificationService) throws IOException {
+
+    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy,
+                                    NotificationService notificationService)
+        throws IOException {
+
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.notificationService = notificationService;
         notificationThreshold = 30;
@@ -78,12 +88,55 @@ public class AnomalyDetectionPipeline {
      * Private helper method for building the sp.pipeline.
      */
     private void buildPipeline() throws IOException {
+        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
         // Create a keyed Kafka Stream of incoming AnomalyInformation signals
         StreamsBuilder builder = new StreamsBuilder();
 
-        buildScoreCalculationPart();
+        DataStream<AISSignal> streamWithAssignedIds = buildIdAssignmentPart();
+        buildScoreCalculationPart(streamWithAssignedIds);
         buildScoreAggregationPart(builder);
         buildNotifications(builder);
+    }
+
+    /**
+     * Creates a sink from Flink to a Kafka topic.
+     *
+     * @param kafkaServerAddress Kafka server address
+     * @param topicName Kafka topic name to send the data to
+     * @return the created KafkaSink object
+     */
+    private KafkaSink<String> createSinkFlinkToKafka(String kafkaServerAddress, String topicName) {
+        return KafkaSink.<String>builder()
+                .setBootstrapServers(kafkaServerAddress)
+                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
+                        .setTopic(topicName)
+                        .setValueSerializationSchema(new SimpleStringSchema())
+                        .build()
+                )
+                .build();
+    }
+
+    /**
+     * Builds the first part of the pipeline - the part that takes as input the raw AIS signals from Kafka,
+     * assigns an internal ID to each signal and sends them to another Kafka topic.
+     * The internal ID is calculated as a hash of the producer ID and the ship hash.
+     *
+     * @return the DataStream with the AISSignal objects that have been assigned an internal ID.
+     *         Used in the next step of the pipeline.
+     */
+    private DataStream<AISSignal> buildIdAssignmentPart() {
+        // Create a Flink stream that consumes AIS signals from Kafka
+        KafkaSource<String> kafkaSource = StreamUtils.getFlinkStreamConsumingFromKafka(RAW_INCOMING_AIS_TOPIC_NAME);
+        DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
+
+        // Map stream from JSON strings to ExternalAISSignal objects
+        DataStream<ExternalAISSignal> sourceWithNoIDs = rawSourceSerialized.map(ExternalAISSignal::fromJson);
+
+        // Map ExternalAISSignal objects to AISSignal objects by assigning an internal ID
+        return sourceWithNoIDs.map(x -> {
+            int calculatedID = Objects.hash(x.getProducerID(), x.getShipHash()) & 0x7FFFFFFF; // Ensure positive ID
+            return new AISSignal(x, calculatedID);
+        });
     }
 
     /**
@@ -95,43 +148,21 @@ public class AnomalyDetectionPipeline {
      * injected scoreCalculationStrategy class. I.e., this part only calls that method. This way the
      * anomaly detection algorithm can be easily swapped out.
      */
-    private void buildScoreCalculationPart() {
-        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+    private void buildScoreCalculationPart(DataStream<AISSignal> source) {
 
-        // Create a Flink stream that consumes AIS signals from Kafka
-        KafkaSource<String> kafkaSource = StreamUtils.getFlinkStreamConsumingFromKafka(INCOMING_AIS_TOPIC_NAME);
-        DataStream<String> sourceSerialized = flinkEnv.fromSource(kafkaSource,
-                WatermarkStrategy.noWatermarks(), "AIS Source");
-
-        // Map stream from JSON strings to AISSignal objects
-        DataStream<AISSignal> source = sourceSerialized.map((x) -> {
-            System.out.println("Received AIS signal as JSON to topic ships-AIS. JSON: " + x);
-            return AISSignal.fromJson(x);
-        });
+        // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
+        KafkaSink<String> signalsSink = createSinkFlinkToKafka(KAFKA_SERVER_ADDRESS, INCOMING_AIS_TOPIC_NAME);
+        source.map(AISSignal::toJson).sinkTo(signalsSink);
 
         // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
-        DataStream<AnomalyInformation> updateStream =
-                scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
+        DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
 
         // Map the computed AnomalyInformation objects to JSON strings
-        DataStream<String> updateStreamSerialized = updateStream.map(x -> {
-            System.out.println("Mapping the AnomalyInformation object to JSON (from the ships-AIS topic). Object: " + x);
-            return x.toJson();
-        });
+        DataStream<String> updateStreamSerialized = updateStream.map(AnomalyInformation::toJson);
 
         // Send the calculated AnomalyInformation objects to Kafka
-        KafkaSink<String> sink = KafkaSink.<String>builder()
-                .setBootstrapServers(KAFKA_SERVER_ADDRESS)
-                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                        .setTopic(CALCULATED_SCORES_TOPIC_NAME)
-                        .setValueSerializationSchema(new SimpleStringSchema())
-                        .build()
-                )
-                // TODO: Maybe we need this, maybe not. Not sure yet.
-                //  .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
-                .build();
-
-        updateStreamSerialized.sinkTo(sink);
+        KafkaSink<String> scoresSink = createSinkFlinkToKafka(KAFKA_SERVER_ADDRESS, CALCULATED_SCORES_TOPIC_NAME);
+        updateStreamSerialized.sinkTo(scoresSink);
     }
 
     /**
@@ -150,31 +181,31 @@ public class AnomalyDetectionPipeline {
      */
     private void buildScoreAggregationPart(StreamsBuilder builder) {
         // Construct and merge two streams and select the ship hash as a key for the new stream.
-        KStream<String, ShipInformation> mergedStream = mergeStreams(builder);
+        KStream<Long, ShipInformation> mergedStream = mergeStreams(builder);
 
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<String, CurrentShipDetails> table = mergedStream
-            .mapValues(x -> {
-                try {
-                    return x.toJson();
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .groupByKey()
-            .aggregate(
-            CurrentShipDetails::new,
-                (key, valueJson, aggregatedShipDetails) -> {
+        KTable<Long, CurrentShipDetails> table = mergedStream
+                .mapValues(x -> {
                     try {
-                        return aggregateSignals(aggregatedShipDetails, valueJson, key);
+                        return x.toJson();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
-                },
-            Materialized
-                    .<String, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NAME)
-                    .withValueSerde(CurrentShipDetails.getSerde())
-            );
+                })
+                .groupByKey()
+                .aggregate(
+                        CurrentShipDetails::new,
+                        (key, valueJson, aggregatedShipDetails) -> {
+                            try {
+                                return aggregateSignals(aggregatedShipDetails, valueJson, key);
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        },
+                        Materialized
+                                .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NAME)
+                                .withValueSerde(CurrentShipDetails.getSerde())
+                );
 
         builder.build();
         this.state = table;
@@ -188,21 +219,16 @@ public class AnomalyDetectionPipeline {
      * @return a KStream object that consists of computed AISSignal objects, wrapped around
      *     ShipInformation class
      */
-    private KStream<String, ShipInformation> streamAISSignals(StreamsBuilder builder) {
+    private KStream<Long, ShipInformation> streamAISSignals(StreamsBuilder builder) {
 
         // Take the initial AISSignal and wrap them into ShipInformation objects, so we could later merge the stream
         // with already wrapped AnomalyInformation objects
-        KStream<String, String> streamAISSignalsJSON = builder.stream(INCOMING_AIS_TOPIC_NAME);
-        KStream<String, ShipInformation> streamAISSignals = streamAISSignalsJSON
+        KStream<Long, String> streamAISSignalsJSON = builder.stream(INCOMING_AIS_TOPIC_NAME);
+        KStream<Long, ShipInformation> streamAISSignals = streamAISSignalsJSON
                 .mapValues(x -> {
-                    System.out.println("Received AIS signal as JSON to topic ship-AIS for the building part. JSON: " + x);
                     AISSignal aisSignal;
-                    try {
-                        aisSignal = AISSignal.fromJson(x);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return new ShipInformation(aisSignal.getShipHash(), null, aisSignal);
+                    aisSignal = AISSignal.fromJson(x);
+                    return new ShipInformation(aisSignal.getId(), null, aisSignal);
                 });
         return streamAISSignals;
     }
@@ -215,20 +241,19 @@ public class AnomalyDetectionPipeline {
      * @return KStream object that consists of computed AnomalyInformation objects, wrapped around
      *     ShipInformation class
      */
-    private KStream<String, ShipInformation> streamAnomalyInformation(StreamsBuilder builder) {
+    private KStream<Long, ShipInformation> streamAnomalyInformation(StreamsBuilder builder) {
 
         // Take computed AnomalyInformation JSON strings, deserialize them and wrap them into ShipInformation objects,
         // so we could later merge the stream with wrapped simple AISSignal objects
-        KStream<String, String> streamAnomalyInformationJSON = builder.stream(CALCULATED_SCORES_TOPIC_NAME);
-        KStream<String, ShipInformation> streamAnomalyInformation  = streamAnomalyInformationJSON.mapValues(x -> {
-            System.out.println("Received AnomalyInformation object as JSON string in ship-scores. JSON: " + x);
+        KStream<Long, String> streamAnomalyInformationJSON = builder.stream(CALCULATED_SCORES_TOPIC_NAME);
+        KStream<Long, ShipInformation> streamAnomalyInformation  = streamAnomalyInformationJSON.mapValues(x -> {
             AnomalyInformation anomalyInformation = null;
             try {
                 anomalyInformation = AnomalyInformation.fromJson(x);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-            return new ShipInformation(anomalyInformation.getShipHash(), anomalyInformation, null);
+            return new ShipInformation(anomalyInformation.getId(), anomalyInformation, null);
         });
 
         return streamAnomalyInformation;
@@ -248,22 +273,22 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Returns the current scores of the ships in the system.
+     * Returns the current (last updated) anomaly scores of the ships in the system.
      *
      * @return the current scores of the ships in the system.
      */
-    public HashMap<String, CurrentShipDetails> getCurrentScores() throws PipelineException {
+    public HashMap<Long, AnomalyInformation> getCurrentScores() throws PipelineException {
         try {
             // Get the current state of the KTable
             final String storeName = this.state.queryableStoreName();
-            ReadOnlyKeyValueStore<String, CurrentShipDetails> view = this.kafkaStreams.store(
+            ReadOnlyKeyValueStore<Long, CurrentShipDetails> view = this.kafkaStreams.store(
                     StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
             );
 
-            // Create a copy of the state
-            HashMap<String, CurrentShipDetails> stateCopy = new HashMap<>();
-            try (KeyValueIterator<String, CurrentShipDetails> iter = view.all()) {
-                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value));
+            // Create a copy of the state considering only the current AnomalyInformation values for each ship
+            HashMap<Long, AnomalyInformation> stateCopy = new HashMap<>();
+            try (KeyValueIterator<Long, CurrentShipDetails> iter = view.all()) {
+                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAnomalyInformation()));
             }
             return stateCopy;
 
@@ -275,21 +300,30 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Method that constructs a unified stream of anomaly information and AIS signals, wrapped in ShipInformation class.
+     * Returns the current (last updated) AIS signals of the ships in the system.
      *
-     * @param builder Streams builder
-     * @return unified stream
+     * @return the current (last updated) AIS signals of the ships in the system.
      */
-    private KStream<String, ShipInformation> mergeStreams(StreamsBuilder builder) {
-        // Construct two separate streams for AISSignals and computed AnomalyScores, and wrap each stream values into
-        // ShipInformation object, so that we could later merge these two streams
-        KStream<String, ShipInformation> streamAnomalyInformation  = streamAnomalyInformation(builder);
-        KStream<String, ShipInformation> streamAISSignals = streamAISSignals(builder);
+    public HashMap<Long, AISSignal> getCurrentAISSignals() throws PipelineException {
+        try {
+            // Get the current state of the KTable
+            final String storeName = this.state.queryableStoreName();
+            ReadOnlyKeyValueStore<Long, CurrentShipDetails> view = this.kafkaStreams.store(
+                    StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
+            );
 
-        // Merge two streams and select the ship hash as a key for the new stream.
-        return streamAISSignals
-                .merge(streamAnomalyInformation)
-                .selectKey((key, value) -> value.getShipHash());
+            // Create a copy of the state considering only the current AISSingnal values for each ship
+            HashMap<Long, AISSignal> stateCopy = new HashMap<>();
+            try (KeyValueIterator<Long, CurrentShipDetails> iter = view.all()) {
+                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAISSignal()));
+            }
+            return stateCopy;
+
+        } catch (Exception e) {
+            String err = "Failed to query store: " + e.getMessage() + ", continuing";
+            System.out.println(err);
+            throw new PipelineException(err);
+        }
     }
 
     /**
@@ -316,11 +350,11 @@ public class AnomalyDetectionPipeline {
             }
         });
         // Key the stream
-        KStream<String, AnomalyInformation> streamAnomalyInformationKeyed = streamAnomalyInformation
-                .selectKey((key, value) -> value.getShipHash());
+        KStream<Long, AnomalyInformation> streamAnomalyInformationKeyed = streamAnomalyInformation
+                .selectKey((key, value) -> value.getId());
 
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<String, AnomalyInformation> notificationsState = streamAnomalyInformationKeyed
+        KTable<Long, AnomalyInformation> notificationsState = streamAnomalyInformationKeyed
                 .mapValues(x -> {
                     try {
                         return x.toJson();
@@ -333,13 +367,13 @@ public class AnomalyDetectionPipeline {
                         AnomalyInformation::new,
                         (key, valueJson, lastInformation) -> {
                             try {
-                                return aggregateSignals(lastInformation, valueJson, key);
+                                return aggregateNotificationSignals(lastInformation, valueJson, key);
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
                         },
                         Materialized
-                                .<String, AnomalyInformation, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
+                                .<Long, AnomalyInformation, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
                                 .withValueSerde(AnomalyInformation.getSerde())
                 );
         this.kafkaStreams = StreamUtils.getKafkaStreamConsumingFromKafka(builder);
@@ -357,7 +391,7 @@ public class AnomalyDetectionPipeline {
      *      or the old one)
      * @throws JsonProcessingException in case JSON value does not correspond to an AnomalyInformation object
      */
-    public AnomalyInformation aggregateSignals(AnomalyInformation currentAnomaly, String valueJson, String key)
+    public AnomalyInformation aggregateNotificationSignals(AnomalyInformation currentAnomaly, String valueJson, Long key)
             throws JsonProcessingException {
         // Convert the new anomaly information object from JSON TODO: perhaps add the threshold to some conf file!
         AnomalyInformation newAnomaly = AnomalyInformation.fromJson(valueJson);
@@ -402,51 +436,59 @@ public class AnomalyDetectionPipeline {
     /**
      * Aggregates data to a resulting map.
      *
-     * @param aggregatedShipDetails object that stores all needed data for a ship
+     * @param aggregatedShipDetails object that stores the latest received data for a ship
      * @param valueJson json value for a signal
      * @param key hash value of the ship
      * @return updated object that stores all needed data for a ship
      */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, String key)
+    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, Long key)
             throws JsonProcessingException {
-        System.out.println("Started aggregating JSON value. JSON: " + valueJson);
-
-        // If this is the first signal received, instantiate the past information as an empty list
-        if (aggregatedShipDetails.getPastInformation() == null)
-            aggregatedShipDetails.setPastInformation(new ArrayList<>());
 
         ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
+        AISSignal aisSignal = shipInformation.getAisSignal();
 
-        // If the signal is AIS signal, add it to past information
-        if (shipInformation.getAnomalyInformation() == null) {
-            aggregatedShipDetails.getPastInformation().add(shipInformation);
-        } else if (shipInformation.getAisSignal() == null) {
-            // If the signal is Anomaly Information signal, attach it to a corresponding AIS signal
+        // Boolean to check if the current aggregated ship details object has not yet been fully initialized
+        // i.e., if either no AISSignal or AnomalyInformation has been set yet
+        boolean shipDetailsNotInitialized = aggregatedShipDetails.getCurrentAISSignal() == null
+                || aggregatedShipDetails.getCurrentAnomalyInformation() == null;
 
-            // Set the anomaly information to be the most recent one
-            // TODO: take care of proper format for the date
-            // TODO: CONSIDER ANOMALY INFO ARRIVING EARLIER THAN AIS SIGNAL
-            aggregatedShipDetails.setAnomalyInformation(shipInformation.getAnomalyInformation());
+        // If the processed ShipInformation instance encapsulates a AISSignal instance:
+        // update the current value of the AISSignal field
+        if (aisSignal != null && (shipDetailsNotInitialized
+                || aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp()))
+        ) {
+            aggregatedShipDetails.setCurrentAISSignal(aisSignal);
+        }
 
-            // Find the corresponding AISSignal for the AnomalyInformation object, and update the ShipInformation object
-            for (int i = aggregatedShipDetails.getPastInformation().size() - 1; i >= 0; i--) {
-                ShipInformation information = aggregatedShipDetails.getPastInformation().get(i);
+        // If the processed ShipInformation instance encapsulates a AnomalyInformation instance:
+        // update the current value of the AnomalyInformation field
+        if (anomalyInformation != null
+                && (shipDetailsNotInitialized || anomalyInformation.getCorrespondingTimestamp()
+                .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp()))
+        ) {
+            aggregatedShipDetails.setCurrentAnomalyInformation(anomalyInformation);
+        }
 
-                if (information.getAisSignal().getTimestamp().isEqual(anomalyInformation.getCorrespondingTimestamp())) {
-                    // Check that there are no problems with the data
-                    assert information.getAisSignal().getShipHash().equals(anomalyInformation.getShipHash());
-                    assert information.getShipHash().equals(anomalyInformation.getShipHash());
-
-                    information.setAnomalyInformation(anomalyInformation);
-                    aggregatedShipDetails.setAnomalyInformation(anomalyInformation);
-                    break;
-                }
-            }
-        } else throw new RuntimeException("Something went wrong");
-
-        System.out.println("Current ship details after aggregation, for " + key + " ship: " + aggregatedShipDetails);
         return aggregatedShipDetails;
     }
 
+    /**
+     * Method that constructs a unified stream of AnomalyInformation and AISSignal instances,
+     * wrapped inside a ShipInformation class.
+     *
+     * @param builder StreamsBuilder instance responsible for configuring the KStream instances
+     * @return unified stream
+     */
+    private KStream<Long, ShipInformation> mergeStreams(StreamsBuilder builder) {
+        // Construct two separate streams for AISSignals and computed AnomalyScores, and wrap each stream values into
+        // ShipInformation object, so that we could later merge these two streams
+        KStream<Long, ShipInformation> streamAnomalyInformation  = streamAnomalyInformation(builder);
+        KStream<Long, ShipInformation> streamAISSignals = streamAISSignals(builder);
+
+        // Merge two streams and select the ship hash as a key for the new stream.
+        return streamAISSignals
+                .merge(streamAnomalyInformation)
+                .selectKey((key, value) -> value.getShipId());
+    }
 }

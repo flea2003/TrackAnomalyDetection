@@ -52,7 +52,7 @@ class ShipService {
               // TODO fix the handling of this case
               const shipDetailsItem = ShipService.createShipDetailsFromDTOs(
                 aisSignal,
-                { id: aisSignal.id, anomalyScore: -1 },
+                { id: aisSignal.id, description: "", anomalyScore: -1 },
               );
               result.push(shipDetailsItem);
             }
@@ -77,12 +77,8 @@ class ShipService {
         if (Array.isArray(response) && response.length > 0) {
           // eslint-disable-next-line
           const aisResults: AISSignal[] = response.map((item: any) => {
-            console.log("item : " + item);
-            console.log(
-              "  " + item.shipHash + " " + item.longitude + " " + item.latitude,
-            );
             return {
-              id: item.shipHash,
+              id: item.id,
               speed: item.speed,
               long: item.longitude,
               lat: item.latitude,
@@ -116,11 +112,13 @@ class ShipService {
               if (item == null) {
                 return {
                   id: "null ship",
+                  description: "",
                   anomalyScore: -1,
                 };
               } else
                 return {
-                  id: item.shipHash,
+                  id: item.id,
+                  description: item.explanation,
                   anomalyScore: item.score,
                 };
             },
@@ -149,7 +147,7 @@ class ShipService {
       aisSignal.lat,
       aisSignal.long,
       anomalyInfo.anomalyScore,
-      "",
+      anomalyInfo.description,
       aisSignal.departurePort,
       aisSignal.course,
       aisSignal.speed,

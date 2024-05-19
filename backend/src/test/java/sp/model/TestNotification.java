@@ -17,7 +17,7 @@ public class TestNotification {
     void setUp() {
         notification = new Notification(1F, "explanation",
                 OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                "hash1", 0, 0);
+                1L, 0, 0);
     }
 
     @Test
@@ -30,7 +30,7 @@ public class TestNotification {
     void testConstructor1() {
         Notification notification2 = new Notification(1F, "explanation",
                 OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                "hash1", 0, 0);
+                1L, 0, 0);
 
         assertThat(notification2).isEqualTo(notification);
     }
@@ -39,12 +39,9 @@ public class TestNotification {
     @Test
     void testConstructor2() {
         AnomalyInformation anomalyInformation = new AnomalyInformation(1F, "explanation",
-                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)), "hash1");
+                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)), 1L);
         Notification notification2 = new Notification(anomalyInformation);
 
         assertThat(notification2).isEqualTo(notification);
     }
-
-
-
 }

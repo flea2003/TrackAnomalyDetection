@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import sp.dtos.AISSignal;
+import sp.model.AISSignal;
 import sp.dtos.AnomalyInformation;
 import sp.utils.UtilsObjectMapper;
 
@@ -20,8 +20,7 @@ import sp.utils.UtilsObjectMapper;
 @ToString
 @EqualsAndHashCode
 public class ShipInformation {
-    private String shipHash;
-
+    private long shipId;
     private AnomalyInformation anomalyInformation;
     private AISSignal aisSignal;
 
@@ -31,12 +30,6 @@ public class ShipInformation {
      * @return the respective JSON string
      */
     public String toJson() throws JsonProcessingException {
-        // Assert that there are no flaws in the data
-        if (!shipHash.isEmpty() && !shipHash.isBlank()) {
-            assert anomalyInformation == null || anomalyInformation.getShipHash().equals(shipHash);
-            assert aisSignal == null || aisSignal.getShipHash().equals(shipHash);
-        }
-
         return new UtilsObjectMapper().writeValueAsString(this);
     }
 

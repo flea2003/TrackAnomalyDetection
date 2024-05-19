@@ -27,19 +27,19 @@ public class TestNotificationController {
     void setUp() throws NotFoundNotificationException {
         notification1 = new Notification(1F, "explanation",
                 OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                "hash1", 0, 1);
+                1L, 0, 1);
         notification2 = new Notification(1F, "explanation",
                 OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                "hash2", 0, 1);
+                2L, 0, 1);
         notification3 = new Notification(1F, "explanation",
                 OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                "hash2", 0, 2);
+                2L, 0, 2);
         notificationService = mock(NotificationService.class);
 
         when(notificationService.getNotificationById(0L)).thenReturn(notification1);
         when(notificationService.getNotificationById(1L)).thenReturn(notification2);
         when(notificationService.getAllNotifications()).thenReturn(List.of(notification1, notification2, notification3));
-        when(notificationService.getAllNotificationForShip("hash2")).thenReturn(List.of(notification2, notification3));
+        when(notificationService.getAllNotificationForShip(2L)).thenReturn(List.of(notification2, notification3));
         when(notificationService.getNotificationById(4L)).thenThrow(NotFoundNotificationException.class);
         notificationController = new NotificationController(notificationService);
     }
@@ -66,6 +66,6 @@ public class TestNotificationController {
 
     @Test
     void testGetNotificationForAShip() throws NotFoundNotificationException {
-        assertThat(notificationController.getAllNotificationsForShip("hash2")).isEqualTo(ResponseEntity.ok(List.of(notification2, notification3)));
+        assertThat(notificationController.getAllNotificationsForShip(2L)).isEqualTo(ResponseEntity.ok(List.of(notification2, notification3)));
     }
 }

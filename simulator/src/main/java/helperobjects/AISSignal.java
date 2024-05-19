@@ -21,7 +21,7 @@ import lombok.ToString;
 @ToString
 @JsonSerialize
 public class AISSignal implements Serializable {
-
+    private final String producerID;
     private final String shipHash;
     private final float speed;
     private final float longitude;
