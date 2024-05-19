@@ -12,7 +12,7 @@ test("Rounding of latitude and longitude", () => {
     "time",
     "p1",
     1,
-    350.0
+    350.0,
   );
 
   // Test that the rounding is done correctly. Assumes that the rounding is 1000
