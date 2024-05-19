@@ -333,7 +333,6 @@ public class AnomalyDetectionPipeline {
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
         AISSignal aisSignal = shipInformation.getAisSignal();
 
-
         // If the processed ShipInformation instance encapsulates a AISSignal instance:
         // update the current value of the AISSignal field
         if (aisSignal != null
@@ -354,7 +353,7 @@ public class AnomalyDetectionPipeline {
             // If the field currentAnomalyInformation of the aggregating object is not initialized
             // consider the value of the highest recorded score to be -1
             Float currentMaxAnomalyScore = aggregatedShipDetails.getCurrentAnomalyInformation() == null
-                    ? -1 : aggregatedShipDetails.getCurrentAnomalyInformation().getMaxAnomalyScore();
+                    ? 0 : aggregatedShipDetails.getCurrentAnomalyInformation().getMaxAnomalyScore();
             Float newMaxAnomalyScore = anomalyInformation.getScore() > currentMaxAnomalyScore
                     ? anomalyInformation.getScore() : currentMaxAnomalyScore;
             aggregatedShipDetails.setCurrentAnomalyInformation(

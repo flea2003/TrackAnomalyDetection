@@ -24,7 +24,7 @@ public class AnomalyInformation implements Serializable {
     private final Float score;
     private final String explanation;
     // Field required by the aggregating CurrentShipDetails object
-    // Instantiated with -1 for a regular AnomalyInformation instance
+    // Instantiated with 0 for a regular AnomalyInformation instance
     private final Float maxAnomalyScore;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime correspondingTimestamp;
