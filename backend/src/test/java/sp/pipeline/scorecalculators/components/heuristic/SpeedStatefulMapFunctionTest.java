@@ -10,7 +10,7 @@ import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
 import org.apache.flink.streaming.util.OneInputStreamOperatorTestHarness;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 
 public class SpeedStatefulMapFunctionTest {
 

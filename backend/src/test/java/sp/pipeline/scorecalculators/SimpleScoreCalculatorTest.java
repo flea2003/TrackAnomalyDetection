@@ -8,7 +8,7 @@ import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class SimpleScoreCalculatorTest {
 

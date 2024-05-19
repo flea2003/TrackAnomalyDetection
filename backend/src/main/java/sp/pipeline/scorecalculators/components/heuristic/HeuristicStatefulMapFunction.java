@@ -9,7 +9,7 @@ import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
 
 @Getter

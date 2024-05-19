@@ -2,8 +2,7 @@ package sp.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AnomalyInformation;
-import sp.dtos.ExtendedAnomalyInformation;
+import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
@@ -116,7 +115,7 @@ public class TestShipsDataService {
 //    @Test
 //    void getCurrentAnomalyInformationTest(){
 //        try{
-//            ExtendedAnomalyInformation anomalyInformation = shipsDataService.getCurrentAnomalyInformation(1L);
+//            CurrentShipDetails anomalyInformation = shipsDataService.getCurrentAnomalyInformation(1L);
 //            assertThat(anomalyInformation.getAnomalyInformation().getScore()).isEqualTo(0.5f);
 //            assertThat(anomalyInformation.getAnomalyInformation().getId()).isEqualTo(1L);
 //        } catch (Exception e){

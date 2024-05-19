@@ -3,7 +3,7 @@ package sp.pipeline.scorecalculators.components.heuristic;
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.circularMetric;
 
 import sp.model.AISSignal;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 
 public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
 

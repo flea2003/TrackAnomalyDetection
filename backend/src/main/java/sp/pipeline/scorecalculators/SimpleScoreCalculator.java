@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 import sp.pipeline.scorecalculators.components.heuristic.SignalStatefulMapFunction;
 import sp.pipeline.scorecalculators.components.heuristic.SpeedStatefulMapFunction;
 import sp.pipeline.scorecalculators.components.heuristic.TurningStatefulMapFunction;

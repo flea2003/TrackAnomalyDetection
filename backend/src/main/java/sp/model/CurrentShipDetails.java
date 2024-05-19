@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.serialization.Serde;
-import sp.dtos.AnomalyInformation;
 import sp.utils.UtilsObjectMapper;
 import java.io.Serializable;
 

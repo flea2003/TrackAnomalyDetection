@@ -3,16 +3,14 @@ package sp.pipeline.scorecalculators.components.heuristic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.operators.StreamMap;
 import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 
 import org.apache.flink.streaming.util.OneInputStreamOperatorTestHarness;
 

@@ -3,7 +3,7 @@ package sp.pipeline.scorecalculators.components.heuristic;
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.harvesineDistance;
 
 import java.time.Duration;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
 
 public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
