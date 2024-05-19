@@ -1,16 +1,18 @@
 import React from "react";
 
-import "../../styles/common.css";
-import "../../styles/objectDetailsEntry.css";
+import "../../../styles/common.css";
+import "../../../styles/objectDetailsEntry.css";
 
 /**
  * This component is a single entry in the Object Details. It displays a single key-value pair of the object.
- * In reality, it simply displays "type: value" on the screen with bolding and padding. The property type and value are passed as props.
+ * In reality, it simply displays type on one line and value on the other with some styling.
+ * The property type and value are passed as props.
  */
 function ObjectDetailsEntry(props: { type: string; value: string }) {
   return (
     <div className="object-details-entry">
-      <span className="object-details-entry-type">{props.type}</span>:{" "}
+      <span className="object-details-entry-type">{props.type}</span>
+      <br />
       <span className="object-details-entry-value">{props.value}</span>
     </div>
   );
