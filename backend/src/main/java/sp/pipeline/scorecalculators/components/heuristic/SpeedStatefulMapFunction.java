@@ -21,26 +21,52 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     public AnomalyInformation map(AISSignal value) throws Exception {
-        AnomalyInformation anomalyInformation = new AnomalyInformation();
-        AnomalyInformation pastAnomalyInformation = getAnomalyInformationValueState().value();
         AISSignal pastAISSignal = getAisSignalValueState().value();
 
         // In the case that our stateful map has encountered signals in the past
-        if (pastAnomalyInformation != null && pastAISSignal != null) {
-            double globeDistance = harvesineDistance(value.getLatitude(), value.getLongitude(),
-                pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
-            double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
-            double computedSpeed = globeDistance / (time + 0.00001);
-
-            boolean speedIsLow = computedSpeed <= 55.5;
-            boolean reportedSpeedIsAccurate = Math.abs(value.getSpeed() - computedSpeed) <= 10;
-            boolean accelerationIsLow = (getAisSignalValueState().value().getSpeed() - value.getSpeed()) / (time + 0.00001) < 50;
-
-            if (!speedIsLow || !reportedSpeedIsAccurate || !accelerationIsLow) {
-                this.getLastDetectedAnomalyTime().update(value.getTimestamp());
-            }
+        if (pastAISSignal != null && isAnomaly(value, pastAISSignal)) {
+            this.getLastDetectedAnomalyTime().update(value.getTimestamp());
         }
-        return super.setAnomalyInformationResult(anomalyInformation, value, 33f, badMsg, goodMsg);
+
+        return super.setAnomalyInformationResult(value, 33f, badMsg, goodMsg);
     }
 
+    /**
+     * Checks if the current value is anomaly based on heuristics (current speed, reported
+     * speed difference and the acceleration).
+     *
+     * @param value current AIS signal
+     * @param pastAISSignal past AIS signal
+     * @return true if the current AIS signal is considered an anomaly based on speed
+     *     heuristics, and false otherwise.
+     */
+    public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) {
+        double globeDistance = harvesineDistance(value.getLatitude(), value.getLongitude(),
+                pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
+        double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
+
+        double computedSpeed = globeDistance / (time + 0.00001);
+        double reportedSpeedDifference = Math.abs(value.getSpeed() - computedSpeed);
+        double computedAcceleration = (value.getSpeed() - pastAISSignal.getSpeed()) / (time + 0.00001);
+
+        return isAnomaly(computedSpeed, reportedSpeedDifference, computedAcceleration);
+    }
+
+    /**
+     * Checks if the current value is anomaly based on heuristics (current speed, reported
+     * speed difference and the acceleration).
+     *
+     * @param computedSpeed computed speed based on the past AIS signal
+     * @param reportedSpeedDifference the difference between computed speed and reported speed
+     * @param computedAcceleration computed acceleration based on the past AIS signal
+     * @return true if the current AIS signal is considered an anomaly based on speed
+     *     heuristics, and false otherwise.
+     */
+    public boolean isAnomaly(double computedSpeed, double reportedSpeedDifference, double computedAcceleration) {
+        boolean speedIsLow = (computedSpeed <= 55.5);
+        boolean reportedSpeedIsAccurate = (reportedSpeedDifference <= 10);
+        boolean accelerationIsLow = (computedAcceleration < 50);
+
+        return !speedIsLow || !reportedSpeedIsAccurate || !accelerationIsLow;
+    }
 }

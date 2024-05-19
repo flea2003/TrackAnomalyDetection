@@ -66,9 +66,6 @@ public class SampleStatefulMapFunction extends RichMapFunction<AISSignal, Anomal
      */
     @Override
     public AnomalyInformation map(AISSignal value) throws Exception {
-        // Thread.sleep(4000);
-        // Access the current score for the ship. If it is empty, initialize it to 0
-
         Float currentScore = score.value();
         if (currentScore == null) {
             currentScore = 0F;

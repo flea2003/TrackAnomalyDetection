@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.circularMetric;
 
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ToolsTest {
 
@@ -17,4 +18,5 @@ class ToolsTest {
     void circularMetricTest(){
         assertThat(Math.round(circularMetric(33.4f, 85.3f))).isEqualTo(52);
     }
+
 }

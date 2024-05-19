@@ -23,7 +23,7 @@ import sp.utils.UtilsObjectMapper;
 @ToString
 @EqualsAndHashCode
 public class AnomalyInformation implements Serializable {
-    private final Float score;
+    private final float score;
     private final String explanation;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime correspondingTimestamp;
