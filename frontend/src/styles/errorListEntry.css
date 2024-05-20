@@ -12,8 +12,6 @@
 
     /* Make sure when hovering it is like a link */
     cursor: pointer;
-
-    padding-left: 5px;
 }
 
 .error-list-entry:hover {
