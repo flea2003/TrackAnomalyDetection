@@ -11,8 +11,6 @@ import bellIcon from "../../../assets/icons/bell-notification.svg";
 import settingsIcon from "../../../assets/icons/settings.svg";
 import bugIcon from "../../../assets/icons/bug.svg";
 
-import sidebarStyleConfig from "../../../configs/sidebarConfig.json";
-
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
 }
@@ -70,9 +68,8 @@ function Sidebar({ pageChanger }: SidebarProps) {
       </span>
       <span
         data-testid="sidebar-bug-icon"
-        className="sidebar-entry"
+        className={getBugIconClassName()}
         onClick={onBugIconClicked}
-        style={{ backgroundColor: getBugBackgroundColor() }}
       >
         <img src={bugIcon} className="sidebar-icon" alt={bugIconAlt} />
       </span>
@@ -81,15 +78,16 @@ function Sidebar({ pageChanger }: SidebarProps) {
 }
 
 /**
- * Returns the colour that should be used for the bug icon in the sidebar.
- * The background is transparent when there are no unread notifications,
- * and has a light red (light coral) colour otherwise.
+ * Returns the class name for the icon element that represents error list
+ * in the sidebar.
+ * The class name is based on whether all notifications were read or not,
+ * so that the icon could be shown in red when there are unread notifications.
  */
-function getBugBackgroundColor() {
+function getBugIconClassName() {
   if (ErrorNotificationService.areAllRead()) {
-    return sidebarStyleConfig["bug-background-color-all-read"];
+    return "sidebar-bug-icon-all-read";
   }
-  return sidebarStyleConfig["bug-background-color-not-all-read"];
+  return "sidebar-bug-icon-not-all-read";
 }
 
 export default Sidebar;

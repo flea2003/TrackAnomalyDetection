@@ -17,10 +17,12 @@ class ShipService {
    * @returns a promise that resolves to an array of ShipDetails.
    */
   static queryBackendForShipsArray: () => Promise<ShipDetails[]> = async () => {
-    const response = await HttpSender.get(ShipService.shipsCurrentDetailsEndpoint)
+    const response = await HttpSender.get(
+      ShipService.shipsCurrentDetailsEndpoint,
+    );
 
     if (!Array.isArray(response)) {
-      ErrorNotificationService.addError("Server returned not an array")
+      ErrorNotificationService.addError("Server returned not an array");
       return [];
     }
 
@@ -36,7 +38,7 @@ class ShipService {
 
     return responseWithoutNulls.map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (item: any) => ShipService.extractCurrentShipDetails(item)
+      (item: any) => ShipService.extractCurrentShipDetails(item),
     );
   };
 

@@ -119,3 +119,19 @@ test("get all notifications does not return more than the limit", () => {
   expect(notifications.length).toBe(1);
   expect(notifications[0].message).toBe("warning");
 });
+
+test("mark as read test", () => {
+  ErrorNotificationService.addError("error");
+  ErrorNotificationService.addError("error2");
+
+  let notifications = ErrorNotificationService.getAllNotifications();
+
+  ErrorNotificationService.markAsRead(notifications[0].id);
+
+  // only the first one should be marked as read
+  expect(ErrorNotificationService.areAllRead()).toBe(false);
+
+  notifications = ErrorNotificationService.getAllNotifications();
+  expect(notifications[0].wasRead).toBe(true);
+  expect(notifications[1].wasRead).toBe(false);
+});
