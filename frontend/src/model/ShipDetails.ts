@@ -48,6 +48,7 @@ class ShipDetails {
     return [
       { type: "Ship ID", value: this.id.toString() },
       { type: "Explanation", value: this.explanation },
+      { type: "Anomaly Score", value: this.anomalyScore + "%" },
       {
         type: "Highest Recorded Anomaly Score",
         value: this.maxAnomalyScore + "%",
@@ -60,12 +61,6 @@ class ShipDetails {
       { type: "Departure Port", value: "" + this.departurePort },
       { type: "Course", value: "" + this.course },
       { type: "Speed", value: "" + this.speed },
-      {
-        type: "Latitude",
-        value:
-          "" +
-          Math.round(this.lat * ShipDetails.rounding) / ShipDetails.rounding,
-      },
       {
         type: "Position",
         value: this.getPositionString(),

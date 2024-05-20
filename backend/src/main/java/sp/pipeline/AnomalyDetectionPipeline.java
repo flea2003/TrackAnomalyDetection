@@ -1,7 +1,6 @@
 package sp.pipeline;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Properties;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +30,6 @@ import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
-import sp.model.MaxAnomalyScoreDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 import java.util.Objects;
@@ -323,80 +321,6 @@ public class AnomalyDetectionPipeline {
             System.out.println(err);
             throw new PipelineException(err);
         }
-    }
-
-    /**
-     * Aggregates data to a resulting map.
-     *
-     * @param aggregatedShipDetails object that stores the latest received data for a ship
-     * @param valueJson json value for a signal
-     * @param key hash value of the ship
-     * @return updated object that stores all needed data for a ship
-     */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson, Long key)
-            throws JsonProcessingException {
-
-        ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
-        AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
-        AISSignal aisSignal = shipInformation.getAisSignal();
-
-        // If the processed ShipInformation instance encapsulates a AISSignal instance:
-        // update the current value of the AISSignal field
-        if (aisSignal != null
-                && (aggregatedShipDetails.getCurrentAISSignal() == null
-                || aisSignal.getTimestamp().isAfter(aggregatedShipDetails.getCurrentAISSignal().getTimestamp()))) {
-
-            aggregatedShipDetails.setCurrentAISSignal(aisSignal);
-        }
-
-        // If the processed ShipInformation instance encapsulates a AnomalyInformation instance:
-        // update the current value of the AnomalyInformation field, additionally modifying the value
-        // of the highest recorder Anomaly Score for the ship
-        if (anomalyInformation != null
-                && (aggregatedShipDetails.getCurrentAnomalyInformation() == null
-                || anomalyInformation.getCorrespondingTimestamp()
-                .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp()))) {
-
-            aggregatedShipDetails.setCurrentAnomalyInformation(anomalyInformation);
-
-            // Update the value of the maxAnomalyScoreInfo field
-            MaxAnomalyScoreDetails updatedMaxAnomalyScoreDetails = updateMaxScoreDetails(aggregatedShipDetails,
-                    anomalyInformation);
-
-            aggregatedShipDetails.setMaxAnomalyScoreInfo(updatedMaxAnomalyScoreDetails);
-
-        }
-
-        return aggregatedShipDetails;
-    }
-
-    /**
-     * Utility method for updating the maxAnomalyScoreInfo filed of the streams aggregating object.
-     *
-     * @return - the updated MaxAnomalyScoreDetails instance
-     */
-    private MaxAnomalyScoreDetails updateMaxScoreDetails(CurrentShipDetails aggregatedShipDetails,
-                                                         AnomalyInformation anomalyInformation) {
-        // Given that we received a new AnomalyInformation signal we have to update
-        // the MaxAnomalyScoreDetails field
-        // If the field maxAnomalyScoreInfo of the aggregating object is not initialized:
-        // consider the value of the highest recorded score to be 0
-        // consider the value of the corresponding timestamp to be null
-        boolean isMaxScoreInitialized = aggregatedShipDetails.getMaxAnomalyScoreInfo() == null;
-
-        float currentMaxScore = isMaxScoreInitialized
-                ? 0 : aggregatedShipDetails.getMaxAnomalyScoreInfo().getMaxAnomalyScore();
-
-        float newMaxScore = currentMaxScore < anomalyInformation.getScore()
-                ? anomalyInformation.getScore() : currentMaxScore;
-
-        OffsetDateTime currentTimestamp = isMaxScoreInitialized
-                ? null : aggregatedShipDetails.getMaxAnomalyScoreInfo().getCorrespondingTimestamp();
-
-        OffsetDateTime newTimestamp = newMaxScore == anomalyInformation.getScore()
-                ? anomalyInformation.getCorrespondingTimestamp() : currentTimestamp;
-
-        return new MaxAnomalyScoreDetails(newMaxScore, newTimestamp);
     }
 
     /**
