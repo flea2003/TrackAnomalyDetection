@@ -19,13 +19,6 @@ import sp.model.AnomalyInformation;
 
 
 public class ZipTupleMapFunctionTest {
-    private final OffsetDateTime time1 = OffsetDateTime.of(2004, 1, 27, 1,1,0,0,
-        ZoneOffset.ofHours(0));
-    private final OffsetDateTime time2 = OffsetDateTime.of(2004, 1, 27, 1,15,0,0,
-        ZoneOffset.ofHours(0));
-    private final OffsetDateTime time3 = OffsetDateTime.of(2004, 1, 27, 1,17,0,0,
-        ZoneOffset.ofHours(0));
-
 
     @ClassRule
     public static MiniClusterWithClientResource flinkCluster =

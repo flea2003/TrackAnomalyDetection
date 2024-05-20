@@ -3,6 +3,7 @@ package sp.pipeline;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.Properties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -37,28 +38,27 @@ import java.util.Objects;
 
 @Service
 public class AnomalyDetectionPipeline {
-    private static final String RAW_INCOMING_AIS_TOPIC_NAME;
-    private static final String INCOMING_AIS_TOPIC_NAME;
-    private static final String CALCULATED_SCORES_TOPIC_NAME;
-    private static final String KAFKA_SERVER_ADDRESS;
-    private static final String KAFKA_STORE_NAME;
+
+    private static final String RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais-raw.topic.name";
+    private static final String INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais.topic.name";
+    private static final String CALCULATED_SCORES_TOPIC_NAME_PROPERTY = "calculated.scores.topic.name";
+    private static final String KAFKA_SERVER_ADDRESS_PROPERTY = "kafka.server.address";
+    private static final String KAFKA_STORE_NAME_PROPERTY = "kafka.store.name";
+
+    private String rawIncomingAisTopicName;
+    private String incomingAisTopicName;
+    private String calculatedScoresTopicName;
+    private String kafkaServerAddress;
+    private String kafkaStoreName;
+
+
     private final ScoreCalculationStrategy scoreCalculationStrategy;
+    private final StreamUtils streamUtils;
+    private final Aggregator aggregator;
+
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
     private KTable<Long, CurrentShipDetails> state;
-
-    // Load the needed parameters from the configurations file
-    static {
-        try {
-            RAW_INCOMING_AIS_TOPIC_NAME = StreamUtils.loadConfig().getProperty("incoming.ais-raw.topic.name");
-            INCOMING_AIS_TOPIC_NAME = StreamUtils.loadConfig().getProperty("incoming.ais.topic.name");
-            CALCULATED_SCORES_TOPIC_NAME = StreamUtils.loadConfig().getProperty("calculated.scores.topic.name");
-            KAFKA_SERVER_ADDRESS = StreamUtils.loadConfig().getProperty("kafka.server.address");
-            KAFKA_STORE_NAME = StreamUtils.loadConfig().getProperty("kafka.store.name");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * Constructor for the AnomalyDetectionPipeline.
@@ -66,10 +66,42 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy)
-        throws IOException {
+    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy,
+                StreamUtils streamUtils, Aggregator aggregator) throws IOException {
+
         this.scoreCalculationStrategy = scoreCalculationStrategy;
+        this.streamUtils = streamUtils;
+        this.aggregator = aggregator;
+
+        loadParametersFromConfigFile();
         buildPipeline();
+    }
+
+    /**
+     * Closes the pipeline by closing KafkaStreams and Flink environment.
+     *
+     * @throws Exception when closing Flink environment throws exception
+     */
+    public void closePipeline() throws Exception {
+        kafkaStreams.close();
+        flinkEnv.close();
+    }
+
+    /**
+     * Loads the needed parameters from the configuration file.
+     */
+    private void loadParametersFromConfigFile() throws IOException {
+        Properties config = streamUtils.loadConfig();
+
+        if (config == null) {
+            throw new IOException("Properties file not found");
+        }
+
+        rawIncomingAisTopicName = config.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
+        incomingAisTopicName = config.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
+        calculatedScoresTopicName = config.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
+        kafkaServerAddress = config.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
+        kafkaStoreName = config.getProperty(KAFKA_STORE_NAME_PROPERTY);
     }
 
     /**
@@ -110,9 +142,9 @@ public class AnomalyDetectionPipeline {
      * @return the DataStream with the AISSignal objects that have been assigned an internal ID.
      *         Used in the next step of the pipeline.
      */
-    private DataStream<AISSignal> buildIdAssignmentPart() {
+    private DataStream<AISSignal> buildIdAssignmentPart() throws IOException {
         // Create a Flink stream that consumes AIS signals from Kafka
-        KafkaSource<String> kafkaSource = StreamUtils.getFlinkStreamConsumingFromKafka(RAW_INCOMING_AIS_TOPIC_NAME);
+        KafkaSource<String> kafkaSource = streamUtils.getFlinkStreamConsumingFromKafka(rawIncomingAisTopicName);
         DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
 
         // Map stream from JSON strings to ExternalAISSignal objects
@@ -126,7 +158,7 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Builds the first part of the sp.pipeline - the score calculation part, done in Flink. This sp.pipeline
+     * Builds the first part of the `sp.pipeline` - the score calculation part, done in Flink. This `sp.pipeline`
      * consumes AIS signals from Kafka, calculates the anomaly scores (in Flink) and sends them to back
      * to Kafka into another topic.
 
@@ -137,7 +169,7 @@ public class AnomalyDetectionPipeline {
     private void buildScoreCalculationPart(DataStream<AISSignal> source) {
 
         // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
-        KafkaSink<String> signalsSink = createSinkFlinkToKafka(KAFKA_SERVER_ADDRESS, INCOMING_AIS_TOPIC_NAME);
+        KafkaSink<String> signalsSink = createSinkFlinkToKafka(kafkaServerAddress, incomingAisTopicName);
         source.map(AISSignal::toJson).sinkTo(signalsSink);
 
         // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
@@ -147,12 +179,12 @@ public class AnomalyDetectionPipeline {
         DataStream<String> updateStreamSerialized = updateStream.map(AnomalyInformation::toJson);
 
         // Send the calculated AnomalyInformation objects to Kafka
-        KafkaSink<String> scoresSink = createSinkFlinkToKafka(KAFKA_SERVER_ADDRESS, CALCULATED_SCORES_TOPIC_NAME);
+        KafkaSink<String> scoresSink = createSinkFlinkToKafka(kafkaServerAddress, calculatedScoresTopicName);
         updateStreamSerialized.sinkTo(scoresSink);
     }
 
     /**
-     * Builds the second part of the sp.pipeline - the score aggregation part. In particular, this part
+     * Builds the second part of the `sp.pipeline` - the score aggregation part. In particular, this part
      * takes the calculated score updates from Kafka (which were pushed there by the previous part)
      * and aggregates them into a KTable. It also takes care of appending needed AIS signals to the KTable.
      * This KTable is then used as the state of the sp.pipeline.
@@ -165,8 +197,7 @@ public class AnomalyDetectionPipeline {
      * anomaly score field in the corresponding places.
      * </p>
      */
-    private void buildScoreAggregationPart() {
-        // Create a keyed Kafka Stream of incoming AnomalyInformation signals
+    private void buildScoreAggregationPart() throws IOException {
         StreamsBuilder builder = new StreamsBuilder();
 
         // Construct and merge two streams and select the ship hash as a key for the new stream.
@@ -186,19 +217,19 @@ public class AnomalyDetectionPipeline {
                         CurrentShipDetails::new,
                         (key, valueJson, aggregatedShipDetails) -> {
                             try {
-                                return aggregateSignals(aggregatedShipDetails, valueJson, key);
+                                return aggregator.aggregateSignals(aggregatedShipDetails, valueJson);
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
                         },
                         Materialized
-                                .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NAME)
+                                .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(kafkaStoreName)
                                 .withValueSerde(CurrentShipDetails.getSerde())
                 );
 
         builder.build();
         this.state = table;
-        this.kafkaStreams = StreamUtils.getKafkaStreamConsumingFromKafka(builder);
+        this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
     }
 
@@ -214,14 +245,17 @@ public class AnomalyDetectionPipeline {
 
         // Take the initial AISSignal and wrap them into ShipInformation objects, so we could later merge the stream
         // with already wrapped AnomalyInformation objects
-        KStream<Long, String> streamAISSignalsJSON = builder.stream(INCOMING_AIS_TOPIC_NAME);
-        KStream<Long, ShipInformation> streamAISSignals = streamAISSignalsJSON
+        KStream<Long, String> streamAISSignalsJSON = builder.stream(incomingAisTopicName);
+        return streamAISSignalsJSON
                 .mapValues(x -> {
                     AISSignal aisSignal;
-                    aisSignal = AISSignal.fromJson(x);
+                    try {
+                        aisSignal = AISSignal.fromJson(x);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
                     return new ShipInformation(aisSignal.getId(), null, aisSignal);
                 });
-        return streamAISSignals;
     }
 
     /**
@@ -236,9 +270,10 @@ public class AnomalyDetectionPipeline {
 
         // Take computed AnomalyInformation JSON strings, deserialize them and wrap them into ShipInformation objects,
         // so we could later merge the stream with wrapped simple AISSignal objects
-        KStream<Long, String> streamAnomalyInformationJSON = builder.stream(CALCULATED_SCORES_TOPIC_NAME);
-        KStream<Long, ShipInformation> streamAnomalyInformation  = streamAnomalyInformationJSON.mapValues(x -> {
-            AnomalyInformation anomalyInformation = null;
+        KStream<Long, String> streamAnomalyInformationJSON = builder.stream(calculatedScoresTopicName);
+
+        return streamAnomalyInformationJSON.mapValues(x -> {
+            AnomalyInformation anomalyInformation;
             try {
                 anomalyInformation = AnomalyInformation.fromJson(x);
             } catch (JsonProcessingException e) {
@@ -246,8 +281,6 @@ public class AnomalyDetectionPipeline {
             }
             return new ShipInformation(anomalyInformation.getId(), anomalyInformation, null);
         });
-
-        return streamAnomalyInformation;
     }
 
     /**

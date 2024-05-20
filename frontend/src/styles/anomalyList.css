@@ -1,17 +1,7 @@
 #anomaly-list-container {
+    width: 5%;
     text-align: center;
     display: flex;
-}
-
-#anomaly-list-title {
-    height: var(--anomaly-list-title-height);
-    width: 100%;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: var(--anomaly-list-title-font-size);
-    font-weight: bold;
 }
 
 #anomaly-list-internal-container {
@@ -21,6 +11,11 @@
 #anomaly-list-close-icon {
     height: var(--anomaly-list-closing-icon-size);
     width: var(--anomaly-list-closing-icon-size);
+    padding: var(--anomaly-list-closing-icon-margin);
+}
+
+#anomaly-list-close-icon:hover {
+    cursor: pointer;
 }
 
 #anomaly-list-title-container {
@@ -29,11 +24,4 @@
     align-items: center;
     border-bottom: 1px solid black;
 
-}
-
-#anomaly-list-close-icon {
-    padding-left: var(--anomaly-list-closing-icon-margin);
-}
-#anomaly-list-close-icon:hover {
-    cursor: pointer;
 }

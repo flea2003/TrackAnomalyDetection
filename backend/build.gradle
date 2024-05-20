@@ -13,6 +13,7 @@ plugins {
 
 ext {
 	flinkVersion = '1.19.0'
+	kafkaVersion = '3.7.0'
 	scalaBinaryVersion = '_2.12'
 	slf4jVersion = '1.7.36'
 	log4jVersion = '2.17.1'
@@ -68,17 +69,14 @@ configurations {
 }
 
 dependencies {
-	testImplementation group: 'org.apache.kafka', name: 'kafka-streams-test-utils', version: '3.7.0'
-
+	testImplementation group: 'org.apache.kafka', name: 'kafka-streams-test-utils', version: "${kafkaVersion}"
 
 	implementation 'io.r2dbc:r2dbc-spi:0.9.0.RELEASE' // Check for the latest version
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.apache.kafka:kafka-streams:3.7.0'
-	implementation 'org.springframework.kafka:spring-kafka:3.1.4'
+	implementation "org.apache.kafka:kafka-streams:${kafkaVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.kafka:spring-kafka-test:3.1.4'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'com.h2database:h2'
 	implementation 'org.projectlombok:lombok:1.18.28'
@@ -115,7 +113,6 @@ dependencies {
 	implementation group: 'org.apache.flink', name: 'flink-core', version: "${flinkVersion}"
 	implementation group: 'org.apache.flink', name: 'flink-queryable-state-client-java', version: "${flinkVersion}"
 	implementation "org.apache.flink:flink-queryable-state-runtime:${flinkVersion}"
-	//	implementation 'org.apache.kafka:kafka-streams:3.7.0'
 	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.7.0'
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
 
@@ -147,6 +144,13 @@ shadowJar {
 
 test {
 	useJUnitPlatform()
+
+	// modify jvmArgs (needed by Flink tests)
+	jvmArgs += [
+			'--add-opens=java.base/java.util=ALL-UNNAMED',
+			'--add-opens=java.base/java.lang=ALL-UNNAMED',
+			'--add-opens=java.base/java.time=ALL-UNNAMED'
+	]
 }
 
 jacoco {

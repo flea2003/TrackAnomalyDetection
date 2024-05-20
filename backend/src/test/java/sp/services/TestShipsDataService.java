@@ -76,6 +76,12 @@ public class TestShipsDataService {
             put(4L, currentShipDetails4);
         }};
 
+        mapAISSignal = new HashMap<>(){{
+            put(1L, signal3);
+            put(2L, signal2);
+            put(3L, signal5);
+            put(4L, signal6);
+        }};
 
         AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
