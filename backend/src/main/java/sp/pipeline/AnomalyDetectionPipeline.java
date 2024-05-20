@@ -25,7 +25,7 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
@@ -296,10 +296,11 @@ public class AnomalyDetectionPipeline {
 
     /**
      * Returns the current (last updated) anomaly scores of the ships in the system.
+     * Additionally return the current max anomaly score information of the ships in the system.
      *
-     * @return the current scores of the ships in the system.
+     * @return the current and max scores of the ships in the system.
      */
-    public HashMap<Long, AnomalyInformation> getCurrentScores() throws PipelineException {
+    public HashMap<Long, CurrentShipDetails> getCurrentShipDetails() throws PipelineException {
         try {
             // Get the current state of the KTable
             final String storeName = this.state.queryableStoreName();
@@ -308,36 +309,10 @@ public class AnomalyDetectionPipeline {
             );
 
             // Create a copy of the state considering only the current AnomalyInformation values for each ship
-            HashMap<Long, AnomalyInformation> stateCopy = new HashMap<>();
+            HashMap<Long, CurrentShipDetails> stateCopy = new HashMap<>();
             try (KeyValueIterator<Long, CurrentShipDetails> iter = view.all()) {
-                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAnomalyInformation()));
-            }
-            return stateCopy;
-
-        } catch (Exception e) {
-            String err = "Failed to query store: " + e.getMessage() + ", continuing";
-            System.out.println(err);
-            throw new PipelineException(err);
-        }
-    }
-
-    /**
-     * Returns the current (last updated) AIS signals of the ships in the system.
-     *
-     * @return the current (last updated) AIS signals of the ships in the system.
-     */
-    public HashMap<Long, AISSignal> getCurrentAISSignals() throws PipelineException {
-        try {
-            // Get the current state of the KTable
-            final String storeName = this.state.queryableStoreName();
-            ReadOnlyKeyValueStore<Long, CurrentShipDetails> view = this.kafkaStreams.store(
-                    StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
-            );
-
-            // Create a copy of the state considering only the current AISSignal values for each ship
-            HashMap<Long, AISSignal> stateCopy = new HashMap<>();
-            try (KeyValueIterator<Long, CurrentShipDetails> iter = view.all()) {
-                iter.forEachRemaining(kv -> stateCopy.put(kv.key, kv.value.getCurrentAISSignal()));
+                iter.forEachRemaining(kv -> stateCopy
+                        .put(kv.key, kv.value));
             }
             return stateCopy;
 

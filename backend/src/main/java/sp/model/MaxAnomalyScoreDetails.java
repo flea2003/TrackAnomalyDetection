@@ -1,9 +1,7 @@
-package sp.dtos;
+package sp.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,23 +10,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import sp.utils.UtilsObjectMapper;
+import java.io.Serializable;
+import java.time.OffsetDateTime;
+
 
 @Getter
-@Builder
-@NoArgsConstructor(force = true)
-@AllArgsConstructor
 @Setter
+@NoArgsConstructor(force = true)
 @ToString
 @EqualsAndHashCode
-public class AnomalyInformation implements Serializable {
-    private final float score;
-    private final String explanation;
+@AllArgsConstructor
+@Builder
+public class MaxAnomalyScoreDetails implements Serializable {
+    private final Float maxAnomalyScore;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime correspondingTimestamp;
-    private final Long id;
 
     /**
-     * Converts a particular AISUpdate object to a JSON string.
+     * Converts a particular MaxAnomalyScoreDetails object to a JSON string.
      *
      * @return the respective JSON string
      */
@@ -37,12 +36,13 @@ public class AnomalyInformation implements Serializable {
     }
 
     /**
-     * Converts a JSON string to an AISUpdate object.
+     * Converts a JSON string to an AnomalyInformation object.
      *
      * @param val the JSON string to convert
      * @return the converted AISUpdate object
      */
-    public static AnomalyInformation fromJson(String val) throws JsonProcessingException {
-        return new UtilsObjectMapper().readValue(val, AnomalyInformation.class);
+    public static MaxAnomalyScoreDetails fromJson(String val) throws JsonProcessingException {
+        return new UtilsObjectMapper().readValue(val, MaxAnomalyScoreDetails.class);
     }
+
 }

@@ -71,7 +71,7 @@ function getPropertyElements(ship: ShipDetails) {
       <ObjectDetailsEntry
         key={property.type}
         type={property.type}
-        value={property.value}
+        value={property.value.toString()}
       />
     );
   });
