@@ -28,7 +28,6 @@ function Side({
   ErrorNotificationService.initialize(setErrorNotificationState);
 
   return (
-    // <Stack className="side-container" direction="row">
     <>
       <MiddleColumn
         currentPage={currentPage}

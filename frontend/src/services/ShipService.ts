@@ -45,7 +45,9 @@ class ShipService {
         );
         result.push(shipDetailsItem);
       } else {
-        ErrorNotificationService.addError("No matching anomaly info was found");
+        ErrorNotificationService.addWarning(
+          "No matching anomaly info was found",
+        );
       }
       return result;
     }, []);

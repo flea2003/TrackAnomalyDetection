@@ -3,6 +3,12 @@ import ErrorNotificationService, {
   ErrorSeverity,
 } from "../../services/ErrorNotificationService";
 
+beforeEach(() => {
+  // Remove refreshState function, so it does nothing.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ErrorNotificationService.refreshState = () => {};
+});
+
 afterEach(() => {
   ErrorNotificationService.clearAllNotifications();
   ErrorNotificationService.savedNotificationsLimit = 10000; // bring back the limit if it was changed

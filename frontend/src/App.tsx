@@ -27,7 +27,7 @@ function App() {
     if (mapRef.current !== null) {
       mapRef.current.centerMapOntoShip(details);
     } else {
-      ErrorNotificationService.addError("mapRef is null");
+      ErrorNotificationService.addWarning("mapRef is null");
     }
   };
 

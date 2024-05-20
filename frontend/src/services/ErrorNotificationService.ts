@@ -3,6 +3,8 @@ import warningSymbol from "../assets/icons/error-notifications/warning.svg";
 import infoSymbol from "../assets/icons/error-notifications/info.svg";
 import React from "react";
 
+import errorListConfig from "../configs/errorListConfig.json";
+
 export enum ErrorSeverity {
   ERROR = "error",
   WARNING = "warning",
@@ -49,12 +51,16 @@ export class ErrorNotification {
  */
 class ErrorNotificationService {
   private static notifications: ErrorNotification[] = [];
-  private static refreshState = () => {
+  static refreshState = () => {
     console.log("ErrorNotificationService refreshState was not set up");
   };
 
-  static savedNotificationsLimit = 1000; // will not store more notifications than this number
-  static returnedNotificationsLimit = 100; // will not return more notifications than this number
+  // will not store more notifications than this number
+  static savedNotificationsLimit = errorListConfig["savedNotificationsLimit"];
+
+  // will not return more notifications than this number
+  static returnedNotificationsLimit =
+    errorListConfig["shownNotificationsLimit"];
 
   /**
    * Initialize the service by providing the function that should be called to update the state.

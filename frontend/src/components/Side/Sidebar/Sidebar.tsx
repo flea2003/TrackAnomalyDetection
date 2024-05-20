@@ -1,5 +1,7 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
+import { CurrentPage } from "../../../App";
+import ErrorNotificationService from "../../../services/ErrorNotificationService";
 
 import "../../../styles/common.css";
 import "../../../styles/sidebar.css";
@@ -8,8 +10,8 @@ import shipIcon from "../../../assets/icons/ship.png";
 import bellIcon from "../../../assets/icons/bell-notification.svg";
 import settingsIcon from "../../../assets/icons/settings.svg";
 import bugIcon from "../../../assets/icons/bug.svg";
-import { CurrentPage } from "../../../App";
-import ErrorNotificationService from "../../../services/ErrorNotificationService";
+
+import sidebarStyleConfig from "../../../configs/sidebarConfig.json";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -85,9 +87,9 @@ function Sidebar({ pageChanger }: SidebarProps) {
  */
 function getBugBackgroundColor() {
   if (ErrorNotificationService.areAllRead()) {
-    return "transparent";
+    return sidebarStyleConfig["bug-background-color-all-read"];
   }
-  return "lightcoral";
+  return sidebarStyleConfig["bug-background-color-not-all-read"];
 }
 
 export default Sidebar;

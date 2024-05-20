@@ -4,16 +4,16 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
 import L from "leaflet";
 import createShipIcon from "../ShipIcon/ShipIcon";
-import "../../styles/map.css";
-import "../../styles/common.css";
-
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
 
-import mapStyleConfig from "../../styles/mapConfig.json";
-import ErrorNotificationService from "../../services/ErrorNotificationService";
+import "../../styles/map.css";
+import "../../styles/common.css";
+
+import mapStyleConfig from "../../configs/mapConfig.json";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -69,7 +69,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
     useImperativeHandle(ref, () => ({
       centerMapOntoShip(ship: ShipDetails) {
         if (map == null) {
-          ErrorNotificationService.addError(
+          ErrorNotificationService.addWarning(
             "map is null in the call centerMapOntoShip",
           );
           return;
@@ -115,7 +115,12 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
             });
         } catch (error) {
           if (error instanceof Error) {
-            ErrorNotificationService.addError(error.message);
+            ErrorNotificationService.addWarning(
+              "Error while adding an icon for ship with id " +
+                ship.id +
+                ": " +
+                error.message,
+            );
           }
         }
       });
