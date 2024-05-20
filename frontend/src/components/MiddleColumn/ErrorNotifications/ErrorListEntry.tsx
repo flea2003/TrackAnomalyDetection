@@ -31,7 +31,7 @@ function ErrorListEntry({ notification }: ErrorListEntryProps) {
       data-testid="error-list-entry"
       spacing={0}
       // style={{ backgroundColor: color }}
-      onClick={() => (notification.wasRead = true)}
+      onClick={() => ErrorNotificationService.markAsRead(notification.id)}
     >
       <span className="error-list-entry-icon-container">
         <img

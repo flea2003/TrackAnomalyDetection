@@ -1,6 +1,7 @@
 import errorSymbol from "../assets/icons/error-notifications/error.svg";
 import warningSymbol from "../assets/icons/error-notifications/warning.svg";
 import infoSymbol from "../assets/icons/error-notifications/info.svg";
+import React from "react";
 
 export enum ErrorSeverity {
   ERROR = "error",
@@ -48,9 +49,22 @@ export class ErrorNotification {
  */
 class ErrorNotificationService {
   private static notifications: ErrorNotification[] = [];
+  private static refreshState = () => {
+    console.log("ErrorNotificationService refreshState was not set up");
+  }
 
-  static savedNotificationsLimit = 100000; // will not store more notifications than this number
+  static savedNotificationsLimit = 10000; // will not store more notifications than this number
   static returnedNotificationsLimit = 100; // will not return more notifications than this number
+
+  /**
+   * Initialize the service by providing the function that should be called to update the state.
+   * The state is created in `App.tsx` by calling `useState`, and the setter is passed here.
+   *
+   * @param setErrorNotificationsService the setter of the state created in the `App.tsx`
+   */
+  static initialize(setErrorNotificationsService:  React.Dispatch<React.SetStateAction<ErrorNotification[]>>) {
+    this.refreshState = () => setErrorNotificationsService(this.getAllNotifications())
+  }
 
   /**
    * Adds an error to current list of notifications.
@@ -88,6 +102,8 @@ class ErrorNotificationService {
   private static addNotification(notification: ErrorNotification) {
     this.notifications.push(notification);
     this.checkNotificationLimit();
+
+    this.refreshState();
   }
 
   /**
@@ -119,6 +135,21 @@ class ErrorNotificationService {
     this.notifications.forEach((notification) => {
       notification.wasRead = true;
     });
+
+    this.refreshState();
+  }
+
+  /**
+   * Mark the notification with the given id as read.
+   *
+   * @param id the id of the notification to be marked as read
+   */
+  static markAsRead(id: number) {
+    this.notifications.filter(notification => notification.id === id).forEach((notification) => {
+      notification.wasRead = true;
+    });
+
+    this.refreshState();
   }
 
   /**
@@ -137,6 +168,8 @@ class ErrorNotificationService {
     this.notifications = this.notifications.filter(
       (notification) => notification.id !== id,
     );
+
+    this.refreshState();
   }
 
   /**
@@ -146,6 +179,8 @@ class ErrorNotificationService {
    */
   static clearAllNotifications() {
     this.notifications = [];
+
+    this.refreshState();
   }
 }
 
