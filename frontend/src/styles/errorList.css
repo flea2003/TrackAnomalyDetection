@@ -3,6 +3,7 @@
     text-align: center;
     display: flex;
     height: 100vh;
+    border-left: 1px solid black;
 }
 
 #error-list-internal-container {
@@ -28,6 +29,22 @@
 
 }
 
-#error-list-title-container button{
+#error-list-mark-all-button {
     margin-right: 5px;
+    background-color: white;
+    box-shadow: 0 3px #999;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+#error-list-mark-all-button:hover {
+    background-color: lightgray;
+}
+
+#error-list-mark-all-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px #666;
+    background-color: lightgray;
 }
