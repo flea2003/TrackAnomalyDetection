@@ -60,18 +60,18 @@ public class Aggregator {
         // If the field maxAnomalyScoreInfo of the aggregating object is not initialized:
         // consider the value of the highest recorded score to be 0
         // consider the value of the corresponding timestamp to be null
-        boolean isMaxScoreInitialized = aggregatedShipDetails.getMaxAnomalyScoreInfo() == null;
+        boolean isMaxScoreUninitialized = aggregatedShipDetails.getMaxAnomalyScoreInfo() == null;
 
-        float currentMaxScore = isMaxScoreInitialized
-                ? 0 : aggregatedShipDetails.getMaxAnomalyScoreInfo().getMaxAnomalyScore();
+        MaxAnomalyScoreDetails currentMaxInfo = isMaxScoreUninitialized
+                ? new MaxAnomalyScoreDetails(0F, null)
+                : aggregatedShipDetails.getMaxAnomalyScoreInfo();
 
-        float newMaxScore = Math.max(currentMaxScore, anomalyInformation.getScore());
-
-        OffsetDateTime currentTimestamp = isMaxScoreInitialized
-                ? null : aggregatedShipDetails.getMaxAnomalyScoreInfo().getCorrespondingTimestamp();
+        float newMaxScore = Math.max(currentMaxInfo.getMaxAnomalyScore(),
+                anomalyInformation.getScore());
 
         OffsetDateTime newTimestamp = newMaxScore == anomalyInformation.getScore()
-                ? anomalyInformation.getCorrespondingTimestamp() : currentTimestamp;
+                ? anomalyInformation.getCorrespondingTimestamp()
+                : currentMaxInfo.getCorrespondingTimestamp();
 
         return new MaxAnomalyScoreDetails(newMaxScore, newTimestamp);
     }

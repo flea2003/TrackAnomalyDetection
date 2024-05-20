@@ -155,4 +155,58 @@ class AggregatorTest {
         assertEquals(result.getCurrentAnomalyInformation(), info);
     }
 
+    @Test
+    void aggregateSignalsWithUninitializedMaxUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
+        CurrentShipDetails details = new CurrentShipDetails(null, signal, null);
+        ShipInformation shipInfo = new ShipInformation(1L, info, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), info.getScore());
+    }
+
+    @Test
+    void aggregateSignalsWithUninitializedMaxNoUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation info = new AnomalyInformation(-1f, "explain", timestamp, 1L);
+        CurrentShipDetails details = new CurrentShipDetails(null, signal, null);
+        ShipInformation shipInfo = new ShipInformation(1L, info, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), 0f);
+    }
+
+    @Test
+    void aggregateSignalsWithInitializedMaxUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation prevInfo = new AnomalyInformation(1f, "explain", timestamp, 1L);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(prevInfo, signal, maxInfo);
+
+        AnomalyInformation newInfo = new AnomalyInformation(2F, "new explain", timestamp2, 1L);
+        ShipInformation shipInfo = new ShipInformation(1L, newInfo, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), newInfo.getScore());
+    }
+
+    @Test
+    void aggregateSignalsWithInitializedMaxNoUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation prevInfo = new AnomalyInformation(1f, "explain", timestamp, 1L);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(prevInfo, signal, maxInfo);
+
+        AnomalyInformation newInfo = new AnomalyInformation(0.5F, "new explain", timestamp2, 1L);
+        ShipInformation shipInfo = new ShipInformation(1L, newInfo, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), prevInfo.getScore());
+    }
+
 }
