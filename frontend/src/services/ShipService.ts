@@ -5,8 +5,6 @@ import HttpSender from "../utils/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
 
 class ShipService {
-  static httpSender: HttpSender = new HttpSender();
-
   /** Backend API endpoint for retrieving (polling) the information about
    * the latest ship details for each ship, encapsulating: the AIS information and current/max anomaly information
    */
@@ -18,18 +16,8 @@ class ShipService {
    * The method returns a promise that resolves to an array of ShipDetails.
    * @returns a promise that resolves to an array of ShipDetails.
    */
-  static queryBackendForShipsArray: () => Promise<ShipDetails[]> = () => {
-    // Fetch the latest ship details of all monitored ships
-    return ShipService.getCurrentShipDetails();
-  };
-
-  /**
-   * Helper function that leverages the static instance of HttpSender in order to query the backend server
-   * @returns - array of the latest DTO that encapsulate the last ship details of the ships
-   */
-  static getCurrentShipDetails: () => Promise<ShipDetails[]> = async () => {
-    const response = await ShipService.httpSender
-      .get(ShipService.shipsCurrentDetailsEndpoint);
+  static queryBackendForShipsArray: () => Promise<ShipDetails[]> = async () => {
+    const response = await HttpSender.get(ShipService.shipsCurrentDetailsEndpoint)
 
     if (!Array.isArray(response)) {
       ErrorNotificationService.addError("Server returned not an array")
