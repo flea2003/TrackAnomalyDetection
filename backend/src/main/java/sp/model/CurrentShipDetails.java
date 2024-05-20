@@ -1,26 +1,26 @@
 package sp.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import java.io.Serializable;
-import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.serialization.Serde;
-import sp.dtos.AnomalyInformation;
-
+import sp.utils.UtilsObjectMapper;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonSerialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 public class CurrentShipDetails implements Serializable {
-    private AnomalyInformation anomalyInformation;
-    private List<ShipInformation> pastInformation;
+    private AnomalyInformation currentAnomalyInformation;
+    private AISSignal currentAISSignal;
+    private MaxAnomalyScoreDetails maxAnomalyScoreInfo;
 
     /**
      * Get serializer+deserializer for CurrentShipDetails. I am using simple JSON serialization here.
@@ -29,7 +29,6 @@ public class CurrentShipDetails implements Serializable {
      * @return Serde object for this class.
      */
     public static Serde<CurrentShipDetails> getSerde() {
-        ObjectMapper jsonObjectMapper = new ObjectMapper();
-        return new Jackson2Serde<>(jsonObjectMapper, CurrentShipDetails.class);
+        return new Jackson2Serde<>(new UtilsObjectMapper(), CurrentShipDetails.class);
     }
 }

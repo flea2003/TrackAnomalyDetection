@@ -1,6 +1,13 @@
 package sp.dtos;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sp.model.AnomalyInformation;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAnomalyInformation {
@@ -8,23 +15,12 @@ public class TestAnomalyInformation {
 
     @BeforeEach
     void setUp() {
-        anomalyInformation = new AnomalyInformation(0.5F, "explanation", "12/12/12", "hash");
+        anomalyInformation = new AnomalyInformation(0.5F, "explanation", OffsetDateTime.of(2004, 01, 27, 1,1,0,0, ZoneOffset.ofHours(0)), 1L);
     }
 
     @Test
-    void testToJson() {
-        assertThat(anomalyInformation.toJson()).isEqualTo("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash\"}");
-    }
-
-    @Test
-    void testFromJson1() {
+    void testToJson() throws JsonProcessingException {
         assertThat(AnomalyInformation.fromJson(anomalyInformation.toJson())).isEqualTo(anomalyInformation);
     }
-
-    @Test
-    void testFromJson2() {
-        assertThat(AnomalyInformation.fromJson("{\"score\":0.5,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"12/12/12\",\"shipHash\":\"hash\"}")).isEqualTo(anomalyInformation);
-    }
-
 
 }

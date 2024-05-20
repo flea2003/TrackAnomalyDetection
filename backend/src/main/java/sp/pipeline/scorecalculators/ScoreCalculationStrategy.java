@@ -1,8 +1,8 @@
 package sp.pipeline.scorecalculators;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
-import sp.dtos.AISSignal;
-import sp.dtos.AnomalyInformation;
+import sp.model.AISSignal;
+import sp.model.AnomalyInformation;
 
 public interface ScoreCalculationStrategy {
     /**

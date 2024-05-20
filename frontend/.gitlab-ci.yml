@@ -1,12 +1,41 @@
-stages:
-  - test
-
-react_tests:
-  stage: test
+react_build:
+  stage: build
   image: node
   needs: []
   before_script:
     - cd frontend
     - npm ci
   script:
-    - npm run test a
+    - npm run build
+
+
+react_tests:
+  stage: test
+  image: node
+  needs: ["react_build"]
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm run test:ci
+  coverage: /All files[^|]*\|[^|]*\|[^|]*\s+([\d\.]+)/
+
+react_linter:
+  stage: code_quality
+  image: node
+  needs: ["react_build"]
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm run lint
+
+react_prettier_checks:
+  stage: code_quality
+  image: node
+  needs: ["react_build"]
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm run prettier:check

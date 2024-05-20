@@ -1,34 +1,36 @@
 .anomaly-list-entry {
-    /* background-color: aquamarine; */
-
     width: 100%;
     height: var(--anomaly-list-entry-height);
 
     border-bottom: 1px solid black;
-    align-items: center;
 
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
 
-    /* Make sure when hovering it s like a link */
+    /* Make sure when hovering it is like a link */
     cursor: pointer;
 }
+
 .anomaly-list-entry:hover{
     font-weight: 500;
 }
 
-.anomaly-list-entry-main-text {
-    font-size: var(--anomaly-list-entry-font-size);
+.anomaly-list-entry:hover .anomaly-list-entry-icon-container{
+    transform: scale(1.5);
 }
 
 .anomaly-list-entry-score {
-    font-weight: bold;
+    font-size: var(--anomaly-list-entry-font-size);
+    width: 30px;
+    text-align: center;
 }
 
 .anomaly-list-entry-icon-container {
     font-size: var(--anomaly-list-entry-font-size);
     height: 100%;
-    width: 50px;
+    width: var(--anomaly-list-entry-icon-container-width);
     display: flex;
     justify-content: center;
     align-items: center;

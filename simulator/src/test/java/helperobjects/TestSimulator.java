@@ -13,6 +13,8 @@ import parsers.Parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +32,14 @@ public class TestSimulator {
     KafkaProducer<String, String> producer;
     BufferedReader reader;
     List<SimpleEntry<Timestamp, String>> resultingData;
-    String startSignal = "{\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"27/01/2024 10:10\",\"departurePort\":\"VALLETTA\"}";
-    String endSignal = "{\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"27/01/2024 10:11\",\"departurePort\":\"CEUTA\"}";
-    String thirdSignal = "{\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"27/01/2024 10:10\",\"departurePort\":\"CEUTA\"}";
+    OffsetDateTime dateTime1 = OffsetDateTime.of(2004, 01, 27, 1,1,0,0, ZoneOffset.ofHours(0));
+    OffsetDateTime dateTime2 = OffsetDateTime.of(2004, 01, 27, 1,2,0,0, ZoneOffset.ofHours(0));
+    String date1 = "2004-01-27T01:01:00Z";
+    String date2 = "2004-01-27T01:02:00Z";
+
+    String startSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"first\",\"speed\":1.9,\"longitude\":14.54255,\"latitude\":35.8167,\"course\":25.0,\"heading\":1.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"VALLETTA\"}";
+    String secondSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"second\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2004-01-27T01:01:00Z\",\"departurePort\":\"CEUTA\"}";
+    String endSignal = "{\"producerID\":\"simulator\",\"shipHash\":\"third\",\"speed\":0.6,\"longitude\":-5.3482,\"latitude\":35.92638,\"course\":8.0,\"heading\":284.0,\"timestamp\":\"2004-01-27T01:02:00Z\",\"departurePort\":\"CEUTA\"}";
 
 
     @BeforeEach
@@ -40,19 +47,19 @@ public class TestSimulator {
         this.reader = mock(BufferedReader.class);
         this.producer = mock(KafkaProducer.class);
         this.topicName = "testTopic";
-        startTime = new Timestamp(2024, 1, 27, 10, 10);
-        endTime = new Timestamp(2024, 1, 27, 10, 11);
+        startTime = new Timestamp(2004, 1, 27, 01, 01);
+        endTime = new Timestamp(2004, 1, 27, 01, 02);
         resultingData = new ArrayList<>(List.of(
                 new SimpleEntry<>(startTime, startSignal),
-                new SimpleEntry<>(new Timestamp(2024, 1, 27, 10, 10), thirdSignal),
+                new SimpleEntry<>(new Timestamp(2004, 1, 27, 01, 01), secondSignal),
                 new SimpleEntry<>(endTime, endSignal)
         ));
         reader = mock(BufferedReader.class);
         when(reader.readLine())
                 .thenReturn("VESSEL_HASH,speed,LON,LAT,COURSE,HEADING,TIMESTAMP,departurePortName\n")
-                .thenReturn("first,1.9,14.54255,35.8167,25,1,27/01/2024 10:10,VALLETTA\n")
-                .thenReturn("second,0.6,-5.3482,35.92638,8,284,27/01/2024 10:11,CEUTA\n")
-                .thenReturn("third,0.6,-5.3482,35.92638,8,284,27/01/2024 10:10,CEUTA\n")
+                .thenReturn("first,1.9,14.54255,35.8167,25,1,27/01/2004 01:01,VALLETTA\n")
+                .thenReturn("second,0.6,-5.3482,35.92638,8,284,27/01/2004 01:01,CEUTA\n")
+                .thenReturn("third,0.6,-5.3482,35.92638,8,284,27/01/2004 01:02,CEUTA\n")
                 .thenReturn(null);
 
         this.parser = new DEBSParser(reader);
@@ -99,7 +106,7 @@ public class TestSimulator {
                 );
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, thirdSignal)),
+                eq(new ProducerRecord<>(topicName, secondSignal)),
                 argThat((ArgumentMatcher<Callback>) (callback) -> {
                     if (callback instanceof Callback) {
                         callback.onCompletion(null, null);
@@ -150,7 +157,7 @@ public class TestSimulator {
                 any());
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
-                eq(new ProducerRecord<>(topicName, thirdSignal)),
+                eq(new ProducerRecord<>(topicName, secondSignal)),
                 any());
         inOrder.verify(producer).flush();
         inOrder.verify(producer).send(
@@ -173,4 +180,5 @@ public class TestSimulator {
         AssertionsForClassTypes.assertThat(simulator.getStream().getData()).isEqualTo(new ArrayList<>());
         verifyNoMoreInteractions(reader);
     }
+
 }
