@@ -7,8 +7,8 @@ class ShipService {
   static httpSender: HttpSender = new HttpSender();
 
   /** Backend API endpoint for retrieving (polling) the information about
-     / the latest ship details for each ship, encapsulating: the AIS information and current/max anomaly information
-     */
+   * the latest ship details for each ship, encapsulating: the AIS information and current/max anomaly information
+   */
   static shipsCurrentDetailsEndpoint = "/ships/details";
 
   /**
@@ -39,7 +39,6 @@ class ShipService {
               if (item == null) {
                 return ShipService.dummyShipDetails();
               } else {
-                console.log(item);
                 return ShipService.extractCurrentShipDetails(item);
               }
             },
@@ -67,7 +66,6 @@ class ShipService {
   static extractCurrentShipDetails: (item: APIResponseItem) => ShipDetails = (
     item,
   ) => {
-    console.log(item);
     if (
       !item.currentAISSignal &&
       item.currentAnomalyInformation &&
