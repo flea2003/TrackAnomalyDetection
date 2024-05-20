@@ -53,31 +53,27 @@ const fakeAPIResItemNoAnomalyInfo = {
 };
 
 test("backend-fetching-invalid", async () => {
-  const mockStaticF = jest.fn().mockReturnValue(Promise.resolve([null]));
-  HttpSender.get = mockStaticF;
+  HttpSender.get = jest.fn().mockReturnValue(Promise.resolve([null]));
   const result = await ShipService.queryBackendForShipsArray();
   expect(result).toStrictEqual([ShipService.dummyShipDetails()]);
 });
 
 test("backend-fetching-empty-array", async () => {
-  const mockStaticF = jest.fn().mockReturnValue(Promise.resolve([]));
-  HttpSender.get = mockStaticF;
+  HttpSender.get = jest.fn().mockReturnValue(Promise.resolve([]));
   const result = await ShipService.queryBackendForShipsArray();
   expect(result).toStrictEqual([]);
 });
 
 test("backend-fetching-invalid-type", async () => {
-  const mockStaticFn = jest.fn().mockReturnValue(Promise.resolve("value"));
-  HttpSender.get = mockStaticFn;
+  HttpSender.get = jest.fn().mockReturnValue(Promise.resolve("value"));
   const result = await ShipService.queryBackendForShipsArray();
   expect(result).toStrictEqual([]);
 });
 
 test("backend-fetching-valid-details", async () => {
-  const mockStaticFn = jest
+  HttpSender.get = jest
     .fn()
     .mockReturnValue(Promise.resolve([fakeAPIResponseItem]));
-  HttpSender.get = mockStaticFn;
   const result = await ShipService.queryBackendForShipsArray();
   expect(result).toStrictEqual([
     new ShipDetails(
@@ -97,10 +93,9 @@ test("backend-fetching-valid-details", async () => {
 });
 
 test("backend-fetching-null-ais", async () => {
-  const mockStaticFn = jest
+  HttpSender.get = jest
     .fn()
     .mockReturnValue(Promise.resolve([fakeAPIResItemNoAIS]));
-  HttpSender.get = mockStaticFn;
   const result = await ShipService.queryBackendForShipsArray();
   expect(result).toStrictEqual([
     new ShipDetails(
@@ -120,10 +115,9 @@ test("backend-fetching-null-ais", async () => {
 });
 
 test("backend-fetching-null-anomaly-info", async () => {
-  const mockStaticFn = jest
+  HttpSender.get = jest
     .fn()
     .mockReturnValue(Promise.resolve([fakeAPIResItemNoAnomalyInfo]));
-  HttpSender.get = mockStaticFn;
   const result = await ShipService.queryBackendForShipsArray();
   expect(result).toStrictEqual([
     new ShipDetails(

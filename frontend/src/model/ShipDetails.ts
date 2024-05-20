@@ -47,8 +47,7 @@ class ShipDetails {
   getPropertyList() {
     return [
       { type: "Ship ID", value: this.id.toString() },
-      { type: "Explanation", value: this.explanation.toString() },
-      { type: "Anomaly Score", value: this.anomalyScore.toString() + "%" },
+      { type: "Explanation", value: this.explanation },
       {
         type: "Highest Recorded Anomaly Score",
         value: this.maxAnomalyScore.toString() + "%",
@@ -65,8 +64,6 @@ class ShipDetails {
         value: this.getPositionString(),
       },
       { type: "Speed", value: this.speed.toString() },
-      { type: "Heading", value: this.heading.toString() },
-      { type: "Departure", value: this.departurePort.toString() },
     ];
   }
 

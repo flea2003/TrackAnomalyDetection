@@ -16,15 +16,6 @@ class ShipService {
    * @returns a promise that resolves to an array of ShipDetails.
    */
   static queryBackendForShipsArray: () => Promise<ShipDetails[]> = () => {
-    // Fetch the latest ship details of all monitored ships
-    return ShipService.getCurrentShipDetails();
-  };
-
-  /**
-   * Helper function that leverages the static instance of HttpSender in order to query the backend server
-   * @returns - array of the latest DTO that encapsulate the last ship details of the ships
-   */
-  static getCurrentShipDetails: () => Promise<ShipDetails[]> = () => {
     return HttpSender.get(ShipService.shipsCurrentDetailsEndpoint).then(
       (response) => {
         // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
