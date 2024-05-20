@@ -4,8 +4,6 @@ import APIResponseItem from "../templates/APIResponseItem";
 import HttpSender from "../utils/HttpSender";
 
 class ShipService {
-  static httpSender: HttpSender = new HttpSender();
-
   /** Backend API endpoint for retrieving (polling) the information about
    * the latest ship details for each ship, encapsulating: the AIS information and current/max anomaly information
    */
@@ -27,9 +25,8 @@ class ShipService {
    * @returns - array of the latest DTO that encapsulate the last ship details of the ships
    */
   static getCurrentShipDetails: () => Promise<ShipDetails[]> = () => {
-    return ShipService.httpSender
-      .get(ShipService.shipsCurrentDetailsEndpoint)
-      .then((response) => {
+    return HttpSender.get(ShipService.shipsCurrentDetailsEndpoint).then(
+      (response) => {
         // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
         if (Array.isArray(response) && response.length > 0) {
           return response.map(
@@ -46,7 +43,8 @@ class ShipService {
         } else {
           return [];
         }
-      });
+      },
+    );
   };
 
   /**

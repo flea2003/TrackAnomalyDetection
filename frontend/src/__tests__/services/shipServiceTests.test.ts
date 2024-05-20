@@ -1,188 +1,143 @@
-// TODO fix the tests
+import HttpSender from "../../utils/HttpSender";
+import ShipService from "../../services/ShipService";
+import APIResponseItem from "../../templates/APIResponseItem";
+import ShipDetails from "../../model/ShipDetails";
 
-test("dummy", () => {
-  expect(2).toBe(2);
+const fakeAPIResponseItem: APIResponseItem = {
+  currentAISSignal: {
+    id: 1,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t1",
+    departurePort: "p1",
+  },
+  currentAnomalyInformation: {
+    id: 1,
+    score: 1,
+    explanation: "explanation",
+    correspondingTimestamp: "t1",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 1,
+    correspondingTimestamp: "t1",
+  },
+};
+
+const fakeAPIResItemNoAIS = {
+  currentAnomalyInformation: {
+    id: 1,
+    score: 1,
+    explanation: "explanation",
+    correspondingTimestamp: "t1",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 1,
+    correspondingTimestamp: "t1",
+  },
+};
+
+const fakeAPIResItemNoAnomalyInfo = {
+  currentAISSignal: {
+    id: 1,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t1",
+    departurePort: "p1",
+  },
+};
+
+test("backend-fetching-invalid", async () => {
+  const mockStaticF = jest.fn().mockReturnValue(Promise.resolve([null]));
+  HttpSender.get = mockStaticF;
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([ShipService.dummyShipDetails()]);
 });
 
-// import '@testing-library/jest-dom';
-// import ShipService from "../../services/ShipService";
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns 2 proper arrays
-// describe("Test successful execution", () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([{
-//               id: "1",
-//               speed: 350.0,
-//               long: 29.0,
-//               lat: 47.0,
-//               course: 90,
-//               departurePort: "p1",
-//               heading: 1,
-//               timestamp: "t1"
-//             }]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([{
-//               id: "1",
-//               anomalyScore: 1
-//             }]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: successful aggregation of the fetched arrays
-//   test("backend-fetching-valid", async () => {
-//     const result = await ShipService.queryBackendForShipsArray();
-//     expect(result.length==1).toBe(true);
-//   });
-// });
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns 2 empty arrays
-// describe('Execution with empty arrays', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-// // TEST: aggregation of empty arrays
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// })
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns a proper array containing the anomaly information of 1 ship
-// // and an empty array corresponding to the AIS signal of that ship
-// describe('Execution with empty AIS array', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([{
-//               id: "1",
-//               anomalyScore: 1
-//             }]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: aggregation with empty AIS array
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// })
-//
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns two proper arrays with AIS and anomaly information
-// // for 2 different ships
-// describe('Execution with un-matching arrays', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([{
-//               id: "1",
-//               speed: 350.0,
-//               long: 29.0,
-//               lat: 47.0,
-//               course: 90,
-//               departurePort: "p1",
-//               heading: 1,
-//               timestamp: "t1"
-//             }]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([{
-//               id: "2",
-//               anomalyScore: 1
-//             }]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: successful aggregation of the fetched arrays with un-matching ships
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// });
-//
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns a proper array containing the AIS information of 1 ship
-// // and an empty array corresponding to the anomaly information of that ship
-// describe('Execution with empty AnomalyInfo array', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([{
-//               id: "1",
-//               speed: 350.0,
-//               long: 29.0,
-//               lat: 47.0,
-//               course: 90,
-//               departurePort: "p1",
-//               heading: 1,
-//               timestamp: "t1"
-//             }]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: successful aggregation of the fetched arrays with un-matching ships
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// });
+test("backend-fetching-empty-array", async () => {
+  const mockStaticF = jest.fn().mockReturnValue(Promise.resolve([]));
+  HttpSender.get = mockStaticF;
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([]);
+});
+
+test("backend-fetching-invalid-type", async () => {
+  const mockStaticFn = jest.fn().mockReturnValue(Promise.resolve("value"));
+  HttpSender.get = mockStaticFn;
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([]);
+});
+
+test("backend-fetching-valid-details", async () => {
+  const mockStaticFn = jest
+    .fn()
+    .mockReturnValue(Promise.resolve([fakeAPIResponseItem]));
+  HttpSender.get = mockStaticFn;
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+  ]);
+});
+
+test("backend-fetching-null-ais", async () => {
+  const mockStaticFn = jest
+    .fn()
+    .mockReturnValue(Promise.resolve([fakeAPIResItemNoAIS]));
+  HttpSender.get = mockStaticFn;
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      1,
+      0,
+      0,
+      0,
+      1,
+      "explanation",
+      1,
+      "t1",
+      "Information not available (yet)",
+      0,
+      0,
+    ),
+  ]);
+});
+
+test("backend-fetching-null-anomaly-info", async () => {
+  const mockStaticFn = jest
+    .fn()
+    .mockReturnValue(Promise.resolve([fakeAPIResItemNoAnomalyInfo]));
+  HttpSender.get = mockStaticFn;
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      -1,
+      "Information not available (yet)",
+      0,
+      "Information not available (yet)",
+      "p1",
+      90,
+      350.0,
+    ),
+  ]);
+});
