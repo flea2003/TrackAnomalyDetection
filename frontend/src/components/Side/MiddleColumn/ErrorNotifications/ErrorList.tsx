@@ -2,14 +2,14 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import ErrorListEntry from "./ErrorListEntry";
 import List from "@mui/material/List";
-import { CurrentPage } from "../../../App";
-import closeIcon from "../../../assets/icons/close.svg";
+import { CurrentPage } from "../../../../App";
+import closeIcon from "../../../../assets/icons/close.svg";
 
-import "../../../styles/common.css";
-import "../../../styles/errorList.css";
+import "../../../../styles/common.css";
+import "../../../../styles/errorList.css";
 import ErrorNotificationService, {
   ErrorNotification,
-} from "../../../services/ErrorNotificationService";
+} from "../../../../services/ErrorNotificationService";
 
 interface ErrorListProps {
   pageChanger: (currentPage: CurrentPage) => void;

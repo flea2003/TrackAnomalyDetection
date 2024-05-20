@@ -1,12 +1,12 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 
-import "../../../styles/common.css";
-import "../../../styles/errorListEntry.css";
+import "../../../../styles/common.css";
+import "../../../../styles/errorListEntry.css";
 import ErrorNotificationService, {
   ErrorNotification,
-} from "../../../services/ErrorNotificationService";
-import trashIcon from "../../../assets/icons/trash.svg";
+} from "../../../../services/ErrorNotificationService";
+import trashIcon from "../../../../assets/icons/trash.svg";
 
 interface ErrorListEntryProps {
   notification: ErrorNotification;

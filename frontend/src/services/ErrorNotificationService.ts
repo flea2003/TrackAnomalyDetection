@@ -53,7 +53,7 @@ class ErrorNotificationService {
     console.log("ErrorNotificationService refreshState was not set up");
   };
 
-  static savedNotificationsLimit = 10000; // will not store more notifications than this number
+  static savedNotificationsLimit = 1000; // will not store more notifications than this number
   static returnedNotificationsLimit = 100; // will not return more notifications than this number
 
   /**

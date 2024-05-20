@@ -2,14 +2,13 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import { useState, useEffect } from "react";
 import Map from "./components/Map/Map";
-import Sidebar from "./components/Sidebar/Sidebar";
-import MiddleColumn from "./components/MiddleColumn/MiddleColumn";
 import ShipDetails from "./model/ShipDetails";
 import ShipService from "./services/ShipService";
 import { MapExportedMethodsType } from "./components/Map/Map";
 import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
+import Side from "./components/Side/Side";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -20,12 +19,6 @@ export interface CurrentPage {
 }
 
 function App() {
-  // Set up the ErrorNotificationService
-  const [, setErrorNotificationState] = React.useState(
-    ErrorNotificationService.getAllNotifications(),
-  );
-  ErrorNotificationService.initialize(setErrorNotificationState);
-
   // Create a reference to the map component
   const mapRef = React.useRef<MapExportedMethodsType>(null);
 
@@ -79,13 +72,12 @@ function App() {
     <div className="App" id="root-div">
       <Stack direction="row">
         <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
-        <MiddleColumn
+        <Side
           currentPage={currentPage}
           ships={ships}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}
         />
-        <Sidebar pageChanger={pageChanger} />
       </Stack>
     </div>
   );

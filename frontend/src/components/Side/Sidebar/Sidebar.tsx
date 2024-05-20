@@ -1,15 +1,15 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 
-import "../../styles/common.css";
-import "../../styles/sidebar.css";
+import "../../../styles/common.css";
+import "../../../styles/sidebar.css";
 
-import shipIcon from "../../assets/icons/ship.png";
-import bellIcon from "../../assets/icons/bell-notification.svg";
-import settingsIcon from "../../assets/icons/settings.svg";
-import bugIcon from "../../assets/icons/bug.svg";
-import { CurrentPage } from "../../App";
-import ErrorNotificationService from "../../services/ErrorNotificationService";
+import shipIcon from "../../../assets/icons/ship.png";
+import bellIcon from "../../../assets/icons/bell-notification.svg";
+import settingsIcon from "../../../assets/icons/settings.svg";
+import bugIcon from "../../../assets/icons/bug.svg";
+import { CurrentPage } from "../../../App";
+import ErrorNotificationService from "../../../services/ErrorNotificationService";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
