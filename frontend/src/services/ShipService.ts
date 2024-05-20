@@ -39,6 +39,7 @@ class ShipService {
               if (item == null) {
                 return ShipService.dummyShipDetails();
               } else {
+                console.log(item);
                 return ShipService.extractCurrentShipDetails(item);
               }
             },
@@ -66,55 +67,56 @@ class ShipService {
   static extractCurrentShipDetails: (item: APIResponseItem) => ShipDetails = (
     item,
   ) => {
+    console.log(item);
     if (
-      !item.aisInformation &&
-      item.anomalyInformation &&
-      item.maxAnomalyScoreDetails
+      !item.currentAISSignal &&
+      item.currentAnomalyInformation &&
+      item.maxAnomalyScoreInfo
     ) {
       return new ShipDetails(
-        item.anomalyInformation.id,
+        item.currentAnomalyInformation.id,
         0,
         0,
         0,
-        item.anomalyInformation.anomalyScore,
-        item.anomalyInformation.explanation,
-        item.maxAnomalyScoreDetails.maxAnomalyScore,
-        item.maxAnomalyScoreDetails.correspondingTimestamp,
+        item.currentAnomalyInformation.score,
+        item.currentAnomalyInformation.explanation,
+        item.maxAnomalyScoreInfo.maxAnomalyScore,
+        item.maxAnomalyScoreInfo.correspondingTimestamp,
         "",
         0,
         0,
       );
     }
     if (
-      item.aisInformation &&
-      (!item.anomalyInformation || !item.maxAnomalyScoreDetails)
+      item.currentAISSignal &&
+      (!item.currentAnomalyInformation || !item.maxAnomalyScoreInfo)
     ) {
       return new ShipDetails(
-        item.aisInformation.id,
-        item.aisInformation.heading,
-        item.aisInformation.latitude,
-        item.aisInformation.longitude,
+        item.currentAISSignal.id,
+        item.currentAISSignal.heading,
+        item.currentAISSignal.latitude,
+        item.currentAISSignal.longitude,
         -1,
         "",
         0,
         "",
-        item.aisInformation.departurePort,
-        item.aisInformation.course,
-        item.aisInformation.speed,
+        item.currentAISSignal.departurePort,
+        item.currentAISSignal.course,
+        item.currentAISSignal.speed,
       );
     } else {
       return new ShipDetails(
-        item.aisInformation.id,
-        item.aisInformation.heading,
-        item.aisInformation.latitude,
-        item.aisInformation.longitude,
-        item.anomalyInformation.anomalyScore,
-        item.anomalyInformation.explanation,
-        item.maxAnomalyScoreDetails.maxAnomalyScore,
-        item.maxAnomalyScoreDetails.correspondingTimestamp,
-        item.aisInformation.departurePort,
-        item.aisInformation.course,
-        item.aisInformation.speed,
+        item.currentAISSignal.id,
+        item.currentAISSignal.heading,
+        item.currentAISSignal.latitude,
+        item.currentAISSignal.longitude,
+        item.currentAnomalyInformation.score,
+        item.currentAnomalyInformation.explanation,
+        item.maxAnomalyScoreInfo.maxAnomalyScore,
+        item.maxAnomalyScoreInfo.correspondingTimestamp,
+        item.currentAISSignal.departurePort,
+        item.currentAISSignal.course,
+        item.currentAISSignal.speed,
       );
     }
   };

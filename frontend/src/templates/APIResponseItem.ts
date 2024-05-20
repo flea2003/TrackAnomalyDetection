@@ -1,5 +1,5 @@
 interface APIResponseItem {
-  aisInformation: {
+  currentAISSignal: {
     id: number;
     speed: number;
     longitude: number;
@@ -9,13 +9,13 @@ interface APIResponseItem {
     timestamp: string;
     departurePort: string;
   };
-  anomalyInformation: {
+  currentAnomalyInformation: {
     id: number;
-    anomalyScore: number;
+    score: number;
     explanation: string;
     correspondingTimestamp: string;
   };
-  maxAnomalyScoreDetails: {
+  maxAnomalyScoreInfo: {
     maxAnomalyScore: number;
     correspondingTimestamp: string;
   };

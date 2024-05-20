@@ -68,7 +68,6 @@ class ShipDetails {
       { type: "Speed", value: this.speed.toString() },
       { type: "Heading", value: this.heading.toString() },
       { type: "Departure", value: this.departurePort.toString() },
-      { type: "Course", value: this.course.toString() },
     ];
   }
 

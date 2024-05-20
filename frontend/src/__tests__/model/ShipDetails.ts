@@ -35,7 +35,7 @@ test("getPropertyList returns a list of correct size", () => {
   );
 
   // Test that the list has the correct size
-  expect(fake.getPropertyList().length).toBe(14);
+  expect(fake.getPropertyList().length).toBe(13);
 });
 
 test("getPropertyList returns correct id", () => {
