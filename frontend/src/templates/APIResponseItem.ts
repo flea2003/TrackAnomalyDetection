@@ -20,3 +20,5 @@ interface APIResponseItem {
     correspondingTimestamp: string;
   };
 }
+
+export default APIResponseItem;
