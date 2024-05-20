@@ -51,7 +51,7 @@ class ErrorNotificationService {
   private static notifications: ErrorNotification[] = [];
   private static refreshState = () => {
     console.log("ErrorNotificationService refreshState was not set up");
-  }
+  };
 
   static savedNotificationsLimit = 10000; // will not store more notifications than this number
   static returnedNotificationsLimit = 100; // will not return more notifications than this number
@@ -62,8 +62,13 @@ class ErrorNotificationService {
    *
    * @param setErrorNotificationsService the setter of the state created in the `App.tsx`
    */
-  static initialize(setErrorNotificationsService:  React.Dispatch<React.SetStateAction<ErrorNotification[]>>) {
-    this.refreshState = () => setErrorNotificationsService(this.getAllNotifications())
+  static initialize(
+    setErrorNotificationsService: React.Dispatch<
+      React.SetStateAction<ErrorNotification[]>
+    >,
+  ) {
+    this.refreshState = () =>
+      setErrorNotificationsService(this.getAllNotifications());
   }
 
   /**
@@ -145,9 +150,11 @@ class ErrorNotificationService {
    * @param id the id of the notification to be marked as read
    */
   static markAsRead(id: number) {
-    this.notifications.filter(notification => notification.id === id).forEach((notification) => {
-      notification.wasRead = true;
-    });
+    this.notifications
+      .filter((notification) => notification.id === id)
+      .forEach((notification) => {
+        notification.wasRead = true;
+      });
 
     this.refreshState();
   }

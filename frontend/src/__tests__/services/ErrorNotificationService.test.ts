@@ -5,7 +5,7 @@ import ErrorNotificationService, {
 
 afterEach(() => {
   ErrorNotificationService.clearAllNotifications();
-  ErrorNotificationService.savedNotificationsLimit = 100000; // bring back the limit if it was changed
+  ErrorNotificationService.savedNotificationsLimit = 10000; // bring back the limit if it was changed
   ErrorNotificationService.returnedNotificationsLimit = 100; // in case it was changed
 });
 

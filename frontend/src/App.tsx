@@ -21,7 +21,9 @@ export interface CurrentPage {
 
 function App() {
   // Set up the ErrorNotificationService
-  const [, setErrorNotificationState] = React.useState(ErrorNotificationService.getAllNotifications());
+  const [, setErrorNotificationState] = React.useState(
+    ErrorNotificationService.getAllNotifications(),
+  );
   ErrorNotificationService.initialize(setErrorNotificationState);
 
   // Create a reference to the map component

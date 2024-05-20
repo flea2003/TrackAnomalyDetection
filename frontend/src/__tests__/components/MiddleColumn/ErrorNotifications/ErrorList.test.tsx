@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import App, { CurrentPage } from "../../../../App";
 import React from "react";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
@@ -12,7 +12,9 @@ afterEach(() => {
 test("When bug icon is clicked, the error list is shown with the current errors", async () => {
   render(<App />);
 
-  ErrorNotificationService.addError("error text");
+  act(() => {
+    ErrorNotificationService.addError("error text");
+  });
 
   const bugIcon = screen.getByTestId("sidebar-bug-icon");
   fireEvent.click(bugIcon);
