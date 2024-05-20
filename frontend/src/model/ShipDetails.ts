@@ -6,6 +6,8 @@ class ShipDetails {
   lng: number;
   anomalyScore: number;
   explanation: string;
+  maxAnomalyScore: number;
+  correspondingTimestamp: string;
   departurePort: string;
   course: number;
   speed: number;
@@ -17,6 +19,8 @@ class ShipDetails {
     lng: number,
     anomalyScore: number,
     description: string,
+    maxAnomalyScore: number,
+    correspondingTimestamp: string,
     departurePort: string,
     course: number,
     speed: number,
@@ -27,6 +31,8 @@ class ShipDetails {
     this.lng = lng;
     this.anomalyScore = anomalyScore;
     this.explanation = description;
+    this.maxAnomalyScore = maxAnomalyScore;
+    this.correspondingTimestamp = correspondingTimestamp;
     this.departurePort = departurePort;
     this.course = course;
     this.speed = speed;
@@ -43,13 +49,21 @@ class ShipDetails {
       { type: "Ship ID", value: this.id.toString() },
       { type: "Explanation", value: this.explanation },
       {
+        type: "Highest Recorded Anomaly Score",
+        value: this.maxAnomalyScore.toString() + "%",
+      },
+      {
+        type: "Timestamp of the Highest Anomaly Score",
+        value: this.correspondingTimestamp,
+      },
+      { type: "Heading", value: this.heading.toString() },
+      { type: "Departure Port", value: this.departurePort },
+      { type: "Course", value: this.course.toString() },
+      {
         type: "Position",
         value: this.getPositionString(),
       },
       { type: "Speed", value: this.speed.toString() },
-      { type: "Heading", value: this.heading.toString() },
-      { type: "Departure", value: this.departurePort.toString() },
-      { type: "Course", value: this.course.toString() },
     ];
   }
 

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AnomalyInformation;
-import sp.model.AISSignal;
-import sp.model.CurrentShipDetails;
-import sp.model.ShipInformation;
+import sp.model.*;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -18,8 +15,8 @@ class AggregatorTest {
 
     private Aggregator aggregator;
 
-    private OffsetDateTime timestamp = OffsetDateTime.of(2015, 4, 18, 1,1,0,0, ZoneOffset.ofHours(0));
-    private OffsetDateTime timestamp2 = OffsetDateTime.of(2016, 4, 18, 1,1,0,0, ZoneOffset.ofHours(0));
+    private final OffsetDateTime timestamp = OffsetDateTime.of(2015, 4, 18, 1,1,0,0, ZoneOffset.ofHours(0));
+    private final OffsetDateTime timestamp2 = OffsetDateTime.of(2016, 4, 18, 1,1,0,0, ZoneOffset.ofHours(0));
 
     @BeforeEach
     void setUp() {
@@ -34,28 +31,31 @@ class AggregatorTest {
     @Test
     void detailsNotInitializedFirstNull() {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
-        CurrentShipDetails details = new CurrentShipDetails(null, signal);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(null, signal, maxInfo);
         assertTrue(aggregator.shipDetailsNotInitialized(details));
     }
 
     @Test
     void detailsNotInitializedSecondNull() {
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, null);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, null, maxInfo);
         assertTrue(aggregator.shipDetailsNotInitialized(details));
     }
 
     @Test
-    void detailsNotInitializedBothNonNull() {
+    void detailsNotInitializedAllNonNull() {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, signal);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, signal, maxInfo);
         assertFalse(aggregator.shipDetailsNotInitialized(details));
     }
 
     @Test
     void testEncapsulatesAnomalyWhenNull() {
-        CurrentShipDetails details = new CurrentShipDetails(null, null);
+        CurrentShipDetails details = new CurrentShipDetails(null, null, null);
 
         assertFalse(aggregator.encapsulatesAnomalyInformation(null, details));
     }
@@ -63,7 +63,7 @@ class AggregatorTest {
     @Test
     void testEncapsulatesAnomalyWhenNotFinalized() {
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, null);
+        CurrentShipDetails details = new CurrentShipDetails(info, null, null);
 
         assertTrue(aggregator.encapsulatesAnomalyInformation(info, details));
     }
@@ -72,7 +72,8 @@ class AggregatorTest {
     void testEncapsulatesAnomalyBasedOnTimestampsFalse() {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, signal);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, signal, maxInfo);
 
         assertFalse(aggregator.encapsulatesAnomalyInformation(info, details));
     }
@@ -81,7 +82,8 @@ class AggregatorTest {
     void testEncapsulatesAnomalyBasedOnTimestampsTrue() {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, signal);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, signal, maxInfo);
 
         AnomalyInformation info2 = new AnomalyInformation(0.5f, "explain", timestamp2, 1L);
         assertTrue(aggregator.encapsulatesAnomalyInformation(info2, details));
@@ -89,7 +91,7 @@ class AggregatorTest {
 
     @Test
     void testEncapsulatesAISWhenNull() {
-        CurrentShipDetails details = new CurrentShipDetails(null, null);
+        CurrentShipDetails details = new CurrentShipDetails(null, null, null);
 
         assertFalse(aggregator.encapsulatesAISSignal(null, details));
     }
@@ -97,7 +99,8 @@ class AggregatorTest {
     @Test
     void testEncapsulatesAISWhenNotFinalized() {
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, null);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, null, maxInfo);
 
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         assertTrue(aggregator.encapsulatesAISSignal(signal, details));
@@ -107,7 +110,8 @@ class AggregatorTest {
     void testEncapsulatesAISBasedOnTimestampsFalse() {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, signal);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, signal, maxInfo);
 
         assertFalse(aggregator.encapsulatesAISSignal(signal, details));
     }
@@ -116,7 +120,8 @@ class AggregatorTest {
     void testEncapsulatesAISBasedOnTimestampsTrue() {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-        CurrentShipDetails details = new CurrentShipDetails(info, signal);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, signal, maxInfo);
 
         AISSignal signal2 = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp2, "port");
         assertTrue(aggregator.encapsulatesAISSignal(signal2, details));
@@ -126,8 +131,8 @@ class AggregatorTest {
     void aggregateSignalsWithNewAIS() throws JsonProcessingException {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-
-        CurrentShipDetails details = new CurrentShipDetails(info, null);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(info, null, maxInfo);
         ShipInformation shipInfo = new ShipInformation(1L, null, signal);
 
         CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
@@ -140,14 +145,68 @@ class AggregatorTest {
     void aggregateSignalsWithNewAnomalyInfo() throws JsonProcessingException {
         AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
         AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
-
-        CurrentShipDetails details = new CurrentShipDetails(null, signal);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(null, signal, maxInfo);
         ShipInformation shipInfo = new ShipInformation(1L, info, null);
 
         CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
 
         assertSame(result, details);
         assertEquals(result.getCurrentAnomalyInformation(), info);
+    }
+
+    @Test
+    void aggregateSignalsWithUninitializedMaxUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation info = new AnomalyInformation(0.5f, "explain", timestamp, 1L);
+        CurrentShipDetails details = new CurrentShipDetails(null, signal, null);
+        ShipInformation shipInfo = new ShipInformation(1L, info, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), info.getScore());
+    }
+
+    @Test
+    void aggregateSignalsWithUninitializedMaxNoUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation info = new AnomalyInformation(-1f, "explain", timestamp, 1L);
+        CurrentShipDetails details = new CurrentShipDetails(null, signal, null);
+        ShipInformation shipInfo = new ShipInformation(1L, info, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), 0f);
+    }
+
+    @Test
+    void aggregateSignalsWithInitializedMaxUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation prevInfo = new AnomalyInformation(1f, "explain", timestamp, 1L);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(prevInfo, signal, maxInfo);
+
+        AnomalyInformation newInfo = new AnomalyInformation(2F, "new explain", timestamp2, 1L);
+        ShipInformation shipInfo = new ShipInformation(1L, newInfo, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), newInfo.getScore());
+    }
+
+    @Test
+    void aggregateSignalsWithInitializedMaxNoUpdate() throws JsonProcessingException {
+        AISSignal signal = new AISSignal(1L, 1f, 2f, 3f, 4f, 5f, timestamp, "port");
+        AnomalyInformation prevInfo = new AnomalyInformation(1f, "explain", timestamp, 1L);
+        MaxAnomalyScoreDetails maxInfo = new MaxAnomalyScoreDetails(1F, timestamp);
+        CurrentShipDetails details = new CurrentShipDetails(prevInfo, signal, maxInfo);
+
+        AnomalyInformation newInfo = new AnomalyInformation(0.5F, "new explain", timestamp2, 1L);
+        ShipInformation shipInfo = new ShipInformation(1L, newInfo, null);
+
+        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+
+        assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), prevInfo.getScore());
     }
 
 }

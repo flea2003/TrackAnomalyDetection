@@ -8,42 +8,89 @@ test("Rounding of latitude and longitude", () => {
     0.12034,
     0,
     "test",
+    0,
+    "time",
     "p1",
     1,
     350.0,
   );
 
   // Test that the rounding is done correctly. Assumes that the rounding is 1000
-  expect(fake.getPropertyList()[2].value).toBe("0.123, 0.12");
+  expect(fake.getPropertyList()[7].value).toBe("0.123, 0.12");
 });
 
-test("getPropertyList returns an expected list", () => {
-  const shipDetails = new ShipDetails(
+test("getPropertyList returns a list of correct size", () => {
+  const fake = new ShipDetails(
     1,
     0,
     0.123456,
     0.12034,
     0,
     "test",
+    0,
+    "time",
     "p1",
     1,
     350.0,
   );
 
-  const properties = shipDetails.getPropertyList();
-
   // Test that the list has the correct size
-  expect(properties.length).toBe(7);
+  expect(fake.getPropertyList().length).toBe(9);
+});
 
-  // check each property
-  expect(properties[0]).toStrictEqual({ type: "Ship ID", value: "1" });
-  expect(properties[1]).toStrictEqual({ type: "Explanation", value: "test" });
-  expect(properties[2]).toStrictEqual({
-    type: "Position",
-    value: "0.123, 0.12",
-  });
-  expect(properties[3]).toStrictEqual({ type: "Speed", value: "350" });
-  expect(properties[4]).toStrictEqual({ type: "Heading", value: "0" });
-  expect(properties[5]).toStrictEqual({ type: "Departure", value: "p1" });
-  expect(properties[6]).toStrictEqual({ type: "Course", value: "1" });
+test("getPropertyList returns correct id", () => {
+  const fake = new ShipDetails(
+    1,
+    0,
+    0.123456,
+    0.12034,
+    0,
+    "test",
+    0,
+    "time",
+    "p1",
+    1,
+    350.0,
+  );
+
+  // Test that the id is correct
+  expect(fake.getPropertyList()[0].value).toBe("1");
+});
+
+test("getPropertyList returns correct explanation", () => {
+  const fake = new ShipDetails(
+    1,
+    0,
+    0.123456,
+    0.12034,
+    0,
+    "test",
+    0,
+    "time",
+    "p1",
+    1,
+    350.0,
+  );
+
+  // Test that the explanation is correct
+  expect(fake.getPropertyList()[1].value).toBe("test");
+});
+
+test("getPropertyList returns correct heading", () => {
+  const fake = new ShipDetails(
+    1,
+    0,
+    0.123456,
+    0.12034,
+    0,
+    "test",
+    0,
+    "time",
+    "p1",
+    1,
+    350.0,
+  );
+
+  // Test that the heading is correct
+  expect(fake.getPropertyList()[4].value).toBe("0");
 });

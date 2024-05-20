@@ -2,10 +2,9 @@ package sp.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
-import sp.model.AISSignal;
+import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
 import java.util.HashMap;
 import java.util.List;
@@ -29,55 +28,29 @@ public class ShipsDataService {
     }
 
     /**
-     * Computes the current AIS information for a specified ship.
-     *
-     * @param shipId the id of a ship
-     * @return current AIS information for a specified ship
-     */
-    public AISSignal getCurrentAISInformation(Long shipId) throws NotExistingShipException, PipelineException {
-        AISSignal currentAISSignal = anomalyDetectionPipeline.getCurrentAISSignals().get(shipId);
-
-        if (currentAISSignal == null) {
-            throw new NotExistingShipException("Couldn't find such ship.");
-        }
-
-        return currentAISSignal;
-
-    }
-
-    /**
-     * Computes the current anomaly information for a specified ship.
+     * Retrieves the current extensive information for a specified ship.
      *
      * @param shipId the id of the ship
-     * @return anomaly information for a specified ship
+     * @return - CurrentShipDetails instance encapsulating the current extensive information of a ship
      */
-    public AnomalyInformation getCurrentAnomalyInformation(Long shipId) throws NotExistingShipException, PipelineException {
-        AnomalyInformation currentAnomalyInfo = anomalyDetectionPipeline.getCurrentScores().get(shipId);
-        if (currentAnomalyInfo == null) {
+    public CurrentShipDetails getIndividualCurrentShipDetails(Long shipId)
+            throws NotExistingShipException, PipelineException {
+        CurrentShipDetails anomalyInfo = anomalyDetectionPipeline.getCurrentShipDetails().get(shipId);
+        if (anomalyInfo == null) {
             throw new NotExistingShipException("Couldn't find such ship.");
         }
-        return currentAnomalyInfo;
+        return anomalyInfo;
     }
 
 
     /**
-     * Computes the current AIS data for all ships.
+     * Retrieves the current extensive information for all ships in the system.
      *
-     * @return the current AIS data for all ships
+     * @return the CurrentShipDetails instances corresponding to all ships
      */
-    public List<AISSignal> getCurrentAISInformationOfAllShips() throws PipelineException {
-        HashMap<Long, AISSignal> shipsInfo = anomalyDetectionPipeline.getCurrentAISSignals();
+    public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException {
+        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentShipDetails();
         return shipsInfo.values().stream().toList();
     }
 
-    /**
-     * Computes the current anomaly information of all ships.
-     *
-     * @return a list of anomaly information objects for all ships
-     */
-    public List<AnomalyInformation> getCurrentAnomalyInformationOfAllShips() throws PipelineException {
-        HashMap<Long, AnomalyInformation> shipsInfo = anomalyDetectionPipeline.getCurrentScores();
-
-        return shipsInfo.values().stream().toList();
-    }
 }
