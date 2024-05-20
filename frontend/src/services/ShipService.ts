@@ -2,6 +2,7 @@
 import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";
 import HttpSender from "../utils/HttpSender";
+import ErrorNotificationService from "./ErrorNotificationService";
 
 class ShipService {
   /** Backend API endpoint for retrieving (polling) the information about
@@ -15,35 +16,30 @@ class ShipService {
    * The method returns a promise that resolves to an array of ShipDetails.
    * @returns a promise that resolves to an array of ShipDetails.
    */
-  static queryBackendForShipsArray: () => Promise<ShipDetails[]> = () => {
-    return HttpSender.get(ShipService.shipsCurrentDetailsEndpoint).then(
-      (response) => {
-        // TODO: Implementing proper error handling for the cases in which the retrieved array is empty
-        if (Array.isArray(response) && response.length > 0) {
-          return response.map(
-            // eslint-disable-next-line
-            (item: any) => {
-              // TODO: fix this place (better handling of this case)
-              if (item == null) {
-                return ShipService.dummyShipDetails();
-              } else {
-                return ShipService.extractCurrentShipDetails(item);
-              }
-            },
-          );
-        } else {
-          return [];
-        }
-      },
+  static queryBackendForShipsArray: () => Promise<ShipDetails[]> = async () => {
+    const response = await HttpSender.get(
+      ShipService.shipsCurrentDetailsEndpoint,
     );
-  };
 
-  /**
-   * Utility method that returns a dummy instance of CurrentShipDetails.
-   * @return - dummy CurrentShipDetails object
-   */
-  static dummyShipDetails: () => ShipDetails = () => {
-    return new ShipDetails(-1, 0, 0, 0, -1, "", 0, "", "", 0, 0);
+    if (!Array.isArray(response)) {
+      ErrorNotificationService.addError("Server returned not an array");
+      return [];
+    }
+
+    if (response.length === 0) {
+      ErrorNotificationService.addInformation("Ship array is empty");
+      return [];
+    }
+
+    const responseWithoutNulls = response.filter((item) => item !== null);
+    if (responseWithoutNulls.length !== response.length) {
+      ErrorNotificationService.addError("Ship array contained null items");
+    }
+
+    return responseWithoutNulls.map(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (item: any) => ShipService.extractCurrentShipDetails(item),
+    );
   };
 
   /**

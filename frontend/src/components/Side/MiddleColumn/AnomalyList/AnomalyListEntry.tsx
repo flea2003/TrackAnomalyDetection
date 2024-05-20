@@ -1,13 +1,13 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 
-import ShipDetails from "../../../model/ShipDetails";
-import { calculateAnomalyColor } from "../../../utils/AnomalyColorCalculator";
-import shipIcon from "../../../assets/icons/ship.png";
+import ShipDetails from "../../../../model/ShipDetails";
+import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
+import shipIcon from "../../../../assets/icons/ship.png";
 
-import "../../../styles/common.css";
-import "../../../styles/anomalyListEntry.css";
-import { CurrentPage } from "../../../App";
+import "../../../../styles/common.css";
+import "../../../../styles/anomalyListEntry.css";
+import { CurrentPage } from "../../../../App";
 
 interface AnomalyListEntryProps {
   shipDetails: ShipDetails;

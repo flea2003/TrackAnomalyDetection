@@ -2,6 +2,13 @@ import HttpSender from "../../utils/HttpSender";
 import ShipService from "../../services/ShipService";
 import APIResponseItem from "../../templates/APIResponseItem";
 import ShipDetails from "../../model/ShipDetails";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
+
+beforeEach(() => {
+  // Make refreshState do nothing, so that it does not print to console.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ErrorNotificationService.refreshState = () => {};
+});
 
 const fakeAPIResponseItem: APIResponseItem = {
   currentAISSignal: {
@@ -55,7 +62,7 @@ const fakeAPIResItemNoAnomalyInfo = {
 test("backend-fetching-invalid", async () => {
   HttpSender.get = jest.fn().mockReturnValue(Promise.resolve([null]));
   const result = await ShipService.queryBackendForShipsArray();
-  expect(result).toStrictEqual([ShipService.dummyShipDetails()]);
+  expect(result).toStrictEqual([]);
 });
 
 test("backend-fetching-empty-array", async () => {

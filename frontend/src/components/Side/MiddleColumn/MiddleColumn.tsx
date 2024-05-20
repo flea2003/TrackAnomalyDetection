@@ -1,8 +1,10 @@
-import { CurrentPage } from "../../App";
+import { CurrentPage } from "../../../App";
 import AnomalyList from "./AnomalyList/AnomalyList";
 import ObjectDetails from "./ObjectDetails/ObjectDetails";
 import React, { JSX } from "react";
-import ShipDetails from "../../model/ShipDetails";
+import ShipDetails from "../../../model/ShipDetails";
+import ErrorList from "./ErrorNotifications/ErrorList";
+import ErrorNotificationService from "../../../services/ErrorNotificationService";
 
 interface MiddleColumnProps {
   currentPage: CurrentPage;
@@ -38,8 +40,16 @@ function MiddleColumn({
       return <div>Notifications</div>;
     case "settings":
       return <div>Settings</div>;
-    default:
+    case "errors":
+      return <ErrorList pageChanger={pageChanger} />;
+    case "none":
       return <div></div>;
+    default: {
+      ErrorNotificationService.addWarning(
+        "MiddleColumn required page not found: " + currentPage.currentPage,
+      );
+      return <div></div>;
+    }
   }
 }
 
