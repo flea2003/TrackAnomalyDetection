@@ -122,7 +122,7 @@ class ShipService {
       if (aScore > bScore) {
         return -1;
       }
-      if (aScore == bScore) {
+      if (aScore === bScore) {
         return 0;
       } else {
         return 1;
