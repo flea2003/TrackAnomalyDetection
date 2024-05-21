@@ -67,11 +67,25 @@ class ShipDetails {
     ];
   }
 
+  /**
+   * Utility method for concatenating the latitude and longitude values.
+   */
   getPositionString() {
     return roundShipDetail(this.lat) + ", " + roundShipDetail(this.lng);
   }
+
+  /**
+   * Getter for the anomalyScore field.
+   */
+  getAnomalyScore() {
+    return this.anomalyScore;
+  }
 }
 
+/**
+ * Utility method for processing numerical values.
+ * @param x - numerical value
+ */
 function roundShipDetail(x: number) {
   return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding;
 }
