@@ -314,8 +314,8 @@ test("sorting-valid-list-descending-ascending", async () => {
 });
 
 test("sorting-invalid-order", () => {
-  const spyOnErrorServiceMethod = spyOn(ErrorNotificationService, 'addError');
-  const result = ShipService.sortList([], 'order');
+  const spyOnErrorServiceMethod = spyOn(ErrorNotificationService, "addError");
+  const result = ShipService.sortList([], "order");
   expect(spyOnErrorServiceMethod).toHaveBeenCalled();
   expect(result).toStrictEqual([]);
-})
+});

@@ -31,6 +31,7 @@ function AnomalyListEntry({
   const shipIconAltText = "Ship Icon";
 
   const shipAnomalyScore = shipDetails.anomalyScore;
+  const shipId = shipDetails.id % 1000;
   const color = calculateAnomalyColor(shipAnomalyScore);
 
   const onClick = () => {
@@ -46,13 +47,16 @@ function AnomalyListEntry({
       style={{ backgroundColor: color }}
       onClick={onClick}
     >
-      <span className="anomaly-list-entry-icon-container">
-        <img
-          src={shipIcon}
-          className="anomaly-list-entry-icon"
-          alt={shipIconAltText}
-        />
-      </span>
+      <div className="anomaly-list-entry-icon-id-container">
+        <span className="anomaly-list-entry-icon-container">
+          <img
+            src={shipIcon}
+            className="anomaly-list-entry-icon"
+            alt={shipIconAltText}
+          />
+        </span>
+        <span className="anomaly-list-entry-id">#{shipId}</span>
+      </div>
       <span className="anomaly-list-entry-score">{shipAnomalyScore}%</span>
     </Stack>
   );
