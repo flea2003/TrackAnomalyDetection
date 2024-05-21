@@ -116,6 +116,10 @@ class ShipService {
     list,
     order = "desc",
   ) => {
+    if (!["desc", "asc"].includes(order)) {
+      ErrorNotificationService.addError("Invalid sorting order");
+      return [];
+    }
     const sortedList = list.sort((a, b) => {
       const aScore = a.getAnomalyScore();
       const bScore = b.getAnomalyScore();

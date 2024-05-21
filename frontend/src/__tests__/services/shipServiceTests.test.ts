@@ -3,6 +3,7 @@ import ShipService from "../../services/ShipService";
 import APIResponseItem from "../../templates/APIResponseItem";
 import ShipDetails from "../../model/ShipDetails";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
+import spyOn = jest.spyOn;
 
 beforeEach(() => {
   // Make refreshState do nothing, so that it does not print to console.
@@ -311,3 +312,10 @@ test("sorting-valid-list-descending-ascending", async () => {
     ),
   ]);
 });
+
+test("sorting-invalid-order", () => {
+  const spyOnErrorServiceMethod = spyOn(ErrorNotificationService, 'addError');
+  const result = ShipService.sortList([], 'order');
+  expect(spyOnErrorServiceMethod).toHaveBeenCalled();
+  expect(result).toStrictEqual([]);
+})
