@@ -1,6 +1,6 @@
 react_build:
   stage: build
-  image: node
+  image: node:lts-alpine3.18
   needs: []
   before_script:
     - cd frontend
@@ -11,7 +11,7 @@ react_build:
 
 react_tests:
   stage: test
-  image: node
+  image: node:lts-alpine3.18
   needs: ["react_build"]
   before_script:
     - cd frontend
@@ -22,7 +22,7 @@ react_tests:
 
 react_linter:
   stage: code_quality
-  image: node
+  image: node:lts-alpine3.18
   needs: ["react_build"]
   before_script:
     - cd frontend
@@ -32,7 +32,7 @@ react_linter:
 
 react_prettier_checks:
   stage: code_quality
-  image: node
+  image: node:lts-alpine3.18
   needs: ["react_build"]
   before_script:
     - cd frontend
