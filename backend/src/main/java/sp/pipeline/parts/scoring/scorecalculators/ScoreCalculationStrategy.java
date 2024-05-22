@@ -1,4 +1,4 @@
-package sp.pipeline.scorecalculators;
+package sp.pipeline.parts.scoring.scorecalculators;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
 import sp.model.AISSignal;

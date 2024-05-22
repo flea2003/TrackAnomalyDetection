@@ -1,15 +1,12 @@
 package sp.pipeline.aggregators;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonParseException;
-import sp.controllers.NotificationController;
 import sp.model.*;
 import sp.exceptions.NotFoundNotificationException;
+import sp.pipeline.parts.aggregation.aggregators.NotificationsAggregator;
 import sp.services.NotificationService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

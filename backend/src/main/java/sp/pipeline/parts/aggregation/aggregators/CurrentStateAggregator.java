@@ -1,4 +1,4 @@
-package sp.pipeline.aggregators;
+package sp.pipeline.parts.aggregation.aggregators;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;

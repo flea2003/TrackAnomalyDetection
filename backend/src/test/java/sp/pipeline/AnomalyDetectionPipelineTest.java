@@ -1,18 +1,7 @@
 package sp.pipeline;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import sp.pipeline.aggregators.CurrentStateAggregator;
-import sp.pipeline.aggregators.NotificationsAggregator;
-import sp.pipeline.scorecalculators.DefaultScoreCalculator;
-import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
-import sp.services.NotificationService;
-
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
 class AnomalyDetectionPipelineTest {

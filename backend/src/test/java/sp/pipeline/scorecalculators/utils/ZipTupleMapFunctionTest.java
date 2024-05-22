@@ -16,6 +16,7 @@ import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.Test;
 import sp.model.AnomalyInformation;
+import sp.pipeline.parts.scoring.scorecalculators.utils.ZipTupleMapFunction;
 
 
 public class ZipTupleMapFunctionTest {

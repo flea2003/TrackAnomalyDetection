@@ -1,10 +1,10 @@
 package sp.pipeline.scorecalculators.components.heuristic;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static sp.pipeline.scorecalculators.components.heuristic.Tools.circularMetric;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.circularMetric;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools;
 
 class ToolsTest {
 

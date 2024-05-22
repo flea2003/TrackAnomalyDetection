@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.*;
-import sp.pipeline.aggregators.CurrentStateAggregator;
+import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

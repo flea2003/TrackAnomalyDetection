@@ -9,6 +9,7 @@ import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
+import sp.pipeline.parts.scoring.scorecalculators.DefaultScoreCalculator;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

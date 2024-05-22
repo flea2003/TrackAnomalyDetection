@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
+import sp.pipeline.parts.scoring.scorecalculators.components.heuristic.SignalStatefulMapFunction;
 
 public class SignalStatefulMapFunctionTest {
 
