@@ -1,5 +1,6 @@
 package sp.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.dtos.AnomalyInformation;
@@ -12,12 +13,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class TestNotification {
 
     private Notification notification;
+    private OffsetDateTime dateTime;
 
     @BeforeEach
-    void setUp() {
-        notification = new Notification(1F, "explanation",
-                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                1L, 0, 0);
+    void setUp() throws JsonProcessingException {
+        dateTime =  OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0));
+        notification = new Notification(
+                new CurrentShipDetails(
+                        new AnomalyInformation(1F, "explanation", dateTime, 1L),
+                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                )
+        );
     }
 
     @Test
@@ -27,20 +33,11 @@ public class TestNotification {
     }
 
     @Test
-    void testConstructor1() {
-        Notification notification2 = new Notification(1F, "explanation",
-                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                1L, 0, 0);
-
-        assertThat(notification2).isEqualTo(notification);
-    }
-
-
-    @Test
-    void testConstructor2() {
-        AnomalyInformation anomalyInformation = new AnomalyInformation(1F, "explanation",
-                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)), 1L);
-        Notification notification2 = new Notification(anomalyInformation);
+    void testConstructor1() throws JsonProcessingException {
+        Notification notification2 = new Notification(new CurrentShipDetails(
+                new AnomalyInformation(1F, "explanation", dateTime, 1L),
+                new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+        ));
 
         assertThat(notification2).isEqualTo(notification);
     }

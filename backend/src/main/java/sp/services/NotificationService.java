@@ -2,7 +2,6 @@ package sp.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotFoundNotificationException;
 import sp.model.Notification;
 import sp.repositories.NotificationRepository;
@@ -49,17 +48,8 @@ public class NotificationService {
      *
      * @param notification notification object
      */
-    public void addNotification(Notification notification) {
-        notificationRepository.save(notification);
-    }
-
-    /**
-     * Temporary method until there is no timestamp database.
-     *
-     * @param anomalyInformation object that corresponds to the new notification
-     */
-    public void addNotification(AnomalyInformation anomalyInformation) {
-        notificationRepository.save(new Notification(anomalyInformation));
+    public Notification addNotification(Notification notification) {
+        return notificationRepository.save(notification);
     }
 
     public List<Notification> getAllNotificationForShip(Long shipID) {
@@ -80,8 +70,10 @@ public class NotificationService {
 
         Notification result = allNotifications.get(0);
         for (Notification notification : allNotifications) {
-            if (notification.getCorrespondingTimestamp().isAfter(result.getCorrespondingTimestamp())
-                    || notification.getCorrespondingTimestamp().isEqual(result.getCorrespondingTimestamp())
+            if (notification.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp()
+                    .isAfter(result.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp())
+                    || notification.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp()
+                    .isEqual(result.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp())
             ) {
                 result = notification;
             }

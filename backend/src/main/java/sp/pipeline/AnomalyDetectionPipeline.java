@@ -30,6 +30,7 @@ import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
+import sp.model.Notification;
 import sp.model.ShipInformation;
 import sp.pipeline.aggregators.CurrentStateAggregator;
 import sp.pipeline.aggregators.NotificationsAggregator;
@@ -368,20 +369,18 @@ public class AnomalyDetectionPipeline {
      */
     public void buildNotifications(StreamsBuilder builder) throws IOException {
         // Construct a stream for computed AnomalyInformation objects
-        KStream<String, String> streamAnomalyInformationJSON = builder.stream(calculatedScoresTopicName);
-        KStream<String, AnomalyInformation> streamAnomalyInformation  = streamAnomalyInformationJSON.mapValues(x -> {
-            try {
-                return AnomalyInformation.fromJson(x);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        // Key the stream
-        KStream<Long, AnomalyInformation> streamAnomalyInformationKeyed = streamAnomalyInformation
-                .selectKey((key, value) -> value.getId());
+        KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
+        /*
+        // Use the following code for easier testing (and also comment out the first line in the method)
 
+        KStream<Long, String> firstStream = builder.stream(calculatedScoresTopicName);
+        KStream<Long, AnomalyInformation> second = firstStream.mapValues(x -> {try { return AnomalyInformation
+        .fromJson(x); } catch (JsonProcessingException e) {  throw new RuntimeException(e); }  });
+        KStream<Long, AnomalyInformation> third = second.selectKey((key, value) -> value.getId());
+        KStream<Long, CurrentShipDetails> streamOfUpdates = third.mapValues(x -> new CurrentShipDetails(x, null));
+        */
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<Long, AnomalyInformation> notificationsState = streamAnomalyInformationKeyed
+        KTable<Long, Notification> notificationsState = streamOfUpdates
                 .mapValues(x -> {
                     try {
                         return x.toJson();
@@ -391,7 +390,7 @@ public class AnomalyDetectionPipeline {
                 })
                 .groupByKey()
                 .aggregate(
-                        AnomalyInformation::new,
+                        Notification::new,
                         (key, valueJson, lastInformation) -> {
                             try {
                                 return notificationsAggregator.aggregateSignals(lastInformation, valueJson, key);
@@ -400,8 +399,8 @@ public class AnomalyDetectionPipeline {
                             }
                         },
                         Materialized
-                                .<Long, AnomalyInformation, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
-                                .withValueSerde(AnomalyInformation.getSerde())
+                                .<Long, Notification, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
+                                .withValueSerde(Notification.getSerde())
                 );
         this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();

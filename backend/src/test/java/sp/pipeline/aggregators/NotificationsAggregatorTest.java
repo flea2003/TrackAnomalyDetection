@@ -10,13 +10,12 @@ import com.fasterxml.jackson.core.JsonParseException;
 import sp.controllers.NotificationController;
 import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotFoundNotificationException;
+import sp.model.AISSignal;
+import sp.model.CurrentShipDetails;
 import sp.model.Notification;
 import sp.services.NotificationService;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -27,16 +26,16 @@ public class NotificationsAggregatorTest {
 
     private NotificationsAggregator notificationsAggregator;
 
-    private String valueJsonLow = "{\"score\":10,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1}";
-    private String valueJsonHigh = "{\"score\":50,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1}";
+    private String valueJsonLow = "{\"currentAnomalyInformation\":{\"score\":10.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}}\n";
+    private String valueJsonHigh = "{\"currentAnomalyInformation\":{\"score\":50.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}}\n";
     private String key = "1";
 
-    private AnomalyInformation initialValue = new AnomalyInformation(0F, null, null, 1L);
-    private AnomalyInformation oldValueLow = new AnomalyInformation(10, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L);
-    private AnomalyInformation oldValueHigh = new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L);
+    private Notification initialValue = new Notification(null, null, null);
+    private Notification oldValueLow = new Notification(new CurrentShipDetails(new AnomalyInformation(10, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal()));
+    private Notification oldValueHigh = new Notification(new CurrentShipDetails(new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal()));
 
     @BeforeEach
-    void setUp() throws NotFoundNotificationException {
+    void setUp() throws NotFoundNotificationException, JsonProcessingException {
         notificationService = mock(NotificationService.class);
         notificationsAggregator = new NotificationsAggregator(notificationService);
     }
@@ -55,38 +54,38 @@ public class NotificationsAggregatorTest {
     @Test
     void testAggregateSimpleHigh() throws NotFoundNotificationException, JsonProcessingException {
         when(notificationService.getNewestNotificationForShip(1L)).thenThrow(NotFoundNotificationException.class);
-        assertThat(notificationsAggregator.aggregateSignals(initialValue, valueJsonHigh, 1L)).isEqualTo(AnomalyInformation.fromJson(valueJsonHigh));
-        verify(notificationService, times(1)).addNotification(AnomalyInformation.fromJson(valueJsonHigh));
+        assertThat(notificationsAggregator.aggregateSignals(initialValue, valueJsonHigh, 1L)).isEqualTo(oldValueHigh);
+        verify(notificationService, times(1)).addNotification(oldValueHigh);
     }
 
 
     @Test
     void testAggregateSimpleLow() throws NotFoundNotificationException, JsonProcessingException {
         when(notificationService.getNewestNotificationForShip(1L)).thenThrow(NotFoundNotificationException.class);
-        assertThat(notificationsAggregator.aggregateSignals(initialValue, valueJsonLow, 1L)).isEqualTo(AnomalyInformation.fromJson(valueJsonLow));
-        verify(notificationService, times(0)).addNotification(AnomalyInformation.fromJson(valueJsonLow));
+        assertThat(notificationsAggregator.aggregateSignals(initialValue, valueJsonLow, 1L)).isEqualTo(oldValueLow);
+        verify(notificationService, times(0)).addNotification(oldValueLow);
     }
 
     @Test
     void testAggregateComplexLow() throws NotFoundNotificationException, JsonProcessingException {
-        when(notificationService.getNewestNotificationForShip(1L)).thenReturn(new Notification(oldValueLow));
+        when(notificationService.getNewestNotificationForShip(1L)).thenReturn(oldValueLow);
         assertThat(notificationsAggregator.aggregateSignals(initialValue, valueJsonLow, 1L)).isEqualTo(oldValueLow);
-        verify(notificationService, times(0)).addNotification(AnomalyInformation.fromJson(valueJsonLow));
+        verify(notificationService, times(0)).addNotification(oldValueLow);
     }
 
     @Test
     void testAggregateComplexHigh1() throws NotFoundNotificationException, JsonProcessingException {
-        when(notificationService.getNewestNotificationForShip(1L)).thenReturn(new Notification(oldValueLow));
+        when(notificationService.getNewestNotificationForShip(1L)).thenReturn(oldValueLow);
         assertThat(notificationsAggregator.aggregateSignals(oldValueLow, valueJsonHigh, 1L)).isEqualTo(oldValueHigh);
-        verify(notificationService, times(1)).addNotification(AnomalyInformation.fromJson(valueJsonHigh));
+        verify(notificationService, times(1)).addNotification(oldValueHigh);
     }
 
 
     @Test
     void testAggregateComplexHigh2() throws NotFoundNotificationException, JsonProcessingException {
-        when(notificationService.getNewestNotificationForShip(1L)).thenReturn(new Notification(oldValueLow));
-        valueJsonHigh =  "{\"score\":20,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1}";
-        assertThat(notificationsAggregator.aggregateSignals(oldValueHigh, valueJsonHigh, 1L)).isEqualTo(AnomalyInformation.fromJson(valueJsonHigh));
-        verify(notificationService, times(0)).addNotification(AnomalyInformation.fromJson(valueJsonHigh));
+        when(notificationService.getNewestNotificationForShip(1L)).thenReturn(oldValueLow);
+        valueJsonHigh =  "{\"currentAnomalyInformation\":{\"score\":20.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}}\n";
+        assertThat(notificationsAggregator.aggregateSignals(oldValueHigh, valueJsonHigh, 1L)).isEqualTo(new Notification(CurrentShipDetails.fromJson(valueJsonHigh)));
+        verify(notificationService, times(0)).addNotification(oldValueHigh);
     }
 }

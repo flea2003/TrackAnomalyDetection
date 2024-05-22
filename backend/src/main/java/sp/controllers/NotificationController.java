@@ -51,11 +51,11 @@ public class NotificationController {
     /**
      * Gets all notifications for a particular ship.
      *
-     * @param shipID id of the ship
+     * @param id id of the ship
      * @return a list of notifications that correspond to a particular ship
      */
     @GetMapping("/notifications/ship/{id}")
-    public ResponseEntity<List<Notification>> getAllNotificationsForShip(@PathVariable Long shipID) {
-        return ResponseEntity.ok(this.notificationService.getAllNotificationForShip(shipID));
+    public ResponseEntity<List<Notification>> getAllNotificationsForShip(@PathVariable Long id) {
+        return ResponseEntity.ok(this.notificationService.getAllNotificationForShip(id));
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.kafka.common.serialization.Serde;
 import sp.utils.UtilsObjectMapper;
 
 @Getter
@@ -46,9 +44,5 @@ public class AnomalyInformation implements Serializable {
      */
     public static AnomalyInformation fromJson(String val) throws JsonProcessingException {
         return new UtilsObjectMapper().readValue(val, AnomalyInformation.class);
-    }
-
-    public static Serde<AnomalyInformation> getSerde() {
-        return new Jackson2Serde<>(new UtilsObjectMapper(), AnomalyInformation.class);
     }
 }

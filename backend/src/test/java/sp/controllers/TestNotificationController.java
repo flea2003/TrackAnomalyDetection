@@ -1,10 +1,15 @@
 package sp.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
+import sp.dtos.AnomalyInformation;
 import sp.exceptions.NotFoundNotificationException;
+import sp.model.AISSignal;
+import sp.model.CurrentShipDetails;
 import sp.model.Notification;
 import sp.services.NotificationService;
 import java.time.OffsetDateTime;
@@ -22,18 +27,31 @@ public class TestNotificationController {
     private Notification notification1;
     private Notification notification2;
     private Notification notification3;
+    private OffsetDateTime dateTime =  OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0));
 
     @BeforeEach
-    void setUp() throws NotFoundNotificationException {
-        notification1 = new Notification(1F, "explanation",
-                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                1L, 0, 1);
-        notification2 = new Notification(1F, "explanation",
-                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                2L, 0, 1);
-        notification3 = new Notification(1F, "explanation",
-                OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0)),
-                2L, 0, 2);
+    void setUp() throws NotFoundNotificationException, JsonProcessingException {
+        notification1 = new Notification(
+                new CurrentShipDetails(
+                        new AnomalyInformation(1F, "explanation", dateTime, 1L),
+                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                )
+        );
+
+        notification2 = new Notification(
+                new CurrentShipDetails(
+                        new AnomalyInformation(1F, "explanation", dateTime, 2L),
+                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                )
+        );
+
+        notification3 = new Notification(
+                new CurrentShipDetails(
+                        new AnomalyInformation(1F, "explanation", dateTime, 3L),
+                        new AISSignal(3L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                )
+        );
+
         notificationService = mock(NotificationService.class);
 
         when(notificationService.getNotificationById(0L)).thenReturn(notification1);
