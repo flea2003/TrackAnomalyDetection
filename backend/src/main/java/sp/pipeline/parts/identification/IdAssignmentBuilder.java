@@ -11,7 +11,6 @@ import sp.model.AISSignal;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.StreamUtils;
 
-import java.io.IOException;
 import java.util.Objects;
 
 @Component
@@ -34,7 +33,7 @@ public class IdAssignmentBuilder {
      * @return the DataStream with the AISSignal objects that have been assigned an internal ID.
      *         Used in the next step of the pipeline.
      */
-    public DataStream<AISSignal> buildIdAssignmentPart(StreamExecutionEnvironment flinkEnv) throws IOException {
+    public DataStream<AISSignal> buildIdAssignmentPart(StreamExecutionEnvironment flinkEnv) {
         // Create a Flink stream that consumes AIS signals from Kafka
         KafkaSource<String> kafkaSource = streamUtils.getFlinkStreamConsumingFromKafka(configuration.rawIncomingAisTopicName);
         DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");

@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
 
-import java.io.IOException;
-
 @Component
 public class NotificationsDetectionBuilder {
     private final NotificationsAggregator notificationsAggregator;
@@ -32,7 +30,7 @@ public class NotificationsDetectionBuilder {
      * signal (which in our case is wrapped in CurrentShipDetails for optimization purposes for retrieving AIS signal).
      *
      */
-    public void buildNotifications(KTable<Long, CurrentShipDetails> state) throws IOException {
+    public void buildNotifications(KTable<Long, CurrentShipDetails> state) {
         // Construct a stream for computed AnomalyInformation objects
         KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
         /*

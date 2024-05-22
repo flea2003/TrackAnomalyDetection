@@ -66,7 +66,7 @@ public class AnomalyDetectionPipeline {
     /**
      * Private helper method for building the sp.pipeline.
      */
-    private void buildPipeline() throws IOException {
+    private void buildPipeline()  {
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
         // Create a keyed Kafka Stream of incoming AnomalyInformation signals
         StreamsBuilder builder = new StreamsBuilder();

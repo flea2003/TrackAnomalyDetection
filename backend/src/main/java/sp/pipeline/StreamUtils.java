@@ -11,7 +11,6 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Properties;
 
 @Service
@@ -35,9 +34,9 @@ public class StreamUtils {
      * @param topic the name of the topic from which to consume
      * @return the created Flink stream
      */
-    public KafkaSource<String> getFlinkStreamConsumingFromKafka(String topic) throws IOException {
+    public KafkaSource<String> getFlinkStreamConsumingFromKafka(String topic) {
         // Load the properties of Kafka from the configuration file
-        Properties props = configuration.loadConfig();
+        Properties props = configuration.getFullConfiguration();
 
         return KafkaSource.<String>builder()
                 .setProperties(props)
@@ -53,9 +52,9 @@ public class StreamUtils {
      * @param builder streams builder
      * @return created KafkaStreams object with the specified configuration
      */
-    public KafkaStreams getKafkaStreamConsumingFromKafka(StreamsBuilder builder) throws IOException {
+    public KafkaStreams getKafkaStreamConsumingFromKafka(StreamsBuilder builder) {
         // Load properties from the configuration file
-        Properties props = configuration.loadConfig();
+        Properties props = configuration.getFullConfiguration();
 
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return new KafkaStreams(builder.build(), props);

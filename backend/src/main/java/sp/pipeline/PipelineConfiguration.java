@@ -24,30 +24,26 @@ public class PipelineConfiguration {
     public final String calculatedScoresTopicName;
     public final String kafkaServerAddress;
     public final String kafkaStoreName;
+    private Properties savedConfiguration;
 
 
     public PipelineConfiguration(@Value("${kafka.config.file:kafka-connection.properties}") String configPath) throws IOException {
         this.configPath = configPath;
-        Properties config = loadConfig();
+        loadConfig();
 
-        if (config == null) {
+        if (savedConfiguration == null) {
             throw new IOException("Properties file not found");
         }
 
-        rawIncomingAisTopicName = config.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
-        incomingAisTopicName = config.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
-        calculatedScoresTopicName = config.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
-        kafkaServerAddress = config.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
-        kafkaStoreName = config.getProperty(KAFKA_STORE_NAME_PROPERTY);
+        rawIncomingAisTopicName = savedConfiguration.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
+        incomingAisTopicName = savedConfiguration.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
+        calculatedScoresTopicName = savedConfiguration.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
+        kafkaServerAddress = savedConfiguration.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
+        kafkaStoreName = savedConfiguration.getProperty(KAFKA_STORE_NAME_PROPERTY);
+
     }
 
-    /**
-     * Loads the properties from the configuration file.
-     *
-     * @return the loaded properties
-     * @throws IOException if such file does not exist
-     */
-    public Properties loadConfig() throws IOException {
+    private void loadConfig() throws IOException {
         if (!Files.exists(Paths.get(configPath))) {
             throw new IOException("Kafka configuration file '" + configPath + "' was not found.");
         }
@@ -57,6 +53,15 @@ public class PipelineConfiguration {
             config.load(inputStream);
         }
 
-        return config;
+        this.savedConfiguration = config;
+    }
+
+    /**
+     * Returns the properties from the configuration file.
+     *
+     * @return the properties from the configuration file
+     */
+    public Properties getFullConfiguration() {
+        return savedConfiguration;
     }
 }
