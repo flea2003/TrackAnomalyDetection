@@ -1,9 +1,6 @@
 package sp.pipeline;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
-import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.common.utils.Bytes;
@@ -25,6 +22,7 @@ import sp.model.*;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
 import sp.pipeline.parts.aggregation.aggregators.NotificationsAggregator;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
+import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 
 import java.io.IOException;
@@ -42,6 +40,7 @@ public class AnomalyDetectionPipeline {
     private KafkaStreams kafkaStreams;
     private KTable<Long, CurrentShipDetails> state;
     private final IdAssignmentBuilder idAssignmentBuilder;
+    private final ScoreCalculationBuilder scoreCalculationBuilder;
 
 
     /**
@@ -55,13 +54,15 @@ public class AnomalyDetectionPipeline {
                                     CurrentStateAggregator currentStateAggregator,
                                     NotificationsAggregator notificationsAggregator,
                                     PipelineConfiguration configuration,
-                                    IdAssignmentBuilder idAssignmentBuilder) throws IOException {
+                                    IdAssignmentBuilder idAssignmentBuilder,
+                                    ScoreCalculationBuilder scoreCalculationBuilder) throws IOException {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.streamUtils = streamUtils;
         this.currentStateAggregator = currentStateAggregator;
         this.notificationsAggregator = notificationsAggregator;
         this.configuration = configuration;
         this.idAssignmentBuilder = idAssignmentBuilder;
+        this.scoreCalculationBuilder = scoreCalculationBuilder;
 
         buildPipeline();
     }
@@ -85,55 +86,9 @@ public class AnomalyDetectionPipeline {
         StreamsBuilder builder = new StreamsBuilder();
 
         DataStream<AISSignal> streamWithAssignedIds = idAssignmentBuilder.buildIdAssignmentPart(flinkEnv);
-        buildScoreCalculationPart(streamWithAssignedIds);
+        scoreCalculationBuilder.buildScoreCalculationPart(streamWithAssignedIds, scoreCalculationStrategy);
         buildScoreAggregationPart(builder);
         buildNotifications(builder);
-    }
-
-    /**
-     * Creates a sink from Flink to a Kafka topic.
-     *
-     * @param kafkaServerAddress Kafka server address
-     * @param topicName Kafka topic name to send the data to
-     * @return the created KafkaSink object
-     */
-    private KafkaSink<String> createSinkFlinkToKafka(String kafkaServerAddress, String topicName) {
-        return KafkaSink.<String>builder()
-                .setBootstrapServers(kafkaServerAddress)
-                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                        .setTopic(topicName)
-                        .setValueSerializationSchema(new SimpleStringSchema())
-                        .build()
-                )
-                .build();
-    }
-
-
-
-    /**
-     * Builds the first part of the `sp.pipeline` - the score calculation part, done in Flink. This `sp.pipeline`
-     * consumes AIS signals from Kafka, calculates the anomaly scores (in Flink) and sends them to back
-     * to Kafka into another topic.
-
-     * The middle part, i.e., calculating anomaly scores (using Flink) is actually defined in the
-     * injected scoreCalculationStrategy class. I.e., this part only calls that method. This way the
-     * anomaly detection algorithm can be easily swapped out.
-     */
-    private void buildScoreCalculationPart(DataStream<AISSignal> source) {
-
-        // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
-        KafkaSink<String> signalsSink = createSinkFlinkToKafka(configuration.kafkaServerAddress, configuration.incomingAisTopicName);
-        source.map(AISSignal::toJson).sinkTo(signalsSink);
-
-        // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
-        DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
-
-        // Map the computed AnomalyInformation objects to JSON strings
-        DataStream<String> updateStreamSerialized = updateStream.map(AnomalyInformation::toJson);
-
-        // Send the calculated AnomalyInformation objects to Kafka
-        KafkaSink<String> scoresSink = createSinkFlinkToKafka(configuration.kafkaServerAddress, configuration.calculatedScoresTopicName);
-        updateStreamSerialized.sinkTo(scoresSink);
     }
 
     /**
