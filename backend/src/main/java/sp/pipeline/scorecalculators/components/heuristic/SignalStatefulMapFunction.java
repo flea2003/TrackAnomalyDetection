@@ -2,7 +2,6 @@ package sp.pipeline.scorecalculators.components.heuristic;
 
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.harvesineDistance;
 
-import java.io.IOException;
 import java.time.Duration;
 import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
@@ -34,7 +33,16 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
         return super.setAnomalyInformationResult(value, 33f, badMsg, goodMsg);
     }
 
-    public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) throws IOException {
+    /**
+     * Checks if the current AISSignal is considered an anomaly. Takes the past signal to compare with.
+     * The signal is considered an anomaly if the time between the signals is significant or the distance
+     * between signals is significant.
+     *
+     * @param value current AIS signal
+     * @param pastAISSignal previous AIS signal
+     * @return true if the current signal is anomalous, false otherwise
+     */
+    public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) {
         double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
 
         boolean signalTimingIsGood = time < 10;
