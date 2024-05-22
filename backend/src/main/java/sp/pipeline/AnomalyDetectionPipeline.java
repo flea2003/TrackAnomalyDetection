@@ -18,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.exceptions.PipelineException;
-import sp.model.*;
-import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
+import sp.model.AISSignal;
+import sp.model.CurrentShipDetails;
+import sp.model.Notification;
+import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.aggregation.aggregators.NotificationsAggregator;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
@@ -34,13 +36,13 @@ public class AnomalyDetectionPipeline {
     private final PipelineConfiguration configuration;
     private final ScoreCalculationStrategy scoreCalculationStrategy;
     private final StreamUtils streamUtils;
-    private final CurrentStateAggregator currentStateAggregator;
     private final NotificationsAggregator notificationsAggregator;
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
     private KTable<Long, CurrentShipDetails> state;
     private final IdAssignmentBuilder idAssignmentBuilder;
     private final ScoreCalculationBuilder scoreCalculationBuilder;
+    ScoreAggregationBuilder scoreAggregationBuilder;
 
 
     /**
@@ -51,18 +53,18 @@ public class AnomalyDetectionPipeline {
     @Autowired
     public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator") ScoreCalculationStrategy scoreCalculationStrategy,
                                     StreamUtils streamUtils,
-                                    CurrentStateAggregator currentStateAggregator,
                                     NotificationsAggregator notificationsAggregator,
                                     PipelineConfiguration configuration,
                                     IdAssignmentBuilder idAssignmentBuilder,
-                                    ScoreCalculationBuilder scoreCalculationBuilder) throws IOException {
+                                    ScoreCalculationBuilder scoreCalculationBuilder,
+                                    ScoreAggregationBuilder scoreAggregationBuilder) throws IOException {
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.streamUtils = streamUtils;
-        this.currentStateAggregator = currentStateAggregator;
         this.notificationsAggregator = notificationsAggregator;
         this.configuration = configuration;
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
+        this.scoreAggregationBuilder = scoreAggregationBuilder;
 
         buildPipeline();
     }
@@ -87,105 +89,12 @@ public class AnomalyDetectionPipeline {
 
         DataStream<AISSignal> streamWithAssignedIds = idAssignmentBuilder.buildIdAssignmentPart(flinkEnv);
         scoreCalculationBuilder.buildScoreCalculationPart(streamWithAssignedIds, scoreCalculationStrategy);
-        buildScoreAggregationPart(builder);
+
+        this.state = scoreAggregationBuilder.buildScoreAggregationPart(builder);
         buildNotifications(builder);
     }
 
-    /**
-     * Builds the second part of the `sp.pipeline` - the score aggregation part. In particular, this part
-     * takes the calculated score updates from Kafka (which were pushed there by the previous part)
-     * and aggregates them into a KTable. It also takes care of appending needed AIS signals to the KTable.
-     * This KTable is then used as the state of the sp.pipeline.
-     *
-     * <p>The actual implementation works the following way:
-     * 1. Incoming AIS signals are mapped to ShipInformation object with the anomaly score missing.
-     * 2. AIS score updates are mapped to ShipInformation objects as well, with AIS signal missing.
-     * 3. The AIS-signal type ShipInformation objects get to the KTable first and just get added there.
-     * 4. The AIS-score-update type ShipInformation objects  get to the KTable after those and just update the missing
-     * anomaly score field in the corresponding places.
-     * </p>
-     */
-    private void buildScoreAggregationPart(StreamsBuilder builder) {
-        // Construct and merge two streams and select the ship hash as a key for the new stream.
-        KStream<Long, ShipInformation> mergedStream = mergeStreams(builder);
 
-        // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<Long, CurrentShipDetails> table = mergedStream
-                .mapValues(x -> {
-                    try {
-                        return x.toJson();
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .groupByKey()
-                .aggregate(
-                        CurrentShipDetails::new,
-                        (key, valueJson, aggregatedShipDetails) -> {
-                            try {
-                                return currentStateAggregator.aggregateSignals(aggregatedShipDetails, valueJson);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
-                        Materialized
-                                .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.kafkaStoreName)
-                                .withValueSerde(CurrentShipDetails.getSerde())
-                );
-
-        builder.build();
-        this.state = table;
-    }
-
-    /**
-     * Builds a KStream object that consists of computed AISSignal objects, wrapped around
-     * ShipInformation class (i.e. AnomalyInformation is set to null)
-     *
-     * @param builder streams builder
-     * @return a KStream object that consists of computed AISSignal objects, wrapped around
-     *     ShipInformation class
-     */
-    private KStream<Long, ShipInformation> streamAISSignals(StreamsBuilder builder) {
-
-        // Take the initial AISSignal and wrap them into ShipInformation objects, so we could later merge the stream
-        // with already wrapped AnomalyInformation objects
-        KStream<Long, String> streamAISSignalsJSON = builder.stream(configuration.incomingAisTopicName);
-        return streamAISSignalsJSON
-                .mapValues(x -> {
-                    AISSignal aisSignal;
-                    try {
-                        aisSignal = AISSignal.fromJson(x);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return new ShipInformation(aisSignal.getId(), null, aisSignal);
-                });
-    }
-
-    /**
-     * Builds a KStream object that consists of computed AnomalyInformation objects, wrapped around
-     * ShipInformation class (i.e. AISSignal is set to null)
-     *
-     * @param builder streams builder
-     * @return KStream object that consists of computed AnomalyInformation objects, wrapped around
-     *     ShipInformation class
-     */
-    private KStream<Long, ShipInformation> streamAnomalyInformation(StreamsBuilder builder) {
-
-        // Take computed AnomalyInformation JSON strings, deserialize them and wrap them into ShipInformation objects,
-        // so we could later merge the stream with wrapped simple AISSignal objects
-        KStream<Long, String> streamAnomalyInformationJSON = builder.stream(configuration.calculatedScoresTopicName);
-
-        return streamAnomalyInformationJSON.mapValues(x -> {
-            AnomalyInformation anomalyInformation;
-            try {
-                anomalyInformation = AnomalyInformation.fromJson(x);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            return new ShipInformation(anomalyInformation.getId(), anomalyInformation, null);
-        });
-    }
 
     /**
      * Starts the stream processing: both Flink anomaly-detection part and Kafka score-aggregation part.
@@ -279,24 +188,5 @@ public class AnomalyDetectionPipeline {
                 );
         this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
-    }
-
-    /**
-     * Method that constructs a unified stream of AnomalyInformation and AISSignal instances,
-     * wrapped inside a ShipInformation class.
-     *
-     * @param builder StreamsBuilder instance responsible for configuring the KStream instances
-     * @return unified stream
-     */
-    private KStream<Long, ShipInformation> mergeStreams(StreamsBuilder builder) {
-        // Construct two separate streams for AISSignals and computed AnomalyScores, and wrap each stream values into
-        // ShipInformation object, so that we could later merge these two streams
-        KStream<Long, ShipInformation> streamAnomalyInformation  = streamAnomalyInformation(builder);
-        KStream<Long, ShipInformation> streamAISSignals = streamAISSignals(builder);
-
-        // Merge two streams and select the ship hash as a key for the new stream.
-        return streamAISSignals
-                .merge(streamAnomalyInformation)
-                .selectKey((key, value) -> value.getShipId());
     }
 }
