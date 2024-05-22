@@ -1,11 +1,8 @@
 package sp.pipeline.parts.notifications;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
@@ -13,6 +10,12 @@ import sp.model.Notification;
 @Component
 public class NotificationsDetectionBuilder {
     private final NotificationsAggregator notificationsAggregator;
+
+    /**
+     * Constructor for the NotificationsDetectionBuilder class.
+     *
+     * @param notificationsAggregator an injected object that handles the logic of creating and storing notifications
+     */
     public NotificationsDetectionBuilder(NotificationsAggregator notificationsAggregator) {
         this.notificationsAggregator = notificationsAggregator;
     }
@@ -43,7 +46,7 @@ public class NotificationsDetectionBuilder {
         KStream<Long, CurrentShipDetails> streamOfUpdates = third.mapValues(x -> new CurrentShipDetails(x, null));
         */
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<Long, Notification> notificationsState = streamOfUpdates
+        streamOfUpdates
                 .mapValues(x -> {
                     try {
                         return x.toJson();
@@ -60,10 +63,6 @@ public class NotificationsDetectionBuilder {
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
-                        },
-                        Materialized
-                                .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("temp-notifications-store")
-                                .withValueSerde(Notification.getSerde())
-                );
+                        });
     }
 }

@@ -22,12 +22,18 @@ public class ScoreAggregationBuilder {
     private final CurrentStateAggregator currentStateAggregator;
     private final PipelineConfiguration configuration;
 
+    /**
+     * Constructor for the ScoreAggregationBuilder class.
+     *
+     * @param configuration an object that holds configuration properties
+     * @param currentStateAggregator an responsible for aggregating the current state of the pipeline
+     */
     @Autowired
-    public ScoreAggregationBuilder(CurrentStateAggregator currentStateAggregator, PipelineConfiguration configuration) {
+    public ScoreAggregationBuilder(PipelineConfiguration configuration,
+                                   CurrentStateAggregator currentStateAggregator) {
         this.currentStateAggregator = currentStateAggregator;
         this.configuration = configuration;
     }
-
 
     /**
      * Builds a KStream object that consists of computed AnomalyInformation objects, wrapped around
@@ -41,7 +47,7 @@ public class ScoreAggregationBuilder {
 
         // Take computed AnomalyInformation JSON strings, deserialize them and wrap them into ShipInformation objects,
         // so we could later merge the stream with wrapped simple AISSignal objects
-        KStream<Long, String> streamAnomalyInformationJSON = builder.stream(configuration.calculatedScoresTopicName);
+        KStream<Long, String> streamAnomalyInformationJSON = builder.stream(configuration.getCalculatedScoresTopicName());
 
         return streamAnomalyInformationJSON.mapValues(x -> {
             AnomalyInformation anomalyInformation;
@@ -53,7 +59,6 @@ public class ScoreAggregationBuilder {
             return new ShipInformation(anomalyInformation.getId(), anomalyInformation, null);
         });
     }
-
 
     /**
      * Builds a KStream object that consists of computed AISSignal objects, wrapped around
@@ -67,7 +72,7 @@ public class ScoreAggregationBuilder {
 
         // Take the initial AISSignal and wrap them into ShipInformation objects, so we could later merge the stream
         // with already wrapped AnomalyInformation objects
-        KStream<Long, String> streamAISSignalsJSON = builder.stream(configuration.incomingAisTopicName);
+        KStream<Long, String> streamAISSignalsJSON = builder.stream(configuration.getIncomingAisTopicName());
         return streamAISSignalsJSON
                 .mapValues(x -> {
                     AISSignal aisSignal;
@@ -79,6 +84,7 @@ public class ScoreAggregationBuilder {
                     return new ShipInformation(aisSignal.getId(), null, aisSignal);
                 });
     }
+
     /**
      * Method that constructs a unified stream of AnomalyInformation and AISSignal instances,
      * wrapped inside a ShipInformation class.
@@ -97,8 +103,9 @@ public class ScoreAggregationBuilder {
                 .merge(streamAnomalyInformation)
                 .selectKey((key, value) -> value.getShipId());
     }
+
     /**
-     * Builds the second part of the `sp.pipeline` - the score aggregation part. In particular, this part
+     * Builds the second part of the `sp.pipeline`the score aggregation part. In particular, this part
      * takes the calculated score updates from Kafka (which were pushed there by the previous part)
      * and aggregates them into a KTable. It also takes care of appending needed AIS signals to the KTable.
      * This KTable is then used as the state of the sp.pipeline.
@@ -135,7 +142,7 @@ public class ScoreAggregationBuilder {
                             }
                         },
                         Materialized
-                                .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.kafkaStoreName)
+                                .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.getKafkaStoreName())
                                 .withValueSerde(CurrentShipDetails.getSerde())
                 );
         builder.build();

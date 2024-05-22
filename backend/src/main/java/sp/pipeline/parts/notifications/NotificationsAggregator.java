@@ -2,8 +2,6 @@ package sp.pipeline.parts.notifications;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
-import org.apache.commons.collections.KeyValue;
-import org.apache.commons.collections.Transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.NotificationNotFoundException;
@@ -37,17 +35,17 @@ public class NotificationsAggregator {
      * 1. If the anomaly score was below a threshold, and now got above threshold, a notification should be added
      * 2. In all other scenarios, notification should not be sent.
      *
-     * However, we want to keep track of the state of the current anomaly score (whether it is below or above threshold)
-     * as it is the only way to decide whenther a notification should be sent.
+     * <p>However, we want to keep track of the state of the current anomaly score (whether it is below or above threshold)
+     * as it is the only way to decide whether a notification should be sent.
      *
-     * Also, note that the logic when a notification should be sent will be improved in the future to account for TYPE
+     * <p>Also, note that the logic when a notification should be sent will be improved in the future to account for TYPE
      * of the anomalies.
      *
      * @param previousNotification Notification object that depicts the state
      * @param newValueJson JSON value of the CurrentShipDetails object that just arrived
      * @param shipID internal ID of the ship
      * @return Notification object that corresponds to the newest state (in case the anomaly score gone above the
-     * threshold or below)
+     *         threshold or below)
      * @throws JsonProcessingException in case JSON value does not correspond to an AnomalyInformation object
      */
     public Notification aggregateSignals(Notification previousNotification, String newValueJson, Long shipID)

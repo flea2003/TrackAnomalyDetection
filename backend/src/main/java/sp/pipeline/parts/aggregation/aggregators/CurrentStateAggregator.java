@@ -51,7 +51,9 @@ public class CurrentStateAggregator {
     /**
      * Utility method for updating the maxAnomalyScoreInfo filed of the streams aggregating object.
      *
-     * @return - the updated MaxAnomalyScoreDetails instance
+     * @param aggregatedShipDetails an object that stores the current state of the ship
+     * @param anomalyInformation the new AnomalyInformation signal for updating the max score
+     * @returnthe updated MaxAnomalyScoreDetails instance
      */
     private MaxAnomalyScoreDetails updateMaxScoreDetails(CurrentShipDetails aggregatedShipDetails,
                                                          AnomalyInformation anomalyInformation) {

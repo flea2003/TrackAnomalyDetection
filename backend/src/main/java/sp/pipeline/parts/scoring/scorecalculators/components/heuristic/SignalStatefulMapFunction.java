@@ -2,7 +2,6 @@ package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
-
 import java.time.Duration;
 
 public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {

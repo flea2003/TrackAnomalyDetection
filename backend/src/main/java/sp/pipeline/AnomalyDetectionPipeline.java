@@ -18,8 +18,6 @@ import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
-
-import java.io.IOException;
 import java.util.HashMap;
 
 @Service
@@ -35,15 +33,20 @@ public class AnomalyDetectionPipeline {
     private final NotificationsDetectionBuilder notificationsDetectionBuilder;
 
     /**
-     * Constructor for the AnomalyDetectionPipeline.
+     * Constructor for the AnomalyDetectionPipeline class.
      *
+     * @param streamUtils utility class for setting up streams
+     * @param idAssignmentBuilder builder for the id assignment part of the pipeline
+     * @param scoreCalculationBuilder builder for the score calculation part of the pipeline
+     * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
+     * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
      */
     @Autowired
     public AnomalyDetectionPipeline(StreamUtils streamUtils,
                                     IdAssignmentBuilder idAssignmentBuilder,
                                     ScoreCalculationBuilder scoreCalculationBuilder,
                                     ScoreAggregationBuilder scoreAggregationBuilder,
-                                    NotificationsDetectionBuilder notificationsDetectionBuilder) throws IOException {
+                                    NotificationsDetectionBuilder notificationsDetectionBuilder) {
         this.streamUtils = streamUtils;
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
@@ -64,7 +67,7 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
-     * Private helper method for building the sp.pipeline.
+     * Private helper method for building the pipeline step by step.
      */
     private void buildPipeline()  {
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -82,9 +85,8 @@ public class AnomalyDetectionPipeline {
     }
 
 
-
     /**
-     * Starts the stream processing: both Flink anomaly-detection part and Kafka score-aggregation part.
+     * Starts the stream processing: both Flink and Kafka parts.
      * Note that this method is not blocking, and it will not be called by the constructor.
      */
     public void runPipeline() {

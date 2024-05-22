@@ -1,8 +1,8 @@
 package sp.pipeline;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,24 +12,40 @@ import java.util.Properties;
 
 @Component
 public class PipelineConfiguration {
-    private static final String KAFKA_STORE_NOTIFICATIONS_NAME = "ships-notification-store";
     private static final String RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais-raw.topic.name";
     private static final String INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais.topic.name";
     private static final String CALCULATED_SCORES_TOPIC_NAME_PROPERTY = "calculated.scores.topic.name";
     private static final String KAFKA_SERVER_ADDRESS_PROPERTY = "kafka.server.address";
     private static final String KAFKA_STORE_NAME_PROPERTY = "kafka.store.name";
-    private final String configPath;
-    public final String rawIncomingAisTopicName;
-    public final String incomingAisTopicName;
-    public final String calculatedScoresTopicName;
-    public final String kafkaServerAddress;
-    public final String kafkaStoreName;
+
+    @Getter
+    private final String rawIncomingAisTopicName;
+
+    @Getter
+    private final String incomingAisTopicName;
+
+    @Getter
+    private final String calculatedScoresTopicName;
+
+    @Getter
+    private final String kafkaServerAddress;
+
+    @Getter
+    private final String kafkaStoreName;
+
+    @Getter
     private Properties savedConfiguration;
 
-
-    public PipelineConfiguration(@Value("${kafka.config.file:kafka-connection.properties}") String configPath) throws IOException {
-        this.configPath = configPath;
-        loadConfig();
+    /**
+     * Constructor for the PipelineConfiguration class. Loads the configuration file from the specified path.
+     * If the file is not found, an IOException is thrown. The public fields are then loaded from the file.
+     *
+     * @param configPath path to the configuration file
+     * @throws IOException if the configuration file is not found
+     */
+    public PipelineConfiguration(@Value("${kafka.config.file:kafka-connection.properties}")
+                                 String configPath) throws IOException {
+        loadConfig(configPath);
 
         if (savedConfiguration == null) {
             throw new IOException("Properties file not found");
@@ -43,13 +59,19 @@ public class PipelineConfiguration {
 
     }
 
-    private void loadConfig() throws IOException {
-        if (!Files.exists(Paths.get(configPath))) {
-            throw new IOException("Kafka configuration file '" + configPath + "' was not found.");
+    /**
+     * Loads the configuration file from the specified path.
+     *
+     * @param path path to the configuration file
+     * @throws IOException if the configuration file is not found
+     */
+    private void loadConfig(String path) throws IOException {
+        if (!Files.exists(Paths.get(path))) {
+            throw new IOException("Kafka configuration file '" + path + "' was not found.");
         }
 
         Properties config = new Properties();
-        try (InputStream inputStream = new FileInputStream(configPath)) {
+        try (InputStream inputStream = new FileInputStream(path)) {
             config.load(inputStream);
         }
 

@@ -10,7 +10,6 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Properties;
 
 @Service
@@ -19,7 +18,7 @@ public class StreamUtils {
     private final PipelineConfiguration configuration;
 
     /**
-     * Sets up the StreamUtils object
+     * Sets up the StreamUtils object.
      *
      * @param configuration object that hold configuration properties
      */

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.Notification;
 import sp.repositories.NotificationRepository;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +54,7 @@ public class NotificationService {
     }
 
     /**
-     * Gets all notifications for a particular ship
+     * Gets all notifications for a particular ship.
      *
      * @param shipID internal id of the ship
      * @return a list of notifications for a ship
