@@ -6,11 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
-import sp.dtos.AnomalyInformation;
+import sp.model.*;
 import sp.exceptions.NotFoundNotificationException;
-import sp.model.AISSignal;
-import sp.model.CurrentShipDetails;
-import sp.model.Notification;
 import sp.services.NotificationService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -34,21 +31,24 @@ public class TestNotificationController {
         notification1 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 1L),
-                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
 
         notification2 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 2L),
-                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
 
         notification3 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 3L),
-                        new AISSignal(3L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(3L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
 

@@ -3,7 +3,7 @@ package sp.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AnomalyInformation;
+import sp.model.AnomalyInformation;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -21,7 +21,8 @@ public class TestNotification {
         notification = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 1L),
-                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
     }
@@ -36,7 +37,8 @@ public class TestNotification {
     void testConstructor1() throws JsonProcessingException {
         Notification notification2 = new Notification(new CurrentShipDetails(
                 new AnomalyInformation(1F, "explanation", dateTime, 1L),
-                new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                new MaxAnomalyScoreDetails()
         ));
 
         assertThat(notification2).isEqualTo(notification);

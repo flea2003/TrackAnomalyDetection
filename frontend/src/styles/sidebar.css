@@ -1,4 +1,4 @@
-.sidebar-entry {
+.sidebar-entry, .sidebar-bug-icon-all-read, .sidebar-bug-icon-not-all-read {
     width: 100%;
     height: 50px;
     border-bottom: 1px solid black;
@@ -12,7 +12,15 @@
     height: var(--sidebar-icon-size);
 }
 
-.sidebar-entry:hover {
+.sidebar-entry:hover, .sidebar-bug-icon-all-read:hover, .sidebar-bug-icon-not-all-read:hover  {
     cursor: pointer;
     background-color: lightblue;
+}
+
+.sidebar-bug-icon-not-all-read {
+    background-color: lightcoral;
+}
+
+.sidebar-bug-icon-not-all-read:hover {
+    background-color: indianred;
 }

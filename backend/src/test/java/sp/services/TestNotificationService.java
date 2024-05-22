@@ -3,11 +3,8 @@ package sp.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.dtos.AnomalyInformation;
+import sp.model.*;
 import sp.exceptions.NotFoundNotificationException;
-import sp.model.AISSignal;
-import sp.model.CurrentShipDetails;
-import sp.model.Notification;
 import sp.repositories.NotificationRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -34,21 +31,24 @@ public class TestNotificationService {
         notification1 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 0L),
-                        new AISSignal(0L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(0L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
 
         notification2 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 1L),
-                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
 
         notification3 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 2L),
-                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
 
@@ -100,7 +100,8 @@ public class TestNotificationService {
         Notification notification4 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", OffsetDateTime.of(2004, 01, 27, 0, 3, 0, 0, ZoneOffset.ofHours(0)), 2L),
-                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
         when(notificationRepository.findNotificationByShipID(2L)).thenReturn(List.of(notification2, notification4));
@@ -113,7 +114,8 @@ public class TestNotificationService {
         Notification notification4 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", OffsetDateTime.of(2005, 01, 27, 0, 3, 0, 0, ZoneOffset.ofHours(0)), 2L),
-                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA")
+                        new AISSignal(2L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
+                        new MaxAnomalyScoreDetails()
                 )
         );
         when(notificationRepository.findNotificationByShipID(2L)).thenReturn(List.of(notification2, notification4));

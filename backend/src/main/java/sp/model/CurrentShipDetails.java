@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.serialization.Serde;
-import sp.dtos.AnomalyInformation;
 import sp.utils.UtilsObjectMapper;
 
 @Data
@@ -22,6 +21,7 @@ import sp.utils.UtilsObjectMapper;
 public class CurrentShipDetails implements Serializable {
     private AnomalyInformation currentAnomalyInformation;
     private AISSignal currentAISSignal;
+    private MaxAnomalyScoreDetails maxAnomalyScoreInfo;
 
     /**
      * Converts a JSON string to a CurrentShipDetails object.

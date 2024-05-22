@@ -1,13 +1,15 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
+import { CurrentPage } from "../../../App";
+import ErrorNotificationService from "../../../services/ErrorNotificationService";
 
-import "../../styles/common.css";
-import "../../styles/sidebar.css";
+import "../../../styles/common.css";
+import "../../../styles/sidebar.css";
 
-import shipIcon from "../../assets/icons/ship.png";
-import bellIcon from "../../assets/icons/bell-notification.svg";
-import settingsIcon from "../../assets/icons/settings.svg";
-import { CurrentPage } from "../../App";
+import shipIcon from "../../../assets/icons/ship.png";
+import bellIcon from "../../../assets/icons/bell-notification.svg";
+import settingsIcon from "../../../assets/icons/settings.svg";
+import bugIcon from "../../../assets/icons/bug.svg";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -25,6 +27,7 @@ function Sidebar({ pageChanger }: SidebarProps) {
   const shipIconAlt = "Ship Icon";
   const bellIconAlt = "Bell Icon";
   const settingsIconAlt = "Settings Icon";
+  const bugIconAlt = "Bug Icon";
 
   // Define the click handlers for the icons
   const onShipIconClicked = () =>
@@ -33,6 +36,8 @@ function Sidebar({ pageChanger }: SidebarProps) {
     pageChanger({ currentPage: "notifications", shownShipId: -1 });
   const onSettingsIconClicked = () =>
     pageChanger({ currentPage: "settings", shownShipId: -1 });
+  const onBugIconClicked = () =>
+    pageChanger({ currentPage: "errors", shownShipId: -1 });
 
   return (
     <Stack id="sidebar" data-testid="sidebar">
@@ -61,8 +66,28 @@ function Sidebar({ pageChanger }: SidebarProps) {
           alt={settingsIconAlt}
         />
       </span>
+      <span
+        data-testid="sidebar-bug-icon"
+        className={getBugIconClassName()}
+        onClick={onBugIconClicked}
+      >
+        <img src={bugIcon} className="sidebar-icon" alt={bugIconAlt} />
+      </span>
     </Stack>
   );
+}
+
+/**
+ * Returns the class name for the icon element that represents error list
+ * in the sidebar.
+ * The class name is based on whether all notifications were read or not,
+ * so that the icon could be shown in red when there are unread notifications.
+ */
+function getBugIconClassName() {
+  if (ErrorNotificationService.areAllRead()) {
+    return "sidebar-bug-icon-all-read";
+  }
+  return "sidebar-bug-icon-not-all-read";
 }
 
 export default Sidebar;

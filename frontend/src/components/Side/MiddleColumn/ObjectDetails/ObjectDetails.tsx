@@ -1,13 +1,14 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
-import ShipDetails from "../../../model/ShipDetails";
+import ShipDetails from "../../../../model/ShipDetails";
 import ObjectDetailsEntry from "./ObjectDetailsEntry";
 
-import "../../../styles/common.css";
-import "../../../styles/objectDetails.css";
-import returnIcon from "../../../assets/icons/back.svg";
-import { CurrentPage } from "../../../App";
+import "../../../../styles/common.css";
+import "../../../../styles/objectDetails.css";
+import returnIcon from "../../../../assets/icons/back.svg";
+import { CurrentPage } from "../../../../App";
+import ErrorNotificationService from "../../../../services/ErrorNotificationService";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
@@ -31,6 +32,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
   const ship = allShips.find((ship) => ship.id === shipID);
 
   if (ship === undefined) {
+    ErrorNotificationService.addWarning("No ship found with ID " + shipID);
     return shipNotFoundElement();
   }
 
@@ -69,7 +71,7 @@ function getPropertyElements(ship: ShipDetails) {
       <ObjectDetailsEntry
         key={property.type}
         type={property.type}
-        value={property.value}
+        value={property.value.toString()}
       />
     );
   });

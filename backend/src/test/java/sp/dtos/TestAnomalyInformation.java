@@ -3,6 +3,7 @@ package sp.dtos;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sp.model.AnomalyInformation;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

@@ -4,15 +4,16 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
 import L from "leaflet";
 import createShipIcon from "../ShipIcon/ShipIcon";
-import "../../styles/map.css";
-import "../../styles/common.css";
-
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
 
-import mapStyleConfig from "../../styles/mapConfig.json";
+import "../../styles/map.css";
+import "../../styles/common.css";
+
+import mapStyleConfig from "../../configs/mapConfig.json";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -68,6 +69,9 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
     useImperativeHandle(ref, () => ({
       centerMapOntoShip(ship: ShipDetails) {
         if (map == null) {
+          ErrorNotificationService.addWarning(
+            "map is null in the call centerMapOntoShip",
+          );
           return;
         }
         map.flyTo(
@@ -96,15 +100,29 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
 
       // Add all ship icons to the map
       ships.forEach((ship) => {
-        L.marker([ship.lat, ship.lng], {
-          icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
-        })
-          .addTo(map)
-          .bindPopup("ID: " + ship.id)
-          .on("click", (e) => {
-            map.flyTo(e.latlng, map.getZoom());
-            pageChanger({ currentPage: "objectDetails", shownShipId: ship.id });
-          });
+        try {
+          L.marker([ship.lat, ship.lng], {
+            icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
+          })
+            .addTo(map)
+            .bindPopup("ID: " + ship.id)
+            .on("click", (e) => {
+              map.flyTo(e.latlng, map.getZoom());
+              pageChanger({
+                currentPage: "objectDetails",
+                shownShipId: ship.id,
+              });
+            });
+        } catch (error) {
+          if (error instanceof Error) {
+            ErrorNotificationService.addWarning(
+              "Error while adding an icon for ship with id " +
+                ship.id +
+                ": " +
+                error.message,
+            );
+          }
+        }
       });
 
       return () => {

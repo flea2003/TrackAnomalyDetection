@@ -8,11 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonParseException;
 import sp.controllers.NotificationController;
-import sp.dtos.AnomalyInformation;
+import sp.model.*;
 import sp.exceptions.NotFoundNotificationException;
-import sp.model.AISSignal;
-import sp.model.CurrentShipDetails;
-import sp.model.Notification;
 import sp.services.NotificationService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -26,18 +23,19 @@ public class NotificationsAggregatorTest {
 
     private NotificationsAggregator notificationsAggregator;
 
-    private String valueJsonLow = "{\"currentAnomalyInformation\":{\"score\":10.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}}\n";
-    private String valueJsonHigh = "{\"currentAnomalyInformation\":{\"score\":50.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}}\n";
+    private String valueJsonLow = "{\"currentAnomalyInformation\":{\"score\":10.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}, \"maxAnomalyScoreInfo\":{\"maxAnomalyScore\":null,\"correspondingTimestamp\":null}}\n";
+    private String valueJsonHigh = "{\"currentAnomalyInformation\":{\"score\":50.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}, \"maxAnomalyScoreInfo\":{\"maxAnomalyScore\":null,\"correspondingTimestamp\":null}}\n";
     private String key = "1";
 
     private Notification initialValue = new Notification(null, null, null);
-    private Notification oldValueLow = new Notification(new CurrentShipDetails(new AnomalyInformation(10, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal()));
-    private Notification oldValueHigh = new Notification(new CurrentShipDetails(new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal()));
+    private Notification oldValueLow = new Notification(new CurrentShipDetails(new AnomalyInformation(10, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal(), new MaxAnomalyScoreDetails()));
+    private Notification oldValueHigh = new Notification(new CurrentShipDetails(new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal(), new MaxAnomalyScoreDetails()));
 
     @BeforeEach
     void setUp() throws NotFoundNotificationException, JsonProcessingException {
         notificationService = mock(NotificationService.class);
         notificationsAggregator = new NotificationsAggregator(notificationService);
+        System.out.println(new CurrentShipDetails(new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal(), new MaxAnomalyScoreDetails()).toJson());
     }
 
     @Test

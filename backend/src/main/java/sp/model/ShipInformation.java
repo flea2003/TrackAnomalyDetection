@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import sp.model.AISSignal;
-import sp.dtos.AnomalyInformation;
 import sp.utils.UtilsObjectMapper;
 
 @Getter
