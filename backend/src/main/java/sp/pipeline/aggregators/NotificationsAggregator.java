@@ -35,7 +35,7 @@ public class NotificationsAggregator {
      * 1. If the anomaly score was below a threshold, and now got above threshold, a notification should be added
      * 2. In all other scenarios, notification should not be sent.
      * However, we want to keep track of the state of the current anomaly score (whether it is below or above threshold)
-     * as it is the only way to decide whenther a notification should be sent.
+     * as it is the only way to decide whether a notification should be sent.
      * Also, note that the logic when a notification should be sent will be improved in the future to account for TYPE
      * of the anomalies.
      *
@@ -58,24 +58,24 @@ public class NotificationsAggregator {
         // started, and so the most recent notification information should be retrieved
         if (previousShipDetails == null) previousShipDetails = extractFromJPA(newShipDetails, shipID);
 
+        // Extract previous and new anomaly scores to ease up the readability
+        float previousScore = previousShipDetails.getCurrentAnomalyInformation().getScore();
+        float newScore = newShipDetails.getCurrentAnomalyInformation().getScore();
+
         // Check if the score of the previously stored notification is above the threshold.
-        if (previousShipDetails.getCurrentAnomalyInformation().getScore() >= notificationThreshold) {
+        if (previousScore >= notificationThreshold) {
+
             // If the previously stored score is above the threshold, and also the newly arrived information object
             // score is above the threshold, then return the old information as the updated state
-
-            if (newShipDetails.getCurrentAnomalyInformation().getScore() >= notificationThreshold)
-                resultingInformation = previousShipDetails;
+            if (newScore >= notificationThreshold) resultingInformation = previousShipDetails;
 
             // If the previously stored score is above the threshold, and the newly arrived information score is below
             // the threshold, return that new information as the new state
-            else {
-                resultingInformation = newShipDetails;
-            }
+            else  resultingInformation = newShipDetails;
         } else {
             // If the previously stored score is below the threshold, and also the newly arrived information object
             // score is below the threshold, then return the old information as the updated state
-            if (newShipDetails.getCurrentAnomalyInformation().getScore() < notificationThreshold)
-                resultingInformation = previousShipDetails;
+            if (newScore < notificationThreshold) resultingInformation = previousShipDetails;
             else {
                 // If the previously stored score is below the threshold, and the newly arrived information object
                 // score is above the threshold, then return the new information as the updated state, and ALSO save the

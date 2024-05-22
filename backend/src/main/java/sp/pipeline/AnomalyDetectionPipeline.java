@@ -121,7 +121,7 @@ public class AnomalyDetectionPipeline {
 
         buildScoreCalculationPart(streamWithAssignedIds);
         buildScoreAggregationPart(builder);
-        buildNotifications(builder);
+        buildNotificationPart();
 
         this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
@@ -344,9 +344,8 @@ public class AnomalyDetectionPipeline {
      * is enough to have the information of the most recent notification for that ship, and a new AnomalyInformation
      * signal (which in our case is wrapped in CurrentShipDetails for optimization purposes for retrieving AIS signal).
      *
-     * @param builder StreamsBuilder object
      */
-    public void buildNotifications(StreamsBuilder builder) throws IOException {
+    public void buildNotificationPart() throws IOException {
         // Construct a stream for computed AnomalyInformation objects
         KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
         /*
@@ -360,27 +359,27 @@ public class AnomalyDetectionPipeline {
         */
         // Construct the KTable (state that is stored) by aggregating the merged stream
         streamOfUpdates
-                .mapValues(x -> {
+            .mapValues(x -> {
+                try {
+                    return x.toJson();
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .groupByKey()
+            .aggregate(
+                Notification::new,
+                (key, valueJson, lastInformation) -> {
                     try {
-                        return x.toJson();
+                        return notificationsAggregator.aggregateSignals(lastInformation, valueJson, key);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
-                })
-                .groupByKey()
-                .aggregate(
-                        Notification::new,
-                        (key, valueJson, lastInformation) -> {
-                            try {
-                                return notificationsAggregator.aggregateSignals(lastInformation, valueJson, key);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
-                        Materialized
-                                .<Long, Notification, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
-                                .withValueSerde(Notification.getSerde())
-        ;
+                },
+                Materialized
+                        .<Long, Notification, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
+                        .withValueSerde(Notification.getSerde())
+            );
     }
 
     /**
