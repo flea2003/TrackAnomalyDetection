@@ -18,6 +18,13 @@ ext {
 	slf4jVersion = '1.7.36'
 	log4jVersion = '2.17.1'
 	jacksonVersion = '2.15.0'
+
+	// these jvmArgs are needed by Flink code
+	additionalJvmArgs = [
+			'--add-opens=java.base/java.util=ALL-UNNAMED',
+			'--add-opens=java.base/java.lang=ALL-UNNAMED',
+			'--add-opens=java.base/java.time=ALL-UNNAMED'
+	]
 }
 
 tasks.withType(JavaCompile) {
@@ -32,19 +39,11 @@ java {
 }
 
 bootRun{
-	jvmArgs = [
-			'--add-opens=java.base/java.util=ALL-UNNAMED',
-			'--add-opens=java.base/java.lang=ALL-UNNAMED',
-			'--add-opens=java.base/java.time=ALL-UNNAMED'
-	]
+	jvmArgs = additionalJvmArgs
 }
 
 test {
-	jvmArgs += [
-			'--add-opens=java.base/java.util=ALL-UNNAMED',
-			'--add-opens=java.base/java.lang=ALL-UNNAMED',
-			'--add-opens=java.base/java.time=ALL-UNNAMED'
-	]
+	jvmArgs += additionalJvmArgs
 }
 
 checkstyle {
@@ -167,7 +166,7 @@ jacocoTestReport {
 }
 
 pitest {
-	//adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
+	// adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
 	// check https://github.com/pitest/pitest-junit5-plugin?tab=readme-ov-file#gradle
 	junit5PluginVersion = '1.2.1'
 
@@ -175,6 +174,8 @@ pitest {
 	threads = 4
 	timestampedReports = false
 	outputFormats = ['XML', 'HTML']
+
+	jvmArgs = additionalJvmArgs
 }
 
 
