@@ -12,6 +12,7 @@ import sp.pipeline.AnomalyDetectionPipeline;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +32,10 @@ public class TestShipsDataService {
     private AISSignal signal4;
     private AISSignal signal5;
     private AISSignal signal6;
+    private CurrentShipDetails currentShipDetails1;
+    private CurrentShipDetails currentShipDetails2;
+    private CurrentShipDetails currentShipDetails3;
+    private CurrentShipDetails currentShipDetails4;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -53,19 +58,19 @@ public class TestShipsDataService {
                 20.0f, 60.0f, 80.0f,
                 OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "Beijing");
 
-        CurrentShipDetails currentShipDetails1 = new CurrentShipDetails();
+        currentShipDetails1 = new CurrentShipDetails();
         currentShipDetails1.setCurrentAnomalyInformation(new AnomalyInformation(0.5f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), 1L));
         currentShipDetails1.setCurrentAISSignal(signal3);
 
-        CurrentShipDetails currentShipDetails2 = new CurrentShipDetails();
+        currentShipDetails2 = new CurrentShipDetails();
         currentShipDetails2.setCurrentAnomalyInformation(new AnomalyInformation(0.2f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), 2L));
         currentShipDetails2.setCurrentAISSignal(signal2);
 
-        CurrentShipDetails currentShipDetails3 = new CurrentShipDetails();
+        currentShipDetails3 = new CurrentShipDetails();
         currentShipDetails3.setCurrentAnomalyInformation(new AnomalyInformation(0.7f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), 3L));
         currentShipDetails3.setCurrentAISSignal(signal5);
 
-        CurrentShipDetails currentShipDetails4 = new CurrentShipDetails();
+        currentShipDetails4 = new CurrentShipDetails();
         currentShipDetails4.setCurrentAnomalyInformation(new AnomalyInformation(0.1f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), 4L));
         currentShipDetails4.setCurrentAISSignal(signal6);
 
@@ -142,6 +147,12 @@ public class TestShipsDataService {
     void CurrentAnomalyInformationOfAllShipsExceptionTest(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentShipDetails())
                 .isInstanceOf(PipelineException.class);
+    }
+
+    @Test
+    void getCurrentShipDetailsTest() throws PipelineException {
+        List<CurrentShipDetails> result = shipsDataService.getCurrentShipDetails();
+        assertThat(result).containsExactly(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
     }
 
 }

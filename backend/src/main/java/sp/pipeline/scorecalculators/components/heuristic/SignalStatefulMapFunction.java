@@ -2,6 +2,7 @@ package sp.pipeline.scorecalculators.components.heuristic;
 
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.harvesineDistance;
 
+import java.io.IOException;
 import java.time.Duration;
 import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
@@ -26,16 +27,20 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
 
         // In the case that our stateful map has encountered signals in the past
         if (pastAISSignal != null) {
-            double time = Duration.between(getAisSignalValueState().value().getTimestamp(), value.getTimestamp()).toMinutes();
-
-            boolean signalTimingIsGood = time < 10;
-            boolean shipDidntTravelTooMuch = harvesineDistance(value.getLatitude(), value.getLongitude(),
-                pastAISSignal.getLatitude(), pastAISSignal.getLongitude()) / (time / 60) < 6;
-
-            if (!signalTimingIsGood && !shipDidntTravelTooMuch) {
+            if (isAnomaly(value, pastAISSignal)) {
                 getLastDetectedAnomalyTime().update(value.getTimestamp());
             }
         }
         return super.setAnomalyInformationResult(value, 33f, badMsg, goodMsg);
+    }
+
+    public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) throws IOException {
+        double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
+
+        boolean signalTimingIsGood = time < 10;
+        boolean shipDidntTravelTooMuch = harvesineDistance(value.getLatitude(), value.getLongitude(),
+                pastAISSignal.getLatitude(), pastAISSignal.getLongitude()) / (time / 60) < 6;
+
+        return !signalTimingIsGood && !shipDidntTravelTooMuch;
     }
 }

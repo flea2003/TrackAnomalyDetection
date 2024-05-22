@@ -41,15 +41,34 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      *     heuristics, and false otherwise.
      */
     public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) {
-        double globeDistance = harvesineDistance(value.getLatitude(), value.getLongitude(),
-                pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
-        double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
+        return isAnomaly(
+                computeSpeed(value, pastAISSignal),
+                getReportedSpeedDifference(value, pastAISSignal),
+                calculateAcceleration(value, pastAISSignal)
+        );
+    }
 
-        double computedSpeed = globeDistance / (time + 0.00001);
-        double reportedSpeedDifference = Math.abs(value.getSpeed() - computedSpeed);
-        double computedAcceleration = (value.getSpeed() - pastAISSignal.getSpeed()) / (time + 0.00001);
+    public double computeSpeed(AISSignal value, AISSignal pastAISSignal) {
+        double globeDistance = harvesineDistance(
+                value.getLatitude(), value.getLongitude(),
+                pastAISSignal.getLatitude(), pastAISSignal.getLongitude()
+        );
+        double time = getTimeDifference(value, pastAISSignal);
 
-        return isAnomaly(computedSpeed, reportedSpeedDifference, computedAcceleration);
+        return globeDistance / (time + 0.00001);
+    }
+
+    public double getReportedSpeedDifference(AISSignal value, AISSignal pastValue) {
+        return Math.abs(value.getSpeed() - computeSpeed(pastValue, value));
+    }
+
+    public double getTimeDifference(AISSignal value, AISSignal pastAISSignal) {
+        return Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
+    }
+
+    public double calculateAcceleration(AISSignal value, AISSignal pastAISSignal) {
+        double time = getTimeDifference(value, pastAISSignal);
+        return (value.getSpeed() - pastAISSignal.getSpeed()) / (time + 0.00001);
     }
 
     /**
