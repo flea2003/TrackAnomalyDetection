@@ -359,7 +359,7 @@ public class AnomalyDetectionPipeline {
         KStream<Long, CurrentShipDetails> streamOfUpdates = third.mapValues(x -> new CurrentShipDetails(x, null));
         */
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<Long, Notification> notificationsState = streamOfUpdates
+        streamOfUpdates
                 .mapValues(x -> {
                     try {
                         return x.toJson();
@@ -380,7 +380,7 @@ public class AnomalyDetectionPipeline {
                         Materialized
                                 .<Long, Notification, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
                                 .withValueSerde(Notification.getSerde())
-                );
+        ;
     }
 
     /**
