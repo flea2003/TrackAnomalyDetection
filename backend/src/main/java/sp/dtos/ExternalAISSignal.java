@@ -23,7 +23,6 @@ import java.time.OffsetDateTime;
 @EqualsAndHashCode
 @ToString
 @JsonSerialize
-
 public class ExternalAISSignal implements Serializable {
     private final String producerID;
     private final String shipHash;

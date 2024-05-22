@@ -92,6 +92,9 @@ public class AnomalyDetectionPipeline {
 
         this.state = scoreAggregationBuilder.buildScoreAggregationPart(builder);
         buildNotifications(builder);
+
+        this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
+        this.kafkaStreams.cleanUp();
     }
 
 
@@ -141,13 +144,14 @@ public class AnomalyDetectionPipeline {
     /**
      * Notification pipeline building part. The idea is the following: there is a database, where all notifications are
      * stored. When backend restarts, a state (which is actually the notifications Kafka table) queries the
-     * notificationsService class, and for each ship, its last notification is retrieved (this is not exactly what
-     * happens, but the idea is the same). Then, from the ships-scores topic, a stream of AnomalyInformation objects is
-     * constantly being retrieved. The aggregation part is responsible for the logic of computing when a new
-     * notification should be created, and once it has to be created, querying the notificationService class, which
-     * handles it. It then also updates the most recent notification that is stored for that particular ship.
-     * Note that to decide whether a new notification for a particular ship should be created, it is enough to have the
-     * information of the mosrt recent notification for that ship, and a new AnomalyInformation signal.
+     * notificationsService class, and for each ship, its last notification is retrieved as the initial state
+     * Notification object. Then, a stream of updates from the KafkaTable which stores the current state is retrieved:
+     * it contains a stream of updates that happen in that table. Then, the stateful mapping part is responsible for the
+     * logic of computing when a new notification should be created, and once it has to be created, querying the
+     * notificationService class, which handles it. It then also updates the most recent notification that is stored for
+     * that particular ship. Note that to decide whether a new notification for a particular ship should be created, it
+     * is enough to have the information of the most recent notification for that ship, and a new AnomalyInformation
+     * signal (which in our case is wrapped in CurrentShipDetails for optimization purposes for retrieving AIS signal).
      *
      * @param builder StreamsBuilder object
      */
@@ -186,7 +190,5 @@ public class AnomalyDetectionPipeline {
                                 .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("temp-notifications-store")
                                 .withValueSerde(Notification.getSerde())
                 );
-        this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
-        this.kafkaStreams.cleanUp();
     }
 }

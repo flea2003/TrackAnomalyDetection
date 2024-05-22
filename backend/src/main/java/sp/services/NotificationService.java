@@ -2,9 +2,11 @@ package sp.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import sp.exceptions.NotFoundNotificationException;
+import sp.exceptions.NotificationNotFoundException;
 import sp.model.Notification;
 import sp.repositories.NotificationRepository;
+
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,11 +38,11 @@ public class NotificationService {
      * @param id id of the notification
      * @return notification object
      */
-    public Notification getNotificationById(Long id) throws NotFoundNotificationException {
+    public Notification getNotificationById(Long id) throws NotificationNotFoundException {
         Optional<Notification> notification = notificationRepository.findById(id);
         if (notification.isPresent()) {
             return notification.get();
-        } else throw new NotFoundNotificationException();
+        } else throw new NotificationNotFoundException();
     }
 
     /**
@@ -52,6 +54,12 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
+    /**
+     * Gets all notifications for a particular ship
+     *
+     * @param shipID internal id of the ship
+     * @return a list of notifications for a ship
+     */
     public List<Notification> getAllNotificationForShip(Long shipID) {
         return notificationRepository.findNotificationByShipID(shipID);
     }
@@ -63,18 +71,20 @@ public class NotificationService {
      * @return notification object of the newest ship
      */
     @Transactional
-    public Notification getNewestNotificationForShip(Long shipID) throws NotFoundNotificationException {
+    public Notification getNewestNotificationForShip(Long shipID) throws NotificationNotFoundException {
 
         List<Notification> allNotifications = notificationRepository.findNotificationByShipID(shipID);
-        if (allNotifications.isEmpty()) throw new NotFoundNotificationException();
+        if (allNotifications.isEmpty()) throw new NotificationNotFoundException();
 
         Notification result = allNotifications.get(0);
         for (Notification notification : allNotifications) {
-            if (notification.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp()
-                    .isAfter(result.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp())
-                    || notification.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp()
-                    .isEqual(result.getCurrentShipDetails().getCurrentAnomalyInformation().getCorrespondingTimestamp())
-            ) {
+
+            OffsetDateTime currentTime = notification.getCurrentShipDetails().getCurrentAnomalyInformation()
+                    .getCorrespondingTimestamp();
+            OffsetDateTime oldestTime = result.getCurrentShipDetails().getCurrentAnomalyInformation()
+                    .getCorrespondingTimestamp();
+
+            if (currentTime.isAfter(oldestTime) || currentTime.isEqual(oldestTime)) {
                 result = notification;
             }
         }

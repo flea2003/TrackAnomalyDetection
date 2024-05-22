@@ -1,10 +1,10 @@
 package sp.exceptions;
 
-public class NotFoundNotificationException extends Exception {
+public class NotificationNotFoundException extends Exception {
     /**
      * Default constructor which initiates the exception with a default message.
      */
-    public NotFoundNotificationException() {
+    public NotificationNotFoundException() {
         super("Couldn't find such notification");
     }
 
@@ -13,7 +13,7 @@ public class NotFoundNotificationException extends Exception {
      *
      * @param msg message of the exception
      */
-    public NotFoundNotificationException(String msg) {
+    public NotificationNotFoundException(String msg) {
         super(msg);
     }
 

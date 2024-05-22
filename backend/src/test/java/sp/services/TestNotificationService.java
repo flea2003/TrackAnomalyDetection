@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.*;
-import sp.exceptions.NotFoundNotificationException;
+import sp.exceptions.NotificationNotFoundException;
 import sp.repositories.NotificationRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -26,7 +26,7 @@ public class TestNotificationService {
     private OffsetDateTime dateTime =  OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0));
 
     @BeforeEach
-    void setUp() throws NotFoundNotificationException, JsonProcessingException {
+    void setUp() throws NotificationNotFoundException, JsonProcessingException {
         notificationRepository = mock(NotificationRepository.class);
         notification1 = new Notification(
                 new CurrentShipDetails(
@@ -66,13 +66,13 @@ public class TestNotificationService {
         assertThat(notificationService).isNotNull();
     }
     @Test
-    void testGetNotificationValid() throws NotFoundNotificationException {
+    void testGetNotificationValid() throws NotificationNotFoundException {
         assertThat(notificationService.getNotificationById(0L)).isEqualTo(notification1);
     }
 
     @Test
-    void testGetNotificationException() throws NotFoundNotificationException {
-        assertThrows(NotFoundNotificationException.class, () -> notificationService.getNotificationById(4L));
+    void testGetNotificationException() throws NotificationNotFoundException {
+        assertThrows(NotificationNotFoundException.class, () -> notificationService.getNotificationById(4L));
     }
 
     @Test
@@ -90,13 +90,13 @@ public class TestNotificationService {
     }
 
     @Test
-    void testGetNewestNotificationForShipValid() throws NotFoundNotificationException, JsonProcessingException {
+    void testGetNewestNotificationForShipValid() throws NotificationNotFoundException, JsonProcessingException {
         Notification notification = notificationService.getNewestNotificationForShip(2L);
         assertThat(notification).isEqualTo(notification3);
     }
 
     @Test
-    void testGetNewestNotificationForShipValidEqualTime() throws NotFoundNotificationException, JsonProcessingException {
+    void testGetNewestNotificationForShipValidEqualTime() throws NotificationNotFoundException, JsonProcessingException {
         Notification notification4 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", OffsetDateTime.of(2004, 01, 27, 0, 3, 0, 0, ZoneOffset.ofHours(0)), 2L),
@@ -110,7 +110,7 @@ public class TestNotificationService {
     }
 
     @Test
-    void testGetNewestNotificationForShipValidLaterTime() throws NotFoundNotificationException, JsonProcessingException {
+    void testGetNewestNotificationForShipValidLaterTime() throws NotificationNotFoundException, JsonProcessingException {
         Notification notification4 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", OffsetDateTime.of(2005, 01, 27, 0, 3, 0, 0, ZoneOffset.ofHours(0)), 2L),
@@ -126,12 +126,12 @@ public class TestNotificationService {
 
 
     @Test
-    void testGetNewestNotificationForShipException() throws NotFoundNotificationException {
-        assertThrows(NotFoundNotificationException.class, () -> notificationService.getNewestNotificationForShip(3L));
+    void testGetNewestNotificationForShipException() throws NotificationNotFoundException {
+        assertThrows(NotificationNotFoundException.class, () -> notificationService.getNewestNotificationForShip(3L));
     }
 
     @Test
-    void getAllNotifications() throws NotFoundNotificationException {
+    void getAllNotifications() throws NotificationNotFoundException {
         assertThat(notificationService.getAllNotifications()).isEqualTo(List.of(notification1, notification2, notification3));
     }
 }

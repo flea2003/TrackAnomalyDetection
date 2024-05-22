@@ -3,7 +3,7 @@ package sp.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sp.exceptions.NotFoundNotificationException;
+import sp.exceptions.NotificationNotFoundException;
 import sp.model.Notification;
 import sp.services.NotificationService;
 import java.util.List;
@@ -43,7 +43,7 @@ public class NotificationController {
     public ResponseEntity<Notification> getNotificationById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(this.notificationService.getNotificationById(id));
-        } catch (NotFoundNotificationException e) {
+        } catch (NotificationNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

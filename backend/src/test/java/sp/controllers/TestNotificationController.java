@@ -5,9 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
 import sp.model.*;
-import sp.exceptions.NotFoundNotificationException;
+import sp.exceptions.NotificationNotFoundException;
 import sp.services.NotificationService;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -27,7 +26,7 @@ public class TestNotificationController {
     private OffsetDateTime dateTime =  OffsetDateTime.of(2004, 01, 27, 1, 2, 0, 0, ZoneOffset.ofHours(0));
 
     @BeforeEach
-    void setUp() throws NotFoundNotificationException, JsonProcessingException {
+    void setUp() throws NotificationNotFoundException, JsonProcessingException {
         notification1 = new Notification(
                 new CurrentShipDetails(
                         new AnomalyInformation(1F, "explanation", dateTime, 1L),
@@ -58,7 +57,7 @@ public class TestNotificationController {
         when(notificationService.getNotificationById(1L)).thenReturn(notification2);
         when(notificationService.getAllNotifications()).thenReturn(List.of(notification1, notification2, notification3));
         when(notificationService.getAllNotificationForShip(2L)).thenReturn(List.of(notification2, notification3));
-        when(notificationService.getNotificationById(4L)).thenThrow(NotFoundNotificationException.class);
+        when(notificationService.getNotificationById(4L)).thenThrow(NotificationNotFoundException.class);
         notificationController = new NotificationController(notificationService);
     }
 
@@ -73,17 +72,17 @@ public class TestNotificationController {
     }
 
     @Test
-    void testGetNotificationByIdProper() throws NotFoundNotificationException {
+    void testGetNotificationByIdProper() throws NotificationNotFoundException {
         assertThat(notificationController.getNotificationById(0L)).isEqualTo(ResponseEntity.ok(notification1));
     }
 
     @Test
-    void testGetNotificationByIdThrows() throws NotFoundNotificationException {
+    void testGetNotificationByIdThrows() throws NotificationNotFoundException {
         assertThat(notificationController.getNotificationById(4L)).isEqualTo(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @Test
-    void testGetNotificationForAShip() throws NotFoundNotificationException {
+    void testGetNotificationForAShip() throws NotificationNotFoundException {
         assertThat(notificationController.getAllNotificationsForShip(2L)).isEqualTo(ResponseEntity.ok(List.of(notification2, notification3)));
     }
 }
