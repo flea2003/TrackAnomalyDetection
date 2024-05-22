@@ -1,4 +1,4 @@
-package sp.pipeline.scorecalculators.components.sample;
+package sp.pipeline.parts.scoring.scorecalculators.components.sample;
 
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.operators.StreamMap;

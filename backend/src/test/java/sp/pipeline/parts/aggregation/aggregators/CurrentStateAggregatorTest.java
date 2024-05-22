@@ -1,4 +1,4 @@
-package sp.pipeline;
+package sp.pipeline.parts.aggregation.aggregators;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.AfterEach;

@@ -1,4 +1,4 @@
-package sp.pipeline.scorecalculators;
+package sp.pipeline.parts.scoring.scorecalculators;
 
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -9,42 +9,47 @@ import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
-import sp.pipeline.parts.scoring.scorecalculators.DefaultScoreCalculator;
+import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
+import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-class DefaultScoreCalculatorTest {
+class SimpleScoreCalculatorTest {
 
     // Tests based on https://nightlies.apache.org/flink/flink-docs-master/docs/dev/datastream/testing/
 
     private final OffsetDateTime time1 = OffsetDateTime.of(2004, 1, 27, 1,1,0,0, ZoneOffset.ofHours(0));
+    private final OffsetDateTime time2 = OffsetDateTime.of(2004, 1, 27, 1,15,0,0, ZoneOffset.ofHours(0));
+    private final OffsetDateTime time3 = OffsetDateTime.of(2004, 1, 27, 1,17,0,0, ZoneOffset.ofHours(0));
+
 
     @ClassRule
     public static MiniClusterWithClientResource flinkCluster =
-            new MiniClusterWithClientResource(
-                    new MiniClusterResourceConfiguration.Builder()
-                            .setNumberSlotsPerTaskManager(2)
-                            .setNumberTaskManagers(1)
-                            .build());
+        new MiniClusterWithClientResource(
+            new MiniClusterResourceConfiguration.Builder()
+                .setNumberSlotsPerTaskManager(2)
+                .setNumberTaskManagers(1)
+                .build());
 
     @Test
     void testSetupFlinkAnomalyScoreCalculationPart() throws Exception {
         // create initial AISSignal objects
         // ais1 and ais2 are from the same ship
-        AISSignal ais1 = new AISSignal(1L, 1, 2, 3, 4, 5, time1, "port1");
-        AISSignal ais2 = new AISSignal(1L, 10, 20, 30, 40, 50, time1, "port1");
-        AISSignal ais3 = new AISSignal(2L, 100, 200, 300, 400, 500, time1, "port2");
+        AISSignal ais1 = new AISSignal(1, 1, 2, 3, 4, 5, time1, "port1");
+        AISSignal ais2 = new AISSignal(1, 5, 20, 30, 20, 10, time2, "port1");
+        AISSignal ais3 = new AISSignal(1, 5, 20, 70, 0, 50, time3, "port1");
+        AISSignal ais4 = new AISSignal(2, 3, 200, 300, 400, 500, time3, "port2");
 
         // prepare flink environment and streams
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStream<AISSignal> aisStream = env.fromData(List.of(ais1, ais2, ais3));
+        DataStream<AISSignal> aisStream = env.fromData(List.of(ais1, ais2, ais3, ais4));
 
-        DefaultScoreCalculator scoreCalculator = new DefaultScoreCalculator();
+        ScoreCalculationStrategy scoreCalculator = new SimpleScoreCalculator();
         DataStream<AnomalyInformation> resultStream = scoreCalculator.setupFlinkAnomalyScoreCalculationPart(aisStream);
 
         CollectSink.anomalyInfoList.clear();
@@ -54,10 +59,16 @@ class DefaultScoreCalculatorTest {
 
         // verify result
         List<AnomalyInformation> result = CollectSink.anomalyInfoList;
-        assertTrue(result.containsAll(List.of(
-                new AnomalyInformation(2, "", time1, 1L),
-                new AnomalyInformation(1, "", time1, 2L)
-        )));
+
+        assertThat(result).containsAll(List.of(
+            new AnomalyInformation(100f, "The time difference between consecutive AIS signals is anomalous. " +
+                "The ship's speed is anomalous. " +
+                "The ship's turning direction is anomalous.", time3, (long)1),
+            new AnomalyInformation(0.0f, "The time difference between consecutive AIS signals is ok. " +
+                "The ship's speed is ok. " +
+                "The ship's turning direction is ok.", time3, (long)2)
+        ));
+
     }
 
     private static class CollectSink implements SinkFunction<AnomalyInformation> {
