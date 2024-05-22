@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.*;
-import sp.pipeline.parts.aggregation.aggregators.NotificationsAggregator;
+import sp.pipeline.parts.notifications.NotificationsAggregator;
 import sp.services.NotificationService;
 
 import java.time.OffsetDateTime;

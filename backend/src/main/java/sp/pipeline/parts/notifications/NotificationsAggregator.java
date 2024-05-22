@@ -1,4 +1,4 @@
-package sp.pipeline.parts.aggregation.aggregators;
+package sp.pipeline.parts.notifications;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
