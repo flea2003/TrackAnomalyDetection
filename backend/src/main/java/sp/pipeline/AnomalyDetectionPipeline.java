@@ -10,7 +10,6 @@ import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
@@ -19,7 +18,6 @@ import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
-import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,8 +25,6 @@ import java.util.HashMap;
 @Service
 public class AnomalyDetectionPipeline {
 
-    private final PipelineConfiguration configuration;
-    private final ScoreCalculationStrategy scoreCalculationStrategy;
     private final StreamUtils streamUtils;
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
@@ -41,19 +37,14 @@ public class AnomalyDetectionPipeline {
     /**
      * Constructor for the AnomalyDetectionPipeline.
      *
-     * @param scoreCalculationStrategy Strategy the strategy to use for calculating the anomaly scores
      */
     @Autowired
-    public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator") ScoreCalculationStrategy scoreCalculationStrategy,
-                                    StreamUtils streamUtils,
-                                    PipelineConfiguration configuration,
+    public AnomalyDetectionPipeline(StreamUtils streamUtils,
                                     IdAssignmentBuilder idAssignmentBuilder,
                                     ScoreCalculationBuilder scoreCalculationBuilder,
                                     ScoreAggregationBuilder scoreAggregationBuilder,
                                     NotificationsDetectionBuilder notificationsDetectionBuilder) throws IOException {
-        this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.streamUtils = streamUtils;
-        this.configuration = configuration;
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
@@ -81,7 +72,7 @@ public class AnomalyDetectionPipeline {
         StreamsBuilder builder = new StreamsBuilder();
 
         DataStream<AISSignal> streamWithAssignedIds = idAssignmentBuilder.buildIdAssignmentPart(flinkEnv);
-        scoreCalculationBuilder.buildScoreCalculationPart(streamWithAssignedIds, scoreCalculationStrategy);
+        scoreCalculationBuilder.buildScoreCalculationPart(streamWithAssignedIds);
 
         this.state = scoreAggregationBuilder.buildScoreAggregationPart(builder);
         notificationsDetectionBuilder.buildNotifications(this.state);

@@ -3,6 +3,7 @@ package sp.pipeline.parts.scoring;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
@@ -12,13 +13,18 @@ import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 
 @Component
 public class ScoreCalculationBuilder {
-    private StreamUtils streamUtils;
-    private PipelineConfiguration configuration;
+    private final StreamUtils streamUtils;
+    private final PipelineConfiguration configuration;
+    private final ScoreCalculationStrategy scoreCalculationStrategy;
 
     @Autowired
-    public ScoreCalculationBuilder(StreamUtils streamUtils, PipelineConfiguration configuration) {
+    public ScoreCalculationBuilder(StreamUtils streamUtils,
+                                   PipelineConfiguration configuration,
+                                   @Qualifier("simpleScoreCalculator")
+                                       ScoreCalculationStrategy scoreCalculationStrategy) {
         this.streamUtils = streamUtils;
         this.configuration = configuration;
+        this.scoreCalculationStrategy = scoreCalculationStrategy;
     }
 
 
@@ -31,7 +37,7 @@ public class ScoreCalculationBuilder {
      * injected scoreCalculationStrategy class. I.e., this part only calls that method. This way the
      * anomaly detection algorithm can be easily swapped out.
      */
-    public void buildScoreCalculationPart(DataStream<AISSignal> source, ScoreCalculationStrategy scoreCalculationStrategy) {
+    public void buildScoreCalculationPart(DataStream<AISSignal> source) {
 
         // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
         KafkaSink<String> signalsSink = streamUtils.createSinkFlinkToKafka(configuration.kafkaServerAddress, configuration.incomingAisTopicName);
