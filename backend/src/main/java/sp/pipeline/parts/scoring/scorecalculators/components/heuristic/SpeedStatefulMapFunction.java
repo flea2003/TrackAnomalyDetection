@@ -1,8 +1,8 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
-import java.time.Duration;
-import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
+import sp.model.AnomalyInformation;
+import java.time.Duration;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
 
@@ -15,7 +15,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      *
      * @param value The input value.
      * @return the computed Anomaly Information object
-     * @throws Exception - exception from value state descriptors
+     * @throws Exception exception from value state descriptors
      */
     @Override
     public AnomalyInformation map(AISSignal value) throws Exception {

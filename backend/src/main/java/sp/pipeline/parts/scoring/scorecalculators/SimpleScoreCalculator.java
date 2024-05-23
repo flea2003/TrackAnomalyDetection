@@ -34,8 +34,8 @@ public class SimpleScoreCalculator implements ScoreCalculationStrategy {
     /**
      * Consumer function which creates a datastore of anomalies from a stream of tuples.
      *
-     * @param input - the stream of tuples
-     * @return - the computed stream
+     * @param inputthe stream of tuples
+     * @returnthe computed stream
      */
     private DataStream<AnomalyInformation> consume(DataStream<Tuple2<AnomalyInformation, AnomalyInformation>> input) {
         return input.map(x -> new AnomalyInformation(x.f0.getScore() + x.f1.getScore(),

@@ -54,7 +54,7 @@ public class CurrentStateAggregator {
      *
      * @param aggregatedShipDetails an object that stores the current state of the ship
      * @param anomalyInformation the new AnomalyInformation signal for updating the max score
-     * @returnthe updated MaxAnomalyScoreDetails instance
+     * @return the updated MaxAnomalyScoreDetails instance
      */
     private MaxAnomalyScoreDetails updateMaxScoreDetails(CurrentShipDetails aggregatedShipDetails,
                                                          AnomalyInformation anomalyInformation) {

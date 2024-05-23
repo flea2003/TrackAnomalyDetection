@@ -15,7 +15,7 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
      *
      * @param value The input value.
      * @return the computed Anomaly Information object
-     * @throws Exception - exception from value state descriptors
+     * @throws Exception exception from value state descriptors
      */
     @Override
     public AnomalyInformation map(AISSignal value) throws Exception {

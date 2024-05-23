@@ -27,7 +27,7 @@ public class ScoreAggregationBuilder {
      * Constructor for the ScoreAggregationBuilder class.
      *
      * @param configuration an object that holds configuration properties
-     * @param currentStateAggregator an responsible for aggregating the current state of the pipeline
+     * @param currentStateAggregator a responsible for aggregating the current state of the pipeline
      */
     @Autowired
     public ScoreAggregationBuilder(PipelineConfiguration configuration,
@@ -115,8 +115,8 @@ public class ScoreAggregationBuilder {
         KStream<Long, ShipInformation> mergedStream = mergeStreams(builder);
 
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<Long, CurrentShipDetails> table = KafkaJson
-                .serialize(mergedStream)
+        KTable<Long, CurrentShipDetails> table =
+                KafkaJson.serialize(mergedStream)
                 .groupByKey()
                 .aggregate(
                         CurrentShipDetails::new,

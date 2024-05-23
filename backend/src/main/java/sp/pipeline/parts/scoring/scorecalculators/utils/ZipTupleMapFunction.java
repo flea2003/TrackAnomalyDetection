@@ -1,21 +1,21 @@
 package sp.pipeline.parts.scoring.scorecalculators.utils;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.co.CoFlatMapFunction;
 import org.apache.flink.util.Collector;
 import sp.model.AnomalyInformation;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class ZipTupleMapFunction {
 
     /**
      * Takes two datastore of AnomalyInformation and produces one datastore of tuples.
      *
-     * @param stream1 - first stream that we merge
-     * @param stream2 - second stream that we merge
-     * @return - the merged stream
+     * @param stream1 first stream that we merge
+     * @param stream2 second stream that we merge
+     * @return the merged stream
      */
     public DataStream<Tuple2<AnomalyInformation, AnomalyInformation>> merge(DataStream<AnomalyInformation> stream1,
                                                                             DataStream<AnomalyInformation> stream2) {

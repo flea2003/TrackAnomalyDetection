@@ -36,7 +36,7 @@ public class ScoreCalculationBuilder {
     }
 
     /**
-     * Builds the first part of the `sp.pipeline` - the score calculation part, done in Flink. This `sp.pipeline`
+     * Builds the first part of the `sp.pipeline`the score calculation part, done in Flink. This `sp.pipeline`
      * consumes AIS signals from Kafka, calculates the anomaly scores (in Flink) and sends them to back
      * to Kafka into another topic.
 

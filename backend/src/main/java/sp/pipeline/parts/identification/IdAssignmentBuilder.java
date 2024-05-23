@@ -33,7 +33,7 @@ public class IdAssignmentBuilder {
     }
 
     /**
-     * Builds the first part of the pipelinethe part that takes as input the raw AIS signals from Kafka,
+     * Builds the first part of the pipeline the part that takes as input the raw AIS signals from Kafka,
      * assigns an internal ID to each signal and sends them to another Kafka topic.
      * The internal ID is calculated as a hash of the producer ID and the ship hash.
      * In practice, this method first creates a consumer from Kafka and then forwards this stream to the overloaded
