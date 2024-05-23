@@ -3,33 +3,9 @@ package sp.pipeline.scorecalculators.components.heuristic;
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.harvesineDistance;
 
 import java.time.Duration;
-import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
-
-    private static final String goodMsg = "The ship's speed is ok.";
-    private static final String badMsg = "The ship's speed is anomalous.";
-
-    /**
-     * Performs a stateful map operation that receives an AIS signal and produces an
-     * AnomalyInformation based on the predefined heuristics for the speed of the ship.
-     *
-     * @param value The input value.
-     * @return the computed Anomaly Information object
-     * @throws Exception - exception from value state descriptors
-     */
-    @Override
-    public AnomalyInformation map(AISSignal value) throws Exception {
-        AISSignal pastAISSignal = getAisSignalValueState().value();
-
-        // In the case that our stateful map has encountered signals in the past
-        if (pastAISSignal != null && isAnomaly(value, pastAISSignal)) {
-            this.getLastDetectedAnomalyTime().update(value.getTimestamp());
-        }
-
-        return super.setAnomalyInformationResult(value, 33f, badMsg, goodMsg);
-    }
 
     /**
      * Checks if the current value is anomaly based on heuristics (current speed, reported
@@ -50,6 +26,21 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         double computedAcceleration = (value.getSpeed() - pastAISSignal.getSpeed()) / (time + 0.00001);
 
         return isAnomaly(computedSpeed, reportedSpeedDifference, computedAcceleration);
+    }
+
+    @Override
+    public float getAnomalyScore() {
+        return 33f;
+    }
+
+    @Override
+    public String getAnomalyExplanation(AISSignal currentSignal, AISSignal pastSignal) {
+        return "The ship's speed is anomalous.";
+    }
+
+    @Override
+    public String getNonAnomalyExplanation() {
+        return "The ship's speed is ok.";
     }
 
     /**
