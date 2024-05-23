@@ -9,7 +9,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
-import sp.pipeline.utils.json.JsonMapper;
+import sp.pipeline.utils.json.KafkaJson;
 
 @Component
 public class NotificationsDetectionBuilder {
@@ -50,14 +50,7 @@ public class NotificationsDetectionBuilder {
         KStream<Long, CurrentShipDetails> streamOfUpdates = third.mapValues(x -> new CurrentShipDetails(x, null));
         */
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        streamOfUpdates
-                .mapValues(x -> {
-                    try {
-                        return JsonMapper.toJson(x);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+        KafkaJson.serialize(streamOfUpdates)
                 .groupByKey()
                 .aggregate(Notification::new,
                         (key, valueJson, lastInformation) -> {

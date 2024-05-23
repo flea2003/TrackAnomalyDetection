@@ -13,9 +13,9 @@ import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
-import sp.pipeline.utils.json.JsonMapper;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
+import sp.pipeline.utils.json.KafkaJson;
 
 @Component
 public class ScoreAggregationBuilder {
@@ -46,19 +46,14 @@ public class ScoreAggregationBuilder {
      */
     private KStream<Long, ShipInformation> streamAnomalyInformation(StreamsBuilder builder) {
 
-        // Take computed AnomalyInformation JSON strings, deserialize them and wrap them into ShipInformation objects,
-        // so we could later merge the stream with wrapped simple AISSignal objects
-        KStream<Long, String> streamAnomalyInformationJSON = builder.stream(configuration.getCalculatedScoresTopicName());
+        // Take JSON strings from score topic, deserialize them into AnomalyInformation
+        KStream<Long, AnomalyInformation> streamAnomalyInformation = KafkaJson.deserialize(
+                builder.stream(configuration.getCalculatedScoresTopicName()),
+                AnomalyInformation.class
+        );
 
-        return streamAnomalyInformationJSON.mapValues(x -> {
-            AnomalyInformation anomalyInformation;
-            try {
-                anomalyInformation = JsonMapper.fromJson(x, AnomalyInformation.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-            return new ShipInformation(anomalyInformation.getId(), anomalyInformation, null);
-        });
+        // Wrap the AnomalyInformation objects into ShipInformation objects, so we could later merge the stream
+        return streamAnomalyInformation.mapValues(x -> new ShipInformation(x.getId(), x, null));
     }
 
     /**
@@ -73,17 +68,13 @@ public class ScoreAggregationBuilder {
 
         // Take the initial AISSignal and wrap them into ShipInformation objects, so we could later merge the stream
         // with already wrapped AnomalyInformation objects
-        KStream<Long, String> streamAISSignalsJSON = builder.stream(configuration.getIncomingAisTopicName());
-        return streamAISSignalsJSON
-                .mapValues(x -> {
-                    AISSignal aisSignal;
-                    try {
-                        aisSignal = JsonMapper.fromJson(x, AISSignal.class);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return new ShipInformation(aisSignal.getId(), null, aisSignal);
-                });
+        KStream<Long, AISSignal> signalsStream = KafkaJson.deserialize(
+                builder.stream(configuration.getIncomingAisTopicName()),
+                AISSignal.class
+        );
+
+        // Wrap the AISSignal objects into ShipInformation objects, so we could later merge the stream
+        return signalsStream.mapValues(x -> new ShipInformation(x.getId(), null, x));
     }
 
     /**
@@ -124,14 +115,8 @@ public class ScoreAggregationBuilder {
         KStream<Long, ShipInformation> mergedStream = mergeStreams(builder);
 
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<Long, CurrentShipDetails> table = mergedStream
-                .mapValues(x -> {
-                    try {
-                        return JsonMapper.toJson(x);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+        KTable<Long, CurrentShipDetails> table = KafkaJson
+                .serialize(mergedStream)
                 .groupByKey()
                 .aggregate(
                         CurrentShipDetails::new,
