@@ -9,6 +9,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
+import sp.pipeline.JsonMapper;
 
 @Component
 public class NotificationsDetectionBuilder {
@@ -52,14 +53,13 @@ public class NotificationsDetectionBuilder {
         streamOfUpdates
                 .mapValues(x -> {
                     try {
-                        return x.toJson();
+                        return JsonMapper.toJson(x);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
                 })
                 .groupByKey()
-                .aggregate(
-                        Notification::new,
+                .aggregate(Notification::new,
                         (key, valueJson, lastInformation) -> {
                             try {
                                 return notificationsAggregator.aggregateSignals(lastInformation, valueJson, key);
@@ -70,6 +70,6 @@ public class NotificationsDetectionBuilder {
                         Materialized
                                 .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("dummy")
                                 .withValueSerde(Notification.getSerde())
-                );
+            );
     }
 }

@@ -13,6 +13,7 @@ import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
+import sp.pipeline.JsonMapper;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
 
@@ -52,7 +53,7 @@ public class ScoreAggregationBuilder {
         return streamAnomalyInformationJSON.mapValues(x -> {
             AnomalyInformation anomalyInformation;
             try {
-                anomalyInformation = AnomalyInformation.fromJson(x);
+                anomalyInformation = JsonMapper.fromJson(x, AnomalyInformation.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -77,7 +78,7 @@ public class ScoreAggregationBuilder {
                 .mapValues(x -> {
                     AISSignal aisSignal;
                     try {
-                        aisSignal = AISSignal.fromJson(x);
+                        aisSignal = JsonMapper.fromJson(x, AISSignal.class);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
@@ -126,7 +127,7 @@ public class ScoreAggregationBuilder {
         KTable<Long, CurrentShipDetails> table = mergedStream
                 .mapValues(x -> {
                     try {
-                        return x.toJson();
+                        return JsonMapper.toJson(x);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }

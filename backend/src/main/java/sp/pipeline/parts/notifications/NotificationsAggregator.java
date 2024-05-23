@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
+import sp.pipeline.JsonMapper;
 import sp.services.NotificationService;
 
 @Service
@@ -53,7 +54,7 @@ public class NotificationsAggregator {
         // Retrieve current ship details from the previous notification
         CurrentShipDetails previousShipDetails = previousNotification.getCurrentShipDetails();
         // Convert the newly arrived JSON string to the new CurrentShipDetails object
-        CurrentShipDetails newShipDetails = CurrentShipDetails.fromJson(newValueJson);
+        CurrentShipDetails newShipDetails = JsonMapper.fromJson(newValueJson, CurrentShipDetails.class);
         // Check if the stored previous anomaly object has null fields, which would mean that the backend has just
         // started, and so the most recent notification information should be retrieved
         if (previousShipDetails == null) previousShipDetails = extractFromJPA(newShipDetails, shipID);

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
+import sp.pipeline.JsonMapper;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.StreamUtils;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
@@ -51,7 +52,7 @@ public class ScoreCalculationBuilder {
         DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
 
         // Map the computed AnomalyInformation objects to JSON strings
-        DataStream<String> updateStreamSerialized = updateStream.map(AnomalyInformation::toJson);
+        DataStream<String> updateStreamSerialized = updateStream.map(JsonMapper::toJson);
 
         // Send the calculated AnomalyInformation objects to Kafka
         KafkaSink<String> scoresSink = streamUtils.createSinkFlinkToKafka(config.getKafkaServerAddress(),

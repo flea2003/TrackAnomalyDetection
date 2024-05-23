@@ -3,13 +3,13 @@ package sp.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sp.pipeline.JsonMapper;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestShipInformation {
 
@@ -27,7 +27,8 @@ public class TestShipInformation {
 
     @Test
     void testFromJson2() throws JsonProcessingException {
-        assertThat(ShipInformation.fromJson(shipInformation.toJson())).isEqualTo(shipInformation);
+        ShipInformation reconstructed = JsonMapper.fromJson(JsonMapper.toJson(shipInformation), ShipInformation.class);
+        assertThat(reconstructed).isEqualTo(shipInformation);
     }
 
     @Test
@@ -35,9 +36,9 @@ public class TestShipInformation {
         anomalyInformation = new AnomalyInformation(0.5F, "explanation", dateTime, 123L);
         shipInformation = new ShipInformation(123L, anomalyInformation, null);
 
-        String json = shipInformation.toJson();
+        String json = JsonMapper.toJson(shipInformation);
         // check if conversion to both sides resulted in the same object
-        assertEquals(shipInformation, ShipInformation.fromJson(json));
+        assertEquals(shipInformation, JsonMapper.fromJson(json, ShipInformation.class));
     }
 
     @Test
@@ -47,8 +48,8 @@ public class TestShipInformation {
         aisSignal = new AISSignal(shipHash, 1, 2, 3, 4, 5, dateTime, "port");
         shipInformation = new ShipInformation(shipHash, null, aisSignal);
 
-        String json = shipInformation.toJson();
+        String json = JsonMapper.toJson(shipInformation);
         // check if conversion to both sides resulted in the same object
-        assertEquals(shipInformation, ShipInformation.fromJson(json));
+        assertEquals(shipInformation, JsonMapper.fromJson(json, ShipInformation.class));
     }
 }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.*;
-import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
+import sp.pipeline.JsonMapper;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -136,7 +136,7 @@ class CurrentStateAggregatorTest {
         CurrentShipDetails details = new CurrentShipDetails(info, null, maxInfo);
         ShipInformation shipInfo = new ShipInformation(1L, null, signal);
 
-        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+        CurrentShipDetails result = aggregator.aggregateSignals(details, JsonMapper.toJson(shipInfo));
 
         assertSame(result, details);
         assertEquals(result.getCurrentAISSignal(), signal);
@@ -150,7 +150,7 @@ class CurrentStateAggregatorTest {
         CurrentShipDetails details = new CurrentShipDetails(null, signal, maxInfo);
         ShipInformation shipInfo = new ShipInformation(1L, info, null);
 
-        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+        CurrentShipDetails result = aggregator.aggregateSignals(details, JsonMapper.toJson(shipInfo));
 
         assertSame(result, details);
         assertEquals(result.getCurrentAnomalyInformation(), info);
@@ -163,7 +163,7 @@ class CurrentStateAggregatorTest {
         CurrentShipDetails details = new CurrentShipDetails(null, signal, null);
         ShipInformation shipInfo = new ShipInformation(1L, info, null);
 
-        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+        CurrentShipDetails result = aggregator.aggregateSignals(details, JsonMapper.toJson(shipInfo));
 
         assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), info.getScore());
     }
@@ -175,7 +175,7 @@ class CurrentStateAggregatorTest {
         CurrentShipDetails details = new CurrentShipDetails(null, signal, null);
         ShipInformation shipInfo = new ShipInformation(1L, info, null);
 
-        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+        CurrentShipDetails result = aggregator.aggregateSignals(details, JsonMapper.toJson(shipInfo));
 
         assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), 0f);
     }
@@ -190,7 +190,7 @@ class CurrentStateAggregatorTest {
         AnomalyInformation newInfo = new AnomalyInformation(2F, "new explain", timestamp2, 1L);
         ShipInformation shipInfo = new ShipInformation(1L, newInfo, null);
 
-        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+        CurrentShipDetails result = aggregator.aggregateSignals(details, JsonMapper.toJson(shipInfo));
 
         assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), newInfo.getScore());
     }
@@ -205,7 +205,7 @@ class CurrentStateAggregatorTest {
         AnomalyInformation newInfo = new AnomalyInformation(0.5F, "new explain", timestamp2, 1L);
         ShipInformation shipInfo = new ShipInformation(1L, newInfo, null);
 
-        CurrentShipDetails result = aggregator.aggregateSignals(details, shipInfo.toJson());
+        CurrentShipDetails result = aggregator.aggregateSignals(details, JsonMapper.toJson(shipInfo));
 
         assertEquals(result.getMaxAnomalyScoreInfo().getMaxAnomalyScore(), prevInfo.getScore());
     }

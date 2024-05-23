@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.*;
+import sp.pipeline.JsonMapper;
 import sp.pipeline.parts.notifications.NotificationsAggregator;
 import sp.services.NotificationService;
 
@@ -34,7 +35,7 @@ public class NotificationsAggregatorTest {
     void setUp() throws NotificationNotFoundException, JsonProcessingException {
         notificationService = mock(NotificationService.class);
         notificationsAggregator = new NotificationsAggregator(notificationService);
-        System.out.println(new CurrentShipDetails(new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal(), new MaxAnomalyScoreDetails()).toJson());
+//        System.out.println(new CurrentShipDetails(new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal(), new MaxAnomalyScoreDetails()).toJson());
     }
 
     @Test
@@ -82,7 +83,7 @@ public class NotificationsAggregatorTest {
     void testAggregateComplexHigh2() throws NotificationNotFoundException, JsonProcessingException {
         when(notificationService.getNewestNotificationForShip(1L)).thenReturn(oldValueLow);
         valueJsonHigh =  "{\"currentAnomalyInformation\":{\"score\":20.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}}\n";
-        assertThat(notificationsAggregator.aggregateSignals(oldValueHigh, valueJsonHigh, 1L)).isEqualTo(new Notification(CurrentShipDetails.fromJson(valueJsonHigh)));
+        assertThat(notificationsAggregator.aggregateSignals(oldValueHigh, valueJsonHigh, 1L)).isEqualTo(new Notification(JsonMapper.fromJson(valueJsonHigh, CurrentShipDetails.class)));
         verify(notificationService, times(0)).addNotification(oldValueHigh);
     }
 }

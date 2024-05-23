@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sp.dtos.ExternalAISSignal;
 import sp.model.AISSignal;
+import sp.pipeline.JsonMapper;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.StreamUtils;
 import java.util.Objects;
@@ -70,7 +71,8 @@ public class IdAssignmentBuilder {
 
         // Create a stream from the Kafka source, deserialize the JSON strings and deserialize them
         DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
-        DataStream<ExternalAISSignal> sourceWithNoIDs = rawSourceSerialized.map(ExternalAISSignal::fromJson);
+        DataStream<ExternalAISSignal> sourceWithNoIDs = rawSourceSerialized.map(x ->
+                JsonMapper.fromJson(x, ExternalAISSignal.class));
 
         // Map ExternalAISSignal objects to AISSignal objects by assigning an internal ID
         DataStream<AISSignal> sourceWithIDs = sourceWithNoIDs.map(x -> {
@@ -79,7 +81,7 @@ public class IdAssignmentBuilder {
         });
 
         // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
-        sourceWithIDs.map(AISSignal::toJson).sinkTo(signalsSink);
+        sourceWithIDs.map(JsonMapper::toJson).sinkTo(signalsSink);
 
         return sourceWithIDs;
     }

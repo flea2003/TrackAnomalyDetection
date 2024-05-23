@@ -7,6 +7,7 @@ import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.MaxAnomalyScoreDetails;
 import sp.model.ShipInformation;
+import sp.pipeline.JsonMapper;
 import java.time.OffsetDateTime;
 
 @Service
@@ -22,7 +23,7 @@ public class CurrentStateAggregator {
     public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson)
             throws JsonProcessingException {
 
-        ShipInformation shipInformation = ShipInformation.fromJson(valueJson);
+        ShipInformation shipInformation = JsonMapper.fromJson(valueJson, ShipInformation.class);
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
         AISSignal aisSignal = shipInformation.getAisSignal();
 
