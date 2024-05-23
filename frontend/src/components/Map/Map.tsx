@@ -14,6 +14,7 @@ import "../../styles/map.css";
 import "../../styles/common.css";
 
 import mapStyleConfig from "../../configs/mapConfig.json";
+import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -53,6 +54,13 @@ interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
 }
 
+interface ShipIconDetailsType {
+  show: boolean;
+  x: number;
+  y: number;
+  shipDetails: ShipDetails | null;
+}
+
 /**
  * This component is the first column of the main view of the application. It displays the map with all the ships.
  * A list of ships is passed as a prop.
@@ -85,6 +93,10 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
       },
     }));
 
+    const [hoverInfo, setHoverInfo] = useState<ShipIconDetailsType | null>(
+      null,
+    );
+
     // Everything to do with the map updates should be done inside useEffect
     useEffect(() => {
       // If the map is null, we need to create it. We do it once, with state
@@ -112,6 +124,12 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
                 currentPage: "objectDetails",
                 shownShipId: ship.id,
               });
+            })
+            .on("mouseover", (e) => {
+              handleMouseOverShipIcon(e, ship);
+            })
+            .on("mouseout", (e) => {
+              handleMouseOutShipIcon(e);
             });
         } catch (error) {
           if (error instanceof Error) {
@@ -124,6 +142,45 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
           }
         }
       });
+
+      const handleMouseOverShipIcon = (
+        e: L.LeafletMouseEvent,
+        ship: ShipDetails,
+      ) => {
+        // Extract the latitude and longitude coordinates from the LeafletMouseEvent
+        const latLongCoords = e.latlng;
+        const containerPort = map.latLngToContainerPoint(latLongCoords);
+        const { x, y } = containerPort;
+        setHoverInfo((prev) => {
+          return {
+            show: true,
+            x: x,
+            y: y,
+            shipDetails: ship,
+          } as ShipIconDetailsType;
+        });
+        if (hoverInfo !== null) {
+          return (
+            <ShipIconDetails
+              show={hoverInfo.show}
+              x={hoverInfo.x}
+              y={hoverInfo.y}
+              shipDetails={hoverInfo.shipDetails}
+            />
+          );
+        }
+      };
+
+      const handleMouseOutShipIcon = (e: L.LeafletMouseEvent) => {
+        setHoverInfo((prev) => {
+          return {
+            show: false,
+            x: 0,
+            y: 0,
+            shipDetails: null,
+          } as ShipIconDetailsType;
+        });
+      };
 
       return () => {
         if (map) {
