@@ -70,14 +70,21 @@ public class AnomalyDetectionPipeline {
      * Private helper method for building the pipeline step by step.
      */
     private void buildPipeline()  {
-        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
-        // Create a keyed Kafka Stream of incoming AnomalyInformation signals
-        StreamsBuilder builder = new StreamsBuilder();
 
+        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        // Build the pipeline part that assigns IDs to incoming AIS signals (Flink)
         DataStream<AISSignal> streamWithAssignedIds = idAssignmentBuilder.buildIdAssignmentPart(flinkEnv);
+
+        // Build the pipeline part that calculates the anomaly scores (Flink)
         scoreCalculationBuilder.buildScoreCalculationPart(streamWithAssignedIds);
 
+        StreamsBuilder builder = new StreamsBuilder();
+
+        // Build the pipeline part that aggregates the scores (Kafka Streams)
         this.state = scoreAggregationBuilder.buildScoreAggregationPart(builder);
+
+        // Build the pipeline part that produces notifications (Kafka Streams)
         notificationsDetectionBuilder.buildNotifications(this.state);
 
         this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
