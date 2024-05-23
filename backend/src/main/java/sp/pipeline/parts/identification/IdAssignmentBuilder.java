@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sp.dtos.ExternalAISSignal;
 import sp.model.AISSignal;
-import sp.pipeline.JsonMapper;
 import sp.pipeline.PipelineConfiguration;
-import sp.pipeline.StreamUtils;
+import sp.pipeline.utils.StreamUtils;
+import sp.pipeline.utils.json.FlinkJson;
 import java.util.Objects;
 
 @Component
@@ -69,10 +69,11 @@ public class IdAssignmentBuilder {
                                                        KafkaSink<String> signalsSink,
                                                        StreamExecutionEnvironment flinkEnv) {
 
-        // Create a stream from the Kafka source, deserialize the JSON strings and deserialize them
-        DataStream<String> rawSourceSerialized = flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source");
-        DataStream<ExternalAISSignal> sourceWithNoIDs = rawSourceSerialized.map(x ->
-                JsonMapper.fromJson(x, ExternalAISSignal.class));
+        // Create a stream of id-less AIS Signals from the Kafka source
+        DataStream<ExternalAISSignal> sourceWithNoIDs = FlinkJson.deserialize(
+                flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source"),
+                ExternalAISSignal.class
+        );
 
         // Map ExternalAISSignal objects to AISSignal objects by assigning an internal ID
         DataStream<AISSignal> sourceWithIDs = sourceWithNoIDs.map(x -> {
@@ -81,7 +82,7 @@ public class IdAssignmentBuilder {
         });
 
         // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
-        sourceWithIDs.map(JsonMapper::toJson).sinkTo(signalsSink);
+        FlinkJson.serialize(sourceWithIDs).sinkTo(signalsSink);
 
         return sourceWithIDs;
     }

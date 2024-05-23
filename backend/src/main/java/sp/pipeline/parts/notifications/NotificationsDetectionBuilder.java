@@ -9,7 +9,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
-import sp.pipeline.JsonMapper;
+import sp.pipeline.utils.json.JsonMapper;
 
 @Component
 public class NotificationsDetectionBuilder {

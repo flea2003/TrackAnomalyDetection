@@ -1,4 +1,4 @@
-package sp.pipeline;
+package sp.pipeline.utils.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import sp.utils.UtilsObjectMapper;

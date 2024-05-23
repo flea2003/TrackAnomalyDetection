@@ -13,7 +13,7 @@ import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
-import sp.pipeline.JsonMapper;
+import sp.pipeline.utils.json.JsonMapper;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
 

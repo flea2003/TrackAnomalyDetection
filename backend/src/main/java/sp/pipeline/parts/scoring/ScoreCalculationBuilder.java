@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
-import sp.pipeline.JsonMapper;
+import sp.pipeline.utils.json.JsonMapper;
 import sp.pipeline.PipelineConfiguration;
-import sp.pipeline.StreamUtils;
+import sp.pipeline.utils.StreamUtils;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 
 @Component

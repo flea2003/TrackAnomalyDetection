@@ -18,6 +18,7 @@ import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
+import sp.pipeline.utils.StreamUtils;
 import java.util.HashMap;
 
 @Service

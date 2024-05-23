@@ -7,7 +7,7 @@ import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.MaxAnomalyScoreDetails;
 import sp.model.ShipInformation;
-import sp.pipeline.JsonMapper;
+import sp.pipeline.utils.json.JsonMapper;
 import java.time.OffsetDateTime;
 
 @Service

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
-import sp.pipeline.JsonMapper;
+import sp.pipeline.utils.json.JsonMapper;
 import sp.services.NotificationService;
 
 @Service
