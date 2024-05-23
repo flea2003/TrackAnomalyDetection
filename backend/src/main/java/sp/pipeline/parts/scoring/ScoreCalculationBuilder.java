@@ -47,11 +47,6 @@ public class ScoreCalculationBuilder {
      */
     public void buildScoreCalculationPart(DataStream<AISSignal> source) {
 
-        // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
-        KafkaSink<String> signalsSink = streamUtils.createSinkFlinkToKafka(config.getKafkaServerAddress(),
-                config.getIncomingAisTopicName());
-        source.map(AISSignal::toJson).sinkTo(signalsSink);
-
         // Set up the anomaly detection part of the sp.pipeline (happens in Flink)
         DataStream<AnomalyInformation> updateStream = scoreCalculationStrategy.setupFlinkAnomalyScoreCalculationPart(source);
 
