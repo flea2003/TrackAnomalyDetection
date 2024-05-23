@@ -1,9 +1,10 @@
 package sp.pipeline.scorecalculators.components.heuristic;
 
+import static sp.pipeline.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
+
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +17,6 @@ import org.apache.flink.configuration.Configuration;
 import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
 
-import static sp.pipeline.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
-
 @Getter
 public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
 
@@ -28,23 +27,72 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     // this is sometimes the same as anomalyInformationValueState, but sometimes different
     private transient ValueState<AnomalyInformation> lastDetectedAnomalyValueState;
 
-    // decimal format for writing floating point numbers in explanations
-    DecimalFormat df = new DecimalFormat("#.##");
-
+    /**
+     * Checks if the current signal is an anomaly. If the heuristic needs,
+     * the current signal is compared with the given past signal.
+     *
+     * @param currentSignal current AIS signal
+     * @param pastSignal past AIS signal (non-null object)
+     * @return AnomalyScoreWithExplanation object which indicates whether the current
+     *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
+     *     are also included in the same return object.
+     */
     abstract AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal);
+
+    /**
+     * Gets the anomaly score of the heuristic. This score is given to the ship that
+     * is considered an anomaly based on the heuristic.
+     *
+     * @return the anomaly score of the heuristic
+     */
     abstract float getAnomalyScore();
+
+    /**
+     * Explanation string for the heuristic which is used when the ship is non-anomalous.
+     *
+     * @return explanation string
+     */
     abstract String getNonAnomalyExplanation();
 
+    /**
+     * Helper function for the ending of the explanation string.
+     * The ending is a dot symbol followed by new line symbol.
+     *
+     * @return the ending string
+     */
     String explanationEnding() {
         return "." + System.lineSeparator();
     }
 
+    /**
+     * DecimalFormatter for writing floating-point numbers in explanation strings.
+     * The format is configured to allow maximum two decimal places.
+     *
+     * @return the formatter object
+     */
+    DecimalFormat getDecimalFormatter() {
+        return new DecimalFormat("#.##");
+    }
+
+    /**
+     * Initializes the function by initializing the value states.
+     *
+     * @param config Flink configuration object
+     */
     @Override
     public void open(Configuration config) {
         aisSignalValueState = getValueState("aisSignal", new TypeHint<>() {});
         lastDetectedAnomalyValueState = getValueState("lastDetectedAnomaly", new TypeHint<>() {});
     }
 
+    /**
+     * Helper method for creating (initializing) a value state.
+     *
+     * @param name name of the state
+     * @param typeHint type hint for the descriptor (cannot be extracted since Flink then
+     *                 shows errors about generic method)
+     * @return the created value state
+     */
     private <T> ValueState<T> getValueState(String name, TypeHint<T> typeHint) {
         ValueStateDescriptor<T> descriptor =
                 new ValueStateDescriptor<>(
@@ -59,12 +107,12 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      * Performs a stateful map operation that receives an AIS signal and produces an
      * AnomalyInformation based on the predefined heuristics for the speed of the ship.
      *
-     * @param value The input value.
+     * @param value The input value (AIS signal)
      * @return the computed Anomaly Information object
-     * @throws Exception - exception from value state descriptors
+     * @exception IOException exception thrown by interaction with value states
      */
     @Override
-    public AnomalyInformation map(AISSignal value) throws Exception {
+    public AnomalyInformation map(AISSignal value) throws IOException {
         checkCurrentSignal(value);
 
         AnomalyInformation anomalyInfo;
@@ -87,6 +135,15 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
         return anomalyInfo;
     }
 
+    /**
+     * Check if the last detected anomaly is still relevant. It's considered still relevant
+     * if it is in the past 30 minutes.
+     *
+     * @param recentAnomaly last detected anomaly information
+     * @param currentTime time of the current signal
+     * @return true if the last detected anomaly is not earlier than 30 minutes
+     *     before the current signal
+     */
     private boolean isLastDetectedAnomalyRecent(AnomalyInformation recentAnomaly, OffsetDateTime currentTime) {
         if (recentAnomaly == null) {
             return false;
@@ -95,6 +152,13 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
         return timeDiffInMinutes(recentAnomaly.getCorrespondingTimestamp(), currentTime) <= 30;
     }
 
+    /**
+     * Checks the current signal. If it is an anomaly, then new anomaly information is saved
+     * in the value state for the last detected anomaly.
+     *
+     * @param currentSignal current AIS signal
+     * @throws IOException if interaction with value states throw exception
+     */
     private void checkCurrentSignal(AISSignal currentSignal) throws IOException {
         AISSignal pastSignal = getAisSignalValueState().value();
 
