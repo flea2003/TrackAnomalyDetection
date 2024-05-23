@@ -47,10 +47,6 @@ public class PipelineConfiguration {
                                  String configPath) throws IOException {
         loadConfig(configPath);
 
-        if (savedConfiguration == null) {
-            throw new IOException("Properties file not found");
-        }
-
         rawIncomingAisTopicName = savedConfiguration.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
         incomingAisTopicName = savedConfiguration.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
         calculatedScoresTopicName = savedConfiguration.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
