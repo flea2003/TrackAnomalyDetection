@@ -1,5 +1,10 @@
 package sp.pipeline.scorecalculators.components.heuristic;
 
+import sp.model.AISSignal;
+
+import java.time.Duration;
+import java.time.OffsetDateTime;
+
 public class Tools {
 
     /**
@@ -37,6 +42,25 @@ public class Tools {
      */
     public static float circularMetric(float deg1, float deg2) {
         return (float) (180.0 - Math.abs(180 - (deg1 % 360 - deg2 % 360 + 360) % 360));
+    }
+
+    public static long timeDiffInMinutes(OffsetDateTime time1, OffsetDateTime time2) {
+        return Duration.between(time1, time2).toMinutes();
+    }
+
+    public static long timeDiffInMinutes(AISSignal currentSignal, AISSignal pastSignal) {
+        return timeDiffInMinutes(pastSignal.getTimestamp(), currentSignal.getTimestamp());
+    }
+
+    public static double timeDiffInHours(AISSignal currentSignal, AISSignal pastSignal) {
+        return ((double) timeDiffInMinutes(currentSignal, pastSignal)) / 60.0;
+    }
+
+    public static float getDistanceTravelled(AISSignal currentSignal, AISSignal pastSignal) {
+        return harvesineDistance(
+                currentSignal.getLatitude(), currentSignal.getLongitude(),
+                pastSignal.getLatitude(), pastSignal.getLongitude()
+        );
     }
 
 }

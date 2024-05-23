@@ -1,9 +1,13 @@
 package sp.pipeline.scorecalculators.components.heuristic;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
@@ -12,6 +16,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
 import sp.model.AnomalyInformation;
 import sp.model.AISSignal;
+
+import static sp.pipeline.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
 
 @Getter
 public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
@@ -23,10 +29,17 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     // this is sometimes the same as anomalyInformationValueState, but sometimes different
     private transient ValueState<AnomalyInformation> lastDetectedAnomalyValueState;
 
+    // decimal format for writing floating point numbers in explanations
+    DecimalFormat df = new DecimalFormat("#.##");
+
     public abstract boolean isAnomaly(AISSignal currentSignal, AISSignal pastSignal);
     public abstract float getAnomalyScore();
     public abstract String getAnomalyExplanation(AISSignal currentSignal, AISSignal pastSignal);
     public abstract String getNonAnomalyExplanation();
+
+    String explanationEnding() {
+        return "." + System.lineSeparator();
+    }
 
     @Override
     public void open(Configuration config) {
@@ -70,7 +83,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
             );
         }
 
-        // save the signal in the value state for the upcoming signal
+        // save the AIS signal in the value state for the upcoming signal
         this.getAisSignalValueState().update(value);
 
         return anomalyInfo;
@@ -81,8 +94,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
             return false;
         }
 
-        long timeDiffInMinutes = Duration.between(recentAnomaly.getCorrespondingTimestamp(), currentTime).toMinutes();
-        return timeDiffInMinutes <= 30;
+        return timeDiffInMinutes(recentAnomaly.getCorrespondingTimestamp(), currentTime) <= 30;
     }
 
     private void checkCurrentSignal(AISSignal currentSignal) throws IOException {
@@ -103,4 +115,11 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
         }
     }
 
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    static class AnomalyScoreWithExplanation {
+        private float anomalyScore;
+        private String explanation;
+    }
 }

@@ -49,7 +49,7 @@ public class SpeedStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(1);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.\n");
     }
 
     @Test
@@ -67,9 +67,14 @@ public class SpeedStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.\n");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's speed is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Too fast: 840.06 is faster than threshold 55.5.
+                        Speed is inaccurate: 840.06 is different from reported speed of 22 by more than allowed margin 10.
+                        """
+        );
     }
 
 
@@ -94,18 +99,15 @@ public class SpeedStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(3);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.\n");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's speed is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Speed is inaccurate: 2.74 is different from reported speed of 12.8 by more than allowed margin 10.
+                        """
+        );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
-    }
-
-    @Test
-    void testAccelerationIsTooBig() {
-        assertThat(
-                speedStatefulMapFunction.isAnomaly(0.0f, 0.0f, 100.0f)
-        ).isTrue();
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's speed is ok.\n");
     }
 
 }

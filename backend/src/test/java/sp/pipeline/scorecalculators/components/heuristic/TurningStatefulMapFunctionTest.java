@@ -48,7 +48,7 @@ public class TurningStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(1);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class TurningStatefulMapFunctionTest {
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
         OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:01Z");
         AISSignal aisSignal1 = new AISSignal(1, 20, 90, 30, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal(1, 22, 11, 10, 60, 20, timestamp2, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 22, 11, 10, 61, 20, timestamp2, "Malta");
 
         testHarness.processElement(aisSignal1, 20);
         testHarness.processElement(aisSignal2, 60);
@@ -65,9 +65,13 @@ public class TurningStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's turning direction is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Course changed too much: 41 is more than threshold 40.
+                        """
+        );
     }
 
 
@@ -88,11 +92,15 @@ public class TurningStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(3);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's turning direction is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Course changed too much: 41 is more than threshold 40.
+                        """
+        );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
 
     }
 
@@ -107,7 +115,7 @@ public class TurningStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(1);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
     }
 
 }
