@@ -1,8 +1,11 @@
 package sp.pipeline.parts.notifications;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Materialized;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
@@ -63,6 +66,10 @@ public class NotificationsDetectionBuilder {
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
-                        });
+                        },
+                        Materialized
+                                .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("dummy")
+                                .withValueSerde(Notification.getSerde())
+                );
     }
 }
