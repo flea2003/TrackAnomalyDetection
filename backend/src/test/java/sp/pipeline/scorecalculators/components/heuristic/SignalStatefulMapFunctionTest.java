@@ -94,8 +94,7 @@ public class SignalStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Time between two signals is too large: 11 minutes is more than threshold 10 minutes.
-                        Ship travelled too much between signals: 37448.13 is more than threshold 6.0.
+                        Time between two signals is too large: 11 minutes is more than threshold 10 minutes,  and ship travelled too much between signals: 37448.13 is more than threshold 6.0.
                         """
         );
     }
@@ -123,8 +122,7 @@ public class SignalStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Time between two signals is too large: 11 minutes is more than threshold 10 minutes.
-                        Ship travelled too much between signals: 597.3 is more than threshold 6.0.
+                        Time between two signals is too large: 11 minutes is more than threshold 10 minutes,  and ship travelled too much between signals: 597.3 is more than threshold 6.0.
                         """
         );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);

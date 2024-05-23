@@ -2,7 +2,6 @@ package sp.pipeline.scorecalculators.components.heuristic;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import lombok.AllArgsConstructor;
@@ -32,10 +31,9 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     // decimal format for writing floating point numbers in explanations
     DecimalFormat df = new DecimalFormat("#.##");
 
-    public abstract boolean isAnomaly(AISSignal currentSignal, AISSignal pastSignal);
-    public abstract float getAnomalyScore();
-    public abstract String getAnomalyExplanation(AISSignal currentSignal, AISSignal pastSignal);
-    public abstract String getNonAnomalyExplanation();
+    abstract AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal);
+    abstract float getAnomalyScore();
+    abstract String getNonAnomalyExplanation();
 
     String explanationEnding() {
         return "." + System.lineSeparator();
@@ -105,9 +103,11 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
             return;
         }
 
-        if (isAnomaly(currentSignal, pastSignal)) {
+        AnomalyScoreWithExplanation result = checkForAnomaly(currentSignal, pastSignal);
+
+        if (result.isAnomaly()) {
             AnomalyInformation anomalyInfo = new AnomalyInformation(
-                    getAnomalyScore(), getAnomalyExplanation(currentSignal, pastSignal),
+                    result.getAnomalyScore(), result.getExplanation(),
                     currentSignal.getTimestamp(), currentSignal.getId()
             );
 
@@ -119,6 +119,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     @Setter
     @AllArgsConstructor
     static class AnomalyScoreWithExplanation {
+        private boolean isAnomaly;
         private float anomalyScore;
         private String explanation;
     }

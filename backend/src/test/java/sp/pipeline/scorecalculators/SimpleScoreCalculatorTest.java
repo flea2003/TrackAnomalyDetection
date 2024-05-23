@@ -40,7 +40,7 @@ class SimpleScoreCalculatorTest {
         // ais1 and ais2 are from the same ship
         AISSignal ais1 = new AISSignal(1, 1, 2, 3, 4, 5, time1, "port1");
         AISSignal ais2 = new AISSignal(1, 5, 20, 30, 20, 10, time2, "port1");
-        AISSignal ais3 = new AISSignal(1, 5, 20, 70, 0, 50, time3, "port1");
+        AISSignal ais3 = new AISSignal(1, 5, 20, 70, 0, 51, time3, "port1");
         AISSignal ais4 = new AISSignal(2, 3, 200, 300, 400, 500, time3, "port2");
 
         // prepare flink environment and streams
@@ -59,12 +59,20 @@ class SimpleScoreCalculatorTest {
         List<AnomalyInformation> result = CollectSink.anomalyInfoList;
 
         assertThat(result).containsAll(List.of(
-            new AnomalyInformation(100f, "The time difference between consecutive AIS signals is anomalous. " +
-                "The ship's speed is anomalous. " +
-                "The ship's turning direction is anomalous.", time3, (long)1),
-            new AnomalyInformation(0.0f, "The time difference between consecutive AIS signals is ok. " +
-                "The ship's speed is ok. " +
-                "The ship's turning direction is ok.", time3, (long)2)
+            new AnomalyInformation(100f,
+                    """
+                            Time between two signals is too large: 14 minutes is more than threshold 10 minutes,  and ship travelled too much between signals: 15217.09 is more than threshold 6.0.
+                            Too fast: 2223.89 is faster than threshold 55.5.
+                            Speed is inaccurate: 2223.89 is different from reported speed of 5 by more than allowed margin 10.
+                            Heading changed too much: 41 is more than threshold 40.
+                            """
+                    , time3, 1L),
+            new AnomalyInformation(0.0f,
+                    """
+                            The time difference between consecutive AIS signals is ok.
+                            The ship's speed is ok.
+                            The ship's turning direction is ok.
+                            """, time3, 2L)
         ));
 
     }

@@ -2,8 +2,6 @@ package sp.pipeline.scorecalculators.components.heuristic;
 
 import sp.model.AISSignal;
 
-import java.text.DecimalFormat;
-
 import static sp.pipeline.scorecalculators.components.heuristic.Tools.*;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
@@ -12,10 +10,33 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
     private static final double ACCELERATION_THRESHOLD = 50;
     private static final double REPORTED_SPEED_ACCURACY_MARGIN = 10;
 
-    public boolean isAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
-        return speedIsTooFast(currentSignal, pastSignal)
-                || reportedSpeedIsNotAccurate(currentSignal, pastSignal)
-                || accelerationTooBig(currentSignal, pastSignal);
+    AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        String explanation = "";
+        boolean isAnomaly = false;
+
+        if (speedIsTooFast(currentSignal, pastSignal)) {
+            isAnomaly = true;
+            explanation += "Too fast: " + df.format(computeSpeed(currentSignal, pastSignal))
+                    + " is faster than threshold " + df.format(SPEED_THRESHOLD)
+                    + explanationEnding();
+        }
+
+        if (reportedSpeedIsNotAccurate(currentSignal, pastSignal)) {
+            isAnomaly = true;
+            explanation += "Speed is inaccurate: " + df.format(computeSpeed(currentSignal, pastSignal))
+                    + " is different from reported speed of " + df.format(currentSignal.getSpeed())
+                    + " by more than allowed margin " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
+                    + explanationEnding();
+        }
+
+        if (accelerationTooBig(currentSignal, pastSignal)) {
+            isAnomaly = true;
+            explanation += "Acceleration too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
+                    + " is bigger than threshold " + df.format(ACCELERATION_THRESHOLD)
+                    + explanationEnding();
+        }
+
+        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
     }
 
     private double computeSpeed(AISSignal currentSignal, AISSignal pastSignal) {
@@ -33,38 +54,12 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
     }
 
     @Override
-    public float getAnomalyScore() {
+    float getAnomalyScore() {
         return 33f;
     }
 
     @Override
-    public String getAnomalyExplanation(AISSignal currentSignal, AISSignal pastSignal) {
-        String result = "";
-
-        if (speedIsTooFast(currentSignal, pastSignal)) {
-            result += "Too fast: " + df.format(computeSpeed(currentSignal, pastSignal))
-                    + " is faster than threshold " + df.format(SPEED_THRESHOLD)
-                    + explanationEnding();
-        }
-
-        if (reportedSpeedIsNotAccurate(currentSignal, pastSignal)) {
-            result += "Speed is inaccurate: " + df.format(computeSpeed(currentSignal, pastSignal))
-                    + " is different from reported speed of " + df.format(currentSignal.getSpeed())
-                    + " by more than allowed margin " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
-                    + explanationEnding();
-        }
-
-        if (accelerationTooBig(currentSignal, pastSignal)) {
-            result += "Acceleration too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
-                    + " is bigger than threshold " + df.format(ACCELERATION_THRESHOLD)
-                    + explanationEnding();
-        }
-
-        return result;
-    }
-
-    @Override
-    public String getNonAnomalyExplanation() {
+    String getNonAnomalyExplanation() {
         return "The ship's speed is ok" + explanationEnding();
     }
 

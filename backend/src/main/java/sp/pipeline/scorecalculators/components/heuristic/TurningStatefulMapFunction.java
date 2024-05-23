@@ -10,11 +10,28 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
     private final static float COURSE_DIFFERENCE_THRESHOLD = 40;
 
     @Override
-    public boolean isAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+    AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
         currentSignal.updateHeading(); // in case no heading was reported
 
-        return (headingDiffTooBig(pastSignal, currentSignal)
-                || courseDiffTooBig(pastSignal, currentSignal));
+        boolean isAnomaly = false;
+        String explanation = "";
+
+        if (headingDiffTooBig(pastSignal, currentSignal)) {
+            isAnomaly = true;
+            explanation += "Heading changed too much: " + df.format(circularMetric(pastSignal.getHeading(), currentSignal.getHeading()))
+                    + " is more than threshold " + df.format(HEADING_DIFFERENCE_THRESHOLD)
+                    + explanationEnding();
+        }
+
+        if (courseDiffTooBig(pastSignal, currentSignal)) {
+            isAnomaly = true;
+            explanation += "Course changed too much: " + df.format(circularMetric(pastSignal.getCourse(), currentSignal.getCourse()))
+                    + " is more than threshold " + df.format(COURSE_DIFFERENCE_THRESHOLD)
+                    + explanationEnding();
+        }
+
+        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
+
     }
 
     private boolean headingDiffTooBig(AISSignal pastSignal, AISSignal currentSignal) {
@@ -26,31 +43,12 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
     }
 
     @Override
-    public float getAnomalyScore() {
+    float getAnomalyScore() {
         return 34f;
     }
 
     @Override
-    public String getAnomalyExplanation(AISSignal currentSignal, AISSignal pastSignal) {
-        String result = "";
-
-        if (headingDiffTooBig(pastSignal, currentSignal)) {
-            result += "Heading changed too much: " + df.format(circularMetric(pastSignal.getHeading(), currentSignal.getHeading()))
-                    + " is more than threshold " + df.format(HEADING_DIFFERENCE_THRESHOLD)
-                    + explanationEnding();
-        }
-
-        if (courseDiffTooBig(pastSignal, currentSignal)) {
-            result += "Course changed too much: " + df.format(circularMetric(pastSignal.getCourse(), currentSignal.getCourse()))
-                    + " is more than threshold " + df.format(COURSE_DIFFERENCE_THRESHOLD)
-                    + explanationEnding();
-        }
-
-        return result;
-    }
-
-    @Override
-    public String getNonAnomalyExplanation() {
+    String getNonAnomalyExplanation() {
         return "The ship's turning direction is ok" + explanationEnding();
     }
 }

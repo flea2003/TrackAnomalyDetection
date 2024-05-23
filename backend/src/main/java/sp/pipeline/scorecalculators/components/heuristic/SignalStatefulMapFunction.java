@@ -10,36 +10,30 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
     private final static double TRAVELLED_DISTANCE_THRESHOLD = 6;
 
     @Override
-    public boolean isAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
-        return (signalsNotFrequent(currentSignal, pastSignal) && shipTravelledMuch(currentSignal, pastSignal));
-    }
+    AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        boolean isAnomaly = false;
+        String explanation = "";
 
-    @Override
-    public float getAnomalyScore() {
-        return 33f;
-    }
+        if (signalsNotFrequent(currentSignal, pastSignal) && shipTravelledMuch(currentSignal, pastSignal)) {
+            isAnomaly = true;
 
-    @Override
-    public String getAnomalyExplanation(AISSignal currentSignal, AISSignal pastSignal) {
-        String result = "";
-
-        if (signalsNotFrequent(currentSignal, pastSignal)) {
-            result += "Time between two signals is too large: " + df.format(timeDiffInMinutes(currentSignal, pastSignal))
-                    + " minutes is more than threshold " + SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES + " minutes"
-                    + explanationEnding();
-        }
-
-        if (shipTravelledMuch(currentSignal, pastSignal)) {
-            result += "Ship travelled too much between signals: " + df.format(distanceDividedByHours(currentSignal, pastSignal))
+            explanation += "Time between two signals is too large: " + df.format(timeDiffInMinutes(currentSignal, pastSignal))
+                    + " minutes is more than threshold " + SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES + " minutes, "
+                    + " and ship travelled too much between signals: " + df.format(distanceDividedByHours(currentSignal, pastSignal))
                     + " is more than threshold " + TRAVELLED_DISTANCE_THRESHOLD
                     + explanationEnding();
         }
 
-        return result;
+        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
     }
 
     @Override
-    public String getNonAnomalyExplanation() {
+    float getAnomalyScore() {
+        return 33f;
+    }
+
+    @Override
+    String getNonAnomalyExplanation() {
         return "The time difference between consecutive AIS signals is ok" + explanationEnding();
     }
 
