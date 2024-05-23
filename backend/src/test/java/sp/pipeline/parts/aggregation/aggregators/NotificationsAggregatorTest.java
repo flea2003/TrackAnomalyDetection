@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.*;
-import sp.pipeline.JsonMapper;
+import sp.pipeline.utils.json.JsonMapper;
 import sp.pipeline.parts.notifications.NotificationsAggregator;
 import sp.services.NotificationService;
 

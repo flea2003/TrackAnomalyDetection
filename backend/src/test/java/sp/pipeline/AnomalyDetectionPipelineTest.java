@@ -11,6 +11,7 @@ import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.DefaultScoreCalculator;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
+import sp.pipeline.utils.StreamUtils;
 import sp.services.NotificationService;
 
 import java.io.IOException;

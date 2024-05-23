@@ -3,7 +3,7 @@ package sp.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.pipeline.JsonMapper;
+import sp.pipeline.utils.json.JsonMapper;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
