@@ -1,6 +1,5 @@
 package sp.pipeline.parts.notifications;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
@@ -53,13 +52,7 @@ public class NotificationsDetectionBuilder {
         KafkaJson.serialize(streamOfUpdates)
                 .groupByKey()
                 .aggregate(Notification::new,
-                        (key, valueJson, lastInformation) -> {
-                            try {
-                                return notificationsAggregator.aggregateSignals(lastInformation, valueJson, key);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
+                        KafkaJson.aggregator(notificationsAggregator::aggregateSignals, CurrentShipDetails.class),
                         Materialized
                                 .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("dummy")
                                 .withValueSerde(Notification.getSerde())
