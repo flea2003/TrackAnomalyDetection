@@ -9,6 +9,11 @@ interface ShipIconDetailsType {
   shipDetails: ShipDetails | null;
 }
 
+/**
+ * This component manages the state of the pop-up div with reduced ship details.
+ * @param props - parameters needed for the construction of the div
+ * @constructor - constructor
+ */
 const ShipIconDetails = (props: ShipIconDetailsType) => {
   if (!props.show || props.shipDetails == null) {
     return null;

@@ -32,6 +32,9 @@ class TimeUtilities {
     return `${days}d, ${hours}h, ${minutes}m`;
   }
 
+  /**
+   * Utility method that returns the current time.
+   */
   static getCurrentTime = () => {
     return new Date();
   };
