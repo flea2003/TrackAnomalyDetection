@@ -6,8 +6,6 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.state.KeyValueStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
@@ -23,7 +21,6 @@ public class ScoreAggregationBuilder {
 
     private final CurrentStateAggregator currentStateAggregator;
     private final PipelineConfiguration configuration;
-    private static final Logger logger = LoggerFactory.getLogger(ScoreAggregationBuilder.class);
 
     /**
      * Constructor for the ScoreAggregationBuilder class.
