@@ -8,6 +8,7 @@ stages:
   - build
   - test
   - code_quality
+  - collect_coverage
 
 include:
   - local: frontend/.gitlab-ci.yml

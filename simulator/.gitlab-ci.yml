@@ -17,13 +17,22 @@ simulator_tests:
     - chmod +x ./gradlew
   script:
     - ./gradlew test jacocoTestReport
-    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%"
-  coverage: /([0-9]{1,3})%/
+  artifacts:
+    when: always
+    paths:
+      - simulator/build/test-results/test/**/TEST-*.xml
+      - simulator/build/reports/jacoco/test/cobertura-jacocoTestReport.xml
+      - simulator/build/reports/jacoco/test/html/index.html
+    reports:
+      junit: simulator/build/test-results/test/**/TEST-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: simulator/build/reports/jacoco/test/cobertura-jacocoTestReport.xml
 
 simulator_mutation_testing:
   stage: test
   image: gradle:7.6.0-jdk17
-  needs: ["simulator_tests"]
+  needs: ["simulator_build"]
   before_script:
     - cd simulator
     - chmod +x ./gradlew
@@ -51,3 +60,21 @@ simulator_pmd_static_analysis:
     - chmod +x ./gradlew
   script:
     - ./gradlew pmdMain
+
+simulator_statement_coverage:
+  stage: collect_coverage
+  image: gradle:7.6.0-jdk17
+  needs: ["simulator_tests"]
+  before_script: cd simulator
+  script:
+    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%"
+  coverage: /([0-9]{1,3})%/
+
+simulator_branch_coverage:
+  stage: collect_coverage
+  image: gradle:7.6.0-jdk17
+  needs: ["simulator_tests"]
+  before_script: cd simulator
+  script:
+    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%"
+  coverage: /([0-9]{1,3})%/
