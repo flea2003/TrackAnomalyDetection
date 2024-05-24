@@ -1,6 +1,6 @@
 react_build:
   stage: build
-  image: node
+  image: node:lts
   needs: []
   before_script:
     - cd frontend
@@ -11,18 +11,28 @@ react_build:
 
 react_tests:
   stage: test
-  image: node
+  image: node:lts
   needs: ["react_build"]
   before_script:
     - cd frontend
     - npm ci
   script:
     - npm run test:ci
-  coverage: /All files[^|]*\|[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    when: always
+    paths:
+      - frontend/junit.xml
+      - frontend/coverage/cobertura-coverage.xml
+      - frontend/coverage/lcov-report/index.html
+    reports:
+      junit: frontend/junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: frontend/coverage/cobertura-coverage.xml
 
 react_linter:
   stage: code_quality
-  image: node
+  image: node:lts
   needs: ["react_build"]
   before_script:
     - cd frontend
@@ -32,10 +42,28 @@ react_linter:
 
 react_prettier_checks:
   stage: code_quality
-  image: node
+  image: node:lts
   needs: ["react_build"]
   before_script:
     - cd frontend
     - npm ci
   script:
     - npm run prettier:check
+
+react_statement_coverage:
+  stage: collect_coverage
+  image: node:lts
+  needs: ["react_tests"]
+  before_script: cd frontend
+  script:
+    - cat coverage/lcov-report/index.html | head -n26 | tail -n1 | grep -Po "\d+(\.\d+)?"
+  coverage: /\d+\.\d+/
+
+react_branch_coverage:
+  stage: collect_coverage
+  image: node:lts
+  needs: ["react_tests"]
+  before_script: cd frontend
+  script:
+    - cat coverage/lcov-report/index.html | head -n33 | tail -n1 | grep -Po "\d+(\.\d+)?"
+  coverage: /\d+\.\d+/
