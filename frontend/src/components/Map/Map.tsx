@@ -93,9 +93,14 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
       },
     }));
 
-    const [hoverInfo, setHoverInfo] = useState<ShipIconDetailsType | null>(
-      null,
-    );
+    // Initialize the hoverInfo variable that will manage the display of the
+    // pop-up div containing reduced information about a particular ship
+    const [hoverInfo, setHoverInfo] = useState<ShipIconDetailsType>({
+      show: false,
+      x: 0,
+      y: 0,
+      shipDetails: null,
+    } as ShipIconDetailsType);
 
     // Everything to do with the map updates should be done inside useEffect
     useEffect(() => {
@@ -142,7 +147,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
           }
         }
       });
-
+      // Event handling methods for the ship icons
       const handleMouseOverShipIcon = (
         e: L.LeafletMouseEvent,
         ship: ShipDetails,
@@ -159,16 +164,6 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
             shipDetails: ship,
           } as ShipIconDetailsType;
         });
-        if (hoverInfo !== null) {
-          return (
-            <ShipIconDetails
-              show={hoverInfo.show}
-              x={hoverInfo.x}
-              y={hoverInfo.y}
-              shipDetails={hoverInfo.shipDetails}
-            />
-          );
-        }
       };
 
       const handleMouseOutShipIcon = (e: L.LeafletMouseEvent) => {
@@ -196,6 +191,16 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
     return (
       <div id="map-container">
         <div id="map" data-testid="map"></div>
+        {hoverInfo.show && hoverInfo.shipDetails !== null && (
+          <div>
+            <ShipIconDetails
+              show={hoverInfo.show}
+              x={hoverInfo.x}
+              y={hoverInfo.y}
+              shipDetails={hoverInfo.shipDetails}
+            ></ShipIconDetails>
+          </div>
+        )}
       </div>
     );
   },
