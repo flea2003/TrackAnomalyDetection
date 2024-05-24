@@ -5,22 +5,23 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.*;
+import sp.pipeline.aggregators.CurrentStateAggregator;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AggregatorTest {
+class CurrentStateAggregatorTest {
 
-    private Aggregator aggregator;
+    private CurrentStateAggregator aggregator;
 
     private final OffsetDateTime timestamp = OffsetDateTime.of(2015, 4, 18, 1,1,0,0, ZoneOffset.ofHours(0));
     private final OffsetDateTime timestamp2 = OffsetDateTime.of(2016, 4, 18, 1,1,0,0, ZoneOffset.ofHours(0));
 
     @BeforeEach
     void setUp() {
-        aggregator = new Aggregator();
+        aggregator = new CurrentStateAggregator();
     }
 
     @AfterEach

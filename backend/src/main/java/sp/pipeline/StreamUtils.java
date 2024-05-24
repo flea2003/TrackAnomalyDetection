@@ -72,7 +72,6 @@ public class StreamUtils {
         Properties props = loadConfig();
 
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-
         return new KafkaStreams(builder.build(), props);
     }
 }
