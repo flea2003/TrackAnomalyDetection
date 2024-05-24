@@ -131,7 +131,6 @@ public class ScoreAggregationBuilder {
                                 .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.getKafkaStoreName())
                                 .withValueSerde(CurrentShipDetails.getSerde())
                 );
-        builder.build();
         return table;
     }
 }

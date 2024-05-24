@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+@Getter
 @Component
 public class PipelineConfiguration {
     private static final String RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais-raw.topic.name";
@@ -18,22 +19,16 @@ public class PipelineConfiguration {
     private static final String KAFKA_SERVER_ADDRESS_PROPERTY = "kafka.server.address";
     private static final String KAFKA_STORE_NAME_PROPERTY = "kafka.store.name";
 
-    @Getter
     private final String rawIncomingAisTopicName;
 
-    @Getter
     private final String incomingAisTopicName;
 
-    @Getter
     private final String calculatedScoresTopicName;
 
-    @Getter
     private final String kafkaServerAddress;
 
-    @Getter
     private final String kafkaStoreName;
 
-    @Getter
     private Properties savedConfiguration;
 
     /**

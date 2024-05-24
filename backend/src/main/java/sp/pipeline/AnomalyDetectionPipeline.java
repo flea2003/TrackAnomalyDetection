@@ -88,8 +88,12 @@ public class AnomalyDetectionPipeline {
         // Build the pipeline part that produces notifications (Kafka Streams)
         notificationsDetectionBuilder.buildNotifications(this.state);
 
+        // Build the Kafka part of the pipeline
+        builder.build();
+
         this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
+
     }
 
 
