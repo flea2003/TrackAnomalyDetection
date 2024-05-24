@@ -1,4 +1,3 @@
-
 // Create a class to get ship information from the server
 import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";

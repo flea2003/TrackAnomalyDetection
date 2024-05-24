@@ -6,6 +6,7 @@ test("Rounding of latitude and longitude", () => {
     0,
     0.123456,
     0.12034,
+    "t1",
     0,
     "test",
     0,
@@ -16,7 +17,7 @@ test("Rounding of latitude and longitude", () => {
   );
 
   // Test that the rounding is done correctly. Assumes that the rounding is 1000
-  expect(fake.getPropertyList()[7].value).toBe("0.123, 0.12");
+  expect(fake.getPropertyList()[8].value).toBe("0.123, 0.12");
 });
 
 test("getPropertyList returns a list of correct size", () => {
@@ -25,6 +26,7 @@ test("getPropertyList returns a list of correct size", () => {
     0,
     0.123456,
     0.12034,
+    "t1",
     0,
     "test",
     0,
@@ -35,7 +37,7 @@ test("getPropertyList returns a list of correct size", () => {
   );
 
   // Test that the list has the correct size
-  expect(fake.getPropertyList().length).toBe(9);
+  expect(fake.getPropertyList().length).toBe(10);
 });
 
 test("getPropertyList returns correct id", () => {
@@ -44,6 +46,7 @@ test("getPropertyList returns correct id", () => {
     0,
     0.123456,
     0.12034,
+    "t1",
     0,
     "test",
     0,
@@ -63,6 +66,7 @@ test("getPropertyList returns correct explanation", () => {
     0,
     0.123456,
     0.12034,
+    "t1",
     0,
     "test",
     0,
@@ -82,6 +86,7 @@ test("getPropertyList returns correct heading", () => {
     0,
     0.123456,
     0.12034,
+    "t1",
     0,
     "test",
     0,
@@ -92,5 +97,5 @@ test("getPropertyList returns correct heading", () => {
   );
 
   // Test that the heading is correct
-  expect(fake.getPropertyList()[4].value).toBe("0");
+  expect(fake.getPropertyList()[5].value).toBe("0");
 });

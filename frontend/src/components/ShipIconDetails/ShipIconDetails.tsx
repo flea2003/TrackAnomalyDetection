@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import "../../styles/shipIconDetails.css";
-import { computeTimeDifference } from "../../utils/TimeUtilities";
+import TimeUtilities from "../../utils/TimeUtilities";
 interface ShipIconDetailsType {
   show: boolean;
   x: number;
@@ -35,7 +35,7 @@ const ShipIconDetails = (props: ShipIconDetailsType) => {
         </div>
         <div>
           <strong>Lag: </strong>
-          {computeTimeDifference(props.shipDetails.timestamp)}
+          {TimeUtilities.computeTimeDifference(props.shipDetails.timestamp)}
         </div>
       </div>
     );
