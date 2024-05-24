@@ -17,13 +17,23 @@ backend_tests:
     - chmod +x ./gradlew
   script:
     - ./gradlew test jacocoTestReport
-    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%"
-  coverage: /([0-9]{1,3})%/
+  artifacts:
+    when: always
+    paths:
+      - backend/build/test-results/test/**/TEST-*.xml
+      - backend/build/reports/jacoco/test/cobertura-jacocoTestReport.xml
+      - backend/build/reports/jacoco/test/html/index.html
+    reports:
+      junit: backend/build/test-results/test/**/TEST-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: backend/build/reports/jacoco/test/cobertura-jacocoTestReport.xml
+
 
 backend_mutation_testing:
   stage: test
   image: gradle:8.7.0-jdk17
-  needs: ["backend_tests"]
+  needs: ["backend_build"]
   before_script:
     - cd backend
     - chmod +x ./gradlew
@@ -47,7 +57,25 @@ backend_pmd_static_analysis:
   image: gradle:8.7.0-jdk17
   needs: ["backend_build"]
   before_script:
-    - cd simulator
+    - cd backend
     - chmod +x ./gradlew
   script:
     - ./gradlew pmdMain
+
+backend_statement_coverage:
+  stage: collect_coverage
+  image: gradle:8.7.0-jdk17
+  needs: ["backend_tests"]
+  before_script: cd backend
+  script:
+    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%"
+  coverage: /([0-9]{1,3})%/
+
+backend_branch_coverage:
+  stage: collect_coverage
+  image: gradle:8.7.0-jdk17
+  needs: ["backend_tests"]
+  before_script: cd backend
+  script:
+    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%"
+  coverage: /([0-9]{1,3})%/

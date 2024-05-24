@@ -77,7 +77,8 @@
   "jest": {
     "coverageReporters": [
       "lcov",
-      "text"
+      "text",
+      "cobertura"
     ],
     "coverageThreshold": {
       "global": {
