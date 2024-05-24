@@ -4,6 +4,7 @@ class ShipDetails {
   heading: number;
   lat: number;
   lng: number;
+  timestamp: string;
   anomalyScore: number;
   explanation: string;
   maxAnomalyScore: number;
@@ -17,6 +18,7 @@ class ShipDetails {
     heading: number,
     lat: number,
     lng: number,
+    timestamp: string,
     anomalyScore: number,
     description: string,
     maxAnomalyScore: number,
@@ -29,6 +31,7 @@ class ShipDetails {
     this.heading = heading;
     this.lat = lat;
     this.lng = lng;
+    this.timestamp = timestamp;
     this.anomalyScore = anomalyScore;
     this.explanation = description;
     this.maxAnomalyScore = maxAnomalyScore;
@@ -48,6 +51,8 @@ class ShipDetails {
     return [
       { type: "Ship ID", value: this.id.toString() },
       { type: "Explanation", value: this.explanation },
+      { type: "AIS signal received",
+        value: this.timestamp },
       {
         type: "Highest Recorded Anomaly Score",
         value: this.maxAnomalyScore.toString() + "%",

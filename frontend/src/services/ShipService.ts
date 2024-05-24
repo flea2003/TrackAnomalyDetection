@@ -1,3 +1,4 @@
+
 // Create a class to get ship information from the server
 import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";
@@ -35,7 +36,6 @@ class ShipService {
     if (responseWithoutNulls.length !== response.length) {
       ErrorNotificationService.addError("Ship array contained null items");
     }
-
     return ShipService.sortList(
       responseWithoutNulls.map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,6 +64,7 @@ class ShipService {
         0,
         0,
         0,
+        item.currentAnomalyInformation.correspondingTimestamp,
         item.currentAnomalyInformation.score,
         item.currentAnomalyInformation.explanation,
         item.maxAnomalyScoreInfo.maxAnomalyScore,
@@ -82,6 +83,7 @@ class ShipService {
         item.currentAISSignal.heading,
         item.currentAISSignal.latitude,
         item.currentAISSignal.longitude,
+        item.currentAISSignal.timestamp,
         -1,
         "Information not available (yet)",
         0,
@@ -96,6 +98,7 @@ class ShipService {
         item.currentAISSignal.heading,
         item.currentAISSignal.latitude,
         item.currentAISSignal.longitude,
+        item.currentAISSignal.timestamp,
         item.currentAnomalyInformation.score,
         item.currentAnomalyInformation.explanation,
         item.maxAnomalyScoreInfo.maxAnomalyScore,
