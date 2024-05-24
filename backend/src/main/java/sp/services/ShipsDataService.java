@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
+import sp.exceptions.PipelineStartingException;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class ShipsDataService {
      * @return CurrentShipDetails instance encapsulating the current extensive information of a ship
      */
     public CurrentShipDetails getIndividualCurrentShipDetails(Long shipId)
-            throws NotExistingShipException, PipelineException {
+            throws NotExistingShipException, PipelineException, PipelineStartingException {
         CurrentShipDetails anomalyInfo = anomalyDetectionPipeline.getCurrentShipDetails().get(shipId);
         if (anomalyInfo == null) {
             throw new NotExistingShipException("Couldn't find such ship.");
@@ -48,7 +49,7 @@ public class ShipsDataService {
      *
      * @return the CurrentShipDetails instances corresponding to all ships
      */
-    public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException {
+    public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException, PipelineStartingException {
         HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getCurrentShipDetails();
         return shipsInfo.values().stream().toList();
     }

@@ -5,6 +5,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.errors.InvalidStateStoreException;
+import org.apache.kafka.streams.errors.StreamsNotStartedException;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
@@ -12,6 +14,7 @@ import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.PipelineException;
+import sp.exceptions.PipelineStartingException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
@@ -112,7 +115,7 @@ public class AnomalyDetectionPipeline {
      *
      * @return the current and max scores of the ships in the system.
      */
-    public HashMap<Long, CurrentShipDetails> getCurrentShipDetails() throws PipelineException {
+    public HashMap<Long, CurrentShipDetails> getCurrentShipDetails() throws PipelineException, PipelineStartingException {
         try {
             // Get the current state of the KTable
             final String storeName = this.state.queryableStoreName();
@@ -127,11 +130,10 @@ public class AnomalyDetectionPipeline {
                         .put(kv.key, kv.value));
             }
             return stateCopy;
-
-        } catch (Exception e) {
-            String err = "Failed to query store: " + e.getMessage() + ", continuing";
-            System.out.println(err);
-            throw new PipelineException(err);
+        } catch (StreamsNotStartedException e) {
+            throw new PipelineStartingException("The pipeline has not yet started");
+        } catch (InvalidStateStoreException e) {
+            throw new PipelineException("Error while querying the state store");
         }
     }
 }
