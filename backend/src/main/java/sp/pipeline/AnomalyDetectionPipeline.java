@@ -345,7 +345,7 @@ public class AnomalyDetectionPipeline {
      * signal (which in our case is wrapped in CurrentShipDetails for optimization purposes for retrieving AIS signal).
      *
      */
-    public void buildNotificationPart() throws IOException {
+    private void buildNotificationPart() throws IOException {
         // Construct a stream for computed AnomalyInformation objects
         KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
         /*

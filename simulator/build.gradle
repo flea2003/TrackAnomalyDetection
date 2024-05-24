@@ -4,6 +4,7 @@ plugins {
     id 'info.solidsoft.pitest' version '1.15.0'
     id 'jacoco'
     id 'pmd'
+    id 'net.razvan.jacoco-to-cobertura' version '1.2.0'
 }
 
 group = 'org.example'
@@ -71,6 +72,8 @@ jacocoTestReport {
         xml.required = true
         html.required = true
     }
+
+    finalizedBy(jacocoToCobertura)
 }
 
 pmd {
