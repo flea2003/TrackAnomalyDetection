@@ -66,7 +66,7 @@ function App() {
           setShips(shipsArray);
         },
       );
-    }, 1000);
+    }, 1000000);
   }, []);
 
   // Every 1s update the notifications by querying the server
@@ -78,7 +78,7 @@ function App() {
          // setShips(shipsArray);
         },
       );
-    }, 1000);
+    }, 10000);
   }, []);
 
   // Return the main view of the application

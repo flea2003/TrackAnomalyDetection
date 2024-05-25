@@ -1,11 +1,34 @@
 import React from "react";
 import ShipNotification from "../model/ShipNotification";
 import HttpSender from "../utils/HttpSender";
-import ErrorNotificationService from "./ErrorNotificationService";
+import ErrorNotificationService, { ErrorNotification, ErrorSeverity } from "./ErrorNotificationService";
 import APIResponseItem from "../templates/APIResponseItem";
+import NotificationResponseItem from "../templates/NotificationResponseItem";
+import errorSymbol from "../assets/icons/error-notifications/error.svg";
+import warningSymbol from "../assets/icons/error-notifications/warning.svg";
+import infoSymbol from "../assets/icons/error-notifications/info.svg";
+import notificationResponseItem from "../templates/NotificationResponseItem";
+
+export class ShipNotificationCompact {
+
+  readonly id: number;
+  readonly shipID: number;
+  readonly message: string;
+  wasRead: boolean;
+
+  constructor(id: number, shipID: number, message: string, wasRead = false) {
+    this.id = id;
+    this.shipID = shipID;
+    this.message = message;
+    this.wasRead = wasRead;
+  }
+}
+
 
 export class ShipsNotificationService {
   static notificationsEndpoint = "/notifications"
+  private static notifications: ShipNotificationCompact[] = [];
+
 
   static queryBackendForNotificationsArray: () => Promise<ShipNotification[]> = async () => {
     const response = await HttpSender.get(
@@ -30,7 +53,7 @@ export class ShipsNotificationService {
     return ShipsNotificationService.sortList(
       responseWithoutNulls.map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (item: any) => ShipsNotificationService.extractCurrentShipDetails(item),
+        (item: any) => ShipsNotificationService.extractNotificationDetails(item),
       ),
       "desc",
     );
@@ -42,60 +65,45 @@ export class ShipsNotificationService {
    * @param item - the received JSON object
    * @return - dummy ShipDetails object
    */
-  static extractCurrentShipDetails: (item: APIResponseItem) => ShipNotification = (
+  static extractNotificationDetails: (item: NotificationResponseItem) => ShipNotification = (
     item,
   ) => {
-    if (
-      !item.currentAISSignal &&
-      item.currentAnomalyInformation &&
-      item.maxAnomalyScoreInfo
-    ) {
-      return new ShipNotification(
-        item.currentAnomalyInformation.id,
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    ShipNotification
+    const notification = new ShipNotification(
+      item.id,
+      item.shipID,
+      0,
+      0,
+      0,
+      item.currentShipDetails.currentAnomalyInformation.score,
+      item.currentShipDetails.currentAnomalyInformation.explanation,
+      item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
+      item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
+      "CIUJU KAD PAEJO",
+      0,
+      0
+    );
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    ShipsNotificationService.notifications.push(notification);
+
+    return new ShipNotification(
+        item.id,
+        item.shipID,
         0,
         0,
         0,
-        item.currentAnomalyInformation.score,
-        item.currentAnomalyInformation.explanation,
-        item.maxAnomalyScoreInfo.maxAnomalyScore,
-        item.maxAnomalyScoreInfo.correspondingTimestamp,
-        "Information not available (yet)",
+        item.currentShipDetails.currentAnomalyInformation.score,
+        item.currentShipDetails.currentAnomalyInformation.explanation,
+        item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
+        item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
+        "CIUJU KAD PAEJO",
         0,
         0,
       );
-    }
-    if (
-      item.currentAISSignal &&
-      (!item.currentAnomalyInformation || !item.maxAnomalyScoreInfo)
-    ) {
-      return new ShipNotification(
-        item.currentAISSignal.id,
-        item.currentAISSignal.heading,
-        item.currentAISSignal.latitude,
-        item.currentAISSignal.longitude,
-        -1,
-        "Information not available (yet)",
-        0,
-        "Information not available (yet)",
-        item.currentAISSignal.departurePort,
-        item.currentAISSignal.course,
-        item.currentAISSignal.speed,
-      );
-    } else {
-      return new ShipNotification(
-        item.currentAISSignal.id,
-        item.currentAISSignal.heading,
-        item.currentAISSignal.latitude,
-        item.currentAISSignal.longitude,
-        item.currentAnomalyInformation.score,
-        item.currentAnomalyInformation.explanation,
-        item.maxAnomalyScoreInfo.maxAnomalyScore,
-        item.maxAnomalyScoreInfo.correspondingTimestamp,
-        item.currentAISSignal.departurePort,
-        item.currentAISSignal.course,
-        item.currentAISSignal.speed,
-      );
-    }
   };
 
   /**
@@ -128,6 +136,11 @@ export class ShipsNotificationService {
     }
     return sortedList;
   };
+
+
+  static getAllNotifications() {
+    return this.notifications.slice();
+  }
 }
 
 export default ShipNotification;
