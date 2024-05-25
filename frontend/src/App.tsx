@@ -9,6 +9,8 @@ import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
 import Side from "./components/Side/Side";
+import { ShipsNotificationService } from "./services/ShipsNotificationService";
+import ShipNotification from "./model/ShipNotification";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -62,6 +64,18 @@ function App() {
       ShipService.queryBackendForShipsArray().then(
         (shipsArray: ShipDetails[]) => {
           setShips(shipsArray);
+        },
+      );
+    }, 1000);
+  }, []);
+
+  // Every 1s update the notifications by querying the server
+  useEffect(() => {
+    setInterval(() => {
+      // Query for ships. When the results arrive, update the state
+      ShipsNotificationService.queryBackendForNotificationsArray().then(
+        (shipsArray: ShipNotification[]) => {
+         // setShips(shipsArray);
         },
       );
     }, 1000);
