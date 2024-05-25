@@ -1,10 +1,10 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.harvesineDistance;
+
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
 import java.time.Duration;
-
-import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.harvesineDistance;
 
 public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
 
