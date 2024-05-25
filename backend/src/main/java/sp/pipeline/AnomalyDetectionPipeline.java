@@ -35,6 +35,8 @@ import sp.model.ShipInformation;
 import sp.pipeline.aggregators.CurrentStateAggregator;
 import sp.pipeline.aggregators.NotificationsAggregator;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
+import sp.services.WebSocketShipDataService;
+
 import java.util.Objects;
 
 @Service
@@ -56,6 +58,7 @@ public class AnomalyDetectionPipeline {
     private final StreamUtils streamUtils;
     private final CurrentStateAggregator currentStateAggregator;
     private final NotificationsAggregator notificationsAggregator;
+    private final WebSocketShipDataService webSocketShipDataService;
 
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
@@ -70,13 +73,15 @@ public class AnomalyDetectionPipeline {
     @Autowired
     public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy,
                                     StreamUtils streamUtils, CurrentStateAggregator currentStateAggregator,
-                                    NotificationsAggregator notificationsAggregator)
+                                    NotificationsAggregator notificationsAggregator,
+                                    WebSocketShipDataService webSocketShipDataService)
         throws IOException {
 
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.streamUtils = streamUtils;
         this.currentStateAggregator = currentStateAggregator;
         this.notificationsAggregator = notificationsAggregator;
+        this.webSocketShipDataService = webSocketShipDataService;
 
         loadParametersFromConfigFile();
         buildPipeline();
@@ -226,8 +231,13 @@ public class AnomalyDetectionPipeline {
                         CurrentShipDetails::new,
                         (key, valueJson, aggregatedShipDetails) -> {
                             try {
-                                return currentStateAggregator.aggregateSignals(aggregatedShipDetails, valueJson);
-                            } catch (JsonProcessingException e) {
+                                CurrentShipDetails newShipState =
+                                        currentStateAggregator.aggregateSignals(aggregatedShipDetails, valueJson);
+                                // Publish the new CurrentShipDetails state to the clients
+                                // Message is forwarded to the client side only if an WebSocket connection is open
+                                this.webSocketShipDataService.sendCurrentShipDetails(newShipState);
+                                return newShipState;
+                            } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
                         },

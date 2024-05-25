@@ -1,17 +1,15 @@
 package sp.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import sp.model.CurrentShipDetails;
 
 @Controller
 public class WebSocketController {
-    private WebSocketHandler webSocketHandler;
-
-    @Autowired
-    public WebSocketController(WebSocketHandler webSocketHandler) {
-        this.webSocketHandler = webSocketHandler;
+    @MessageMapping("/currentShipDetails")
+    @SendTo("/topic/details")
+    public CurrentShipDetails sendCurrentShipDetails(CurrentShipDetails currentShipDetails) {
+        return currentShipDetails;
     }
-
-
-
 }
