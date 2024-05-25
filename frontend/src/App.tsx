@@ -1,14 +1,15 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 import { useState, useEffect } from "react";
-import Map from "./components/Map/Map";
+import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
 import ShipService from "./services/ShipService";
-import { MapExportedMethodsType } from "./components/Map/Map";
+import { MapExportedMethodsType } from "./components/Map/LMap";
 import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
 import Side from "./components/Side/Side";
+import APIResponseItem from "./templates/APIResponseItem";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -53,94 +54,66 @@ function App() {
   };
 
   // Put the ships as state
-  const [ships, setShips] = useState<ShipDetails[]>([]);
-  const middleColumn = () => {
-    switch (currentPage.currentPage) {
-      case "anomalyList":
-        return (
-          <AnomalyList
-            ships={Array.from(shipsWS.values())}
-            pageChanger={pageChanger}
-            mapCenteringFun={mapCenteringFun}
-          />
-        );
-      case "objectDetails":
-        return (
-          <ObjectDetails
-            ships={Array.from(shipsWS.values())}
-            shipId={currentPage.shownShipId}
-            pageChanger={pageChanger}
-          />
-        );
-      case "notifications":
-        return <div>Notifications</div>;
-      case "settings":
-        return <div>Settings</div>;
-      case "none":
-        return <div></div>;
-    }
-  };
+  const [ships, setShips] = useState<Map<number, ShipDetails>>(new Map());
 
-  // // Put the ships as state
-  // const [ships, setShips] = useState<ShipDetails[]>([]);
-  //
-  // // Every 1s update the anomaly score of all ships by querying the server
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     // Query for ships. When the results arrive, update the state
-  //     ShipService.queryBackendForShipsArray().then(
-  //       (shipsArray: ShipDetails[]) => {
-  //         setShips(shipsArray);
-  //       },
-  //     );
-  //   }, 1000);
-  // }, []);
-
-  const [shipsWS, setShipsWS] = useState<Map<number, ShipDetails>>(new Map());
+  // Leveraging the useEffect hook we fetch the latest state of the
+  // backend table storing ship details whenever the main App component
+  // is mounted or updated
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8081/ws');
+    // Query for ship data in the backend
+    ShipService.queryBackendForShipsArray().then(
+      (shipsArray: ShipDetails[]) => {
+        setShips(ShipService.constructMap(shipsArray));
+      },
+    );
+  }, []);
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:8081/ws");
 
     socket.onmessage = (event) => {
       try {
-        const message = JSON.parse(event.data) as ShipDetails;
-        setShipsWS((prevShips) => {
+        const apiResponse = JSON.parse(event.data) as APIResponseItem;
+        const shipDetails = ShipService.extractCurrentShipDetails(apiResponse);
+        setShips((prevShips) => {
           const updatedShipsMap: Map<number, ShipDetails> = new Map(prevShips);
-          updatedShipsMap.set(message.id, message);
+          updatedShipsMap.set(shipDetails.id, shipDetails);
           return updatedShipsMap;
         });
-
       } catch (error) {
-        console.log(error);
+        ErrorNotificationService.addError("WebSocket connection error");
       }
-    }
+    };
 
     socket.onopen = () => {
-      console.log("WebSocket connection openned");
-    }
+      console.log("WebSocket connection opened");
+    };
 
     socket.onclose = () => {
-      console.log("WebSocket connection closed");
-    }
+      ErrorNotificationService.addError("WebSocket connection closed");
+    };
 
     socket.onerror = (error) => {
-      console.log("Websocket connection error", error);
-    }
+      ErrorNotificationService.addError("WebSocket connection error");
+    };
 
     return () => {
       socket.close();
-    }
-
+    };
   }, []);
-
 
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
       <Stack direction="row">
-        <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
+        <LMap
+          ships={ShipService.sortList(Array.from(ships.values()), "desc")}
+          pageChanger={pageChanger}
+          ref={mapRef}
+        />
         <Side
           currentPage={currentPage}
-          ships={ships}
+          ships={ShipService.sortList(Array.from(ships.values()), "desc")}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}
         />

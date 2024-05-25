@@ -68,7 +68,7 @@ interface ShipIconDetailsType {
  * @param ships the ships to display on the map
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
-const Map = forwardRef<MapExportedMethodsType, MapProps>(
+const LMap = forwardRef<MapExportedMethodsType, MapProps>(
   ({ ships, pageChanger }, ref) => {
     // Initialize the map as state, since we want to have a single instance
     const [map, setMap] = useState<L.Map | null>(null);
@@ -207,7 +207,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
 );
 
 // Needed for Lint to work (React itself does not require this)
-Map.displayName = "Map";
+LMap.displayName = "Map";
 
-export default Map;
+export default LMap;
 export type { MapExportedMethodsType };

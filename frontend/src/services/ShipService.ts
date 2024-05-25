@@ -139,6 +139,21 @@ class ShipService {
     }
     return sortedList;
   };
+
+  /**
+   * Utility method for constructing a map representation of the ShipDetails array.
+   * @param shipDetailsArray - ShipDetails array encapsulating the information fetched from the backend
+   */
+  static constructMap: (
+    shipDetailsArray: ShipDetails[],
+  ) => Map<number, ShipDetails> = (shipDetailsArray) => {
+    const initialMap = new Map<number, ShipDetails>();
+    for (let i = 0; i < shipDetailsArray.length; i++) {
+      const shipDetailsInstance = shipDetailsArray[i];
+      initialMap.set(shipDetailsInstance.id, shipDetailsInstance);
+    }
+    return initialMap;
+  };
 }
 
 export default ShipService;
