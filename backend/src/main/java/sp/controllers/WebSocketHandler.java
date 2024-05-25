@@ -6,7 +6,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import sp.model.CurrentShipDetails;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +13,7 @@ import java.util.Set;
 @Service
 public class WebSocketHandler extends TextWebSocketHandler {
 
-    private final static Set<WebSocketSession> sessions = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<WebSocketSession> sessions = Collections.synchronizedSet(new HashSet<>());
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -26,6 +25,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         sessions.remove(session);
     }
 
+    /**
+     * Method responsible for sending messages to all frontend clients.
+     *
+     * @param currentShipDetails - the CurrentShipDetails instance forwarded to the frontend
+     */
     public void sendShipDetailsToAllClients(CurrentShipDetails currentShipDetails) {
         synchronized (sessions) {
             for (WebSocketSession session : sessions) {
