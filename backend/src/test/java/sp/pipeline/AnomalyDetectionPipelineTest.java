@@ -3,10 +3,10 @@ package sp.pipeline;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
+import sp.pipeline.scorecalculators.SimpleScoreCalculator;
 import sp.pipeline.aggregators.CurrentStateAggregator;
 import sp.pipeline.aggregators.NotificationsAggregator;
-import sp.pipeline.scorecalculators.DefaultScoreCalculator;
-import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 import sp.services.NotificationService;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ class AnomalyDetectionPipelineTest {
 
     @Test
     void successfulLoad() throws Exception {
-        ScoreCalculationStrategy scoreCalculationStrategy = new DefaultScoreCalculator();
+        ScoreCalculationStrategy scoreCalculationStrategy = new SimpleScoreCalculator();
         StreamUtils streamUtils = new StreamUtils("kafka-connection.properties");
         CurrentStateAggregator currentStateAggregator = new CurrentStateAggregator();
         AnomalyDetectionPipeline pipeline = new AnomalyDetectionPipeline(
@@ -32,7 +32,7 @@ class AnomalyDetectionPipelineTest {
 
     @Test
     void loadConfigIOException() throws IOException {
-        ScoreCalculationStrategy scoreCalculationStrategy = new DefaultScoreCalculator();
+        ScoreCalculationStrategy scoreCalculationStrategy = new SimpleScoreCalculator();
         StreamUtils streamUtils = mock(StreamUtils.class);
 
         when(streamUtils.loadConfig()).thenThrow(new IOException());
@@ -44,7 +44,7 @@ class AnomalyDetectionPipelineTest {
 
     @Test
     void loadConfigNull() throws IOException {
-        ScoreCalculationStrategy scoreCalculationStrategy = new DefaultScoreCalculator();
+        ScoreCalculationStrategy scoreCalculationStrategy = new SimpleScoreCalculator();
         StreamUtils streamUtils = mock(StreamUtils.class);
 
         when(streamUtils.loadConfig()).thenReturn(null);

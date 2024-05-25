@@ -108,6 +108,9 @@ public class TurningStatefulMapFunctionTest {
         assertThat(anomalies.size()).isEqualTo(1);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
         assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
+
+        // Check that heading in AISSignal was fixed (changed to course)
+        assertThat(aisSignal1.getHeading()).isEqualTo(20);
     }
 
 }

@@ -41,15 +41,11 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      *     heuristics, and false otherwise.
      */
     public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) {
-        double globeDistance = harvesineDistance(value.getLatitude(), value.getLongitude(),
-                pastAISSignal.getLatitude(), pastAISSignal.getLongitude());
-        double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
-
-        double computedSpeed = globeDistance / (time + 0.00001);
-        double reportedSpeedDifference = Math.abs(value.getSpeed() - computedSpeed);
-        double computedAcceleration = (value.getSpeed() - pastAISSignal.getSpeed()) / (time + 0.00001);
-
-        return isAnomaly(computedSpeed, reportedSpeedDifference, computedAcceleration);
+        return isAnomaly(
+                computeSpeed(value, pastAISSignal),
+                getReportedSpeedDifference(value, pastAISSignal),
+                calculateAcceleration(value, pastAISSignal)
+        );
     }
 
     /**
@@ -68,5 +64,57 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         boolean accelerationIsLow = (computedAcceleration < 50);
 
         return !speedIsLow || !reportedSpeedIsAccurate || !accelerationIsLow;
+    }
+
+    /**
+     * Computes speed by taking the distance travelled between two AIS signals.
+     *
+     * @param value the current AIS signal
+     * @param pastAISSignal the past AIS signal
+     * @return the speed computed based on these two signals
+     */
+    public double computeSpeed(AISSignal value, AISSignal pastAISSignal) {
+        double globeDistance = harvesineDistance(
+                value.getLatitude(), value.getLongitude(),
+                pastAISSignal.getLatitude(), pastAISSignal.getLongitude()
+        );
+        double time = getTimeDifference(value, pastAISSignal);
+
+        return globeDistance / (time + 0.00001);
+    }
+
+    /**
+     * Calculates the absolute difference between the reported speed in the AIS signal and the
+     * calculated speed (using the previous signal).
+     *
+     * @param value the current AIS signal
+     * @param pastValue the previous AIS signal
+     * @return the difference between reported speed and the calculated speed
+     */
+    public double getReportedSpeedDifference(AISSignal value, AISSignal pastValue) {
+        return Math.abs(value.getSpeed() - computeSpeed(pastValue, value));
+    }
+
+    /**
+     * Calculate the time difference between two AIS signals.
+     *
+     * @param value the current AIS signal
+     * @param pastAISSignal the previous AIS signal
+     * @return the difference between two signals
+     */
+    public double getTimeDifference(AISSignal value, AISSignal pastAISSignal) {
+        return Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
+    }
+
+    /**
+     * Calculates acceleration based on the data in two consecutive AIS signals.
+     *
+     * @param value the current AIS signal
+     * @param pastAISSignal the previous AIS signal
+     * @return the computed acceleration
+     */
+    public double calculateAcceleration(AISSignal value, AISSignal pastAISSignal) {
+        double time = getTimeDifference(value, pastAISSignal);
+        return (value.getSpeed() - pastAISSignal.getSpeed()) / (time + 0.00001);
     }
 }
