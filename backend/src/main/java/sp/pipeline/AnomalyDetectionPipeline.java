@@ -30,13 +30,16 @@ import sp.dtos.ExternalAISSignal;
 import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
+import sp.model.Notification;
 import sp.model.ShipInformation;
+import sp.pipeline.aggregators.CurrentStateAggregator;
+import sp.pipeline.aggregators.NotificationsAggregator;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
 import java.util.Objects;
 
 @Service
 public class AnomalyDetectionPipeline {
-
+    private static final String KAFKA_STORE_NOTIFICATIONS_NAME = "ships-notification-store";
     private static final String RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais-raw.topic.name";
     private static final String INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais.topic.name";
     private static final String CALCULATED_SCORES_TOPIC_NAME_PROPERTY = "calculated.scores.topic.name";
@@ -49,14 +52,15 @@ public class AnomalyDetectionPipeline {
     private String kafkaServerAddress;
     private String kafkaStoreName;
 
-
     private final ScoreCalculationStrategy scoreCalculationStrategy;
     private final StreamUtils streamUtils;
-    private final Aggregator aggregator;
+    private final CurrentStateAggregator currentStateAggregator;
+    private final NotificationsAggregator notificationsAggregator;
 
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
     private KTable<Long, CurrentShipDetails> state;
+
 
     /**
      * Constructor for the AnomalyDetectionPipeline.
@@ -65,11 +69,14 @@ public class AnomalyDetectionPipeline {
      */
     @Autowired
     public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy,
-                StreamUtils streamUtils, Aggregator aggregator) throws IOException {
+                                    StreamUtils streamUtils, CurrentStateAggregator currentStateAggregator,
+                                    NotificationsAggregator notificationsAggregator)
+        throws IOException {
 
         this.scoreCalculationStrategy = scoreCalculationStrategy;
         this.streamUtils = streamUtils;
-        this.aggregator = aggregator;
+        this.currentStateAggregator = currentStateAggregator;
+        this.notificationsAggregator = notificationsAggregator;
 
         loadParametersFromConfigFile();
         buildPipeline();
@@ -107,11 +114,17 @@ public class AnomalyDetectionPipeline {
      */
     private void buildPipeline() throws IOException {
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+        // Create a keyed Kafka Stream of incoming AnomalyInformation signals
+        StreamsBuilder builder = new StreamsBuilder();
 
-        // Build the pipeline
         DataStream<AISSignal> streamWithAssignedIds = buildIdAssignmentPart();
+
         buildScoreCalculationPart(streamWithAssignedIds);
-        buildScoreAggregationPart();
+        buildScoreAggregationPart(builder);
+        buildNotificationPart();
+
+        this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
+        this.kafkaStreams.cleanUp();
     }
 
     /**
@@ -195,9 +208,7 @@ public class AnomalyDetectionPipeline {
      * anomaly score field in the corresponding places.
      * </p>
      */
-    private void buildScoreAggregationPart() throws IOException {
-        StreamsBuilder builder = new StreamsBuilder();
-
+    private void buildScoreAggregationPart(StreamsBuilder builder) {
         // Construct and merge two streams and select the ship hash as a key for the new stream.
         KStream<Long, ShipInformation> mergedStream = mergeStreams(builder);
 
@@ -215,7 +226,7 @@ public class AnomalyDetectionPipeline {
                         CurrentShipDetails::new,
                         (key, valueJson, aggregatedShipDetails) -> {
                             try {
-                                return aggregator.aggregateSignals(aggregatedShipDetails, valueJson);
+                                return currentStateAggregator.aggregateSignals(aggregatedShipDetails, valueJson);
                             } catch (JsonProcessingException e) {
                                 throw new RuntimeException(e);
                             }
@@ -227,8 +238,6 @@ public class AnomalyDetectionPipeline {
 
         builder.build();
         this.state = table;
-        this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
-        this.kafkaStreams.cleanUp();
     }
 
     /**
@@ -324,6 +333,56 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
+     * Notification pipeline building part. The idea is the following: there is a database, where all notifications are
+     * stored. When backend restarts, a state (which is actually the notifications Kafka table) queries the
+     * notificationsService class, and for each ship, its last notification is retrieved as the initial state
+     * Notification object. Then, a stream of updates from the KafkaTable which stores the current state is retrieved:
+     * it contains a stream of updates that happen in that table. Then, the stateful mapping part is responsible for the
+     * logic of computing when a new notification should be created, and once it has to be created, querying the
+     * notificationService class, which handles it. It then also updates the most recent notification that is stored for
+     * that particular ship. Note that to decide whether a new notification for a particular ship should be created, it
+     * is enough to have the information of the most recent notification for that ship, and a new AnomalyInformation
+     * signal (which in our case is wrapped in CurrentShipDetails for optimization purposes for retrieving AIS signal).
+     *
+     */
+    private void buildNotificationPart() throws IOException {
+        // Construct a stream for computed AnomalyInformation objects
+        KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
+        /*
+        // Use the following code for easier testing (and also comment out the first line in the method)
+
+        KStream<Long, String> firstStream = builder.stream(calculatedScoresTopicName);
+        KStream<Long, AnomalyInformation> second = firstStream.mapValues(x -> {try { return AnomalyInformation
+        .fromJson(x); } catch (JsonProcessingException e) {  throw new RuntimeException(e); }  });
+        KStream<Long, AnomalyInformation> third = second.selectKey((key, value) -> value.getId());
+        KStream<Long, CurrentShipDetails> streamOfUpdates = third.mapValues(x -> new CurrentShipDetails(x, null));
+        */
+        // Construct the KTable (state that is stored) by aggregating the merged stream
+        streamOfUpdates
+            .mapValues(x -> {
+                try {
+                    return x.toJson();
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .groupByKey()
+            .aggregate(
+                Notification::new,
+                (key, valueJson, lastInformation) -> {
+                    try {
+                        return notificationsAggregator.aggregateSignals(lastInformation, valueJson, key);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                Materialized
+                        .<Long, Notification, KeyValueStore<Bytes, byte[]>>as(KAFKA_STORE_NOTIFICATIONS_NAME)
+                        .withValueSerde(Notification.getSerde())
+            );
+    }
+
+    /**
      * Method that constructs a unified stream of AnomalyInformation and AISSignal instances,
      * wrapped inside a ShipInformation class.
      *
@@ -339,6 +398,6 @@ public class AnomalyDetectionPipeline {
         // Merge two streams and select the ship hash as a key for the new stream.
         return streamAISSignals
                 .merge(streamAnomalyInformation)
-                .selectKey((key, value) -> value.getId());
+                .selectKey((key, value) -> value.getShipId());
     }
 }

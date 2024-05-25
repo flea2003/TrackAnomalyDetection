@@ -1,3 +1,13 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		mavenLocal()
+		//Needed only for SNAPSHOT versions
+		//maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+	}
+}
+
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.5'
@@ -6,6 +16,7 @@ plugins {
 	id 'pmd'
 	id 'jacoco'
 	id 'info.solidsoft.pitest' version '1.15.0'
+	id 'net.razvan.jacoco-to-cobertura' version '1.2.0'
 
 	// For Flink
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -116,9 +127,12 @@ dependencies {
 	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.7.0'
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
 
+	// For JPA:
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.h2database:h2'
+
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
-
 }
 
 // For Flink
@@ -164,6 +178,8 @@ jacocoTestReport {
 		xml.required = true
 		html.required = true
 	}
+
+	finalizedBy(jacocoToCobertura)
 }
 
 pitest {

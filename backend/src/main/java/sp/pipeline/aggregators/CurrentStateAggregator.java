@@ -1,4 +1,4 @@
-package sp.pipeline;
+package sp.pipeline.aggregators;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import sp.model.ShipInformation;
 import java.time.OffsetDateTime;
 
 @Service
-public class Aggregator {
+public class CurrentStateAggregator {
 
     /**
      * Aggregates data to a resulting map.
