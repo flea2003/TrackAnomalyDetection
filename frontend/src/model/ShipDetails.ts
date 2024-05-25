@@ -1,11 +1,16 @@
+import TimeUtilities from "../utils/TimeUtilities";
+
 class ShipDetails {
   static rounding = 1000;
   id: number;
   heading: number;
   lat: number;
   lng: number;
+  timestamp: string;
   anomalyScore: number;
   explanation: string;
+  maxAnomalyScore: number;
+  correspondingTimestamp: string;
   departurePort: string;
   course: number;
   speed: number;
@@ -15,8 +20,11 @@ class ShipDetails {
     heading: number,
     lat: number,
     lng: number,
+    timestamp: string,
     anomalyScore: number,
-    explanation: string,
+    description: string,
+    maxAnomalyScore: number,
+    correspondingTimestamp: string,
     departurePort: string,
     course: number,
     speed: number,
@@ -25,8 +33,11 @@ class ShipDetails {
     this.heading = heading;
     this.lat = lat;
     this.lng = lng;
+    this.timestamp = timestamp;
     this.anomalyScore = anomalyScore;
-    this.explanation = explanation;
+    this.explanation = description;
+    this.maxAnomalyScore = maxAnomalyScore;
+    this.correspondingTimestamp = correspondingTimestamp;
     this.departurePort = departurePort;
     this.course = course;
     this.speed = speed;
@@ -40,28 +51,52 @@ class ShipDetails {
    */
   getPropertyList() {
     return [
-      { type: "Object type", value: "Ship" },
-      { type: "Anomaly score", value: this.anomalyScore + "%" },
+      { type: "Ship ID", value: this.id.toString() },
       { type: "Explanation", value: this.explanation },
-      { type: "Heading", value: "" + this.heading },
-      { type: "Departure Port", value: "" + this.departurePort },
-      { type: "Course", value: "" + this.course },
-      { type: "Speed", value: "" + this.speed },
       {
-        type: "Latitude",
-        value:
-          "" +
-          Math.round(this.lat * ShipDetails.rounding) / ShipDetails.rounding,
+        type: "Last AIS signal",
+        value: TimeUtilities.computeTimeDifference(this.timestamp) + " ago",
       },
       {
-        type: "Longitude",
-        value:
-          "" +
-          Math.round(this.lng * ShipDetails.rounding) / ShipDetails.rounding,
+        type: "Highest Recorded Anomaly Score",
+        value: this.maxAnomalyScore.toString() + "%",
       },
-      { type: "Heading", value: "" + this.heading },
+      {
+        type: "Timestamp of the Highest Anomaly Score",
+        value: this.correspondingTimestamp,
+      },
+      { type: "Heading", value: this.heading.toString() },
+      { type: "Departure Port", value: this.departurePort },
+      { type: "Course", value: this.course.toString() },
+      {
+        type: "Position",
+        value: this.getPositionString(),
+      },
+      { type: "Speed", value: this.speed.toString() },
     ];
   }
+
+  /**
+   * Utility method for concatenating the latitude and longitude values.
+   */
+  getPositionString() {
+    return roundShipDetail(this.lat) + ", " + roundShipDetail(this.lng);
+  }
+
+  /**
+   * Getter for the anomalyScore field.
+   */
+  getAnomalyScore() {
+    return this.anomalyScore;
+  }
+}
+
+/**
+ * Utility method for processing numerical values.
+ * @param x - numerical value
+ */
+function roundShipDetail(x: number) {
+  return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding;
 }
 
 export default ShipDetails;

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import sp.dtos.ExternalAISSignal;
 import sp.utils.UtilsObjectMapper;
@@ -14,6 +15,7 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -25,7 +27,7 @@ public class AISSignal implements Serializable {
     private final float longitude;
     private final float latitude;
     private final float course;
-    private final float heading;
+    private float heading;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime timestamp;
     private final String departurePort;
@@ -46,12 +48,8 @@ public class AISSignal implements Serializable {
      * @param val string value (in JSON format) that is being converted to an AIS object
      * @return AIS object from a given string
      */
-    public static AISSignal fromJson(String val) {
-        try {
-            return new UtilsObjectMapper().readValue(val, AISSignal.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public static AISSignal fromJson(String val) throws JsonProcessingException {
+        return new UtilsObjectMapper().readValue(val, AISSignal.class);
     }
 
 

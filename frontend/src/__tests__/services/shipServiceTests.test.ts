@@ -1,188 +1,332 @@
-// TODO fix the tests
+import HttpSender from "../../utils/HttpSender";
+import ShipService from "../../services/ShipService";
+import APIResponseItem from "../../templates/APIResponseItem";
+import ShipDetails from "../../model/ShipDetails";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
+import spyOn = jest.spyOn;
 
-test("dummy", () => {
-  expect(2).toBe(2);
+beforeEach(() => {
+  // Make refreshState do nothing, so that it does not print to console.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ErrorNotificationService.refreshState = () => {};
 });
 
-// import '@testing-library/jest-dom';
-// import ShipService from "../../services/ShipService";
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns 2 proper arrays
-// describe("Test successful execution", () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([{
-//               id: "1",
-//               speed: 350.0,
-//               long: 29.0,
-//               lat: 47.0,
-//               course: 90,
-//               departurePort: "p1",
-//               heading: 1,
-//               timestamp: "t1"
-//             }]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([{
-//               id: "1",
-//               anomalyScore: 1
-//             }]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: successful aggregation of the fetched arrays
-//   test("backend-fetching-valid", async () => {
-//     const result = await ShipService.queryBackendForShipsArray();
-//     expect(result.length==1).toBe(true);
-//   });
-// });
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns 2 empty arrays
-// describe('Execution with empty arrays', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-// // TEST: aggregation of empty arrays
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// })
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns a proper array containing the anomaly information of 1 ship
-// // and an empty array corresponding to the AIS signal of that ship
-// describe('Execution with empty AIS array', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([{
-//               id: "1",
-//               anomalyScore: 1
-//             }]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: aggregation with empty AIS array
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// })
-//
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns two proper arrays with AIS and anomaly information
-// // for 2 different ships
-// describe('Execution with un-matching arrays', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([{
-//               id: "1",
-//               speed: 350.0,
-//               long: 29.0,
-//               lat: 47.0,
-//               course: 90,
-//               departurePort: "p1",
-//               heading: 1,
-//               timestamp: "t1"
-//             }]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([{
-//               id: "2",
-//               anomalyScore: 1
-//             }]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: successful aggregation of the fetched arrays with un-matching ships
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// });
-//
-//
-// // Mock the HttpSender static instance of the ShipService class
-// // such that its get() method returns a proper array containing the AIS information of 1 ship
-// // and an empty array corresponding to the anomaly information of that ship
-// describe('Execution with empty AnomalyInfo array', () => {
-//   jest.mock('../../services/ShipService', () => ({
-//     __esModule: true,
-//     default: {
-//       // Necessary for retaining the original queryBackendForShipsArray method
-//       // when creating the mock
-//       ...jest.requireActual('../../services/ShipService').default,
-//       httpSender: {
-//         get: jest.fn((endpoint) => {
-//           if(endpoint === '/ships/ais') {
-//             return Promise.resolve([{
-//               id: "1",
-//               speed: 350.0,
-//               long: 29.0,
-//               lat: 47.0,
-//               course: 90,
-//               departurePort: "p1",
-//               heading: 1,
-//               timestamp: "t1"
-//             }]);
-//           } else if (endpoint === '/ships/anomaly') {
-//             return Promise.resolve([]);
-//           }
-//         })
-//       },
-//     }
-//   }))
-//
-// // TEST: successful aggregation of the fetched arrays with un-matching ships
-//   test("backend-fetching-valid", async () => {
-//     ShipService.queryBackendForShipsArray().
-//     then((result) => {expect(result.length==0).toBe(true)});
-//   });
-// });
+const fakeAPIResponseItem: APIResponseItem = {
+  currentAISSignal: {
+    id: 1,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t1",
+    departurePort: "p1",
+  },
+  currentAnomalyInformation: {
+    id: 1,
+    score: 1,
+    explanation: "explanation",
+    correspondingTimestamp: "t1",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 1,
+    correspondingTimestamp: "t1",
+  },
+};
+
+const fakeAPIResponseItem2: APIResponseItem = {
+  currentAISSignal: {
+    id: 2,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t2",
+    departurePort: "p2",
+  },
+  currentAnomalyInformation: {
+    id: 2,
+    score: 2,
+    explanation: "explanation",
+    correspondingTimestamp: "t2",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 2,
+    correspondingTimestamp: "t2",
+  },
+};
+
+const fakeAPIResponseItem3: APIResponseItem = {
+  currentAISSignal: {
+    id: 3,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t3",
+    departurePort: "p3",
+  },
+  currentAnomalyInformation: {
+    id: 3,
+    score: 0.5,
+    explanation: "explanation",
+    correspondingTimestamp: "t3",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 0.5,
+    correspondingTimestamp: "t3",
+  },
+};
+
+const fakeAPIResItemNoAIS = {
+  currentAnomalyInformation: {
+    id: 1,
+    score: 1,
+    explanation: "explanation",
+    correspondingTimestamp: "t1",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 1,
+    correspondingTimestamp: "t1",
+  },
+};
+
+const fakeAPIResItemNoAnomalyInfo = {
+  currentAISSignal: {
+    id: 1,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t1",
+    departurePort: "p1",
+  },
+};
+
+test("backend-fetching-invalid", async () => {
+  HttpSender.get = jest.fn().mockReturnValue(Promise.resolve([null]));
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([]);
+});
+
+test("backend-fetching-empty-array", async () => {
+  HttpSender.get = jest.fn().mockReturnValue(Promise.resolve([]));
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([]);
+});
+
+test("backend-fetching-invalid-type", async () => {
+  HttpSender.get = jest.fn().mockReturnValue(Promise.resolve("value"));
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([]);
+});
+
+test("backend-fetching-valid-details", async () => {
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(Promise.resolve([fakeAPIResponseItem]));
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+  ]);
+});
+
+test("backend-fetching-null-ais", async () => {
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(Promise.resolve([fakeAPIResItemNoAIS]));
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      1,
+      0,
+      0,
+      0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "Information not available (yet)",
+      0,
+      0,
+    ),
+  ]);
+});
+
+test("backend-fetching-null-anomaly-info", async () => {
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(Promise.resolve([fakeAPIResItemNoAnomalyInfo]));
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      -1,
+      "Information not available (yet)",
+      0,
+      "Information not available (yet)",
+      "p1",
+      90,
+      350.0,
+    ),
+  ]);
+});
+
+test("sorting-valid-list-descending-ascending", async () => {
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(
+      Promise.resolve([
+        fakeAPIResponseItem,
+        fakeAPIResponseItem2,
+        fakeAPIResponseItem3,
+        fakeAPIResponseItem,
+      ]),
+    );
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      2,
+      1,
+      47.0,
+      29.0,
+      "t2",
+      2,
+      "explanation",
+      2,
+      "t2",
+      "p2",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      3,
+      1,
+      47.0,
+      29.0,
+      "t3",
+      0.5,
+      "explanation",
+      0.5,
+      "t3",
+      "p3",
+      90,
+      350.0,
+    ),
+  ]);
+
+  expect(ShipService.sortList(result, "asc")).toStrictEqual([
+    new ShipDetails(
+      3,
+      1,
+      47.0,
+      29.0,
+      "t3",
+      0.5,
+      "explanation",
+      0.5,
+      "t3",
+      "p3",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      2,
+      1,
+      47.0,
+      29.0,
+      "t2",
+      2,
+      "explanation",
+      2,
+      "t2",
+      "p2",
+      90,
+      350.0,
+    ),
+  ]);
+});
+
+test("sorting-invalid-order", () => {
+  const spyOnErrorServiceMethod = spyOn(ErrorNotificationService, "addError");
+  const result = ShipService.sortList([], "order");
+  expect(spyOnErrorServiceMethod).toHaveBeenCalled();
+  expect(result).toStrictEqual([]);
+});

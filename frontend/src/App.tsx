@@ -2,14 +2,13 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import { useState, useEffect } from "react";
 import Map from "./components/Map/Map";
-import AnomalyList from "./components/AnomalyList/AnomalyList";
-import Sidebar from "./components/Sidebar/Sidebar";
-import ObjectDetails from "./components/ObjectDetails/ObjectDetails";
 import ShipDetails from "./model/ShipDetails";
 import ShipService from "./services/ShipService";
 import { MapExportedMethodsType } from "./components/Map/Map";
+import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
+import Side from "./components/Side/Side";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -27,6 +26,8 @@ function App() {
   const mapCenteringFun = (details: ShipDetails) => {
     if (mapRef.current !== null) {
       mapRef.current.centerMapOntoShip(details);
+    } else {
+      ErrorNotificationService.addWarning("mapRef is null");
     }
   };
 
@@ -40,7 +41,8 @@ function App() {
   const pageChanger = (newPage: CurrentPage) => {
     if (
       currentPage.currentPage !== "none" &&
-      newPage.currentPage === currentPage.currentPage
+      newPage.currentPage === currentPage.currentPage &&
+      !areShipDetailsOpened(currentPage)
     ) {
       // If we clicked the same icon for the second time
       setCurrentPage({ currentPage: "none", shownShipId: -1 });
@@ -50,6 +52,8 @@ function App() {
     }
   };
 
+  // Put the ships as state
+  const [ships, setShips] = useState<ShipDetails[]>([]);
   const middleColumn = () => {
     switch (currentPage.currentPage) {
       case "anomalyList":
@@ -133,11 +137,22 @@ function App() {
   return (
     <div className="App" id="root-div">
       <Stack direction="row">
-        <Map ships={Array.from(shipsWS.values())} pageChanger={pageChanger} ref={mapRef} />
-        {middleColumn()}
-        <Sidebar pageChanger={pageChanger} />
+        <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
+        <Side
+          currentPage={currentPage}
+          ships={ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+        />
       </Stack>
     </div>
+  );
+}
+
+function areShipDetailsOpened(currentPage: CurrentPage) {
+  return (
+    currentPage.currentPage === "objectDetails" &&
+    currentPage.shownShipId !== -1
   );
 }
 

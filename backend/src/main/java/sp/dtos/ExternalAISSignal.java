@@ -4,15 +4,20 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import sp.utils.UtilsObjectMapper;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 
+
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -25,7 +30,7 @@ public class ExternalAISSignal implements Serializable {
     private final float longitude;
     private final float latitude;
     private final float course;
-    private final float heading;
+    private float heading;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime timestamp;
     private final String departurePort;
@@ -48,4 +53,5 @@ public class ExternalAISSignal implements Serializable {
     public static ExternalAISSignal fromJson(String val) throws JsonProcessingException {
         return new UtilsObjectMapper().readValue(val, ExternalAISSignal.class);
     }
+
 }

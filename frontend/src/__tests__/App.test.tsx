@@ -89,10 +89,10 @@ test("When settings is clicked and then ships icon is clicked, only latter is pr
   await userEvent.click(shipsIcon);
 
   const settingsTitle = screen.queryByText("Settings");
-  const anomalyListTitle = screen.queryByText("Anomaly list");
+  const anomalyListElement = screen.getByTestId("anomaly-list-container");
 
   expect(settingsTitle).toBeNull();
-  expect(anomalyListTitle).toBeVisible();
+  expect(anomalyListElement).toBeVisible();
 });
 
 test("When the close icon is clicked, the anomaly list is not present", async () => {
@@ -102,7 +102,7 @@ test("When the close icon is clicked, the anomaly list is not present", async ()
   const shipIcon = screen.getByTestId("sidebar-ship-icon");
   await userEvent.click(shipIcon);
 
-  // Close the lsit
+  // Close the list
   const closeIcon = screen.getByTestId("anomaly-list-close-icon");
   await userEvent.click(closeIcon);
 
@@ -129,8 +129,8 @@ test("When the user closes the list and opens it again, it is present", async ()
   await userEvent.click(shipIcon2);
 
   await waitFor(() => {
-    const anomalyListTitle = screen.queryByText("Anomaly list");
-    expect(anomalyListTitle).toBeVisible();
+    const anomalyListElement = screen.getByTestId("anomaly-list-container");
+    expect(anomalyListElement).toBeVisible();
   });
 });
 
@@ -145,7 +145,7 @@ test("Double clicking the ship icon opens and closes the list", async () => {
   await userEvent.click(shipIcon);
 
   await waitFor(() => {
-    const anomalyListTitle = screen.queryByText("Anomaly list");
-    expect(anomalyListTitle).toBeNull();
+    const anomalyListElement = screen.queryByTestId("anomaly-list-container");
+    expect(anomalyListElement).toBeNull();
   });
 });

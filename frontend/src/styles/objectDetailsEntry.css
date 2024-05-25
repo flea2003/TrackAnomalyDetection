@@ -4,6 +4,9 @@
     padding-bottom: var(--object-details-entry-padding);
     text-align: left;
     padding-left: var(--object-details-entry-padding);
+    border-bottom: 1px dotted gray;
+
+    font-size: var(--object-details-entry-font-size);
 }
 
 .object-details-entry-type {
@@ -12,4 +15,5 @@
 
 .object-details-entry-value {
     font-weight: normal;
+    overflow-wrap: break-word;
 }
