@@ -31,7 +31,7 @@ public class ShipsDataService {
      * Retrieves the current extensive information for a specified ship.
      *
      * @param shipId the id of the ship
-     * @return - CurrentShipDetails instance encapsulating the current extensive information of a ship
+     * @return CurrentShipDetails instance encapsulating the current extensive information of a ship
      */
     public CurrentShipDetails getIndividualCurrentShipDetails(Long shipId)
             throws NotExistingShipException, PipelineException {

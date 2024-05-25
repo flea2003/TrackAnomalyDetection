@@ -1,16 +1,9 @@
 package sp.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import sp.dtos.ExternalAISSignal;
-import sp.utils.UtilsObjectMapper;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 
@@ -31,27 +24,6 @@ public class AISSignal implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final OffsetDateTime timestamp;
     private final String departurePort;
-
-    /**
-     * Returns the object in JSON format.
-     *
-     * @return json representation of the object
-     */
-    public String toJson() throws JsonProcessingException {
-        return new UtilsObjectMapper().writeValueAsString(this);
-    }
-
-
-    /**
-     * Creates the AIS object from a given string.
-     *
-     * @param val string value (in JSON format) that is being converted to an AIS object
-     * @return AIS object from a given string
-     */
-    public static AISSignal fromJson(String val) throws JsonProcessingException {
-        return new UtilsObjectMapper().readValue(val, AISSignal.class);
-    }
-
 
     /**
      * Constructor for the AISSignal class, which is used to create an AISSignal
