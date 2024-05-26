@@ -132,6 +132,11 @@ dependencies {
 
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
+
+	testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
+	testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
+
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 }
 
 // For Flink

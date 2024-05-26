@@ -103,14 +103,17 @@ public class TurningStatefulMapFunctionTest {
         AISSignal aisSignal1 = new AISSignal(1, 20, 10, 10, 20, 511, timestamp1, "Malta");
 
         testHarness.processElement(aisSignal1, 10);
+
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:55Z");
+        AISSignal aisSignal2 = new AISSignal(1, 20, 10, 10, 20, 22, timestamp2, "Malta");
+
+        testHarness.processElement(aisSignal2, 12);
+
         var anomalies = testHarness.extractOutputStreamRecords();
 
-        assertThat(anomalies.size()).isEqualTo(1);
-        assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
-
-        // Check that heading in AISSignal was fixed (changed to course)
-        assertThat(aisSignal1.getHeading()).isEqualTo(20);
+        assertThat(anomalies.size()).isEqualTo(2);
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0.0f);
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.");
     }
 
 }

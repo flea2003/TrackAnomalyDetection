@@ -56,7 +56,7 @@ class AnomalyDetectionPipelineTest {
 
         // Create the pipeline itself
         anomalyDetectionPipeline = new AnomalyDetectionPipeline(
-                streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder
+            streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder
         );
     }
 

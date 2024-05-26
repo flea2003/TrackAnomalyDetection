@@ -1,5 +1,7 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.circularMetric;
+
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
 
@@ -19,17 +21,28 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     public AnomalyInformation map(AISSignal value) throws Exception {
-        // A 511 heading means that no heading is reported, so we just set it to be equal to the heading value of the ship
-        if (value.getHeading() == NO_HEADING) {
-            value.setHeading(value.getCourse());
+        float valueHeading = value.getHeading();
+        float valueCourse = value.getCourse();
+
+        // A 511 heading means that no heading is reported, so we just take it to be equal to the heading value of the ship
+        if (valueHeading == NO_HEADING) {
+            valueHeading = valueCourse;
         }
 
         AISSignal pastAISSignal = getAisSignalValueState().value();
 
         // In the case that our stateful map has encountered signals in the past
         if (pastAISSignal != null) {
-            boolean headingDifferenceIsGood = Tools.circularMetric(pastAISSignal.getHeading(), value.getHeading()) < 40;
-            boolean courseDifferenceIsGood = Tools.circularMetric(pastAISSignal.getCourse(), value.getCourse()) < 40;
+            float pastValueHeading = getAisSignalValueState().value().getHeading();
+            float pastValueCourse = getAisSignalValueState().value().getCourse();
+
+            if (pastValueHeading == NO_HEADING) {
+                pastValueHeading = pastValueCourse;
+            }
+
+            boolean headingDifferenceIsGood = circularMetric(pastValueHeading, valueHeading) < 40;
+            boolean courseDifferenceIsGood = circularMetric(pastValueCourse, valueCourse) < 40;
+
 
             if (!headingDifferenceIsGood || !courseDifferenceIsGood) {
                 getLastDetectedAnomalyTime().update(value.getTimestamp());

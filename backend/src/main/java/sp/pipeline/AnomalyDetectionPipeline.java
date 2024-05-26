@@ -1,33 +1,30 @@
 package sp.pipeline;
 
+import lombok.Getter;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.state.KeyValueIterator;
-import org.apache.kafka.streams.state.QueryableStoreTypes;
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
+import sp.pipeline.parts.extractors.ShipInformationExtractor;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.utils.StreamUtils;
-import java.util.HashMap;
 
 @Service
 public class AnomalyDetectionPipeline {
-
     private final StreamUtils streamUtils;
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
     private KTable<Long, CurrentShipDetails> state;
+    @Getter
+    private ShipInformationExtractor shipInformationExtractor;
     private final IdAssignmentBuilder idAssignmentBuilder;
     private final ScoreCalculationBuilder scoreCalculationBuilder;
     private final ScoreAggregationBuilder scoreAggregationBuilder;
@@ -71,7 +68,7 @@ public class AnomalyDetectionPipeline {
      * Private helper method for building the pipeline step by step.
      */
     private void buildPipeline()  {
-
+        
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Build the pipeline part that assigns IDs to incoming AIS signals (Flink)
@@ -94,8 +91,8 @@ public class AnomalyDetectionPipeline {
         this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
         this.kafkaStreams.cleanUp();
 
+        this.shipInformationExtractor = new ShipInformationExtractor(state, kafkaStreams);
     }
-
 
     /**
      * Starts the stream processing: both Flink and Kafka parts.
@@ -110,32 +107,4 @@ public class AnomalyDetectionPipeline {
         }
     }
 
-    /**
-     * Returns the current (last updated) anomaly scores of the ships in the system.
-     * Additionally return the current max anomaly score information of the ships in the system.
-     *
-     * @return the current and max scores of the ships in the system.
-     */
-    public HashMap<Long, CurrentShipDetails> getCurrentShipDetails() throws PipelineException {
-        try {
-            // Get the current state of the KTable
-            final String storeName = this.state.queryableStoreName();
-            ReadOnlyKeyValueStore<Long, CurrentShipDetails> view = this.kafkaStreams.store(
-                    StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
-            );
-
-            // Create a copy of the state considering only the current AnomalyInformation values for each ship
-            HashMap<Long, CurrentShipDetails> stateCopy = new HashMap<>();
-            try (KeyValueIterator<Long, CurrentShipDetails> iter = view.all()) {
-                iter.forEachRemaining(kv -> stateCopy
-                        .put(kv.key, kv.value));
-            }
-            return stateCopy;
-
-        } catch (Exception e) {
-            String err = "Failed to query store: " + e.getMessage() + ", continuing";
-            System.out.println(err);
-            throw new PipelineException(err);
-        }
-    }
 }
