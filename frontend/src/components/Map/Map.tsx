@@ -183,12 +183,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
         <div id="map" data-testid="map"></div>
         {hoverInfo.show && hoverInfo.shipDetails !== null && (
           <div>
-            <ShipIconDetails
-              show={hoverInfo.show}
-              x={hoverInfo.x}
-              y={hoverInfo.y}
-              shipDetails={hoverInfo.shipDetails}
-            ></ShipIconDetails>
+            <ShipIconDetails {...hoverInfo}></ShipIconDetails>
           </div>
         )}
       </div>
