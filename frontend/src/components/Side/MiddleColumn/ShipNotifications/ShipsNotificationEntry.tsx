@@ -27,8 +27,9 @@ function ShipNotificationEntry({ notification }: NotificationEntryProps) {
     >
       <span className="error-list-entry-text">
         <div>
-          {notification.message}
           {notification.shipID}
+        </div>
+        <div>
           {notification.id}
         </div>
       </span>

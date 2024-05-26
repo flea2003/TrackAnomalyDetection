@@ -5,10 +5,13 @@ import React, { JSX } from "react";
 import ShipDetails from "../../../model/ShipDetails";
 import ErrorList from "./ErrorNotifications/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
+import ShipsNotificationList from "./ShipNotifications/ShipsNotificationList";
+import ShipNotification from "../../../model/ShipNotification";
 
 interface MiddleColumnProps {
   currentPage: CurrentPage;
   ships: ShipDetails[];
+  notifications: ShipNotification[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
 }
@@ -16,6 +19,7 @@ interface MiddleColumnProps {
 function MiddleColumn({
   currentPage,
   ships,
+  notifications,
   pageChanger,
   mapCenteringFun,
 }: MiddleColumnProps): JSX.Element {
@@ -37,7 +41,11 @@ function MiddleColumn({
         />
       );
     case "notifications":
-      return <div>Notifications</div>;
+      return <ShipsNotificationList
+        notifications={notifications}
+        pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
+      />;
     case "settings":
       return <div>Settings</div>;
     case "errors":

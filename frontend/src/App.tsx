@@ -56,6 +56,7 @@ function App() {
 
   // Put the ships as state
   const [ships, setShips] = useState<ShipDetails[]>([]);
+  const [notifications, setNotifications] = useState<ShipNotification[]>([]);
 
   // Every 1s update the anomaly score of all ships by querying the server
   useEffect(() => {
@@ -66,7 +67,7 @@ function App() {
           setShips(shipsArray);
         },
       );
-    }, 1000000);
+    }, 10000);
   }, []);
 
   // Every 1s update the notifications by querying the server
@@ -74,11 +75,11 @@ function App() {
     setInterval(() => {
       // Query for ships. When the results arrive, update the state
       ShipsNotificationService.queryBackendForNotificationsArray().then(
-        (shipsArray: ShipNotification[]) => {
-         // setShips(shipsArray);
+        (notificationsArray: ShipNotification[]) => {
+          setNotifications(notificationsArray);
         },
       );
-    }, 10000);
+    }, 1000);
   }, []);
 
   // Return the main view of the application
@@ -89,6 +90,7 @@ function App() {
         <Side
           currentPage={currentPage}
           ships={ships}
+          notifications={notifications}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}
         />

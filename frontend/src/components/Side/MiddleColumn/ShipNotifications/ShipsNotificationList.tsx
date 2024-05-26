@@ -8,9 +8,12 @@ import React from "react";
 import { ShipNotificationCompact, ShipsNotificationService } from "../../../../services/ShipsNotificationService";
 import ShipNotification from "../../../../model/ShipNotification";
 import ShipNotificationEntry from "./ShipsNotificationEntry";
+import ShipDetails from "../../../../model/ShipDetails";
 
 interface NotificationListProps {
+  notifications: ShipNotification[];
   pageChanger: (currentPage: CurrentPage) => void;
+  mapCenteringFun: (details: ShipDetails) => void;
 }
 
 /**

@@ -29,6 +29,24 @@ export class ShipsNotificationService {
   static notificationsEndpoint = "/notifications"
   private static notifications: ShipNotificationCompact[] = [];
 
+  static refreshState = () => {
+    console.log("ShipNotificationService refreshState was not set up");
+  };
+
+  /**
+   * Initialize the service by providing the function that should be called to update the state.
+   * The state is created in `App.tsx` by calling `useState`, and the setter is passed here.
+   *
+   * @param setShipNotificationsService
+   */
+  static initialize(
+    setShipNotificationsService: React.Dispatch<
+      React.SetStateAction<ShipNotificationCompact[]>
+    >,
+  ) {
+    this.refreshState = () =>
+      setShipNotificationsService(this.getAllNotifications());
+  }
 
   static queryBackendForNotificationsArray: () => Promise<ShipNotification[]> = async () => {
     const response = await HttpSender.get(
