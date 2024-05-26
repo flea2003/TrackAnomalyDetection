@@ -2,10 +2,22 @@ import ErrorNotificationService, { ErrorNotification } from "../../../../service
 import Stack from "@mui/material/Stack";
 import trashIcon from "../../../../assets/icons/trash.svg";
 import React from "react";
-import { ShipNotificationCompact } from "../../../../services/ShipsNotificationService";
+import ShipDetails from "../../../../model/ShipDetails";
+import { CurrentPage } from "../../../../App";
+import ShipNotification from "../../../../model/ShipNotification";
+import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
+import shipIcon from "../../../../assets/icons/ship.png";
+
+import "../../../../styles/common.css";
+import "../../../../styles/shipNotificationList.css";
+import "../../../../styles/shipNotificationEntry.css";
+
 
 interface NotificationEntryProps {
-  notification: ShipNotificationCompact;
+  notification: ShipNotification;
+  shipDetails: ShipDetails;
+  pageChanger: (currentPage: CurrentPage) => void;
+  mapCenteringFun: (details: ShipDetails) => void;
 }
 
 /**
@@ -15,24 +27,41 @@ interface NotificationEntryProps {
  *
  * @param notification ErrorNotification object which will be shown in this entry.
  */
-function ShipNotificationEntry({ notification }: NotificationEntryProps) {
+function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCenteringFun }:
+                                 NotificationEntryProps) {
+
+  const shipIconAltText = "Ship Icon";
+
+  const shipAnomalyScore = notification.anomalyScore;
+  const message = notification.explanation;
+  const shipId = notification.id % 1000;
+  const date = notification.correspondingTimestamp;
+
+  const onClick = () => {
+    pageChanger({ currentPage: "objectDetails", shownShipId: notification.shipID });
+    mapCenteringFun(shipDetails);
+  };
 
   return (
     <Stack
       direction="row"
-      className="error-list-entry"
-      data-testid="error-list-entry"
+      className="notification-list-entry"
       spacing={0}
-     // onClick={() => ErrorNotificationService.markAsRead(notification.id)}
+      onClick={onClick}
     >
-      <span className="error-list-entry-text">
-        <div>
-          {notification.shipID}
-        </div>
-        <div>
-          {notification.id}
-        </div>
-      </span>
+      <div className="notification-list-entry-icon-id-container">
+        <span className="notification-list-entry-icon-container">
+          <img
+            src={shipIcon}
+            className="notification-list-entry-icon"
+            alt={shipIconAltText}
+          />
+        </span>
+        <span className="notification-list-entry-id">#{shipId}</span>
+      </div>
+      <span className="notification-list-entry-score">{shipAnomalyScore}%</span>
+      <span className="notification-list-entry-date">{date}</span>
+      <span className="notification-list-entry-explanation">{message}</span>
     </Stack>
   );
 }

@@ -43,6 +43,7 @@ function MiddleColumn({
     case "notifications":
       return <ShipsNotificationList
         notifications={notifications}
+        ships={ships}
         pageChanger={pageChanger}
         mapCenteringFun={mapCenteringFun}
       />;

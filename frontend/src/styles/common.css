@@ -29,6 +29,13 @@
     --error-list-entry-icon-size: 20px;
     --error-list-entry-icon-container-width: 25px;
 
+    --notification-list-entry-height: 72px;
+    --notification-list-entry-id-font-size: 0.8em;
+    --notification-list-entry-font-size: 0.6em;
+    --notification-list-date-entry-font-size: 0.8em;
+    --notification-list-entry-icon-container-width: 15px;
+    --notifcation-list-entry-icon-size: 25px;
+
 }
 
 #root-div {

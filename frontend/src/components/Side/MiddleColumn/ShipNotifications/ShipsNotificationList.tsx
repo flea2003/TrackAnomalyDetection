@@ -5,59 +5,68 @@ import ErrorNotificationService, { ErrorNotification } from "../../../../service
 import List from "@mui/material/List";
 import ErrorListEntry from "../ErrorNotifications/ErrorListEntry";
 import React from "react";
-import { ShipNotificationCompact, ShipsNotificationService } from "../../../../services/ShipsNotificationService";
 import ShipNotification from "../../../../model/ShipNotification";
 import ShipNotificationEntry from "./ShipsNotificationEntry";
 import ShipDetails from "../../../../model/ShipDetails";
+import AnomalyListEntry from "../AnomalyList/AnomalyListEntry";
+import ShipsNotificationEntry from "./ShipsNotificationEntry";
+
+
+import "../../../../styles/common.css";
+import "../../../../styles/shipNotificationList.css";
+import "../../../../styles/shipNotificationEntry.css";
+import shipDetails from "../../../../model/ShipDetails";
+
 
 interface NotificationListProps {
   notifications: ShipNotification[];
+  ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
 }
 
-/**
- * This component is the second column of the main view of the application.
- * It displays the (software) errors (or warnings, info) that were caught in our
- * code and passed to ErrorNotificationService.
- *
- * @param pageChanger function that, when called, changes the page displayed in the second column.
- */
-function NotificationList({ pageChanger }: NotificationListProps) {
+
+function ShipsNotificationList({
+                       notifications,
+                       ships,
+                       pageChanger,
+                       mapCenteringFun,
+                     }: NotificationListProps) {
+  const listEntries = [];
+  for (let i = 0; i < notifications.length; i++) {
+    const shipDetails = ships.filter(x => x.id === notifications[i].shipID).slice()[0];
+    listEntries.push(
+      // eslint-disable-next-line react/jsx-no-undef
+      <ShipsNotificationEntry
+        key={i}
+        notification={notifications[i]}
+        shipDetails={shipDetails}
+        pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
+      />
+    );
+  }
+
   return (
-    <Stack id="error-list-container" data-testid="error-list-container">
-      <Stack id="error-list-title-container" direction="row">
+    <Stack id="notification-list-container" data-testid="notification-list-container">
+      <Stack id="notification-list-title-container" direction="row">
         <img
           src={closeIcon}
           alt="Close"
-          id="error-list-close-icon"
-          data-testid="error-list-close-icon"
+          id="notification-list-close-icon"
+          data-testid="notification-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
         />
-
+        <div>Notifications</div>
       </Stack>
       <List
-        id="error-list-internal-container"
+        id="notification-list-internal-container"
         style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}
       >
-        {getNotificationEntries()}
+        {listEntries}
       </List>
     </Stack>
   );
 }
 
-/**
- * Gets all error notifications, reverses them (so that the newest one is the first
- * one), and returns a list of corresponding ErrorListEntry.
- */
-function getNotificationEntries() {
-  return ShipsNotificationService.getAllNotifications()
-    .slice()
-    .reverse()
-    .map((notification: ShipNotificationCompact) => (
-      // eslint-disable-next-line react/jsx-key
-      <ShipNotificationEntry notification={notification} />
-    ));
-}
-
-export default NotificationList;
+export default ShipsNotificationList;

@@ -1,0 +1,67 @@
+.notification-list-entry {
+    width: 100%;
+    height: var(--notification-list-entry-height);
+    background: lightgray;
+    border-bottom: 1px solid black;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+
+    /* Make sure when hovering it is like a link */
+    cursor: pointer;
+}
+
+.notification-list-entry-icon-id-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.notification-list-entry:hover{
+    font-weight: 700;
+}
+
+.notification-list-entry:hover .notification-list-entry-icon-container{
+    transform: scale(1.1);
+}
+
+.notification-list-entry-score {
+    font-size: var(--anomaly-list-entry-font-size);
+    width: 20%;
+    text-align: center;
+}
+
+.notification-list-entry-explanation {
+    font-size: var(--notification-list-entry-font-size);
+    width: 60%;
+    text-align: center;
+}
+
+
+.notification-list-entry-date {
+    font-size: var(--notification-list-date-entry-font-size);
+    width: 60%;
+    text-align: center;
+}
+
+.notification-list-entry-id {
+    font-size: var(--notification-list-entry-id-font-size);
+    width: 30px;
+    text-align:center;
+}
+
+.notification-list-entry-icon-container {
+    font-size: var(--notification-list-entry-font-size);
+    height: 100%;
+    width: var(--notification-list-entry-icon-container-width);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notification-list-entry-icon{
+    height: var(--notifcation-list-entry-icon-size);
+    width: var(--notifcation-list-entry-icon-size);
+}

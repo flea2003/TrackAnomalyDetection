@@ -7,7 +7,6 @@ import MiddleColumn from "./MiddleColumn/MiddleColumn";
 import "../../styles/common.css";
 import "../../styles/side.css";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
-import { ShipsNotificationService } from "../../services/ShipsNotificationService";
 import ShipNotification from "../../model/ShipNotification";
 
 interface SideProps {
@@ -31,11 +30,6 @@ function Side({
     ErrorNotificationService.getAllNotifications(),
   );
   ErrorNotificationService.initialize(setErrorNotificationState);
-
-  const [, setShipNotificationState] = React.useState(
-    ShipsNotificationService.getAllNotifications(),
-  );
-  ShipsNotificationService.initialize(setShipNotificationState);
 
   return (
     <>

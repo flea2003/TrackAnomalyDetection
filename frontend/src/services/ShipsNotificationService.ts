@@ -9,44 +9,13 @@ import warningSymbol from "../assets/icons/error-notifications/warning.svg";
 import infoSymbol from "../assets/icons/error-notifications/info.svg";
 import notificationResponseItem from "../templates/NotificationResponseItem";
 
-export class ShipNotificationCompact {
-
-  readonly id: number;
-  readonly shipID: number;
-  readonly message: string;
-  wasRead: boolean;
-
-  constructor(id: number, shipID: number, message: string, wasRead = false) {
-    this.id = id;
-    this.shipID = shipID;
-    this.message = message;
-    this.wasRead = wasRead;
-  }
-}
-
 
 export class ShipsNotificationService {
   static notificationsEndpoint = "/notifications"
-  private static notifications: ShipNotificationCompact[] = [];
 
   static refreshState = () => {
     console.log("ShipNotificationService refreshState was not set up");
   };
-
-  /**
-   * Initialize the service by providing the function that should be called to update the state.
-   * The state is created in `App.tsx` by calling `useState`, and the setter is passed here.
-   *
-   * @param setShipNotificationsService
-   */
-  static initialize(
-    setShipNotificationsService: React.Dispatch<
-      React.SetStateAction<ShipNotificationCompact[]>
-    >,
-  ) {
-    this.refreshState = () =>
-      setShipNotificationsService(this.getAllNotifications());
-  }
 
   static queryBackendForNotificationsArray: () => Promise<ShipNotification[]> = async () => {
     const response = await HttpSender.get(
@@ -86,27 +55,8 @@ export class ShipsNotificationService {
   static extractNotificationDetails: (item: NotificationResponseItem) => ShipNotification = (
     item,
   ) => {
-
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     ShipNotification
-    const notification = new ShipNotification(
-      item.id,
-      item.shipID,
-      0,
-      0,
-      0,
-      item.currentShipDetails.currentAnomalyInformation.score,
-      item.currentShipDetails.currentAnomalyInformation.explanation,
-      item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
-      item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
-      "CIUJU KAD PAEJO",
-      0,
-      0
-    );
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    ShipsNotificationService.notifications.push(notification);
 
     return new ShipNotification(
         item.id,
@@ -155,10 +105,6 @@ export class ShipsNotificationService {
     return sortedList;
   };
 
-
-  static getAllNotifications() {
-    return this.notifications.slice();
-  }
 }
 
 export default ShipNotification;

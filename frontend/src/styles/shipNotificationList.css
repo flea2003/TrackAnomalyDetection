@@ -1,0 +1,28 @@
+#notification-list-container {
+    width: 30%;
+    text-align: center;
+    display: flex;
+    border-left: 1px solid black;
+}
+
+#notification-list-internal-container {
+    height: 100%;
+}
+
+#notification-list-close-icon {
+    height: var(--anomaly-list-closing-icon-size);
+    width: var(--anomaly-list-closing-icon-size);
+    padding: var(--anomaly-list-closing-icon-margin);
+}
+
+#notification-list-close-icon:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+#notification-list-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black;
+}
