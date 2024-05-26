@@ -15,6 +15,7 @@ import "../../styles/common.css";
 
 import mapStyleConfig from "../../configs/mapConfig.json";
 import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
+import ShipIconDetailsType from "../../templates/ShipIconDetailsType";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -52,13 +53,6 @@ interface MapProps {
 // Define the type of the ref object
 interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
-}
-
-interface ShipIconDetailsType {
-  show: boolean;
-  x: number;
-  y: number;
-  shipDetails: ShipDetails | null;
 }
 
 /**
@@ -156,25 +150,21 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
         const latLongCoords = e.latlng;
         const containerPort = map.latLngToContainerPoint(latLongCoords);
         const { x, y } = containerPort;
-        setHoverInfo((prev) => {
-          return {
-            show: true,
-            x: x,
-            y: y,
-            shipDetails: ship,
-          } as ShipIconDetailsType;
-        });
+        setHoverInfo({
+          show: true,
+          x: x,
+          y: y,
+          shipDetails: ship,
+        } as ShipIconDetailsType);
       };
 
       const handleMouseOutShipIcon = (e: L.LeafletMouseEvent) => {
-        setHoverInfo((prev) => {
-          return {
-            show: false,
-            x: 0,
-            y: 0,
-            shipDetails: null,
-          } as ShipIconDetailsType;
-        });
+        setHoverInfo({
+          show: false,
+          x: 0,
+          y: 0,
+          shipDetails: null,
+        } as ShipIconDetailsType);
       };
 
       return () => {
