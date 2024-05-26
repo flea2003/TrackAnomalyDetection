@@ -1,7 +1,15 @@
 package sp.services;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -14,6 +22,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import sp.pipeline.parts.extractors.ShipInformationExtractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -25,38 +34,32 @@ public class TestShipsDataService {
 
     private ShipsDataService shipsDataService;
     private ShipsDataService shipsDataServiceBroken;
-    private Map<Long, CurrentShipDetails> currentShipDetailsMap;
-    private AISSignal signal1;
-    private AISSignal signal2;
     private AISSignal signal3;
-    private AISSignal signal4;
-    private AISSignal signal5;
-    private AISSignal signal6;
-    private CurrentShipDetails currentShipDetails1;
-    private CurrentShipDetails currentShipDetails2;
-    private CurrentShipDetails currentShipDetails3;
-    private CurrentShipDetails currentShipDetails4;
+    CurrentShipDetails currentShipDetails1;
+    CurrentShipDetails currentShipDetails2;
+    CurrentShipDetails currentShipDetails3;
+    CurrentShipDetails currentShipDetails4;
 
     @BeforeEach
     public void setUp() throws Exception {
-        signal1 = new AISSignal(1L, 60.0f, 10.0f,
-                20.0f, 60.0f, 80.0f,
-                OffsetDateTime.of(2015, 04, 17, 1,1,0,0, ZoneOffset.ofHours(0)), "Klaipeda");
-        signal2 = new AISSignal(2L, 42.0f, 30.0f,
-                20.0f, 60.0f, 80.0f,
-                OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "Chisinau");
+        AISSignal signal1 = new AISSignal(1L, 60.0f, 10.0f,
+            20.0f, 60.0f, 80.0f,
+            OffsetDateTime.of(2015, 04, 17, 1, 1, 0, 0, ZoneOffset.ofHours(0)), "Klaipeda");
+        AISSignal signal2 = new AISSignal(2L, 42.0f, 30.0f,
+            20.0f, 60.0f, 80.0f,
+            OffsetDateTime.of(2015, 04, 18, 1, 1, 0, 0, ZoneOffset.ofHours(0)), "Chisinau");
         signal3 = new AISSignal(1L, 63.0f, 11.0f,
                 20.0f, 60.0f, 80.0f,
                 OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "Amsterdam");
-        signal4 = new AISSignal(3L, 20.0f, 90.0f,
-                20.0f, 60.0f, 80.0f,
-                OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "Delft");
-        signal5 = new AISSignal(3L, 25.0f, 90.0f,
-                20.0f, 60.0f, 80.0f,
-                OffsetDateTime.of(2015, 04, 17, 1,1,0,0, ZoneOffset.ofHours(0)), "Zurich");
-        signal6 = new AISSignal(4L, 0.0f, 0.0f,
-                20.0f, 60.0f, 80.0f,
-                OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), "Beijing");
+        AISSignal signal4 = new AISSignal(3L, 20.0f, 90.0f,
+            20.0f, 60.0f, 80.0f,
+            OffsetDateTime.of(2015, 04, 18, 1, 1, 0, 0, ZoneOffset.ofHours(0)), "Delft");
+        AISSignal signal5 = new AISSignal(3L, 25.0f, 90.0f,
+            20.0f, 60.0f, 80.0f,
+            OffsetDateTime.of(2015, 04, 17, 1, 1, 0, 0, ZoneOffset.ofHours(0)), "Zurich");
+        AISSignal signal6 = new AISSignal(4L, 0.0f, 0.0f,
+            20.0f, 60.0f, 80.0f,
+            OffsetDateTime.of(2015, 04, 18, 1, 1, 0, 0, ZoneOffset.ofHours(0)), "Beijing");
 
         currentShipDetails1 = new CurrentShipDetails();
         currentShipDetails1.setCurrentAnomalyInformation(new AnomalyInformation(0.5f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), 1L));
@@ -74,27 +77,43 @@ public class TestShipsDataService {
         currentShipDetails4.setCurrentAnomalyInformation(new AnomalyInformation(0.1f, "", OffsetDateTime.of(2015, 04, 18, 1,1,0,0, ZoneOffset.ofHours(0)), 4L));
         currentShipDetails4.setCurrentAISSignal(signal6);
 
-        currentShipDetailsMap = new HashMap<Long, CurrentShipDetails>(){{
+        Map<Long, CurrentShipDetails> currentShipDetailsMap = new HashMap<Long, CurrentShipDetails>() {{
             put(1L, currentShipDetails1);
             put(2L, currentShipDetails2);
             put(3L, currentShipDetails3);
             put(4L, currentShipDetails4);
         }};
 
+
+
         AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
 
-        doReturn(currentShipDetailsMap).when(anomalyDetectionPipeline).getCurrentShipDetails();
+        ShipInformationExtractor shipInformationExtractor = Mockito.mock(ShipInformationExtractor.class);
+
+        doReturn(shipInformationExtractor).when(anomalyDetectionPipeline).getShipInformationExtractor();
+
+        doReturn(currentShipDetailsMap).when(shipInformationExtractor)
+            .getFilteredShipDetails(any(Predicate.class));
+
+        doReturn(currentShipDetailsMap).when(shipInformationExtractor)
+            .getCurrentShipDetails();
+
+        ShipInformationExtractor shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
         shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
 
-        doThrow(PipelineException.class).when(anomalyDetectionPipelineBroken).getCurrentShipDetails();
-        doThrow(PipelineException.class).when(anomalyDetectionPipelineBroken).getCurrentShipDetails();
+        doReturn(shipInformationExtractorBroken).when(anomalyDetectionPipelineBroken).getShipInformationExtractor();
+
+        doThrow(PipelineException.class).when(shipInformationExtractorBroken)
+            .getCurrentShipDetails();
+        doThrow(PipelineException.class).when(shipInformationExtractorBroken)
+            .getFilteredShipDetails(any(Predicate.class));
     }
 
     @Test
-    void getCurrentAISInformationTest(){
+    void getIndividualAISTest(){
         try {
             assertThat(shipsDataService.getIndividualCurrentShipDetails(1L).getCurrentAISSignal()).isEqualTo(signal3);
         } catch (Exception e) {
@@ -103,50 +122,48 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getCurrentAISInformationTestNoShipException(){
+    void getIndividualDetailsNoShipException(){
         assertThatThrownBy(() -> shipsDataService.getIndividualCurrentShipDetails(6L))
                 .isInstanceOf(NotExistingShipException.class).hasMessage("Couldn't find such ship.");
     }
 
     @Test
-    void getCurrentAISInformationTestPipelineException(){
+    void getIndividualDetailsTestPipelineException(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
                 .isInstanceOf(PipelineException.class);
     }
 
     @Test
-    void getCurrentAnomalyInformationTest(){
+    void getIndividualShipDetailsTest(){
         try{
-            CurrentShipDetails anomalyInformation = shipsDataService.getIndividualCurrentShipDetails(1L);
-            assertThat(anomalyInformation.getCurrentAnomalyInformation().getScore()).isEqualTo(0.5f);
-            assertThat(anomalyInformation.getCurrentAnomalyInformation().getId()).isEqualTo(1L);
+            CurrentShipDetails currentShipDetails = shipsDataService.getIndividualCurrentShipDetails(1L);
+            assertThat(currentShipDetails.getCurrentAnomalyInformation().getScore()).isEqualTo(0.5f);
+            assertThat(currentShipDetails.getCurrentAnomalyInformation().getId()).isEqualTo(1L);
         } catch (Exception e){
             fail("Exception thrown but not Expected");
         }
     }
 
     @Test
-    void getCurrentAnomalyInformationTestNotShipException(){
+    void ShipDetailsNotShipException(){
         assertThatThrownBy(() -> shipsDataService.getIndividualCurrentShipDetails(6L))
                 .isInstanceOf(NotExistingShipException.class).hasMessage("Couldn't find such ship.");
     }
 
     @Test
-    void getCurrentAnomalyInformationTestPipelineException(){
-        assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
-                .isInstanceOf(PipelineException.class);
-    }
-
-    @Test
-    void CurrentAISOfAllShipsPipelineExceptionTest(){
+    void ShipDetailsOfAllShipsPipelineExceptionTest(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentShipDetails())
                 .isInstanceOf(PipelineException.class);
     }
 
     @Test
-    void CurrentAnomalyInformationOfAllShipsExceptionTest(){
-        assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentShipDetails())
-                .isInstanceOf(PipelineException.class);
+    void getAllCurrentShipDetils(){
+        try {
+            assertThat(shipsDataService.getCurrentShipDetails()).containsExactlyElementsOf(List.of(currentShipDetails1,
+                currentShipDetails2, currentShipDetails3, currentShipDetails4));
+        } catch (Exception e){
+            fail("Exception thrown but not expected");
+        }
     }
 
     @Test
