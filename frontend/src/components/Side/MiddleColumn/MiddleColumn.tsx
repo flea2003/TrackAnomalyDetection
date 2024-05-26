@@ -7,6 +7,7 @@ import ErrorList from "./ErrorNotifications/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
 import ShipsNotificationList from "./ShipNotifications/ShipsNotificationList";
 import ShipNotification from "../../../model/ShipNotification";
+import NotificationDetails from "./NotificationDetails/NotificationDetails";
 
 interface MiddleColumnProps {
   currentPage: CurrentPage;
@@ -40,12 +41,18 @@ function MiddleColumn({
           pageChanger={pageChanger}
         />
       );
-    case "notifications":
+    case "notificationList":
       return <ShipsNotificationList
         notifications={notifications}
         ships={ships}
         pageChanger={pageChanger}
         mapCenteringFun={mapCenteringFun}
+      />;
+    case "notificationDetails":
+      return <NotificationDetails
+        notifications={notifications}
+        notificationID={currentPage.shownShipId}  // note that here we use shownShipId variable to pass the notification ID
+        pageChanger={pageChanger}
       />;
     case "settings":
       return <div>Settings</div>;

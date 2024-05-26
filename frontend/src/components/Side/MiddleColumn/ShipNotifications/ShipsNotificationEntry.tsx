@@ -38,7 +38,7 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
   const date = notification.correspondingTimestamp;
 
   const onClick = () => {
-    pageChanger({ currentPage: "objectDetails", shownShipId: notification.shipID });
+    pageChanger({ currentPage: "notificationDetails", shownShipId: notification.id });
     mapCenteringFun(shipDetails);
   };
 

@@ -33,7 +33,7 @@ function Sidebar({ pageChanger }: SidebarProps) {
   const onShipIconClicked = () =>
     pageChanger({ currentPage: "anomalyList", shownShipId: -1 });
   const onBellIconClicked = () =>
-    pageChanger({ currentPage: "notifications", shownShipId: -1 });
+    pageChanger({ currentPage: "notificationList", shownShipId: -1 });
   const onSettingsIconClicked = () =>
     pageChanger({ currentPage: "settings", shownShipId: -1 });
   const onBugIconClicked = () =>

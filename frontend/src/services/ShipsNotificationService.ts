@@ -55,22 +55,19 @@ export class ShipsNotificationService {
   static extractNotificationDetails: (item: NotificationResponseItem) => ShipNotification = (
     item,
   ) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    ShipNotification
-
     return new ShipNotification(
         item.id,
         item.shipID,
-        0,
-        0,
-        0,
+        item.currentShipDetails.currentAISSignal.heading,
+        item.currentShipDetails.currentAISSignal.latitude,
+        item.currentShipDetails.currentAISSignal.longitude,
         item.currentShipDetails.currentAnomalyInformation.score,
         item.currentShipDetails.currentAnomalyInformation.explanation,
         item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
         item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
-        "CIUJU KAD PAEJO",
-        0,
-        0,
+        item.currentShipDetails.currentAISSignal.departurePort,
+        item.currentShipDetails.currentAISSignal.course,
+        item.currentShipDetails.currentAISSignal.speed
       );
   };
 
