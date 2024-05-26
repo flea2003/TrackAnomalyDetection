@@ -3,10 +3,10 @@ package sp.utils;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -25,5 +25,9 @@ public class WebSocketSessionManager {
         StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headers.getSessionId();
         activeSessions.remove(sessionId);
+    }
+
+    public List<String> getActiveSessions() {
+        return this.activeSessions.values().stream().toList();
     }
 }
