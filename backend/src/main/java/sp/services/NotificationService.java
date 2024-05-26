@@ -90,4 +90,13 @@ public class NotificationService {
 
         return result;
     }
+
+    public void markAsRead(Long id) throws NotificationNotFoundException {
+        Optional<Notification> notification = notificationRepository.findById(id);
+        if (notification.isEmpty()) throw new NotificationNotFoundException();
+
+        Notification notificationValue = notification.get();
+        notificationValue.setRead(true);
+        notificationRepository.save(notificationValue);
+    }
 }

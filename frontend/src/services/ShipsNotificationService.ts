@@ -85,8 +85,8 @@ export class ShipsNotificationService {
       return [];
     }
     const sortedList = list.sort((a, b) => {
-      const aScore = a.getAnomalyScore();
-      const bScore = b.getAnomalyScore();
+      const aScore = a.id;
+      const bScore = b.id;
       if (aScore > bScore) {
         return -1;
       }

@@ -5,7 +5,7 @@ import React, { JSX } from "react";
 import ShipDetails from "../../../model/ShipDetails";
 import ErrorList from "./ErrorNotifications/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
-import ShipsNotificationList from "./ShipNotifications/ShipsNotificationList";
+import ShipsNotificationList from "./NotificationsList/ShipsNotificationList";
 import ShipNotification from "../../../model/ShipNotification";
 import NotificationDetails from "./NotificationDetails/NotificationDetails";
 

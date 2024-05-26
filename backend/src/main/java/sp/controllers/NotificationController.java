@@ -24,6 +24,22 @@ public class NotificationController {
     }
 
     /**
+     * Sets a certain notification as read.
+     *
+     * @return updated Notification object
+     */
+    @PutMapping("/notifications/read/{id}")
+    public ResponseEntity<Void> markAsRead(@PathVariable Long id) throws NotificationNotFoundException {
+        try {
+            this.notificationService.markAsRead(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotificationNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    /**
      * Gets all the notifications in the database (this will likely be changed in the future to get a
      * certain portion of them).
      *

@@ -17,8 +17,8 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long shipID;
+    private boolean isRead;
 
     @Column(length = 2048)
     private final CurrentShipDetails currentShipDetails;
@@ -31,6 +31,7 @@ public class Notification {
      */
     public Notification(CurrentShipDetails currentShipDetails) {
         this.currentShipDetails = currentShipDetails;
+        this.isRead = false;
         this.shipID = currentShipDetails.getCurrentAnomalyInformation().getId();
     }
 
