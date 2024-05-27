@@ -1,6 +1,5 @@
 package sp.controllers;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
+import sp.exceptions.PipelineStartingException;
 import sp.model.CurrentShipDetails;
 import sp.services.ShipsDataService;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -44,6 +45,8 @@ public class ShipsDataController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (PipelineException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (PipelineStartingException e) {
+            return new ResponseEntity<>(HttpStatus.TOO_EARLY);
         }
     }
 
@@ -58,6 +61,8 @@ public class ShipsDataController {
             return ResponseEntity.ok(this.shipsDataService.getCurrentShipDetails());
         } catch (PipelineException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (PipelineStartingException e) {
+            return new ResponseEntity<>(HttpStatus.TOO_EARLY);
         }
     }
 }
