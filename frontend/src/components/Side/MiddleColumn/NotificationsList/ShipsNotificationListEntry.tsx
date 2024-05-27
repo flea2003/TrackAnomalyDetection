@@ -73,17 +73,6 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
       <span className="readStatusClassnAME">{shipAnomalyScore}%</span>
       <span className="notification-list-entry-date">{date}</span>
       <span className="notification-list-entry-explanation">{message}</span>
-      <span className="error-list-entry-icon-container">
-        <img
-          src={warning}
-          className="error-list-entry-trash-icon"
-          data-testid="error-list-entry-trash-icon"
-          alt="Trash Icon"
-         // onClick={() =>
-         //   ErrorNotificationService.removeNotification(notification.id)
-        //  }
-        />
-      </span>
     </Stack>
   );
 }

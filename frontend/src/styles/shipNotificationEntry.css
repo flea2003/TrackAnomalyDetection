@@ -1,7 +1,7 @@
 .notification-list-entry-read {
     width: 100%;
     height: var(--notification-list-entry-height);
-    background: coral;
+    background: lightgray;
     border-bottom: 1px solid black;
 
     display: flex;
@@ -16,8 +16,9 @@
 .notification-list-entry-not-read {
     width: 100%;
     height: var(--notification-list-entry-height);
-    background: lightgray;
+    background: darkgray;
     border-bottom: 1px solid black;
+    font-weight: bold;
 
     display: flex;
     flex-direction: row;
@@ -28,18 +29,16 @@
     cursor: pointer;
 }
 
+.notification-list-entry-read:hover, .notification-list-entry-not-read:hover {
+    background: white;
+    transform: scale(1.01);
+}
+
+
 .notification-list-entry-icon-id-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.notification-list-entry-not-read:hover, .notification-list-entry-read:hover{
-    font-weight: 700;
-}
-
-.notification-list-entry-not-read:hover, .notification-list-entry-read:hover, .notification-list-entry-icon-container{
-    transform: scale(1.1);
 }
 
 .notification-list-entry-score {

@@ -37,6 +37,8 @@ function MiddleColumn({
       return (
         <ObjectDetails
           ships={ships}
+          notifications={notifications}
+          mapCenteringFun={mapCenteringFun}
           shipId={currentPage.shownShipId}
           pageChanger={pageChanger}
         />

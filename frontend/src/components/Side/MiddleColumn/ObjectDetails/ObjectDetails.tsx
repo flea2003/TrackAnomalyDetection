@@ -9,11 +9,15 @@ import "../../../../styles/objectDetails.css";
 import returnIcon from "../../../../assets/icons/back.svg";
 import { CurrentPage } from "../../../../App";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
+import ShipsNotificationListWithoutTitle from "../NotificationsList/ShipsNotificationListWithoutTitle";
+import ShipNotification from "../../../../model/ShipNotification";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
-  shipId: number;
+  notifications: ShipNotification[];
+  mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
+  shipId: number;
 }
 
 /**
@@ -30,6 +34,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
 
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = allShips.find((ship) => ship.id === shipID);
+  const shipNotifications = props.notifications.filter((x) => x.shipID === shipID);
 
   if (ship === undefined) {
     ErrorNotificationService.addWarning("No ship found with ID " + shipID);
@@ -43,11 +48,19 @@ function ObjectDetails(props: ObjectDetailsProps) {
         <span className="object-details-title">Score {ship.anomalyScore}%</span>
       </div>
       <List
-        style={{ maxHeight: "100%", overflow: "auto" }}
-        className="object-details-list"
+       className="object-details-properties-list"
       >
         {getPropertyElements(ship)}
       </List>
+      <div className="object-details-notification-title">Notifications</div>
+      <Stack className={"object-details-notification-list"}>
+        <ShipsNotificationListWithoutTitle
+          notifications={shipNotifications}
+          ships={props.ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={props.mapCenteringFun}
+        />
+      </Stack>
     </Stack>
   );
 }

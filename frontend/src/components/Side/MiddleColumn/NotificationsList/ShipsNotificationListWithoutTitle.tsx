@@ -2,7 +2,11 @@ import React from "react";
 import ShipNotification from "../../../../model/ShipNotification";
 import ShipDetails from "../../../../model/ShipDetails";
 import { CurrentPage } from "../../../../App";
-import ShipsNotificationEntry from "./ShipsNotificationEntry";
+import ShipsNotificationEntry from "./ShipsNotificationListEntry";
+import List from "@mui/material/List";
+
+import "../../../../styles/anomalyList.css";
+
 
 interface NotificationListProps {
   notifications: ShipNotification[];
@@ -19,7 +23,6 @@ function ShipsNotificationListWithoutTitle({
                                            }: NotificationListProps) {
   const listEntries = notifications.map((notification, i) => {
     const shipDetails =  ships.filter(x => x.id === notifications[i].shipID).slice()[0];
-
     return (
       <ShipsNotificationEntry
         key={i}
@@ -31,7 +34,7 @@ function ShipsNotificationListWithoutTitle({
     );
   });
 
-  return <div>{listEntries}</div>;
+  return <List id="notification-list-internal-container">{listEntries}</List>;
 }
 
 export default ShipsNotificationListWithoutTitle;

@@ -58,13 +58,6 @@ function NotificationDetails(props: ObjectDetailsProps) {
       >
         {getPropertyElements(notification)}
       </List>
-      <ShipsNotificationListWithoutTitle
-        notifications={shipNotifications}
-        ships={props.ships}
-        pageChanger={pageChanger}
-        mapCenteringFun={props.mapCenteringFun}
-      />
-
     </Stack>
   );
 }

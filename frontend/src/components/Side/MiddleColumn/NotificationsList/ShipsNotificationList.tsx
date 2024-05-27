@@ -6,10 +6,10 @@ import List from "@mui/material/List";
 import ErrorListEntry from "../ErrorNotifications/ErrorListEntry";
 import React from "react";
 import ShipNotification from "../../../../model/ShipNotification";
-import ShipNotificationEntry from "./ShipsNotificationEntry";
+import ShipNotificationListEntry from "./ShipsNotificationListEntry";
 import ShipDetails from "../../../../model/ShipDetails";
 import AnomalyListEntry from "../AnomalyList/AnomalyListEntry";
-import ShipsNotificationEntry from "./ShipsNotificationEntry";
+import ShipsNotificationEntry from "./ShipsNotificationListEntry";
 
 
 import "../../../../styles/common.css";
@@ -46,24 +46,23 @@ function ShipsNotificationList({
           onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
         />
         <div id="notification-list-name-text">Notifications</div>
-        <button
-          id="notification-list-mark-all-button"
-          onClick={() => {ShipsNotificationService.queryBackendToMarkAllNotificationsAsRead(notifications)}}>
-          read
-        </button>
+        <div id="notification-list-button-button-div">
+          <button
+            id="notification-list-mark-all-button"
+            onClick={() => {
+              ShipsNotificationService.queryBackendToMarkAllNotificationsAsRead(notifications);
+            }}>
+            read
+          </button>
+        </div>
       </Stack>
-      <List
-        id="notification-list-internal-container"
-        style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}
-      >
-        <ShipsNotificationListWithoutTitle
-          notifications={notifications}
-          ships={ships}
-          pageChanger={pageChanger}
-          mapCenteringFun={mapCenteringFun}
+      <ShipsNotificationListWithoutTitle
+        notifications={notifications}
+        ships={ships}
+        pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
           />
-      </List>
-    </Stack>
+      </Stack>
   );
 }
 
