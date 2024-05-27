@@ -6,7 +6,11 @@ import React, {
 } from "react";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import L from "leaflet";
-import createShipIcon from "../ShipIcon/ShipIcon";
+import {
+  createShipIcon,
+  handleMouseOutShipIcon,
+  handleMouseOverShipIcon,
+} from "../ShipIcon/ShipIcon";
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
 
@@ -14,6 +18,8 @@ import "../../styles/map.css";
 import "../../styles/common.css";
 
 import mapStyleConfig from "../../configs/mapConfig.json";
+import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
+import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -85,6 +91,15 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
       },
     }));
 
+    // Initialize the hoverInfo variable that will manage the display of the
+    // pop-up div containing reduced information about a particular ship
+    const [hoverInfo, setHoverInfo] = useState<ShipIconDetailsType>({
+      show: false,
+      x: 0,
+      y: 0,
+      shipDetails: null,
+    } as ShipIconDetailsType);
+
     // Everything to do with the map updates should be done inside useEffect
     useEffect(() => {
       // If the map is null, we need to create it. We do it once, with state
@@ -108,10 +123,17 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
             .bindPopup("ID: " + ship.id)
             .on("click", (e) => {
               map.flyTo(e.latlng, map.getZoom());
+              handleMouseOutShipIcon(e, setHoverInfo);
               pageChanger({
                 currentPage: "objectDetails",
                 shownShipId: ship.id,
               });
+            })
+            .on("mouseover", (e) => {
+              handleMouseOverShipIcon(e, ship, map, setHoverInfo);
+            })
+            .on("mouseout", (e) => {
+              handleMouseOutShipIcon(e, setHoverInfo);
             });
         } catch (error) {
           if (error instanceof Error) {
@@ -139,6 +161,11 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
     return (
       <div id="map-container">
         <div id="map" data-testid="map"></div>
+        {hoverInfo.show && hoverInfo.shipDetails !== null && (
+          <div>
+            <ShipIconDetails {...hoverInfo}></ShipIconDetails>
+          </div>
+        )}
       </div>
     );
   },
