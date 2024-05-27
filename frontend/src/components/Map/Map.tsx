@@ -123,7 +123,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
             .bindPopup("ID: " + ship.id)
             .on("click", (e) => {
               map.flyTo(e.latlng, map.getZoom());
-              handleMouseOverShipIcon(e, ship, map, setHoverInfo);
+              handleMouseOutShipIcon(e, setHoverInfo);
               pageChanger({
                 currentPage: "objectDetails",
                 shownShipId: ship.id,
