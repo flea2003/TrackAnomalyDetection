@@ -13,6 +13,7 @@ public class FlinkJson {
      * Static method that takes a Flink data stream of objects and serializes them to JSON strings.
      *
      * @param source a Flink data stream of objects
+     * @param <T> the type of incoming stream
      * @return a Flink data stream of JSON strings
      */
     public static <T> DataStream<String> serialize(DataStream<T> source) {
@@ -31,6 +32,7 @@ public class FlinkJson {
      *
      * @param source a Flink data stream of JSON strings
      * @param classType the class type of the objects to deserialize to
+     * @param <T> the type of resulting stream
      * @return a Flink data stream of objects
      */
     public static <T> DataStream<T> deserialize(DataStream<String> source, Class<T> classType) {

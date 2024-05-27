@@ -19,6 +19,12 @@ public class ShipInformationExtractor {
     private final KTable<Long, CurrentShipDetails> state;
     private final KafkaStreams kafkaStreams;
 
+    /**
+     * Constructor for ShipInformationExtractor.
+     *
+     * @param state Kafka table representing the current state
+     * @param kafkaStreams KafkaStreams object
+     */
     public ShipInformationExtractor(KTable<Long, CurrentShipDetails> state, KafkaStreams kafkaStreams) {
         this.state = state;
         this.kafkaStreams = kafkaStreams;

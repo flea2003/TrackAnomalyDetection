@@ -24,6 +24,12 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     private transient ValueState<AISSignal> aisSignalValueState;
     private transient ValueState<OffsetDateTime> lastDetectedAnomalyTime;
 
+    /**
+     * Initializes the heuristic score calculator. More precisely, initializes the value
+     * states for anomaly information, last AIS signal and last detected anomaly timestamp.
+     *
+     * @param config the properties for Flink environment
+     */
     @Override
     public void open(Configuration config) {
 
@@ -68,7 +74,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
         // time is less than 30 minutes
         AnomalyInformation anomalyInformation;
         if (getLastDetectedAnomalyTime().value() != null
-            && Duration.between(getLastDetectedAnomalyTime().value(), value.getTimestamp()).toMinutes() <= 30) {
+                && Duration.between(getLastDetectedAnomalyTime().value(), value.getTimestamp()).toMinutes() <= 30) {
             anomalyInformation = new AnomalyInformation(anomalyScore, badMsg, value.getTimestamp(), value.getId());
         } else {
             anomalyInformation = new AnomalyInformation(0f, goodMsg, value.getTimestamp(), value.getId());
