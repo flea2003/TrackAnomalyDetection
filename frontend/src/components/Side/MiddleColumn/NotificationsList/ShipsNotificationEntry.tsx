@@ -7,10 +7,13 @@ import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import shipIcon from "../../../../assets/icons/ship.png";
+import warning from "../../../../assets/icons/error-notifications/warning.svg";
+
 
 import "../../../../styles/common.css";
 import "../../../../styles/shipNotificationList.css";
 import "../../../../styles/shipNotificationEntry.css";
+import {ShipsNotificationService} from "../../../../services/ShipsNotificationService";
 
 
 interface NotificationEntryProps {
@@ -32,20 +35,28 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
 
   const shipIconAltText = "Ship Icon";
 
+  const readStatusClassName = notification.isRead
+    ? "notification-list-entry-read"
+    : "notification-list-entry-not-read";
+
+  //console.log(readStatusClassName)
+
+  const id = notification.id;
   const shipAnomalyScore = notification.anomalyScore;
   const message = notification.explanation;
-  const shipId = notification.id % 1000;
+  const shipId = notification.shipID % 1000;
   const date = notification.correspondingTimestamp;
 
   const onClick = () => {
     pageChanger({ currentPage: "notificationDetails", shownShipId: notification.id });
     mapCenteringFun(shipDetails);
+    ShipsNotificationService.markAsRead(notification);
   };
 
   return (
     <Stack
       direction="row"
-      className="notification-list-entry"
+      className={readStatusClassName}
       spacing={0}
       onClick={onClick}
     >
@@ -59,12 +70,12 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
         </span>
         <span className="notification-list-entry-id">#{shipId}</span>
       </div>
-      <span className="notification-list-entry-score">{shipAnomalyScore}%</span>
+      <span className="readStatusClassnAME">{shipAnomalyScore}%</span>
       <span className="notification-list-entry-date">{date}</span>
       <span className="notification-list-entry-explanation">{message}</span>
       <span className="error-list-entry-icon-container">
         <img
-          src={trashIcon}
+          src={warning}
           className="error-list-entry-trash-icon"
           data-testid="error-list-entry-trash-icon"
           alt="Trash Icon"

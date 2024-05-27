@@ -26,3 +26,14 @@
     align-items: center;
     border-bottom: 1px solid black;
 }
+
+#notification-list-mark-all-button {
+    height: var(--anomaly-list-closing-icon-size);
+    width: var(--notification-list-mark-all-button-length);
+    cursor: pointer;
+}
+
+#notification-list-mark-all-button {
+    height: var(--anomaly-list-closing-icon-size);
+    width: var(--notification-list-mark-all-button-length);
+}

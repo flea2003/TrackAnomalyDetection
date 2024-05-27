@@ -2,6 +2,7 @@ class ShipNotification {
   static rounding = 1000;
   id: number;
   shipID: number;
+  isRead: boolean;
   heading: number;
   lat: number;
   lng: number;
@@ -16,6 +17,7 @@ class ShipNotification {
   constructor(
     id: number,
     shipID: number,
+    isRead: boolean,
     heading: number,
     lat: number,
     lng: number,
@@ -29,6 +31,7 @@ class ShipNotification {
   ) {
     this.id = id;
     this.shipID = shipID;
+    this.isRead = isRead;
     this.heading = heading;
     this.lat = lat;
     this.lng = lng;

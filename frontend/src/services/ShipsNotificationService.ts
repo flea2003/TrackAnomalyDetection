@@ -11,15 +11,27 @@ import notificationResponseItem from "../templates/NotificationResponseItem";
 
 
 export class ShipsNotificationService {
-  static notificationsEndpoint = "/notifications"
+  static getAllNotificationsEndpoint = "/notifications";
+  static markAsReadEndpoint = "/notifications/read/";
 
   static refreshState = () => {
     console.log("ShipNotificationService refreshState was not set up");
   };
 
+  static markAsRead = async (details: ShipNotification) => {
+    if (details.isRead) return;
+    await HttpSender.put(ShipsNotificationService.markAsReadEndpoint + details.id);
+  }
+
+  static markAllAsRead = async (notifications: ShipNotification[]) => {
+    for (let i = 0; i < notifications.length; i++) {
+        await ShipsNotificationService.markAsRead(notifications[i]);
+    }
+  }
+
   static queryBackendForNotificationsArray: () => Promise<ShipNotification[]> = async () => {
     const response = await HttpSender.get(
-      ShipsNotificationService.notificationsEndpoint,
+      ShipsNotificationService.getAllNotificationsEndpoint,
     );
 
     if (!Array.isArray(response)) {
@@ -55,9 +67,11 @@ export class ShipsNotificationService {
   static extractNotificationDetails: (item: NotificationResponseItem) => ShipNotification = (
     item,
   ) => {
+    console.log(item)
     return new ShipNotification(
         item.id,
         item.shipID,
+        item.read,
         item.currentShipDetails.currentAISSignal.heading,
         item.currentShipDetails.currentAISSignal.latitude,
         item.currentShipDetails.currentAISSignal.longitude,

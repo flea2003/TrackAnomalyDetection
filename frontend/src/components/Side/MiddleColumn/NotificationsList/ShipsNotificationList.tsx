@@ -16,6 +16,7 @@ import "../../../../styles/common.css";
 import "../../../../styles/shipNotificationList.css";
 import "../../../../styles/shipNotificationEntry.css";
 import shipDetails from "../../../../model/ShipDetails";
+import shipsNotificationService, { ShipsNotificationService } from "../../../../services/ShipsNotificationService";
 
 
 interface NotificationListProps {
@@ -57,7 +58,12 @@ function ShipsNotificationList({
           data-testid="notification-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
         />
-        <div>Notifications</div>
+        <div id="notification-list-name-text">Notifications</div>
+        <button
+          id="notification-list-mark-all-button"
+          onClick={() => {ShipsNotificationService.markAllAsRead(notifications)}}>
+          read
+        </button>
       </Stack>
       <List
         id="notification-list-internal-container"

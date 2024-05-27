@@ -9,7 +9,7 @@ import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
 import Side from "./components/Side/Side";
-import { ShipsNotificationService } from "./services/ShipsNotificationService";
+import shipsNotificationService, { ShipsNotificationService } from "./services/ShipsNotificationService";
 import ShipNotification from "./model/ShipNotification";
 
 /**
