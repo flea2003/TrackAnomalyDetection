@@ -1,7 +1,14 @@
 import React, { CSSProperties } from "react";
 import "../../styles/shipIconDetails.css";
 import TimeUtilities from "../../utils/TimeUtilities";
-import ShipIconDetailsType from "../../templates/ShipIconDetailsType";
+import ShipDetails from "../../model/ShipDetails";
+
+export interface ShipIconDetailsType {
+  show: boolean;
+  x: number;
+  y: number;
+  shipDetails: ShipDetails | null;
+}
 
 /**
  * This component manages the state of the pop-up div with reduced ship details.

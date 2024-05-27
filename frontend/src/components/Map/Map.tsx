@@ -6,7 +6,11 @@ import React, {
 } from "react";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import L from "leaflet";
-import createShipIcon from "../ShipIcon/ShipIcon";
+import {
+  createShipIcon,
+  handleMouseOutShipIcon,
+  handleMouseOverShipIcon,
+} from "../ShipIcon/ShipIcon";
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
 
@@ -15,7 +19,7 @@ import "../../styles/common.css";
 
 import mapStyleConfig from "../../configs/mapConfig.json";
 import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
-import ShipIconDetailsType from "../../templates/ShipIconDetailsType";
+import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -119,16 +123,17 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
             .bindPopup("ID: " + ship.id)
             .on("click", (e) => {
               map.flyTo(e.latlng, map.getZoom());
+              handleMouseOverShipIcon(e, ship, map, setHoverInfo);
               pageChanger({
                 currentPage: "objectDetails",
                 shownShipId: ship.id,
               });
             })
             .on("mouseover", (e) => {
-              handleMouseOverShipIcon(e, ship);
+              handleMouseOverShipIcon(e, ship, map, setHoverInfo);
             })
             .on("mouseout", (e) => {
-              handleMouseOutShipIcon(e);
+              handleMouseOutShipIcon(e, setHoverInfo);
             });
         } catch (error) {
           if (error instanceof Error) {
@@ -141,31 +146,6 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
           }
         }
       });
-      // Event handling methods for the ship icons
-      const handleMouseOverShipIcon = (
-        e: L.LeafletMouseEvent,
-        ship: ShipDetails,
-      ) => {
-        // Extract the latitude and longitude coordinates from the LeafletMouseEvent
-        const latLongCoords = e.latlng;
-        const containerPort = map.latLngToContainerPoint(latLongCoords);
-        const { x, y } = containerPort;
-        setHoverInfo({
-          show: true,
-          x: x,
-          y: y,
-          shipDetails: ship,
-        } as ShipIconDetailsType);
-      };
-
-      const handleMouseOutShipIcon = (e: L.LeafletMouseEvent) => {
-        setHoverInfo({
-          show: false,
-          x: 0,
-          y: 0,
-          shipDetails: null,
-        } as ShipIconDetailsType);
-      };
 
       return () => {
         if (map) {
