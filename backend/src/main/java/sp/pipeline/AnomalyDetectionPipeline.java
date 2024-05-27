@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
-import sp.pipeline.parts.extractors.ShipInformationExtractor;
+import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;

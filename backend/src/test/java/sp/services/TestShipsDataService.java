@@ -1,15 +1,10 @@
 package sp.services;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -20,9 +15,8 @@ import sp.pipeline.AnomalyDetectionPipeline;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import sp.pipeline.parts.extractors.ShipInformationExtractor;
+import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
