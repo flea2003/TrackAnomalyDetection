@@ -18,6 +18,7 @@ public class KafkaJson {
      *
      * @param stream KStream of JSON strings
      * @param classType class type of the objects to deserialize to
+     * @param <T> the type of resulting stream
      * @return a KStream of objects of the given class type
      */
     public static <T> KStream<Long, T> deserialize(KStream<Long, String> stream,
@@ -36,6 +37,7 @@ public class KafkaJson {
      * Serialize a Kafka Stream of objects to a KStream of JSON strings.
      *
      * @param stream KStream of objects
+     * @param <T> the type of the stream to serialize
      * @return a KStream of JSON strings
      */
     public static <T> KStream<Long, String> serialize(KStream<Long, T> stream) {

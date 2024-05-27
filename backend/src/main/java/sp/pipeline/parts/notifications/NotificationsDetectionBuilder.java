@@ -35,6 +35,7 @@ public class NotificationsDetectionBuilder {
      * is enough to have the information of the most recent notification for that ship, and a new AnomalyInformation
      * signal (which in our case is wrapped in CurrentShipDetails for optimization purposes for retrieving AIS signal).
      *
+     * @param state the Kafka table representing the state
      */
     public void buildNotifications(KTable<Long, CurrentShipDetails> state) {
         // Construct a stream for computed AnomalyInformation objects

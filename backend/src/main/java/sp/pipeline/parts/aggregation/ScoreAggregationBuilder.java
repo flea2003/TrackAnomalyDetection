@@ -108,6 +108,9 @@ public class ScoreAggregationBuilder {
      * 4. The AIS-score-update type ShipInformation objects  get to the KTable after those and just update the missing
      * anomaly score field in the corresponding places.
      * </p>
+     *
+     * @param builder incoming stream
+     * @return Kafka table hashed by key
      */
     public KTable<Long, CurrentShipDetails> buildScoreAggregationPart(StreamsBuilder builder) {
         // Construct and merge two streams and select the ship hash as a key for the new stream.
