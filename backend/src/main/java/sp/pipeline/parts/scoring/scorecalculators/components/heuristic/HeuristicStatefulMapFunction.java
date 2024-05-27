@@ -84,6 +84,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      * @param name name of the state
      * @param typeHint type hint for the descriptor (cannot be extracted since Flink then
      *                 shows errors about generic method)
+     * @param <T> the type of the objects stored in the value state
      * @return the created value state
      */
     private <T> ValueState<T> getValueState(String name, TypeHint<T> typeHint) {

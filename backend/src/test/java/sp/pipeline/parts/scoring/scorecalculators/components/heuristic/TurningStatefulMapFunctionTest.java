@@ -69,7 +69,7 @@ public class TurningStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Course difference between consecutive signals: 41 degrees is more than threshold of 40 degrees.
+                        Course difference between two consecutive signals is too large: 41 degrees is more than threshold of 40 degrees.
                         """
         );
     }
@@ -96,7 +96,7 @@ public class TurningStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Course difference between consecutive signals: 41 degrees is more than threshold of 40 degrees.
+                        Course difference between two consecutive signals is too large: 41 degrees is more than threshold of 40 degrees.
                         """
         );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
@@ -152,7 +152,7 @@ public class TurningStatefulMapFunctionTest {
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(34f);
         assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo(
                 """
-                        Course difference between consecutive signals: 140 degrees is more than threshold of 40 degrees.
+                        Course difference between two consecutive signals is too large: 140 degrees is more than threshold of 40 degrees.
                         """
         );
 

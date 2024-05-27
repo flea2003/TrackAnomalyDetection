@@ -38,7 +38,8 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
         if (signalsNotFrequent && shipTravelledMuch) {
             isAnomaly = true;
 
-            explanation += "Time between two signals is too large: " + df.format(timeDiffInMinutes(currentSignal, pastSignal))
+            explanation += "Time between two consecutive signals is too large: "
+                    + df.format(timeDiffInMinutes(currentSignal, pastSignal))
                     + " minutes is more than threshold of " + SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES + " minutes,"
                     + " and ship's speed (between two signals) is too large: "
                     + df.format(distanceDividedByHours(currentSignal, pastSignal))

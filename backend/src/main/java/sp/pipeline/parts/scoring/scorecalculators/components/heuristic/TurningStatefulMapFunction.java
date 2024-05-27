@@ -33,7 +33,7 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
         // Check heading difference
         if (circularMetric(getCorrectedHeading(pastSignal), getCorrectedHeading(currentSignal)) > HEADING_DIFFERENCE_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Heading difference between consecutive signals: "
+            explanation += "Heading difference between two consecutive signals is too large: "
                     + df.format(circularMetric(pastSignal.getHeading(), currentSignal.getHeading()))
                     + " degrees is more than threshold of " + df.format(HEADING_DIFFERENCE_THRESHOLD)
                     + " degrees"
@@ -43,7 +43,7 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
         // Check course difference
         if (circularMetric(pastSignal.getCourse(), currentSignal.getCourse()) > COURSE_DIFFERENCE_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Course difference between consecutive signals: "
+            explanation += "Course difference between two consecutive signals is too large: "
                     + df.format(circularMetric(pastSignal.getCourse(), currentSignal.getCourse()))
                     + " degrees is more than threshold of " + df.format(COURSE_DIFFERENCE_THRESHOLD)
                     + " degrees"
