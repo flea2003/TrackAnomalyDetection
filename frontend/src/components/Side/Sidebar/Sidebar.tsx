@@ -10,6 +10,7 @@ import shipIcon from "../../../assets/icons/ship.png";
 import bellIcon from "../../../assets/icons/bell-notification.svg";
 import settingsIcon from "../../../assets/icons/settings.svg";
 import bugIcon from "../../../assets/icons/bug.svg";
+import { ShipsNotificationService } from "../../../services/ShipsNotificationService";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -50,7 +51,7 @@ function Sidebar({ pageChanger }: SidebarProps) {
       </span>
       <span
         data-testid="sidebar-bell-icon"
-        className="sidebar-entry"
+        className={getNotificationsIconClassName()}
         onClick={onBellIconClicked}
       >
         <img src={bellIcon} className="sidebar-icon" alt={bellIconAlt} />
@@ -89,5 +90,15 @@ function getBugIconClassName() {
   }
   return "sidebar-bug-icon-not-all-read";
 }
+
+
+function getNotificationsIconClassName() {
+  if (ShipsNotificationService.areAllRead()) {
+    return "sidebar-bug-icon-all-read";
+  }
+  return "sidebar-bug-icon-not-all-read";
+}
+
+
 
 export default Sidebar;

@@ -52,7 +52,7 @@ class ShipNotification {
    */
   getPropertyList() {
     return [
-      { type: "Ship ID", value: this.id.toString() },
+      { type: "Ship ID", value: this.shipID.toString() },
       { type: "Explanation", value: this.explanation },
       {
         type: "Highest Recorded Anomaly Score",

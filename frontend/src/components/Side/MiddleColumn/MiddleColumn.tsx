@@ -53,6 +53,8 @@ function MiddleColumn({
         notifications={notifications}
         notificationID={currentPage.shownShipId}  // note that here we use shownShipId variable to pass the notification ID
         pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
+        ships={ships}
       />;
     case "settings":
       return <div>Settings</div>;

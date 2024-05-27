@@ -17,6 +17,7 @@ import "../../../../styles/shipNotificationList.css";
 import "../../../../styles/shipNotificationEntry.css";
 import shipDetails from "../../../../model/ShipDetails";
 import shipsNotificationService, { ShipsNotificationService } from "../../../../services/ShipsNotificationService";
+import ShipsNotificationListWithoutTitle from "./ShipsNotificationListWithoutTitle";
 
 
 interface NotificationListProps {
@@ -33,20 +34,6 @@ function ShipsNotificationList({
                        pageChanger,
                        mapCenteringFun,
                      }: NotificationListProps) {
-  const listEntries = [];
-  for (let i = 0; i < notifications.length; i++) {
-    const shipDetails = ships.filter(x => x.id === notifications[i].shipID).slice()[0];
-    listEntries.push(
-      // eslint-disable-next-line react/jsx-no-undef
-      <ShipsNotificationEntry
-        key={i}
-        notification={notifications[i]}
-        shipDetails={shipDetails}
-        pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-      />
-    );
-  }
 
   return (
     <Stack id="notification-list-container" data-testid="notification-list-container">
@@ -61,7 +48,7 @@ function ShipsNotificationList({
         <div id="notification-list-name-text">Notifications</div>
         <button
           id="notification-list-mark-all-button"
-          onClick={() => {ShipsNotificationService.markAllAsRead(notifications)}}>
+          onClick={() => {ShipsNotificationService.queryBackendToMarkAllNotificationsAsRead(notifications)}}>
           read
         </button>
       </Stack>
@@ -69,7 +56,12 @@ function ShipsNotificationList({
         id="notification-list-internal-container"
         style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}
       >
-        {listEntries}
+        <ShipsNotificationListWithoutTitle
+          notifications={notifications}
+          ships={ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+          />
       </List>
     </Stack>
   );

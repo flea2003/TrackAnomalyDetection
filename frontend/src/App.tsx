@@ -74,7 +74,7 @@ function App() {
   useEffect(() => {
     setInterval(() => {
       // Query for ships. When the results arrive, update the state
-      ShipsNotificationService.queryBackendForNotificationsArray().then(
+      ShipsNotificationService.queryBackendForAllNotifications().then(
         (notificationsArray: ShipNotification[]) => {
           setNotifications(notificationsArray);
         },

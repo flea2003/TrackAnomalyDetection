@@ -11,27 +11,35 @@ import notificationResponseItem from "../templates/NotificationResponseItem";
 
 
 export class ShipsNotificationService {
-  static getAllNotificationsEndpoint = "/notifications";
+  // THIS IS ONLY USED FOR OPTIMIZATION REASONS FOR areAllRead() METHOD WHICH
+  // THEN DOES NOT HAVE TO QUERY THE BACKEND AGAIN
+  private static notifications: ShipNotification[] = [];
+
+  static allNotificationsEndpoint = "/notifications";
   static markAsReadEndpoint = "/notifications/read/";
 
   static refreshState = () => {
     console.log("ShipNotificationService refreshState was not set up");
   };
 
-  static markAsRead = async (details: ShipNotification) => {
+  static queryBackendToMarkANotificationAsRead = async (details: ShipNotification) => {
     if (details.isRead) return;
     await HttpSender.put(ShipsNotificationService.markAsReadEndpoint + details.id);
   }
 
-  static markAllAsRead = async (notifications: ShipNotification[]) => {
+  static queryBackendToMarkAllNotificationsAsRead = async (notifications: ShipNotification[]) => {
     for (let i = 0; i < notifications.length; i++) {
-        await ShipsNotificationService.markAsRead(notifications[i]);
+        await ShipsNotificationService.queryBackendToMarkANotificationAsRead(notifications[i]);
     }
   }
 
-  static queryBackendForNotificationsArray: () => Promise<ShipNotification[]> = async () => {
+  static queryBackendForAllNotificationsForShip: (shipID: number) => Promise<ShipNotification[]> = async (shipID) => {
+      return await HttpSender.get(ShipsNotificationService.allNotificationsEndpoint + "/" + shipID);
+  }
+
+  static queryBackendForAllNotifications: () => Promise<ShipNotification[]> = async () => {
     const response = await HttpSender.get(
-      ShipsNotificationService.getAllNotificationsEndpoint,
+      ShipsNotificationService.allNotificationsEndpoint,
     );
 
     if (!Array.isArray(response)) {
@@ -49,7 +57,7 @@ export class ShipsNotificationService {
       ErrorNotificationService.addError("Notifications array contained null items");
     }
 
-    return ShipsNotificationService.sortList(
+    this.notifications = ShipsNotificationService.sortList(
       responseWithoutNulls.map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (item: any) => ShipsNotificationService.extractNotificationDetails(item),
@@ -57,6 +65,7 @@ export class ShipsNotificationService {
       "desc",
     );
 
+    return this.notifications;
   }
   /**
    * Utility method that parses the received JSON data and assembles the
@@ -116,6 +125,12 @@ export class ShipsNotificationService {
     return sortedList;
   };
 
+  /**
+   * Checks if all current notifications are marked as read.
+   */
+  static areAllRead() {
+    return this.notifications.every((notification) => notification.isRead);
+  }
 }
 
 export default ShipNotification;

@@ -50,7 +50,7 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
   const onClick = () => {
     pageChanger({ currentPage: "notificationDetails", shownShipId: notification.id });
     mapCenteringFun(shipDetails);
-    ShipsNotificationService.markAsRead(notification);
+    ShipsNotificationService.queryBackendToMarkANotificationAsRead(notification);
   };
 
   return (
