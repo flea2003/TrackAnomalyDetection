@@ -1,6 +1,6 @@
 react_build:
   stage: build
-  image: node:lts
+  image: node:20.13.1
   needs: []
   before_script:
     - cd frontend
@@ -11,7 +11,7 @@ react_build:
 
 react_tests:
   stage: test
-  image: node:lts
+  image: node:20.13.1
   needs: ["react_build"]
   before_script:
     - cd frontend
@@ -32,7 +32,7 @@ react_tests:
 
 react_linter:
   stage: code_quality
-  image: node:lts
+  image: node:20.13.1
   needs: ["react_build"]
   before_script:
     - cd frontend
@@ -42,7 +42,7 @@ react_linter:
 
 react_prettier_checks:
   stage: code_quality
-  image: node:lts
+  image: node:20.13.1
   needs: ["react_build"]
   before_script:
     - cd frontend
@@ -52,7 +52,7 @@ react_prettier_checks:
 
 react_statement_coverage:
   stage: collect_coverage
-  image: node:lts
+  image: node:20.13.1
   needs: ["react_tests"]
   before_script: cd frontend
   script:
@@ -61,7 +61,7 @@ react_statement_coverage:
 
 react_branch_coverage:
   stage: collect_coverage
-  image: node:lts
+  image: node:20.13.1
   needs: ["react_tests"]
   before_script: cd frontend
   script:

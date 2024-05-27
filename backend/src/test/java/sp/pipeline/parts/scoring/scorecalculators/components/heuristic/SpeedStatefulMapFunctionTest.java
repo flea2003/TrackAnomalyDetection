@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.operators.StreamMap;
 import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,10 +104,42 @@ public class SpeedStatefulMapFunctionTest {
     }
 
     @Test
-    void testAccelerationIsTooBig() {
+    void testIsAnomalyEdgeCases() {
         assertThat(
-                speedStatefulMapFunction.isAnomaly(0.0f, 0.0f, 100.0f)
+                speedStatefulMapFunction.isAnomaly(55.5, 10, 49.99)
+        ).isFalse();
+
+        assertThat(
+                speedStatefulMapFunction.isAnomaly(55.51, 10, 49.99)
         ).isTrue();
+
+        assertThat(
+                speedStatefulMapFunction.isAnomaly(55.5, 10.01, 49.99)
+        ).isTrue();
+
+        assertThat(
+                speedStatefulMapFunction.isAnomaly(55.5, 10, 50)
+        ).isTrue();
+    }
+
+    @Test
+    void testHelperFunctionsEdgeCases() {
+        // edge cases to catch the mutants
+
+        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50:00Z");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:50:01Z");
+        AISSignal aisSignal1 = new AISSignal(1, 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 13.0f, 10.00001f, 10, 20, 20, timestamp2, "Malta");
+
+        assertThat(speedStatefulMapFunction.computeSpeed(aisSignal2, aisSignal1))
+                .isCloseTo(104.43270439282058, Offset.offset(0.000001));
+
+        assertThat(speedStatefulMapFunction.getReportedSpeedDifference(aisSignal2, aisSignal1))
+                .isCloseTo(91.43270439282058, Offset.offset(0.000001));
+
+        assertThat(speedStatefulMapFunction.calculateAcceleration(aisSignal2, aisSignal1))
+                .isCloseTo(19999.980926513672, Offset.offset(0.000001));
+
     }
 
 }

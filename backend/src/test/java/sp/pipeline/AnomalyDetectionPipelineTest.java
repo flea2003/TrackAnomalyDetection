@@ -9,8 +9,8 @@ import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsAggregator;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
-import sp.pipeline.parts.scoring.scorecalculators.DefaultScoreCalculator;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
+import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
 import sp.pipeline.utils.StreamUtils;
 import sp.services.NotificationService;
 
@@ -43,7 +43,7 @@ class AnomalyDetectionPipelineTest {
         config = new PipelineConfiguration("kafka-connection.properties");
 
         // Create the core objects
-        scoreCalculationStrategy = new DefaultScoreCalculator();
+        scoreCalculationStrategy = new SimpleScoreCalculator();
         currentStateAggregator = new CurrentStateAggregator();
         notificationsAggregator = new NotificationsAggregator(notificationService);
 
