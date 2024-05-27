@@ -110,4 +110,39 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("");
     }
 
+    @Test
+    void anomalousAcceleration() throws Exception {
+        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:51Z");
+        OffsetDateTime timestamp3 = OffsetDateTime.parse("2024-12-30T04:52Z");
+        AISSignal aisSignal1 = new AISSignal(1, 10f, 10, 10, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 60.001f, 10, 10, 20, 20, timestamp2, "Malta");
+        AISSignal aisSignal3 = new AISSignal(1, 110f, 10, 10, 20, 20, timestamp3, "Malta");
+
+        testHarness.processElement(aisSignal1, 20);
+        testHarness.processElement(aisSignal2, 60);
+        testHarness.processElement(aisSignal3, 61);
+        var anomalies = testHarness.extractOutputStreamRecords();
+
+        assertThat(anomalies.size()).isEqualTo(3);
+
+        assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
+
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 60 km/min by more than allowed margin of 10 km/min.
+                        Acceleration is too big: 50 km/min^2 is bigger than threshold of 50 km/min^2.
+                        """
+        );
+
+        assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo(
+                """
+                        Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 110 km/min by more than allowed margin of 10 km/min.
+                        """
+        );
+    }
+
 }

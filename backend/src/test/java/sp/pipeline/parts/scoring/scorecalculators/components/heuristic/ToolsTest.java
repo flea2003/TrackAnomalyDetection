@@ -18,4 +18,10 @@ class ToolsTest {
         assertThat(Math.round(circularMetric(33.4f, 85.3f))).isEqualTo(52);
     }
 
+    @Test
+    void constructorTest() {
+        Tools t = new Tools();
+        assertThat(t).isNotNull();
+    }
+
 }

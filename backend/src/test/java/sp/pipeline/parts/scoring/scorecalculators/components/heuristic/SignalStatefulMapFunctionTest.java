@@ -129,4 +129,24 @@ public class SignalStatefulMapFunctionTest {
         assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("");
     }
 
+    @Test
+    void testSignalTimeDiffBoundary() throws Exception {
+        // boundary test for the constant SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES
+
+        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:00Z");
+        AISSignal aisSignal1 = new AISSignal(1, 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 12.8f, 11, 10, 20, 20, timestamp2, "Malta");
+
+        testHarness.processElement(aisSignal1, 20);
+        testHarness.processElement(aisSignal2, 31);
+        var anomalies = testHarness.extractOutputStreamRecords();
+
+        assertThat(anomalies.size()).isEqualTo(2);
+
+        // second signal is not an anomaly (happens only after 10 minutes after the first one)
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0f);
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("");
+    }
+
 }
