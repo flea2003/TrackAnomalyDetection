@@ -9,6 +9,7 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
 
     private static final float HEADING_DIFFERENCE_THRESHOLD = 40;
     private static final float COURSE_DIFFERENCE_THRESHOLD = 40;
+    private static final float NO_HEADING = 511;
 
     /**
      * Checks if the current signal is an anomaly.
@@ -23,54 +24,34 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
      *     are also included in the same return object.
      */
     @Override
-    AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
-        // currentSignal.updateHeading(); // in case no heading was reported
-
+    protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
         boolean isAnomaly = false;
         String explanation = "";
 
         DecimalFormat df = getDecimalFormatter();
 
-        if (headingDiffTooBig(pastSignal, currentSignal)) {
+        // Check heading difference
+        if (circularMetric(getCorrectedHeading(pastSignal), getCorrectedHeading(currentSignal)) > HEADING_DIFFERENCE_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Heading changed too much: "
+            explanation += "Heading difference between consecutive signals: "
                     + df.format(circularMetric(pastSignal.getHeading(), currentSignal.getHeading()))
-                    + " is more than threshold " + df.format(HEADING_DIFFERENCE_THRESHOLD)
+                    + " degrees is more than threshold of " + df.format(HEADING_DIFFERENCE_THRESHOLD)
+                    + " degrees"
                     + explanationEnding();
         }
 
-        if (courseDiffTooBig(pastSignal, currentSignal)) {
+        // Check course difference
+        if (circularMetric(pastSignal.getCourse(), currentSignal.getCourse()) > COURSE_DIFFERENCE_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Course changed too much: "
+            explanation += "Course difference between consecutive signals: "
                     + df.format(circularMetric(pastSignal.getCourse(), currentSignal.getCourse()))
-                    + " is more than threshold " + df.format(COURSE_DIFFERENCE_THRESHOLD)
+                    + " degrees is more than threshold of " + df.format(COURSE_DIFFERENCE_THRESHOLD)
+                    + " degrees"
                     + explanationEnding();
         }
 
         return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
 
-    }
-
-    /**
-     * Checks if the change in the heading variable is bigger than the threshold.
-     *
-     * @param pastSignal the past AIS signal
-     * @param currentSignal the current AIS signal
-     * @return true if the heading difference is too big, false otherwise
-     */
-    private boolean headingDiffTooBig(AISSignal pastSignal, AISSignal currentSignal) {
-        return circularMetric(pastSignal.getHeading(), currentSignal.getHeading()) > HEADING_DIFFERENCE_THRESHOLD;
-    }
-
-    /**
-     * Checks if the change in the course variable is bigger than the threshold.
-     *
-     * @param pastSignal the past AIS signal
-     * @param currentSignal the current AIS signal
-     * @return true if the course difference is too big, false otherwise
-     */
-    private boolean courseDiffTooBig(AISSignal pastSignal, AISSignal currentSignal) {
-        return circularMetric(pastSignal.getCourse(), currentSignal.getCourse()) > COURSE_DIFFERENCE_THRESHOLD;
     }
 
     /**
@@ -80,17 +61,22 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
      * @return the anomaly score of the heuristic
      */
     @Override
-    float getAnomalyScore() {
+    protected float getAnomalyScore() {
         return 34f;
     }
 
     /**
-     * Explanation string for the heuristic which is used when the ship is non-anomalous.
+     * Gets the heading of the signal. If the signal has not reported any heading
+     * (which is denoted by 511), then the course is returned instead.
      *
-     * @return explanation string
+     * @param signal the AIS signal
+     * @return the heading if exists, or the course otherwise
      */
-    @Override
-    String getNonAnomalyExplanation() {
-        return "The ship's turning direction is ok" + explanationEnding();
+    private float getCorrectedHeading(AISSignal signal) {
+        if (signal.getHeading() == NO_HEADING) {
+            return signal.getCourse();
+        }
+
+        return signal.getHeading();
     }
 }

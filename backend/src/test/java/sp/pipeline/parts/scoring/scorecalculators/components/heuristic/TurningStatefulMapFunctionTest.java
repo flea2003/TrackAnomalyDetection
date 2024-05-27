@@ -48,7 +48,7 @@ public class TurningStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(1);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
     }
 
     @Test
@@ -65,11 +65,11 @@ public class TurningStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Course changed too much: 41 is more than threshold 40.
+                        Course difference between consecutive signals: 41 degrees is more than threshold of 40 degrees.
                         """
         );
     }
@@ -92,36 +92,15 @@ public class TurningStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(3);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(34.0f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Course changed too much: 41 is more than threshold 40.
+                        Course difference between consecutive signals: 41 degrees is more than threshold of 40 degrees.
                         """
         );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("");
 
     }
-
-//    @Test
-//    void testHeading511() throws Exception {
-//        // Heading 511 in aisSignal1
-//        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
-//        AISSignal aisSignal1 = new AISSignal(1, 20, 10, 10, 20, 511, timestamp1, "Malta");
-//
-//        testHarness.processElement(aisSignal1, 10);
-//
-//        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:55Z");
-//        AISSignal aisSignal2 = new AISSignal(1, 20, 10, 10, 20, 22, timestamp2, "Malta");
-//
-//        testHarness.processElement(aisSignal2, 12);
-//
-//        var anomalies = testHarness.extractOutputStreamRecords();
-//
-//        assertThat(anomalies.size()).isEqualTo(1);
-//        assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-//        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's turning direction is ok.\n");
-//    }
-
 }

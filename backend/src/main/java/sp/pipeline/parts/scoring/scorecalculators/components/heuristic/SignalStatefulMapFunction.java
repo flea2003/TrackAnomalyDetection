@@ -26,20 +26,23 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
      *     are also included in the same return object.
      */
     @Override
-    AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+    protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
         boolean isAnomaly = false;
         String explanation = "";
 
         DecimalFormat df = getDecimalFormatter();
 
-        if (signalsNotFrequent(currentSignal, pastSignal) && shipTravelledMuch(currentSignal, pastSignal)) {
+        boolean signalsNotFrequent = timeDiffInMinutes(currentSignal, pastSignal) > SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES;
+        boolean shipTravelledMuch = distanceDividedByHours(currentSignal, pastSignal) > TRAVELLED_DISTANCE_THRESHOLD;
+
+        if (signalsNotFrequent && shipTravelledMuch) {
             isAnomaly = true;
 
             explanation += "Time between two signals is too large: " + df.format(timeDiffInMinutes(currentSignal, pastSignal))
-                    + " minutes is more than threshold " + SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES + " minutes, "
-                    + " and ship travelled too much between signals: "
+                    + " minutes is more than threshold of " + SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES + " minutes,"
+                    + " and ship's speed (between two signals) is too large: "
                     + df.format(distanceDividedByHours(currentSignal, pastSignal))
-                    + " is more than threshold " + TRAVELLED_DISTANCE_THRESHOLD
+                    + " km/h is more than threshold of " + TRAVELLED_DISTANCE_THRESHOLD + " km/h"
                     + explanationEnding();
         }
 
@@ -53,41 +56,8 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
      * @return the anomaly score of the heuristic
      */
     @Override
-    float getAnomalyScore() {
+    protected float getAnomalyScore() {
         return 33f;
-    }
-
-    /**
-     * Explanation string for the heuristic which is used when the ship is non-anomalous.
-     *
-     * @return explanation string
-     */
-    @Override
-    String getNonAnomalyExplanation() {
-        return "The time difference between consecutive AIS signals is ok" + explanationEnding();
-    }
-
-    /**
-     * Checks if signals were sent NOT frequently. The comparison is done with the threshold
-     * value SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES.
-     *
-     * @param currentSignal the current AIS signal
-     * @param pastSignal the past AIS signal
-     * @return true if the time between the signals is too big, false otherwise
-     */
-    private boolean signalsNotFrequent(AISSignal currentSignal, AISSignal pastSignal) {
-        return timeDiffInMinutes(currentSignal, pastSignal) > SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES;
-    }
-
-    /**
-     * Checks if ship did not travel more than the threshold value.
-     *
-     * @param currentSignal the current AIS signal
-     * @param pastSignal the past AIS signal
-     * @return true if the ship travelled more than the threshold, false otherwise
-     */
-    private boolean shipTravelledMuch(AISSignal currentSignal, AISSignal pastSignal) {
-        return distanceDividedByHours(currentSignal, pastSignal) > TRAVELLED_DISTANCE_THRESHOLD;
     }
 
     /**

@@ -25,32 +25,35 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
      *     are also included in the same return object.
      */
-    AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+    protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
         String explanation = "";
         boolean isAnomaly = false;
 
         DecimalFormat df = getDecimalFormatter();
 
-        if (speedIsTooFast(currentSignal, pastSignal)) {
+        // Compute and check speed between the signals
+        if (computeSpeed(currentSignal, pastSignal) > SPEED_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Too fast: " + df.format(computeSpeed(currentSignal, pastSignal))
-                    + " is faster than threshold " + df.format(SPEED_THRESHOLD)
-                    + explanationEnding();
+            explanation += "Speed is too big: " + df.format(computeSpeed(currentSignal, pastSignal))
+                    + " km/min is faster than threshold of " + df.format(SPEED_THRESHOLD)
+                    + " km/min" + explanationEnding();
         }
 
-        if (reportedSpeedIsNotAccurate(currentSignal, pastSignal)) {
+        // Check the difference between the computed speed and the reported speed
+        if (reportedSpeedDifference(currentSignal, pastSignal) > REPORTED_SPEED_ACCURACY_MARGIN) {
             isAnomaly = true;
-            explanation += "Speed is inaccurate: " + df.format(computeSpeed(currentSignal, pastSignal))
-                    + " is different from reported speed of " + df.format(currentSignal.getSpeed())
-                    + " by more than allowed margin " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
-                    + explanationEnding();
+            explanation += "Speed is inaccurate: the approximated speed of " + df.format(computeSpeed(currentSignal, pastSignal))
+                    + " km/min is different from reported speed of " + df.format(currentSignal.getSpeed())
+                    + " km/min by more than allowed margin of " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
+                    + " km/min" + explanationEnding();
         }
 
-        if (accelerationTooBig(currentSignal, pastSignal)) {
+        // Compute and check acceleration between two signals
+        if (computedAcceleration(currentSignal, pastSignal) > ACCELERATION_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Acceleration too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
-                    + " is bigger than threshold " + df.format(ACCELERATION_THRESHOLD)
-                    + explanationEnding();
+            explanation += "Acceleration is too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
+                    + " km/min^2 is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
+                    + " km/min^2" + explanationEnding();
         }
 
         return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
@@ -99,51 +102,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      * @return the anomaly score of the heuristic
      */
     @Override
-    float getAnomalyScore() {
+    protected float getAnomalyScore() {
         return 33f;
-    }
-
-    /**
-     * Explanation string for the heuristic which is used when the ship is non-anomalous.
-     *
-     * @return explanation string
-     */
-    @Override
-    String getNonAnomalyExplanation() {
-        return "The ship's speed is ok" + explanationEnding();
-    }
-
-    /**
-     * Checks if the speed is more than the threshold.
-     *
-     * @param currentSignal the current AIS signal
-     * @param pastSignal the past AIS signal
-     * @return true if the speed is too big, false otherwise
-     */
-    private boolean speedIsTooFast(AISSignal currentSignal, AISSignal pastSignal) {
-        return computeSpeed(currentSignal, pastSignal) > SPEED_THRESHOLD;
-    }
-
-    /**
-     * Checks if the reported speed and the calculated speed difference is bigger than the
-     * threshold.
-     *
-     * @param currentSignal the current AIS signal
-     * @param pastSignal the past AIS signal
-     * @return true if the difference is too big, false otherwise
-     */
-    private boolean reportedSpeedIsNotAccurate(AISSignal currentSignal, AISSignal pastSignal) {
-        return reportedSpeedDifference(currentSignal, pastSignal) > REPORTED_SPEED_ACCURACY_MARGIN;
-    }
-
-    /**
-     * Checks if the acceleration is bigger than the threshold.
-     *
-     * @param currentSignal the current AIS signal
-     * @param pastSignal the past AIS signal
-     * @return true if the acceleration is too big, false otherwise
-     */
-    private boolean accelerationTooBig(AISSignal currentSignal, AISSignal pastSignal) {
-        return computedAcceleration(currentSignal, pastSignal) > ACCELERATION_THRESHOLD;
     }
 }

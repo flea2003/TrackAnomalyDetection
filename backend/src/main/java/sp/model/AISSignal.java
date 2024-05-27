@@ -21,8 +21,6 @@ import java.time.OffsetDateTime;
 @ToString
 @JsonSerialize
 public class AISSignal implements Serializable {
-    private static final int NO_HEADING = 511;
-
     private final long id;
     private final float speed;
     private final float longitude;
@@ -53,15 +51,4 @@ public class AISSignal implements Serializable {
         this.departurePort = externalSignal.getDeparturePort();
         this.receivedTime = OffsetDateTime.now();
     }
-
-//    /**
-//     * Updates the heading if the heading is not reported.
-//     * Not reported heading is denoted as the number 511.
-//     */
-//    public void updateHeading() {
-//        // A 511 heading means that no heading is reported, so we just set it to be equal to the heading value of the ship
-//        if (this.heading == NO_HEADING) {
-//            this.heading = this.course;
-//        }
-//    }
 }

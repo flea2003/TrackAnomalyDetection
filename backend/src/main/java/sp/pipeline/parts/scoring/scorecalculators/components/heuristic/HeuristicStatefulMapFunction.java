@@ -37,7 +37,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
      *     are also included in the same return object.
      */
-    abstract AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal);
+    protected abstract AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal);
 
     /**
      * Gets the anomaly score of the heuristic. This score is given to the ship that
@@ -45,14 +45,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      *
      * @return the anomaly score of the heuristic
      */
-    abstract float getAnomalyScore();
-
-    /**
-     * Explanation string for the heuristic which is used when the ship is non-anomalous.
-     *
-     * @return explanation string
-     */
-    abstract String getNonAnomalyExplanation();
+    protected abstract float getAnomalyScore();
 
     /**
      * Helper function for the ending of the explanation string.
@@ -60,8 +53,8 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      *
      * @return the ending string
      */
-    String explanationEnding() {
-        return "." + System.lineSeparator();
+    protected String explanationEnding() {
+        return ".\n";
     }
 
     /**
@@ -70,7 +63,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      *
      * @return the formatter object
      */
-    DecimalFormat getDecimalFormatter() {
+    protected DecimalFormat getDecimalFormatter() {
         return new DecimalFormat("#.##");
     }
 
@@ -125,7 +118,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
             );
         } else {
             anomalyInfo = new AnomalyInformation(
-                    0f, getNonAnomalyExplanation(), value.getTimestamp(), value.getId()
+                    0f, "", value.getTimestamp(), value.getId()
             );
         }
 
@@ -182,7 +175,7 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     @Getter
     @Setter
     @AllArgsConstructor
-    static class AnomalyScoreWithExplanation {
+    protected static class AnomalyScoreWithExplanation {
         private boolean isAnomaly;
         private float anomalyScore;
         private String explanation;

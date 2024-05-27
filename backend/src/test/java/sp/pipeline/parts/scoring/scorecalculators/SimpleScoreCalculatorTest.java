@@ -61,18 +61,13 @@ class SimpleScoreCalculatorTest {
         assertThat(result).containsAll(List.of(
             new AnomalyInformation(100f,
                     """
-                            Time between two signals is too large: 14 minutes is more than threshold 10 minutes,  and ship travelled too much between signals: 15217.09 is more than threshold 6.0.
-                            Too fast: 2223.89 is faster than threshold 55.5.
-                            Speed is inaccurate: 2223.89 is different from reported speed of 5 by more than allowed margin 10.
-                            Heading changed too much: 41 is more than threshold 40.
+                            Time between two signals is too large: 14 minutes is more than threshold of 10 minutes, and ship's speed (between two signals) is too large: 15217.09 km/h is more than threshold of 6.0 km/h.
+                            Speed is too big: 2223.89 km/min is faster than threshold of 55.5 km/min.
+                            Speed is inaccurate: the approximated speed of 2223.89 km/min is different from reported speed of 5 km/min by more than allowed margin of 10 km/min.
+                            Heading difference between consecutive signals: 41 degrees is more than threshold of 40 degrees.
                             """
                     , time3, 1L),
-            new AnomalyInformation(0.0f,
-                    """
-                            The time difference between consecutive AIS signals is ok.
-                            The ship's speed is ok.
-                            The ship's turning direction is ok.
-                            """, time3, 2L)
+            new AnomalyInformation(0.0f, "", time3, 2L)
         ));
 
     }
