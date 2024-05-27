@@ -34,6 +34,7 @@ public class TestShipsDataService {
     CurrentShipDetails currentShipDetails2;
     CurrentShipDetails currentShipDetails3;
     CurrentShipDetails currentShipDetails4;
+    ShipInformationExtractor shipInformationExtractorBroken;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -94,7 +95,7 @@ public class TestShipsDataService {
         doReturn(currentShipDetailsMap).when(shipInformationExtractor)
             .getCurrentShipDetails();
 
-        ShipInformationExtractor shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
+        shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
         shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
@@ -126,6 +127,14 @@ public class TestShipsDataService {
     void getIndividualDetailsTestPipelineException(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
                 .isInstanceOf(PipelineException.class);
+    }
+
+    @Test
+    void getIndividualDetailsTestPipelineNotStartedException() throws PipelineException, PipelineStartingException {
+        doThrow(PipelineStartingException.class).when(shipInformationExtractorBroken)
+                .getCurrentShipDetails();
+        assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
+                .isInstanceOf(PipelineStartingException.class);
     }
 
     @Test
