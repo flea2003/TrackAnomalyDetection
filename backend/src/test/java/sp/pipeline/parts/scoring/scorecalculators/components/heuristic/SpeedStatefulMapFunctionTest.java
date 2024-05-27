@@ -6,13 +6,11 @@ import java.time.OffsetDateTime;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.operators.StreamMap;
 import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness;
-import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
-import sp.pipeline.parts.scoring.scorecalculators.components.heuristic.SpeedStatefulMapFunction;
 
 public class SpeedStatefulMapFunctionTest {
 
@@ -51,7 +49,7 @@ public class SpeedStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(1);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
     }
 
     @Test
@@ -69,9 +67,14 @@ public class SpeedStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's speed is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Speed is too big: 840.06 km/min is faster than threshold of 55.5 km/min.
+                        Speed is inaccurate: the approximated speed of 840.06 km/min is different from reported speed of 22 km/min by more than allowed margin of 10 km/min.
+                        """
+        );
     }
 
 
@@ -96,50 +99,50 @@ public class SpeedStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(3);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The ship's speed is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Speed is inaccurate: the approximated speed of 2.74 km/min is different from reported speed of 12.8 km/min by more than allowed margin of 10 km/min.
+                        """
+        );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The ship's speed is ok.");
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("");
     }
 
     @Test
-    void testIsAnomalyEdgeCases() {
-        assertThat(
-                speedStatefulMapFunction.isAnomaly(55.5, 10, 49.99)
-        ).isFalse();
+    void anomalousAcceleration() throws Exception {
+        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:51Z");
+        OffsetDateTime timestamp3 = OffsetDateTime.parse("2024-12-30T04:52Z");
+        AISSignal aisSignal1 = new AISSignal(1, 10f, 10, 10, 20, 20, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 60.001f, 10, 10, 20, 20, timestamp2, "Malta");
+        AISSignal aisSignal3 = new AISSignal(1, 110f, 10, 10, 20, 20, timestamp3, "Malta");
 
-        assertThat(
-                speedStatefulMapFunction.isAnomaly(55.51, 10, 49.99)
-        ).isTrue();
+        testHarness.processElement(aisSignal1, 20);
+        testHarness.processElement(aisSignal2, 60);
+        testHarness.processElement(aisSignal3, 61);
+        var anomalies = testHarness.extractOutputStreamRecords();
 
-        assertThat(
-                speedStatefulMapFunction.isAnomaly(55.5, 10.01, 49.99)
-        ).isTrue();
+        assertThat(anomalies.size()).isEqualTo(3);
 
-        assertThat(
-                speedStatefulMapFunction.isAnomaly(55.5, 10, 50)
-        ).isTrue();
-    }
+        assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
 
-    @Test
-    void testHelperFunctionsEdgeCases() {
-        // edge cases to catch the mutants
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 60 km/min by more than allowed margin of 10 km/min.
+                        Acceleration is too big: 50 km/min^2 is bigger than threshold of 50 km/min^2.
+                        """
+        );
 
-        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50:00Z");
-        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:50:01Z");
-        AISSignal aisSignal1 = new AISSignal(1, 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal(1, 13.0f, 10.00001f, 10, 20, 20, timestamp2, "Malta");
-
-        assertThat(speedStatefulMapFunction.computeSpeed(aisSignal2, aisSignal1))
-                .isCloseTo(104.43270439282058, Offset.offset(0.000001));
-
-        assertThat(speedStatefulMapFunction.getReportedSpeedDifference(aisSignal2, aisSignal1))
-                .isCloseTo(91.43270439282058, Offset.offset(0.000001));
-
-        assertThat(speedStatefulMapFunction.calculateAcceleration(aisSignal2, aisSignal1))
-                .isCloseTo(19999.980926513672, Offset.offset(0.000001));
-
+        assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo(
+                """
+                        Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 110 km/min by more than allowed margin of 10 km/min.
+                        """
+        );
     }
 
 }

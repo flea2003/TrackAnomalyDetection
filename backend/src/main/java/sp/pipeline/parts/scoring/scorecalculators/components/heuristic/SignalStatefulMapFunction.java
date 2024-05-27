@@ -1,54 +1,74 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
-import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.harvesineDistance;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.getDistanceTravelled;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInHours;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
 
 import sp.model.AISSignal;
-import sp.model.AnomalyInformation;
-import java.time.Duration;
+import java.text.DecimalFormat;
+
 
 public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
 
-    private static final String goodMsg = "The time difference between consecutive AIS signals is ok.";
-    private static final String badMsg = "The time difference between consecutive AIS signals is anomalous.";
+    private static final long SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES = 10;
+    private static final double TRAVELLED_DISTANCE_THRESHOLD = 6;
 
     /**
-     * Performs a stateful map operation that receives an AIS signal and produces an
-     * AnomalyInformation based on the predefined heuristics for the interval between
-     * two consecutive signals.
+     * Checks if the current signal is an anomaly.
+     * Ship is considered an anomaly when both of the following are true:
+     * - the time between two signals is too large
+     * - the ship travelled a big distance between two signals
      *
-     * @param value The input value.
-     * @return the computed Anomaly Information object
-     * @throws Exception exception from value state descriptors
+     * @param currentSignal current AIS signal
+     * @param pastSignal past AIS signal (non-null object)
+     * @return AnomalyScoreWithExplanation object which indicates whether the current
+     *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
+     *     are also included in the same return object.
      */
     @Override
-    public AnomalyInformation map(AISSignal value) throws Exception {
-        AISSignal pastAISSignal = getAisSignalValueState().value();
+    protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        boolean isAnomaly = false;
+        String explanation = "";
 
-        // In the case that our stateful map has encountered signals in the past
-        if (pastAISSignal != null) {
-            if (isAnomaly(value, pastAISSignal)) {
-                getLastDetectedAnomalyTime().update(value.getTimestamp());
-            }
+        DecimalFormat df = getDecimalFormatter();
+
+        boolean signalsNotFrequent = timeDiffInMinutes(currentSignal, pastSignal) > SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES;
+        boolean shipTravelledMuch = distanceDividedByHours(currentSignal, pastSignal) > TRAVELLED_DISTANCE_THRESHOLD;
+
+        if (signalsNotFrequent && shipTravelledMuch) {
+            isAnomaly = true;
+
+            explanation += "Time between two consecutive signals is too large: "
+                    + df.format(timeDiffInMinutes(currentSignal, pastSignal))
+                    + " minutes is more than threshold of " + SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES + " minutes,"
+                    + " and ship's speed (between two signals) is too large: "
+                    + df.format(distanceDividedByHours(currentSignal, pastSignal))
+                    + " km/h is more than threshold of " + TRAVELLED_DISTANCE_THRESHOLD + " km/h"
+                    + explanationEnding();
         }
-        return super.setAnomalyInformationResult(value, 33f, badMsg, goodMsg);
+
+        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
     }
 
     /**
-     * Checks if the current AISSignal is considered an anomaly. Takes the past signal to compare with.
-     * The signal is considered an anomaly if the time between the signals is significant or the distance
-     * between signals is significant.
+     * Gets the anomaly score of the heuristic. This score is given to the ship that
+     * is considered an anomaly based on the heuristic.
      *
-     * @param value current AIS signal
-     * @param pastAISSignal previous AIS signal
-     * @return true if the current signal is anomalous, false otherwise
+     * @return the anomaly score of the heuristic
      */
-    public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) {
-        double time = Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
+    @Override
+    protected float getAnomalyScore() {
+        return 33f;
+    }
 
-        boolean signalTimingIsGood = time < 10;
-        boolean shipDidntTravelTooMuch = harvesineDistance(value.getLatitude(), value.getLongitude(),
-                pastAISSignal.getLatitude(), pastAISSignal.getLongitude()) / (time / 60) < 6;
-
-        return !signalTimingIsGood && !shipDidntTravelTooMuch;
+    /**
+     * Calculates the distance divided by hours. Used for method `shipTravelledMuch`.
+     *
+     * @param currentSignal the current signal
+     * @param pastSignal the past signal
+     * @return the calculated distance
+     */
+    private double distanceDividedByHours(AISSignal currentSignal, AISSignal pastSignal) {
+        return getDistanceTravelled(currentSignal, pastSignal) / timeDiffInHours(currentSignal, pastSignal);
     }
 }

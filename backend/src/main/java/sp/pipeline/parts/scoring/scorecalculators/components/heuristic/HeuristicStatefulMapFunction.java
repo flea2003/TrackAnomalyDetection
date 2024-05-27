@@ -1,8 +1,13 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
-import java.time.Duration;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
@@ -15,73 +20,165 @@ import sp.model.AISSignal;
 @Getter
 public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSignal, AnomalyInformation> {
 
-    /*
-        We have three value states, one for last processed aisSignal, one for the
-        one for last processed anomaly information and one for the last time when
-        we have detected an anomaly.
-     */
-    private transient ValueState<AnomalyInformation> anomalyInformationValueState;
+    // last processed AIS signal
     private transient ValueState<AISSignal> aisSignalValueState;
-    private transient ValueState<OffsetDateTime> lastDetectedAnomalyTime;
+
+    // the anomaly information for the last detected anomaly
+    // this is sometimes the same as anomalyInformationValueState, but sometimes different
+    private transient ValueState<AnomalyInformation> lastDetectedAnomalyValueState;
 
     /**
-     * Initializes the heuristic score calculator. More precisely, initializes the value
-     * states for anomaly information, last AIS signal and last detected anomaly timestamp.
+     * Checks if the current signal is an anomaly. If the heuristic needs,
+     * the current signal is compared with the given past signal.
      *
-     * @param config the properties for Flink environment
+     * @param currentSignal current AIS signal
+     * @param pastSignal past AIS signal (non-null object)
+     * @return AnomalyScoreWithExplanation object which indicates whether the current
+     *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
+     *     are also included in the same return object.
+     */
+    protected abstract AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal);
+
+    /**
+     * Gets the anomaly score of the heuristic. This score is given to the ship that
+     * is considered an anomaly based on the heuristic.
+     *
+     * @return the anomaly score of the heuristic
+     */
+    protected abstract float getAnomalyScore();
+
+    /**
+     * Helper function for the ending of the explanation string.
+     * The ending is a dot symbol followed by new line symbol.
+     *
+     * @return the ending string
+     */
+    protected String explanationEnding() {
+        return ".\n";
+    }
+
+    /**
+     * DecimalFormatter for writing floating-point numbers in explanation strings.
+     * The format is configured to allow maximum two decimal places.
+     *
+     * @return the formatter object
+     */
+    protected DecimalFormat getDecimalFormatter() {
+        return new DecimalFormat("#.##");
+    }
+
+    /**
+     * Initializes the function by initializing the value states.
+     *
+     * @param config Flink configuration object
      */
     @Override
     public void open(Configuration config) {
-
-        // Set up the state descriptors
-        ValueStateDescriptor<OffsetDateTime> lastDetectedAnomalyTimeDescriptor =
-                new ValueStateDescriptor<>(
-                        "time",
-                        TypeInformation.of(new TypeHint<>() {})
-                );
-
-        ValueStateDescriptor<AISSignal> aisSignalValueStateDescriptor =
-                new ValueStateDescriptor<>(
-                        "AIS",
-                        TypeInformation.of(new TypeHint<>() {})
-                );
-
-        ValueStateDescriptor<AnomalyInformation> anomalyInformationValueStateDescriptor =
-                new ValueStateDescriptor<>(
-                        "anomaly",
-                        TypeInformation.of(new TypeHint<>() {})
-                );
-
-        // Initialize the states and set them to be accessible in the map function
-        lastDetectedAnomalyTime = getRuntimeContext().getState(lastDetectedAnomalyTimeDescriptor);
-        aisSignalValueState = getRuntimeContext().getState(aisSignalValueStateDescriptor);
-        anomalyInformationValueState = getRuntimeContext().getState(anomalyInformationValueStateDescriptor);
+        aisSignalValueState = getValueState("aisSignal", new TypeHint<>() {});
+        lastDetectedAnomalyValueState = getValueState("lastDetectedAnomaly", new TypeHint<>() {});
     }
 
     /**
-     * Logic for setting the result of the anomaly detected by each heuristic.
+     * Helper method for creating (initializing) a value state.
      *
-     * @param value the AIS signal that was processed
-     * @param anomalyScore the score that each heuristic can set
-     * @param badMsg the explanation in case of anomaly
-     * @param goodMsg the message in case that it is not an anomaly
-     * @return the computed AnomalyInformation
-     * @throws Exception Exception generated by the getValue() of the stateDescriptors, probably should be caught :D
+     * @param name name of the state
+     * @param typeHint type hint for the descriptor (cannot be extracted since Flink then
+     *                 shows errors about generic method)
+     * @param <T> the type of the objects stored in the value state
+     * @return the created value state
      */
-    public AnomalyInformation setAnomalyInformationResult(AISSignal value,
-                                                          Float anomalyScore, String badMsg, String goodMsg) throws Exception {
-        // The AIS signal is considered an anomaly only if the difference between the current time and the last detected anomaly
-        // time is less than 30 minutes
-        AnomalyInformation anomalyInformation;
-        if (getLastDetectedAnomalyTime().value() != null
-                && Duration.between(getLastDetectedAnomalyTime().value(), value.getTimestamp()).toMinutes() <= 30) {
-            anomalyInformation = new AnomalyInformation(anomalyScore, badMsg, value.getTimestamp(), value.getId());
-        } else {
-            anomalyInformation = new AnomalyInformation(0f, goodMsg, value.getTimestamp(), value.getId());
-        }
-        getAnomalyInformationValueState().update(anomalyInformation);
-        getAisSignalValueState().update(value);
-        return anomalyInformation;
+    private <T> ValueState<T> getValueState(String name, TypeHint<T> typeHint) {
+        ValueStateDescriptor<T> descriptor =
+                new ValueStateDescriptor<>(
+                        name,
+                        TypeInformation.of(typeHint)
+                );
+
+        return getRuntimeContext().getState(descriptor);
     }
 
+    /**
+     * Performs a stateful map operation that receives an AIS signal and produces an
+     * AnomalyInformation based on the predefined heuristics for the speed of the ship.
+     *
+     * @param value The input value (AIS signal)
+     * @return the computed Anomaly Information object
+     * @exception IOException exception thrown by interaction with value states
+     */
+    @Override
+    public AnomalyInformation map(AISSignal value) throws IOException {
+        checkCurrentSignal(value);
+
+        AnomalyInformation anomalyInfo;
+        AnomalyInformation lastDetectedAnomaly = getLastDetectedAnomalyValueState().value();
+
+        if (isLastDetectedAnomalyRecent(lastDetectedAnomaly, value.getTimestamp())) {
+            anomalyInfo = new AnomalyInformation(
+                    lastDetectedAnomaly.getScore(), lastDetectedAnomaly.getExplanation(),
+                    value.getTimestamp(), value.getId()
+            );
+        } else {
+            anomalyInfo = new AnomalyInformation(
+                    0f, "", value.getTimestamp(), value.getId()
+            );
+        }
+
+        // save the AIS signal in the value state for the upcoming signal
+        this.getAisSignalValueState().update(value);
+
+        return anomalyInfo;
+    }
+
+    /**
+     * Check if the last detected anomaly is still relevant. It's considered still relevant
+     * if it is in the past 30 minutes.
+     *
+     * @param recentAnomaly last detected anomaly information
+     * @param currentTime time of the current signal
+     * @return true if the last detected anomaly is not earlier than 30 minutes
+     *     before the current signal
+     */
+    private boolean isLastDetectedAnomalyRecent(AnomalyInformation recentAnomaly, OffsetDateTime currentTime) {
+        if (recentAnomaly == null) {
+            return false;
+        }
+
+        return timeDiffInMinutes(recentAnomaly.getCorrespondingTimestamp(), currentTime) <= 30;
+    }
+
+    /**
+     * Checks the current signal. If it is an anomaly, then new anomaly information is saved
+     * in the value state for the last detected anomaly.
+     *
+     * @param currentSignal current AIS signal
+     * @throws IOException if interaction with value states throw exception
+     */
+    private void checkCurrentSignal(AISSignal currentSignal) throws IOException {
+        AISSignal pastSignal = getAisSignalValueState().value();
+
+        // only check if there was a signal in the past
+        if (pastSignal == null) {
+            return;
+        }
+
+        AnomalyScoreWithExplanation result = checkForAnomaly(currentSignal, pastSignal);
+
+        if (result.isAnomaly()) {
+            AnomalyInformation anomalyInfo = new AnomalyInformation(
+                    result.getAnomalyScore(), result.getExplanation(),
+                    currentSignal.getTimestamp(), currentSignal.getId()
+            );
+
+            this.lastDetectedAnomalyValueState.update(anomalyInfo);
+        }
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    protected static class AnomalyScoreWithExplanation {
+        private boolean isAnomaly;
+        private float anomalyScore;
+        private String explanation;
+    }
 }

@@ -2,7 +2,6 @@ package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
 
 import org.apache.flink.api.common.typeinfo.Types;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
-import sp.pipeline.parts.scoring.scorecalculators.components.heuristic.SignalStatefulMapFunction;
 
 public class SignalStatefulMapFunctionTest {
 
@@ -52,7 +50,7 @@ public class SignalStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(1);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
     }
 
     @Test
@@ -70,9 +68,9 @@ public class SignalStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("");
     }
 
 
@@ -92,9 +90,13 @@ public class SignalStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Time between two consecutive signals is too large: 11 minutes is more than threshold of 10 minutes, and ship's speed (between two signals) is too large: 37448.13 km/h is more than threshold of 6.0 km/h.
+                        """
+        );
     }
 
     @Test
@@ -116,72 +118,35 @@ public class SignalStatefulMapFunctionTest {
 
         assertThat(anomalies.size()).isEqualTo(3);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                """
+                        Time between two consecutive signals is too large: 11 minutes is more than threshold of 10 minutes, and ship's speed (between two signals) is too large: 597.3 km/h is more than threshold of 6.0 km/h.
+                        """
+        );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("");
     }
 
     @Test
-    void anomalyExpiresEdgeCases() throws Exception {
-        // This test is for killing the mutant that changes the boundary of 30 minutes.
+    void testSignalTimeDiffBoundary() throws Exception {
+        // boundary test for the constant SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES
 
-        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
-        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:20Z"); // 30 minutes later (edge)
-        OffsetDateTime timestamp3 = OffsetDateTime.parse("2024-12-30T05:50Z"); // 30 minutes later (edge)
-        OffsetDateTime timestamp4 = OffsetDateTime.parse("2024-12-30T06:20Z"); // 30 minutes later (edge)
-        OffsetDateTime timestamp5 = OffsetDateTime.parse("2024-12-30T06:21Z"); // 1 minutes later (edge)
-
-        AISSignal aisSignal1 = new AISSignal(1, 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal(1, 12.8f, 11, 10, 20, 20, timestamp2, "Malta");
-        AISSignal aisSignal3 = new AISSignal(1, 12.8f, 12, 10, 20, 20, timestamp3, "Malta");
-        AISSignal aisSignal4 = new AISSignal(1, 12.8f, 12, 10, 20, 20, timestamp4, "Malta");
-        AISSignal aisSignal5 = new AISSignal(1, 12.8f, 12, 10, 20, 20, timestamp5, "Malta");
-
-        testHarness.processElement(aisSignal1, 1);
-        testHarness.processElement(aisSignal2, 2);
-        testHarness.processElement(aisSignal3, 3);
-        testHarness.processElement(aisSignal4, 4);
-        testHarness.processElement(aisSignal5, 5);
-        var anomalies = testHarness.extractOutputStreamRecords();
-
-        assertThat(anomalies.size()).isEqualTo(5);
-
-        assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
-
-        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
-
-        assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
-
-        assertThat(anomalies.get(3).getValue().getScore()).isEqualTo(33.0f);
-        assertThat(anomalies.get(3).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is anomalous.");
-
-        assertThat(anomalies.get(4).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(4).getValue().getExplanation()).isEqualTo("The time difference between consecutive AIS signals is ok.");
-    }
-
-    @Test
-    void isAnomalyTimeDiffIs10() throws IOException {
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
         OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T05:00Z");
         AISSignal aisSignal1 = new AISSignal(1, 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
         AISSignal aisSignal2 = new AISSignal(1, 12.8f, 11, 10, 20, 20, timestamp2, "Malta");
 
-        assertThat(signalStatefulMapFunction.isAnomaly(aisSignal2, aisSignal1)).isTrue();
-    }
+        testHarness.processElement(aisSignal1, 20);
+        testHarness.processElement(aisSignal2, 31);
+        var anomalies = testHarness.extractOutputStreamRecords();
 
-    @Test
-    void isAnomalyTimeDiffIs11() throws IOException {
-        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
-        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:59Z");
-        AISSignal aisSignal1 = new AISSignal(1, 12.8f, 10, 10, 20, 20, timestamp1, "Malta");
-        AISSignal aisSignal2 = new AISSignal(1, 12.8f, 11, 10, 20, 20, timestamp2, "Malta");
+        assertThat(anomalies.size()).isEqualTo(2);
 
-        assertThat(signalStatefulMapFunction.isAnomaly(aisSignal2, aisSignal1)).isFalse();
+        // second signal is not an anomaly (happens only after 10 minutes after the first one)
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0f);
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("");
     }
 
 }
