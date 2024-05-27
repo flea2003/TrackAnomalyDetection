@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -161,7 +162,7 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getCurrentShipDetailsTest() throws PipelineException {
+    void getCurrentShipDetailsTest() throws PipelineException, PipelineStartingException {
         List<CurrentShipDetails> result = shipsDataService.getCurrentShipDetails();
         assertThat(result).containsExactly(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
     }
