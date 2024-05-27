@@ -1,5 +1,8 @@
+import React from "react";
 import L from "leaflet";
 import { calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
+import ShipDetails from "../../model/ShipDetails";
+import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
 
 /**
  * This function creates the ship icon using some magic and HTML canvas
@@ -46,4 +49,58 @@ function createShipIcon(weight: number, rotation: number): L.Icon {
   });
 }
 
-export default createShipIcon;
+/**
+ * Utility function to extract the coordinates of an event
+ * @param e - event triggered by a user action
+ * @param map - L.Map instance
+ */
+const extractIconCoordinates = (e: L.LeafletMouseEvent, map: L.Map) => {
+  // Extract the latitude and longitude coordinates from the LeafletMouseEvent
+  const latLongCoords = e.latlng;
+  const containerPort = map.latLngToContainerPoint(latLongCoords);
+  const { x, y } = containerPort;
+  return { x, y };
+};
+
+/**
+ * Utility function to update the state of the information pop-up div
+ * whenever the mouse hovers on a ship icon
+ * @param e - the event triggered by the "mouseover" action
+ * @param ship - corresponding ShipDetails instance
+ * @param map - reference to the L.Map instance
+ * @param setHoverInfo - state management function
+ */
+const handleMouseOverShipIcon = (
+  e: L.LeafletMouseEvent,
+  ship: ShipDetails,
+  map: L.Map,
+  setHoverInfo: React.Dispatch<React.SetStateAction<ShipIconDetailsType>>,
+) => {
+  const { x, y } = extractIconCoordinates(e, map);
+  setHoverInfo({
+    show: true,
+    x: x,
+    y: y,
+    shipDetails: ship,
+  } as ShipIconDetailsType);
+};
+
+/**
+ * Utility function to update the state of the information pop-up div
+ * whenever the mouse leaves the surface of the ship icon
+ * @param e - the event triggered by the "mouseout" action
+ * @param setHoverInfo - state management function
+ */
+const handleMouseOutShipIcon = (
+  e: L.LeafletMouseEvent,
+  setHoverInfo: React.Dispatch<React.SetStateAction<ShipIconDetailsType>>,
+) => {
+  setHoverInfo({
+    show: false,
+    x: 0,
+    y: 0,
+    shipDetails: null,
+  } as ShipIconDetailsType);
+};
+
+export { createShipIcon, handleMouseOverShipIcon, handleMouseOutShipIcon };

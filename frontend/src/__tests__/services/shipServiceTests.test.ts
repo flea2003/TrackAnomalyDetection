@@ -3,6 +3,7 @@ import ShipService from "../../services/ShipService";
 import APIResponseItem from "../../templates/APIResponseItem";
 import ShipDetails from "../../model/ShipDetails";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
+import spyOn = jest.spyOn;
 
 beforeEach(() => {
   // Make refreshState do nothing, so that it does not print to console.
@@ -30,6 +31,52 @@ const fakeAPIResponseItem: APIResponseItem = {
   maxAnomalyScoreInfo: {
     maxAnomalyScore: 1,
     correspondingTimestamp: "t1",
+  },
+};
+
+const fakeAPIResponseItem2: APIResponseItem = {
+  currentAISSignal: {
+    id: 2,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t2",
+    departurePort: "p2",
+  },
+  currentAnomalyInformation: {
+    id: 2,
+    score: 2,
+    explanation: "explanation",
+    correspondingTimestamp: "t2",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 2,
+    correspondingTimestamp: "t2",
+  },
+};
+
+const fakeAPIResponseItem3: APIResponseItem = {
+  currentAISSignal: {
+    id: 3,
+    speed: 350.0,
+    longitude: 29.0,
+    latitude: 47.0,
+    course: 90,
+    heading: 1,
+    timestamp: "t3",
+    departurePort: "p3",
+  },
+  currentAnomalyInformation: {
+    id: 3,
+    score: 0.5,
+    explanation: "explanation",
+    correspondingTimestamp: "t3",
+  },
+  maxAnomalyScoreInfo: {
+    maxAnomalyScore: 0.5,
+    correspondingTimestamp: "t3",
   },
 };
 
@@ -88,6 +135,7 @@ test("backend-fetching-valid-details", async () => {
       1,
       47.0,
       29.0,
+      "t1",
       1,
       "explanation",
       1,
@@ -110,6 +158,7 @@ test("backend-fetching-null-ais", async () => {
       0,
       0,
       0,
+      "t1",
       1,
       "explanation",
       1,
@@ -132,6 +181,7 @@ test("backend-fetching-null-anomaly-info", async () => {
       1,
       47.0,
       29.0,
+      "t1",
       -1,
       "Information not available (yet)",
       0,
@@ -141,4 +191,142 @@ test("backend-fetching-null-anomaly-info", async () => {
       350.0,
     ),
   ]);
+});
+
+test("sorting-valid-list-descending-ascending", async () => {
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(
+      Promise.resolve([
+        fakeAPIResponseItem,
+        fakeAPIResponseItem2,
+        fakeAPIResponseItem3,
+        fakeAPIResponseItem,
+      ]),
+    );
+  const result = await ShipService.queryBackendForShipsArray();
+  expect(result).toStrictEqual([
+    new ShipDetails(
+      2,
+      1,
+      47.0,
+      29.0,
+      "t2",
+      2,
+      "explanation",
+      2,
+      "t2",
+      "p2",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      3,
+      1,
+      47.0,
+      29.0,
+      "t3",
+      0.5,
+      "explanation",
+      0.5,
+      "t3",
+      "p3",
+      90,
+      350.0,
+    ),
+  ]);
+
+  expect(ShipService.sortList(result, "asc")).toStrictEqual([
+    new ShipDetails(
+      3,
+      1,
+      47.0,
+      29.0,
+      "t3",
+      0.5,
+      "explanation",
+      0.5,
+      "t3",
+      "p3",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      1,
+      1,
+      47.0,
+      29.0,
+      "t1",
+      1,
+      "explanation",
+      1,
+      "t1",
+      "p1",
+      90,
+      350.0,
+    ),
+    new ShipDetails(
+      2,
+      1,
+      47.0,
+      29.0,
+      "t2",
+      2,
+      "explanation",
+      2,
+      "t2",
+      "p2",
+      90,
+      350.0,
+    ),
+  ]);
+});
+
+test("sorting-invalid-order", () => {
+  const spyOnErrorServiceMethod = spyOn(ErrorNotificationService, "addError");
+  const result = ShipService.sortList([], "order");
+  expect(spyOnErrorServiceMethod).toHaveBeenCalled();
+  expect(result).toStrictEqual([]);
 });

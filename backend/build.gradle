@@ -1,3 +1,13 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		mavenLocal()
+		//Needed only for SNAPSHOT versions
+		//maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+	}
+}
+
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.5'
@@ -6,6 +16,7 @@ plugins {
 	id 'pmd'
 	id 'jacoco'
 	id 'info.solidsoft.pitest' version '1.15.0'
+	id 'net.razvan.jacoco-to-cobertura' version '1.2.0'
 
 	// For Flink
 	id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -18,6 +29,13 @@ ext {
 	slf4jVersion = '1.7.36'
 	log4jVersion = '2.17.1'
 	jacksonVersion = '2.15.0'
+
+	// these jvmArgs are needed by Flink code
+	additionalJvmArgs = [
+			'--add-opens=java.base/java.util=ALL-UNNAMED',
+			'--add-opens=java.base/java.lang=ALL-UNNAMED',
+			'--add-opens=java.base/java.time=ALL-UNNAMED'
+	]
 }
 
 tasks.withType(JavaCompile) {
@@ -32,19 +50,11 @@ java {
 }
 
 bootRun{
-	jvmArgs = [
-			'--add-opens=java.base/java.util=ALL-UNNAMED',
-			'--add-opens=java.base/java.lang=ALL-UNNAMED',
-			'--add-opens=java.base/java.time=ALL-UNNAMED'
-	]
+	jvmArgs = additionalJvmArgs
 }
 
 test {
-	jvmArgs += [
-			'--add-opens=java.base/java.util=ALL-UNNAMED',
-			'--add-opens=java.base/java.lang=ALL-UNNAMED',
-			'--add-opens=java.base/java.time=ALL-UNNAMED'
-	]
+	jvmArgs += additionalJvmArgs
 }
 
 checkstyle {
@@ -116,9 +126,17 @@ dependencies {
 	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.7.0'
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
 
+	// For JPA:
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.h2database:h2'
+
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
 
+	testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
+	testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
+
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 }
 
 // For Flink
@@ -164,10 +182,12 @@ jacocoTestReport {
 		xml.required = true
 		html.required = true
 	}
+
+	finalizedBy(jacocoToCobertura)
 }
 
 pitest {
-	//adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
+	// adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
 	// check https://github.com/pitest/pitest-junit5-plugin?tab=readme-ov-file#gradle
 	junit5PluginVersion = '1.2.1'
 
@@ -175,6 +195,8 @@ pitest {
 	threads = 4
 	timestampedReports = false
 	outputFormats = ['XML', 'HTML']
+
+	jvmArgs = additionalJvmArgs
 }
 
 

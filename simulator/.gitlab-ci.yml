@@ -1,6 +1,6 @@
 simulator_build:
   stage: build
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: []
   before_script:
     - cd simulator
@@ -10,20 +10,29 @@ simulator_build:
 
 simulator_tests:
   stage: test
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["simulator_build"]
   before_script:
     - cd simulator
     - chmod +x ./gradlew
   script:
     - ./gradlew test jacocoTestReport
-    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%"
-  coverage: /([0-9]{1,3})%/
+  artifacts:
+    when: always
+    paths:
+      - simulator/build/test-results/test/**/TEST-*.xml
+      - simulator/build/reports/jacoco/test/cobertura-jacocoTestReport.xml
+      - simulator/build/reports/jacoco/test/html/index.html
+    reports:
+      junit: simulator/build/test-results/test/**/TEST-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: simulator/build/reports/jacoco/test/cobertura-jacocoTestReport.xml
 
 simulator_mutation_testing:
   stage: test
-  image: gradle:7.6.0-jdk17
-  needs: ["simulator_tests"]
+  image: gradle:8.7.0-jdk17
+  needs: ["simulator_build"]
   before_script:
     - cd simulator
     - chmod +x ./gradlew
@@ -34,7 +43,7 @@ simulator_mutation_testing:
 
 simulator_checkstyle:
   stage: code_quality
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["simulator_build"]
   before_script:
     - cd simulator
@@ -44,10 +53,28 @@ simulator_checkstyle:
 
 simulator_pmd_static_analysis:
   stage: code_quality
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["simulator_build"]
   before_script:
     - cd simulator
     - chmod +x ./gradlew
   script:
     - ./gradlew pmdMain
+
+simulator_statement_coverage:
+  stage: collect_coverage
+  image: gradle:8.7.0-jdk17
+  needs: ["simulator_tests"]
+  before_script: cd simulator
+  script:
+    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%"
+  coverage: /([0-9]{1,3})%/
+
+simulator_branch_coverage:
+  stage: collect_coverage
+  image: gradle:8.7.0-jdk17
+  needs: ["simulator_tests"]
+  before_script: cd simulator
+  script:
+    - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%"
+  coverage: /([0-9]{1,3})%/

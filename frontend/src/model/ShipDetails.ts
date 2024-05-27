@@ -1,9 +1,12 @@
+import TimeUtilities from "../utils/TimeUtilities";
+
 class ShipDetails {
   static rounding = 1000;
   id: number;
   heading: number;
   lat: number;
   lng: number;
+  timestamp: string;
   anomalyScore: number;
   explanation: string;
   maxAnomalyScore: number;
@@ -17,6 +20,7 @@ class ShipDetails {
     heading: number,
     lat: number,
     lng: number,
+    timestamp: string,
     anomalyScore: number,
     description: string,
     maxAnomalyScore: number,
@@ -29,6 +33,7 @@ class ShipDetails {
     this.heading = heading;
     this.lat = lat;
     this.lng = lng;
+    this.timestamp = timestamp;
     this.anomalyScore = anomalyScore;
     this.explanation = description;
     this.maxAnomalyScore = maxAnomalyScore;
@@ -49,6 +54,10 @@ class ShipDetails {
       { type: "Ship ID", value: this.id.toString() },
       { type: "Explanation", value: this.explanation },
       {
+        type: "Last AIS signal",
+        value: TimeUtilities.computeTimeDifference(this.timestamp) + " ago",
+      },
+      {
         type: "Highest Recorded Anomaly Score",
         value: this.maxAnomalyScore.toString() + "%",
       },
@@ -67,11 +76,25 @@ class ShipDetails {
     ];
   }
 
+  /**
+   * Utility method for concatenating the latitude and longitude values.
+   */
   getPositionString() {
     return roundShipDetail(this.lat) + ", " + roundShipDetail(this.lng);
   }
+
+  /**
+   * Getter for the anomalyScore field.
+   */
+  getAnomalyScore() {
+    return this.anomalyScore;
+  }
 }
 
+/**
+ * Utility method for processing numerical values.
+ * @param x - numerical value
+ */
 function roundShipDetail(x: number) {
   return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding;
 }

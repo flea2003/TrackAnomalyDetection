@@ -35,10 +35,12 @@ class ShipService {
     if (responseWithoutNulls.length !== response.length) {
       ErrorNotificationService.addError("Ship array contained null items");
     }
-
-    return responseWithoutNulls.map(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (item: any) => ShipService.extractCurrentShipDetails(item),
+    return ShipService.sortList(
+      responseWithoutNulls.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (item: any) => ShipService.extractCurrentShipDetails(item),
+      ),
+      "desc",
     );
   };
 
@@ -61,6 +63,7 @@ class ShipService {
         0,
         0,
         0,
+        item.currentAnomalyInformation.correspondingTimestamp,
         item.currentAnomalyInformation.score,
         item.currentAnomalyInformation.explanation,
         item.maxAnomalyScoreInfo.maxAnomalyScore,
@@ -79,6 +82,7 @@ class ShipService {
         item.currentAISSignal.heading,
         item.currentAISSignal.latitude,
         item.currentAISSignal.longitude,
+        item.currentAISSignal.timestamp,
         -1,
         "Information not available (yet)",
         0,
@@ -93,6 +97,7 @@ class ShipService {
         item.currentAISSignal.heading,
         item.currentAISSignal.latitude,
         item.currentAISSignal.longitude,
+        item.currentAISSignal.timestamp,
         item.currentAnomalyInformation.score,
         item.currentAnomalyInformation.explanation,
         item.maxAnomalyScoreInfo.maxAnomalyScore,
@@ -102,6 +107,37 @@ class ShipService {
         item.currentAISSignal.speed,
       );
     }
+  };
+
+  /**
+   * Utility method that sorts the list of ShipDetails entries based on the corresponding values of the anomaly score.
+   * @param list - fetched list with ShipDetails instances
+   * @param order - either `asc` for ascending or '`desc` for descending (default)
+   */
+  static sortList: (list: ShipDetails[], order: string) => ShipDetails[] = (
+    list,
+    order = "desc",
+  ) => {
+    if (!["desc", "asc"].includes(order)) {
+      ErrorNotificationService.addError("Invalid sorting order");
+      return [];
+    }
+    const sortedList = list.sort((a, b) => {
+      const aScore = a.getAnomalyScore();
+      const bScore = b.getAnomalyScore();
+      if (aScore > bScore) {
+        return -1;
+      }
+      if (aScore === bScore) {
+        return 0;
+      } else {
+        return 1;
+      }
+    });
+    if (order === "asc") {
+      return sortedList.reverse();
+    }
+    return sortedList;
   };
 }
 

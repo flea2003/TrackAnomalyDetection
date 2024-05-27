@@ -7,8 +7,9 @@
 
     --anomaly-list-entry-font-size: 0.8em;
     --anomaly-list-entry-height: 36px;
-    --anomaly-list-entry-icon-size: 20px;
-    --anomaly-list-entry-icon-container-width: 25px;
+    --anomaly-list-entry-icon-size: 15px;
+    --anomaly-list-entry-icon-container-width: 15px;
+    --anomaly-list-entry-id-font-size: 0.6em;
 
     --sidebar-icon-size: 30px;
 
