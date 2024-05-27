@@ -1,13 +1,7 @@
 package sp.pipeline.parts.aggregation.aggregators;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
-import sp.model.AISSignal;
-import sp.model.AnomalyInformation;
-import sp.model.CurrentShipDetails;
-import sp.model.MaxAnomalyScoreDetails;
-import sp.model.ShipInformation;
-import sp.pipeline.utils.json.JsonMapper;
+import sp.model.*;
 import java.time.OffsetDateTime;
 
 @Service
@@ -17,13 +11,13 @@ public class CurrentStateAggregator {
      * Aggregates data to a resulting map.
      *
      * @param aggregatedShipDetails object that stores the latest received data for a ship
-     * @param valueJson json value for a signal
+     * @param shipInformation object that stores the latest received data for a ship
+     * @param shipID the id of the ship (not used here, but needed for the signature)
      * @return updated object that stores all needed data for a ship
      */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, String valueJson)
-            throws JsonProcessingException {
+    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, ShipInformation shipInformation,
+                                               Long shipID) {
 
-        ShipInformation shipInformation = JsonMapper.fromJson(valueJson, ShipInformation.class);
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
         AISSignal aisSignal = shipInformation.getAisSignal();
 

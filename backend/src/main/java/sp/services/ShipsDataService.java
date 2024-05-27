@@ -6,13 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
+import sp.exceptions.PipelineStartingException;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
 import java.util.HashMap;
 import java.util.List;
 
+
 @Service
 public class ShipsDataService {
+
     private final AnomalyDetectionPipeline anomalyDetectionPipeline;
     private final Integer activeTime = 30;
 
@@ -35,7 +38,7 @@ public class ShipsDataService {
      * @return CurrentShipDetails instance encapsulating the current extensive information of a ship
      */
     public CurrentShipDetails getIndividualCurrentShipDetails(Long shipId)
-            throws NotExistingShipException, PipelineException {
+            throws NotExistingShipException, PipelineException, PipelineStartingException {
         CurrentShipDetails anomalyInfo = anomalyDetectionPipeline.getShipInformationExtractor()
             .getCurrentShipDetails().get(shipId);
         if (anomalyInfo == null) {
@@ -50,7 +53,7 @@ public class ShipsDataService {
      *
      * @return the CurrentShipDetails instances corresponding to all ships
      */
-    public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException {
+    public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException, PipelineStartingException {
         OffsetDateTime currentTime = OffsetDateTime.now();
         HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getShipInformationExtractor()
             .getFilteredShipDetails(x -> Duration.between(x.getCurrentAISSignal().getReceivedTime(),

@@ -1,6 +1,5 @@
 package sp.pipeline.parts.aggregation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
@@ -120,13 +119,8 @@ public class ScoreAggregationBuilder {
                 .groupByKey()
                 .aggregate(
                         CurrentShipDetails::new,
-                        (key, valueJson, aggregatedShipDetails) -> {
-                            try {
-                                return currentStateAggregator.aggregateSignals(aggregatedShipDetails, valueJson);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
+                        // Use the KafkaJson.aggregator helper function to avoid cluttering the lambda
+                        KafkaJson.aggregator(currentStateAggregator::aggregateSignals, ShipInformation.class),
                         Materialized
                                 .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.getKafkaStoreName())
                                 .withValueSerde(CurrentShipDetails.getSerde())

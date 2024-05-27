@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
-import sp.pipeline.parts.extractors.ShipInformationExtractor;
+import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
@@ -68,7 +68,7 @@ public class AnomalyDetectionPipeline {
      * Private helper method for building the pipeline step by step.
      */
     private void buildPipeline()  {
-        
+
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Build the pipeline part that assigns IDs to incoming AIS signals (Flink)
@@ -94,6 +94,7 @@ public class AnomalyDetectionPipeline {
         this.shipInformationExtractor = new ShipInformationExtractor(state, kafkaStreams);
     }
 
+
     /**
      * Starts the stream processing: both Flink and Kafka parts.
      * Note that this method is not blocking, and it will not be called by the constructor.
@@ -106,5 +107,4 @@ public class AnomalyDetectionPipeline {
             throw new RuntimeException(e);
         }
     }
-
 }

@@ -1,15 +1,11 @@
 package sp.services;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
+import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -20,9 +16,8 @@ import sp.pipeline.AnomalyDetectionPipeline;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import sp.pipeline.parts.extractors.ShipInformationExtractor;
+import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -39,6 +34,7 @@ public class TestShipsDataService {
     CurrentShipDetails currentShipDetails2;
     CurrentShipDetails currentShipDetails3;
     CurrentShipDetails currentShipDetails4;
+    ShipInformationExtractor shipInformationExtractorBroken;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -99,7 +95,7 @@ public class TestShipsDataService {
         doReturn(currentShipDetailsMap).when(shipInformationExtractor)
             .getCurrentShipDetails();
 
-        ShipInformationExtractor shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
+        shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
         shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
@@ -131,6 +127,14 @@ public class TestShipsDataService {
     void getIndividualDetailsTestPipelineException(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
                 .isInstanceOf(PipelineException.class);
+    }
+
+    @Test
+    void getIndividualDetailsTestPipelineNotStartedException() throws PipelineException, PipelineStartingException {
+        doThrow(PipelineStartingException.class).when(shipInformationExtractorBroken)
+                .getCurrentShipDetails();
+        assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
+                .isInstanceOf(PipelineStartingException.class);
     }
 
     @Test
@@ -167,7 +171,7 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getCurrentShipDetailsTest() throws PipelineException {
+    void getCurrentShipDetailsTest() throws PipelineException, PipelineStartingException {
         List<CurrentShipDetails> result = shipsDataService.getCurrentShipDetails();
         assertThat(result).containsExactly(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
     }

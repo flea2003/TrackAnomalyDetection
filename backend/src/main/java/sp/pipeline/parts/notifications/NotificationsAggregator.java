@@ -1,13 +1,11 @@
 package sp.pipeline.parts.notifications;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
-import sp.pipeline.utils.json.JsonMapper;
 import sp.services.NotificationService;
 
 @Service
@@ -41,20 +39,19 @@ public class NotificationsAggregator {
      * of the anomalies.
      *
      * @param previousNotification Notification object that depicts the state
-     * @param newValueJson JSON value of the CurrentShipDetails object that just arrived
-     * @param shipID internal ID of the ship
+     * @param newShipDetails value of the CurrentShipDetails object that just arrived
+     * @param shipID ship ID
      * @return Notification object that corresponds to the newest state (in case the anomaly score gone above the
      *      threshold or below)
-     * @throws JsonProcessingException in case JSON value does not correspond to an AnomalyInformation object
      */
-    public Notification aggregateSignals(Notification previousNotification, String newValueJson, Long shipID)
-            throws JsonProcessingException {
+    public Notification aggregateSignals(Notification previousNotification, CurrentShipDetails newShipDetails, Long shipID) {
         // Information that will be returned as the updated result for the state
         CurrentShipDetails resultingInformation;
+
         // Retrieve current ship details from the previous notification
         CurrentShipDetails previousShipDetails = previousNotification.getCurrentShipDetails();
+
         // Convert the newly arrived JSON string to the new CurrentShipDetails object
-        CurrentShipDetails newShipDetails = JsonMapper.fromJson(newValueJson, CurrentShipDetails.class);
         // Check if the stored previous anomaly object has null fields, which would mean that the backend has just
         // started, and so the most recent notification information should be retrieved
         if (previousShipDetails == null) previousShipDetails = extractFromJPA(newShipDetails, shipID);
@@ -78,9 +75,8 @@ public class NotificationsAggregator {
             // score is below the threshold, then return the old information as the updated state
             if (newScore < notificationThreshold) resultingInformation = previousShipDetails;
             else {
-                // If the previously stored score is below the threshold, and the newly arrived information object
-                // score is above the threshold, then return the new information as the updated state, and ALSO save the
-                // new notification in the database!
+                // If the previously stored score is below the threshold, and the newly arrived information object score is
+                // above the threshold, then return the new information as the updated state, and save the new notification in DB
                 resultingInformation = newShipDetails;
                 notificationService.addNotification(new Notification(newShipDetails));
             }
