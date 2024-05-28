@@ -5,12 +5,20 @@ import ShipDetails from "../../model/ShipDetails";
 import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
 
 /**
- * This function creates the ship icon using some magic and HTML canvas
- * @param weight - the color which the ship is going to take, where 0 is green and 1 red
- * @param rotation - how many degrees the ship must be rotated(heading value)
+ * This function creates the ship icon using some magic and HTML canvas.
+ * The icon will be arrow-shaped if the ship is moving, and circle-shaped if the ship is
+ * not moving.
+ *
+ * @param weight the color which the ship is going to take, where 0 is green and 1 red
+ * @param rotation how many degrees the ship must be rotated(heading value)
+ * @param isMoving whether the ship is moving
  * @return - the icon of the ship
  */
-function createShipIcon(weight: number, rotation: number, isMoving: boolean): L.Icon {
+function createShipIcon(
+  weight: number,
+  rotation: number,
+  isMoving: boolean,
+): L.Icon {
   const color = calculateAnomalyColor(weight * 100);
 
   const canvas = document.createElement("canvas");
@@ -33,7 +41,20 @@ function createShipIcon(weight: number, rotation: number, isMoving: boolean): L.
   });
 }
 
-function drawShipMovingArrow(color: string, rotation: number, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+/**
+ * Draws the arrow representing the moving ship.
+ *
+ * @param color the color of the ship
+ * @param rotation the orientation of the ship
+ * @param canvas the canvas element on which it is drawn
+ * @param context the context element used for drawing
+ */
+function drawShipMovingArrow(
+  color: string,
+  rotation: number,
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+) {
   const size = 20;
 
   canvas.width = size;
@@ -57,7 +78,18 @@ function drawShipMovingArrow(color: string, rotation: number, canvas: HTMLCanvas
   context.stroke(path);
 }
 
-function drawShipStationaryCircle(color: string, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+/**
+ * Draws the circle representing the stationary (non-moving) ship.
+ *
+ * @param color the color of the ship
+ * @param canvas the canvas element on which it is drawn
+ * @param context the context element used for drawing
+ */
+function drawShipStationaryCircle(
+  color: string,
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+) {
   const size = 20;
   const radius = 7;
 

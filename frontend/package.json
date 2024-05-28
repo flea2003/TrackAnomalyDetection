@@ -75,7 +75,6 @@
     "prettier": "^3.2.5"
   },
   "jest": {
-    "setupFiles": ["jest-canvas-mock"],
     "coverageReporters": [
       "lcov",
       "text",
