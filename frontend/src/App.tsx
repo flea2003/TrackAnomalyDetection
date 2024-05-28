@@ -9,7 +9,7 @@ import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
 import Side from "./components/Side/Side";
-import shipsNotificationService, { ShipsNotificationService } from "./services/ShipsNotificationService";
+import shipsNotificationService, { NotificationService } from "./services/NotificationService";
 import ShipNotification from "./model/ShipNotification";
 
 /**
@@ -56,6 +56,8 @@ function App() {
 
   // Put the ships as state
   const [ships, setShips] = useState<ShipDetails[]>([]);
+
+  // Put notifications as state
   const [notifications, setNotifications] = useState<ShipNotification[]>([]);
 
   // Every 1s update the anomaly score of all ships by querying the server
@@ -67,14 +69,14 @@ function App() {
           setShips(shipsArray);
         },
       );
-    }, 10000);
+    }, 1000);
   }, []);
 
   // Every 1s update the notifications by querying the server
   useEffect(() => {
     setInterval(() => {
-      // Query for ships. When the results arrive, update the state
-      ShipsNotificationService.queryBackendForAllNotifications().then(
+      // Query for notifications. When the results arrive, update the state
+      NotificationService.queryBackendForAllNotifications().then(
         (notificationsArray: ShipNotification[]) => {
           setNotifications(notificationsArray);
         },

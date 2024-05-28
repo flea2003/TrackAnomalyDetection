@@ -2,10 +2,10 @@ import React from "react";
 import ShipNotification from "../../../../model/ShipNotification";
 import ShipDetails from "../../../../model/ShipDetails";
 import { CurrentPage } from "../../../../App";
-import ShipsNotificationEntry from "./ShipsNotificationListEntry";
+import ShipsNotificationEntry from "./NotificationListEntry";
 import List from "@mui/material/List";
 
-import "../../../../styles/anomalyList.css";
+import "../../../../styles/notificationList.css";
 
 
 interface NotificationListProps {
@@ -15,14 +15,14 @@ interface NotificationListProps {
   mapCenteringFun: (details: ShipDetails) => void;
 }
 
-function ShipsNotificationListWithoutTitle({
+function NotificationListWithoutTitle({
                                              notifications,
                                              ships,
                                              pageChanger,
                                              mapCenteringFun,
                                            }: NotificationListProps) {
   const listEntries = notifications.map((notification, i) => {
-    const shipDetails =  ships.filter(x => x.id === notifications[i].shipID).slice()[0];
+    const shipDetails =  ships.filter(x => x.id === notifications[i].shipDetails.id).slice()[0];
     return (
       <ShipsNotificationEntry
         key={i}
@@ -37,4 +37,4 @@ function ShipsNotificationListWithoutTitle({
   return <List id="notification-list-internal-container">{listEntries}</List>;
 }
 
-export default ShipsNotificationListWithoutTitle;
+export default NotificationListWithoutTitle;

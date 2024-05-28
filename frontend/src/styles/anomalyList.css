@@ -8,11 +8,6 @@
     height: 100%;
 }
 
-#notification-list-internal-container {
-    height: 100vh;
-    overflow-y: auto;
-}
-
 #anomaly-list-close-icon {
     height: var(--anomaly-list-closing-icon-size);
     width: var(--anomaly-list-closing-icon-size);

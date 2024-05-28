@@ -9,7 +9,7 @@ import "../../../../styles/objectDetails.css";
 import returnIcon from "../../../../assets/icons/back.svg";
 import { CurrentPage } from "../../../../App";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
-import ShipsNotificationListWithoutTitle from "../NotificationsList/ShipsNotificationListWithoutTitle";
+import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 import ShipNotification from "../../../../model/ShipNotification";
 
 interface ObjectDetailsProps {
@@ -34,7 +34,7 @@ function ObjectDetails(props: ObjectDetailsProps) {
 
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = allShips.find((ship) => ship.id === shipID);
-  const shipNotifications = props.notifications.filter((x) => x.shipID === shipID);
+  const shipNotifications = props.notifications.filter((x) => x.shipDetails.id === shipID);
 
   if (ship === undefined) {
     ErrorNotificationService.addWarning("No ship found with ID " + shipID);
@@ -44,17 +44,18 @@ function ObjectDetails(props: ObjectDetailsProps) {
   return (
     <Stack id="object-details-container">
       <div className="object-details-title-container">
-        {getReturnIcon(pageChanger)}
-        <span className="object-details-title">Score {ship.anomalyScore}%</span>
+       {getReturnIcon(pageChanger)}
+        <span className="object-details-title">
+          Ship ID: {ship.id}
+        </span>
       </div>
-      <List
-       className="object-details-properties-list"
-      >
+      <List className="object-details-properties-list">
         {getPropertyElements(ship)}
       </List>
-      <div className="object-details-notification-title">Notifications</div>
+
       <Stack className={"object-details-notification-list"}>
-        <ShipsNotificationListWithoutTitle
+        <div className="object-details-notification-title">Notifications</div>
+        <NotificationListWithoutTitle
           notifications={shipNotifications}
           ships={props.ships}
           pageChanger={pageChanger}

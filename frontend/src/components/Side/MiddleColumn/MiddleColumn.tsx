@@ -5,7 +5,7 @@ import React, { JSX } from "react";
 import ShipDetails from "../../../model/ShipDetails";
 import ErrorList from "./ErrorNotifications/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
-import ShipsNotificationList from "./NotificationsList/ShipsNotificationList";
+import NotificationList from "./NotificationsList/NotificationList";
 import ShipNotification from "../../../model/ShipNotification";
 import NotificationDetails from "./NotificationDetails/NotificationDetails";
 
@@ -44,7 +44,7 @@ function MiddleColumn({
         />
       );
     case "notificationList":
-      return <ShipsNotificationList
+      return <NotificationList
         notifications={notifications}
         ships={ships}
         pageChanger={pageChanger}
@@ -55,8 +55,6 @@ function MiddleColumn({
         notifications={notifications}
         notificationID={currentPage.shownShipId}  // note that here we use shownShipId variable to pass the notification ID
         pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-        ships={ships}
       />;
     case "settings":
       return <div>Settings</div>;

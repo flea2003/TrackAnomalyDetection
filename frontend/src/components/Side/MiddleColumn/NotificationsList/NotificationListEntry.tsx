@@ -11,9 +11,9 @@ import warning from "../../../../assets/icons/error-notifications/warning.svg";
 
 
 import "../../../../styles/common.css";
-import "../../../../styles/shipNotificationList.css";
-import "../../../../styles/shipNotificationEntry.css";
-import {ShipsNotificationService} from "../../../../services/ShipsNotificationService";
+import "../../../../styles/notificationList.css";
+import "../../../../styles/notificationEntry.css";
+import {NotificationService} from "../../../../services/NotificationService";
 
 
 interface NotificationEntryProps {
@@ -24,17 +24,15 @@ interface NotificationEntryProps {
 }
 
 /**
- * This component is a single entry in the Error Notifications List.
- * It displays the (software) error that occurred.
- * The object to render is passed as a prop.
- *
- * @param notification ErrorNotification object which will be shown in this entry.
+ * This component corresponds to a single entry in the Notifications List.
+ * It displays the short description of the notification that it ccorresponds
+ * to and also allows to get more detailed information by clicking on it. The
+ * object to render is passed as a prop.
  */
 function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCenteringFun }:
                                  NotificationEntryProps) {
 
   const shipIconAltText = "Ship Icon";
-
   const readStatusClassName = notification.isRead
     ? "notification-list-entry-read"
     : "notification-list-entry-not-read";
@@ -42,15 +40,17 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
   //console.log(readStatusClassName)
 
   const id = notification.id;
-  const shipAnomalyScore = notification.anomalyScore;
-  const message = notification.explanation;
-  const shipId = notification.shipID % 1000;
-  const date = notification.correspondingTimestamp;
+  const shipAnomalyScore = notification.shipDetails.anomalyScore;
+  const message = notification.shipDetails.explanation;
+  const shipId = notification.shipDetails.id % 1000;
+  const date = notification.shipDetails.correspondingTimestamp;
 
+  // Once the 'read all' button is clicked on, all notifictions should be set
+  // as read in the backend
   const onClick = () => {
-    pageChanger({ currentPage: "notificationDetails", shownShipId: notification.id });
+    pageChanger({ currentPage: "notificationDetails", shownShipId: id });
     mapCenteringFun(shipDetails);
-    ShipsNotificationService.queryBackendToMarkANotificationAsRead(notification);
+    NotificationService.queryBackendToMarkANotificationAsRead(notification);
   };
 
   return (
@@ -70,9 +70,8 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
         </span>
         <span className="notification-list-entry-id">#{shipId}</span>
       </div>
-      <span className="readStatusClassnAME">{shipAnomalyScore}%</span>
+      <span className="notification-list-entry-score">{shipAnomalyScore}%</span>
       <span className="notification-list-entry-date">{date}</span>
-      <span className="notification-list-entry-explanation">{message}</span>
     </Stack>
   );
 }

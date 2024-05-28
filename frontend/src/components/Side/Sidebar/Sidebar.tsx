@@ -10,7 +10,7 @@ import shipIcon from "../../../assets/icons/ship.png";
 import bellIcon from "../../../assets/icons/bell-notification.svg";
 import settingsIcon from "../../../assets/icons/settings.svg";
 import bugIcon from "../../../assets/icons/bug.svg";
-import { ShipsNotificationService } from "../../../services/ShipsNotificationService";
+import { NotificationService } from "../../../services/NotificationService";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -91,14 +91,15 @@ function getBugIconClassName() {
   return "sidebar-bug-icon-not-all-read";
 }
 
-
+/**
+ * Changes the style of the notification bell background based on whether
+ * there are any unread notifications
+ */
 function getNotificationsIconClassName() {
-  if (ShipsNotificationService.areAllRead()) {
-    return "sidebar-bug-icon-all-read";
+  if (NotificationService.areAllRead()) {
+    return "sidebar-bell-icon-all-read";
   }
-  return "sidebar-bug-icon-not-all-read";
+  return "sidebar-bell-icon-not-all-read";
 }
-
-
 
 export default Sidebar;

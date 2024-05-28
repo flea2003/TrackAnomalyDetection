@@ -8,47 +8,60 @@ import errorSymbol from "../assets/icons/error-notifications/error.svg";
 import warningSymbol from "../assets/icons/error-notifications/warning.svg";
 import infoSymbol from "../assets/icons/error-notifications/info.svg";
 import notificationResponseItem from "../templates/NotificationResponseItem";
+import ShipDetails from "../model/ShipDetails";
 
 
-export class ShipsNotificationService {
+export class NotificationService {
   // THIS IS ONLY USED FOR OPTIMIZATION REASONS FOR areAllRead() METHOD WHICH
   // THEN DOES NOT HAVE TO QUERY THE BACKEND AGAIN
   private static notifications: ShipNotification[] = [];
 
   static allNotificationsEndpoint = "/notifications";
-  static markAsReadEndpoint = "/notifications/read/";
+  static markNotificationAsReadEndpoint = "/notifications/read/";
 
-  static refreshState = () => {
-    console.log("ShipNotificationService refreshState was not set up");
-  };
-
-  static queryBackendToMarkANotificationAsRead = async (details: ShipNotification) => {
-    if (details.isRead) return;
-    await HttpSender.put(ShipsNotificationService.markAsReadEndpoint + details.id);
+  /**
+   * Method that queries the backend to mark a single notification as read.
+   *
+   * @param notification notification object
+   */
+  static queryBackendToMarkANotificationAsRead = async (notification: ShipNotification) => {
+    if (notification.isRead) return;
+    await HttpSender.put(NotificationService.markNotificationAsReadEndpoint + notification.id);
   }
 
+  /**
+   * Method that queries the backend to mark a list of notifications as read.
+   * This is called after pressing the read all button.
+   *
+   * @param notifications a list of notifications that should be marked as read
+   */
   static queryBackendToMarkAllNotificationsAsRead = async (notifications: ShipNotification[]) => {
     for (let i = 0; i < notifications.length; i++) {
-        await ShipsNotificationService.queryBackendToMarkANotificationAsRead(notifications[i]);
+        await NotificationService.queryBackendToMarkANotificationAsRead(notifications[i]);
     }
   }
 
+  /**
+   * Method that fetches all notifications for a particular ship. It is however, for now, not used,
+   * as currently we store all notifications in the frontend. However, in the future it may be needed,
+   * as we may not want to fetch all of the notifications in the history.
+   *
+   * @param shipID id of the ship for which notifications are
+   */
   static queryBackendForAllNotificationsForShip: (shipID: number) => Promise<ShipNotification[]> = async (shipID) => {
-      return await HttpSender.get(ShipsNotificationService.allNotificationsEndpoint + "/" + shipID);
+      return await HttpSender.get(NotificationService.allNotificationsEndpoint + "/" + shipID);
   }
 
+  /**
+   * Method that fetches all notifications from the backend.
+   */
   static queryBackendForAllNotifications: () => Promise<ShipNotification[]> = async () => {
     const response = await HttpSender.get(
-      ShipsNotificationService.allNotificationsEndpoint,
+      NotificationService.allNotificationsEndpoint,
     );
 
     if (!Array.isArray(response)) {
       ErrorNotificationService.addError("Server returned not an array");
-      return [];
-    }
-
-    if (response.length === 0) {
-      ErrorNotificationService.addInformation("Ship array is empty");
       return [];
     }
 
@@ -57,21 +70,23 @@ export class ShipsNotificationService {
       ErrorNotificationService.addError("Notifications array contained null items");
     }
 
-    this.notifications = ShipsNotificationService.sortList(
+    this.notifications = NotificationService.sortList(
       responseWithoutNulls.map(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (item: any) => ShipsNotificationService.extractNotificationDetails(item),
+        (item: any) => NotificationService.extractNotificationDetails(item),
       ),
       "desc",
     );
 
     return this.notifications;
   }
+
   /**
    * Utility method that parses the received JSON data and assembles the
-   * corresponding ShipDetails object
-   * @param item - the received JSON object
-   * @return - dummy ShipDetails object
+   * corresponding ShipNotifications object
+   *
+   * @param item the received JSON object
+   * @return corresponding ShipNotifications objects
    */
   static extractNotificationDetails: (item: NotificationResponseItem) => ShipNotification = (
     item,
@@ -79,24 +94,26 @@ export class ShipsNotificationService {
     console.log(item)
     return new ShipNotification(
         item.id,
-        item.shipID,
         item.read,
-        item.currentShipDetails.currentAISSignal.heading,
-        item.currentShipDetails.currentAISSignal.latitude,
-        item.currentShipDetails.currentAISSignal.longitude,
-        item.currentShipDetails.currentAnomalyInformation.score,
-        item.currentShipDetails.currentAnomalyInformation.explanation,
-        item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
-        item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
-        item.currentShipDetails.currentAISSignal.departurePort,
-        item.currentShipDetails.currentAISSignal.course,
-        item.currentShipDetails.currentAISSignal.speed
+        new ShipDetails(
+          item.shipID,
+          item.currentShipDetails.currentAISSignal.heading,
+          item.currentShipDetails.currentAISSignal.latitude,
+          item.currentShipDetails.currentAISSignal.longitude,
+          item.currentShipDetails.currentAnomalyInformation.score,
+          item.currentShipDetails.currentAnomalyInformation.explanation,
+          item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
+          item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
+          item.currentShipDetails.currentAISSignal.departurePort,
+          item.currentShipDetails.currentAISSignal.course,
+          item.currentShipDetails.currentAISSignal.speed)
       );
   };
 
   /**
-   * Utility method that sorts the list of ShipDetails entries based on the corresponding values of the anomaly score.
-   * @param list - fetched list with ShipDetails instances
+   * Utility method that sorts the list of Notifications entries based on their ID (TODO: later change to be sorted by date)
+   *
+   * @param list - fetched list of notifications
    * @param order - either `asc` for ascending or '`desc` for descending (default)
    */
   static sortList: (list: ShipNotification[], order: string) => ShipNotification[] = (

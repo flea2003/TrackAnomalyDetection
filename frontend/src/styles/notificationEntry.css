@@ -1,0 +1,68 @@
+.notification-list-entry-not-read, .notification-list-entry-read {
+    width: 95%;
+    height: 45px;
+    background: orange;
+    font-weight: bold;
+
+    margin-top: 1px;
+    margin-bottom: 1px;
+    border-radius: 3px;
+    border: 1px solid black;
+    padding: 2px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.notification-list-entry-read {
+    background: lightgray;
+    font-weight: normal;
+
+}
+
+.notification-list-entry-read:hover, .notification-list-entry-not-read:hover {
+    background: white;
+    transform: scale(1.01);
+}
+
+.notification-list-entry-icon-id-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.notification-list-entry-score {
+    font-size: 0.7em;
+    width: 20%;
+    text-align: center;
+}
+
+.notification-list-entry-date {
+    font-size: 0.6em;
+    width: 60%;
+    text-align: center;
+}
+
+.notification-list-entry-id {
+    font-size: 0.5em;
+    width: 30px;
+    text-align:center;
+}
+
+.notification-list-entry-icon-container {
+    font-size: var(--notification-list-entry-font-size);
+    height: 100%;
+    width: var(--notification-list-entry-icon-container-width);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3px;
+}
+
+.notification-list-entry-icon{
+    height: 25px;
+    width: 25px;
+}
