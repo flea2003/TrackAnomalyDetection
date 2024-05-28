@@ -42,8 +42,6 @@
     overflow-y: auto;
     height: calc(60vh - var(--object-details-title-height));
     padding: 3px;
-    border: solid 1px black;
-    border-radius: 3px;
 }
 
 .object-details-notification-list {
@@ -55,8 +53,6 @@
     height: 10vh;
     flex-grow: 1;
     margin-top: 3px;
-    border: solid 1px black;
-    border-radius: 3px;
 }
 
 .object-details-notification-title {

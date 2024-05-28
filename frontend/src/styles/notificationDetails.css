@@ -6,8 +6,6 @@
     flex-shrink: 0;
     overflow-y: auto;
     padding: 3px;
-    border: solid 1px black;
-    border-radius: 3px;
     height: 90%;
 }
 
