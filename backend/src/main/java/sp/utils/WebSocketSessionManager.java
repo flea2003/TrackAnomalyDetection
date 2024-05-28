@@ -1,33 +1,25 @@
 package sp.utils;
 
-import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionConnectedEvent;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class WebSocketSessionManager {
-    private final ConcurrentHashMap<String, String> activeSessions = new ConcurrentHashMap<>();
+    private List<String> activeSessions = Collections.synchronizedList(new ArrayList<>());
 
-    @EventListener
-    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
-        String sessionId = headers.getSessionId();
-        activeSessions.put(sessionId, sessionId);
+
+    public void addSession(String sessionId) {
+        this.activeSessions.add(sessionId);
     }
 
-    @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-        StompHeaderAccessor headers = StompHeaderAccessor.wrap(event.getMessage());
-        String sessionId = headers.getSessionId();
-        activeSessions.remove(sessionId);
+    public void removeSession(String sessionId) {
+        this.activeSessions.remove(sessionId);
     }
 
-    public List<String> getActiveSessions() {
-        return this.activeSessions.values().stream().toList();
+    public boolean checkForOpenConnections() {
+        return !this.activeSessions.isEmpty();
     }
+
 }
