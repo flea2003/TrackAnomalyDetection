@@ -1,4 +1,11 @@
 import ShipDetails from "../../model/ShipDetails";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
+
+beforeEach(() => {
+  // Remove refreshState function, so it does nothing.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ErrorNotificationService.refreshState = () => {};
+});
 
 test("Rounding of latitude and longitude", () => {
   const fake = new ShipDetails(
