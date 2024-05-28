@@ -7,7 +7,6 @@ import List from "@mui/material/List";
 
 import "../../../../styles/notificationList.css";
 
-
 interface NotificationListProps {
   notifications: ShipNotification[];
   ships: ShipDetails[];
@@ -16,13 +15,15 @@ interface NotificationListProps {
 }
 
 function NotificationListWithoutTitle({
-                                             notifications,
-                                             ships,
-                                             pageChanger,
-                                             mapCenteringFun,
-                                           }: NotificationListProps) {
+  notifications,
+  ships,
+  pageChanger,
+  mapCenteringFun,
+}: NotificationListProps) {
   const listEntries = notifications.map((notification, i) => {
-    const shipDetails =  ships.filter(x => x.id === notifications[i].shipDetails.id).slice()[0];
+    const shipDetails = ships
+      .filter((x) => x.id === notifications[i].shipDetails.id)
+      .slice()[0];
     return (
       <ShipsNotificationEntry
         key={i}

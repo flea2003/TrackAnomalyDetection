@@ -10,7 +10,6 @@ import "../../../../styles/notificationEntry.css";
 import { NotificationService } from "../../../../services/NotificationService";
 import NotificationListWithoutTitle from "./NotificationListWithoutTitle";
 
-
 interface NotificationListProps {
   notifications: ShipNotification[];
   ships: ShipDetails[];
@@ -19,24 +18,27 @@ interface NotificationListProps {
 }
 
 function NotificationList({
-                       notifications,
-                       ships,
-                       pageChanger,
-                       mapCenteringFun,
-                     }: NotificationListProps) {
+  notifications,
+  ships,
+  pageChanger,
+  mapCenteringFun,
+}: NotificationListProps) {
   // TODO: perhaps refactor all to separate functions!
-  const image =
+  const image = (
     <img
-    src={closeIcon}
-    alt="Close"
-    id="notification-list-close-icon"
-    data-testid="notification-list-close-icon"
-    onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
-  />;
-
+      src={closeIcon}
+      alt="Close"
+      id="notification-list-close-icon"
+      data-testid="notification-list-close-icon"
+      onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
+    />
+  );
 
   return (
-    <Stack id="notification-list-container" data-testid="notification-list-container">
+    <Stack
+      id="notification-list-container"
+      data-testid="notification-list-container"
+    >
       <Stack id="notification-list-title-container" direction="row">
         {image}
         <div id="notification-list-name-text">Notifications</div>
@@ -44,18 +46,21 @@ function NotificationList({
           <button
             id="notification-list-mark-all-button"
             onClick={() => {
-              NotificationService.queryBackendToMarkAllNotificationsAsRead(notifications);
-            }}>
+              NotificationService.queryBackendToMarkAllNotificationsAsRead(
+                notifications,
+              );
+            }}
+          >
             Read
           </button>
         </div>
       </Stack>
-        <NotificationListWithoutTitle
-          notifications={notifications}
-          ships={ships}
-          pageChanger={pageChanger}
-          mapCenteringFun={mapCenteringFun}
-        />
+      <NotificationListWithoutTitle
+        notifications={notifications}
+        ships={ships}
+        pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
+      />
     </Stack>
   );
 }

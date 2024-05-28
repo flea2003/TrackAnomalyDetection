@@ -1,5 +1,4 @@
 import ShipDetails from "./ShipDetails";
-import shipDetails from "./ShipDetails";
 
 class ShipNotification {
   id: number;
@@ -13,11 +12,7 @@ class ShipNotification {
    * @param isRead status of whether the notification was read
    * @param shipDetails corresponding ship details of the notification
    */
-  constructor(
-    id: number,
-    isRead: boolean,
-    shipDetails: ShipDetails
-  ) {
+  constructor(id: number, isRead: boolean, shipDetails: ShipDetails) {
     this.id = id;
     this.isRead = isRead;
     this.shipDetails = shipDetails;
@@ -32,9 +27,12 @@ class ShipNotification {
    */
   getPropertyList() {
     return [
-      { type: "Ship ID", value: this.shipDetails.id},
-      { type: "Time of the anomaly", value: this.shipDetails.correspondingTimestamp},
-      { type: "Anomaly Score", value: (this.shipDetails.anomalyScore+"%") },
+      { type: "Ship ID", value: this.shipDetails.id },
+      {
+        type: "Time of the anomaly",
+        value: this.shipDetails.correspondingTimestamp,
+      },
+      { type: "Anomaly Score", value: this.shipDetails.anomalyScore + "%" },
       { type: "Explanation", value: this.shipDetails.explanation },
       {
         type: "Highest Recorded Anomaly Score At The Time",

@@ -32,16 +32,17 @@ class HttpSender {
   static async put(endpoint: string): Promise<void> {
     try {
       const response = await fetch(this.url + endpoint, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({}),
       });
       if (!response.ok) {
-        ErrorNotificationService.addError("Error while marking notification as read");
+        ErrorNotificationService.addError(
+          "Error while marking notification as read",
+        );
       }
-
     } catch (error) {
       if (error instanceof Error)
         ErrorNotificationService.addError(
@@ -49,11 +50,6 @@ class HttpSender {
         );
     }
   }
-
-
-
-
-
 }
 
 export default HttpSender;

@@ -38,25 +38,6 @@ test("getPropertyList returns a list of correct size", () => {
   expect(fake.getPropertyList().length).toBe(9);
 });
 
-test("getPropertyList returns correct id", () => {
-  const fake = new ShipDetails(
-    1,
-    0,
-    0.123456,
-    0.12034,
-    0,
-    "test",
-    0,
-    "time",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the id is correct
-  expect(fake.getPropertyList()[0].value).toBe("1");
-});
-
 test("getPropertyList returns correct explanation", () => {
   const fake = new ShipDetails(
     1,

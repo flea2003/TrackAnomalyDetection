@@ -23,7 +23,7 @@ public class NotificationsAggregatorTest {
     private String valueJsonHigh = "{\"currentAnomalyInformation\":{\"score\":50.0,\"explanation\":\"explanation\",\"correspondingTimestamp\":\"2004-01-27T01:01:00Z\",\"id\":1},\"currentAISSignal\":{\"id\":0,\"speed\":0.0,\"longitude\":0.0,\"latitude\":0.0,\"course\":0.0,\"heading\":0.0,\"timestamp\":null,\"departurePort\":null}, \"maxAnomalyScoreInfo\":{\"maxAnomalyScore\":null,\"correspondingTimestamp\":null}}\n";
     private String key = "1";
 
-    private Notification initialValue = new Notification(null, null, null);
+    private Notification initialValue = new Notification(null, null, false, null);
     private Notification oldValueLow = new Notification(new CurrentShipDetails(new AnomalyInformation(10, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal(), new MaxAnomalyScoreDetails()));
     private Notification oldValueHigh = new Notification(new CurrentShipDetails(new AnomalyInformation(50, "explanation", OffsetDateTime.of(2004, 01, 27, 1, 1, 0, 0, ZoneOffset.ofHours(0)), 1L), new AISSignal(), new MaxAnomalyScoreDetails()));
 

@@ -13,7 +13,7 @@ function NotificationDetailsEntry(props: { type: string; value: string }) {
   return (
     <div className="object-details-entry">
       <span className="object-details-entry-type">{props.type}</span>
-      <br/>
+      <br />
       <span className="object-details-entry-value">{props.value}</span>
     </div>
   );

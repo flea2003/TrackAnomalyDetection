@@ -44,18 +44,22 @@ function MiddleColumn({
         />
       );
     case "notificationList":
-      return <NotificationList
-        notifications={notifications}
-        ships={ships}
-        pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-      />;
+      return (
+        <NotificationList
+          notifications={notifications}
+          ships={ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+        />
+      );
     case "notificationDetails":
-      return <NotificationDetails
-        notifications={notifications}
-        notificationID={currentPage.shownShipId}  // note that here we use shownShipId variable to pass the notification ID
-        pageChanger={pageChanger}
-      />;
+      return (
+        <NotificationDetails
+          notifications={notifications}
+          notificationID={currentPage.shownShipId} // note that here we use shownShipId variable to pass the notification ID
+          pageChanger={pageChanger}
+        />
+      );
     case "settings":
       return <div>Settings</div>;
     case "errors":

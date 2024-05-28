@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import NotificationDetailsEntry from "./NotificationDetailsEntry";
@@ -12,9 +12,9 @@ import ErrorNotificationService from "../../../../services/ErrorNotificationServ
 import ShipNotification from "../../../../model/ShipNotification";
 
 interface ObjectDetailsProps {
-  notifications: ShipNotification[],
-  notificationID: number,
-  pageChanger: (currentPage: CurrentPage) => void
+  notifications: ShipNotification[];
+  notificationID: number;
+  pageChanger: (currentPage: CurrentPage) => void;
 }
 
 /**
@@ -24,7 +24,6 @@ interface ObjectDetailsProps {
  * @param props properties passed to this component. Most importantly, it contains the notification information whose details to display.
  */
 function NotificationDetails(props: ObjectDetailsProps) {
-
   // Extract the props
   const allNotifications = props.notifications;
   const notificationID = props.notificationID;
@@ -35,7 +34,9 @@ function NotificationDetails(props: ObjectDetailsProps) {
 
   // If such notification is not (longer) present, show a message.
   if (notification === undefined) {
-    ErrorNotificationService.addWarning("Notification not found with ID: " + notificationID);
+    ErrorNotificationService.addWarning(
+      "Notification not found with ID: " + notificationID,
+    );
     return notificationNotFoundElement();
   }
 
@@ -47,7 +48,9 @@ function NotificationDetails(props: ObjectDetailsProps) {
           Notification ID: {notification.id}
         </span>
       </div>
-      <div className="notification-details-notifier">Ship details at the time of the anomaly:</div>
+      <div className="notification-details-notifier">
+        Ship details at the time of the anomaly:
+      </div>
       <List className="notification-details-properties-list">
         {getPropertyElements(notification)}
       </List>

@@ -34,7 +34,9 @@ function ObjectDetails(props: ObjectDetailsProps) {
 
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = allShips.find((ship) => ship.id === shipID);
-  const shipNotifications = props.notifications.filter((x) => x.shipDetails.id === shipID);
+  const shipNotifications = props.notifications.filter(
+    (x) => x.shipDetails.id === shipID,
+  );
 
   if (ship === undefined) {
     ErrorNotificationService.addWarning("No ship found with ID " + shipID);
@@ -44,10 +46,8 @@ function ObjectDetails(props: ObjectDetailsProps) {
   return (
     <Stack id="object-details-container">
       <div className="object-details-title-container">
-       {getReturnIcon(pageChanger)}
-        <span className="object-details-title">
-          Ship ID: {ship.id}
-        </span>
+        {getReturnIcon(pageChanger)}
+        <span className="object-details-title">Ship ID: {ship.id}</span>
       </div>
       <List className="object-details-properties-list">
         {getPropertyElements(ship)}

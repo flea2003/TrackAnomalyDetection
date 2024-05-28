@@ -24,7 +24,6 @@ function Side({
   pageChanger,
   mapCenteringFun,
 }: SideProps): JSX.Element {
-
   // Set up the ErrorNotificationService
   const [, setErrorNotificationState] = React.useState(
     ErrorNotificationService.getAllNotifications(),

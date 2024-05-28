@@ -1,20 +1,13 @@
-import ErrorNotificationService, { ErrorNotification } from "../../../../services/ErrorNotificationService";
 import Stack from "@mui/material/Stack";
-import trashIcon from "../../../../assets/icons/trash.svg";
 import React from "react";
 import ShipDetails from "../../../../model/ShipDetails";
 import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
-import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import shipIcon from "../../../../assets/icons/ship.png";
-import warning from "../../../../assets/icons/error-notifications/warning.svg";
-
-
 import "../../../../styles/common.css";
 import "../../../../styles/notificationList.css";
 import "../../../../styles/notificationEntry.css";
-import {NotificationService} from "../../../../services/NotificationService";
-
+import { NotificationService } from "../../../../services/NotificationService";
 
 interface NotificationEntryProps {
   notification: ShipNotification;
@@ -29,9 +22,12 @@ interface NotificationEntryProps {
  * to and also allows to get more detailed information by clicking on it. The
  * object to render is passed as a prop.
  */
-function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCenteringFun }:
-                                 NotificationEntryProps) {
-
+function ShipNotificationEntry({
+  notification,
+  shipDetails,
+  pageChanger,
+  mapCenteringFun,
+}: NotificationEntryProps) {
   const shipIconAltText = "Ship Icon";
   const readStatusClassName = notification.isRead
     ? "notification-list-entry-read"
@@ -41,7 +37,6 @@ function ShipNotificationEntry({ notification, shipDetails, pageChanger, mapCent
 
   const id = notification.id;
   const shipAnomalyScore = notification.shipDetails.anomalyScore;
-  const message = notification.shipDetails.explanation;
   const shipId = notification.shipDetails.id % 1000;
   const date = notification.shipDetails.correspondingTimestamp;
 

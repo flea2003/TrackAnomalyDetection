@@ -46,7 +46,7 @@ class ShipDetails {
    */
   getPropertyList() {
     return [
-      { type: "Anomaly Score", value: (this.anomalyScore+"%") },
+      { type: "Anomaly Score", value: this.anomalyScore + "%" },
       { type: "Explanation", value: this.explanation },
       {
         type: "Highest Recorded Anomaly Score",
