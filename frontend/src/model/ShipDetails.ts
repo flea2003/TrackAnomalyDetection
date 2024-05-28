@@ -1,9 +1,12 @@
+import TimeUtilities from "../utils/TimeUtilities";
+
 class ShipDetails {
   static rounding = 1000;
   id: number;
   heading: number;
   lat: number;
   lng: number;
+  timestamp: string;
   anomalyScore: number;
   explanation: string;
   maxAnomalyScore: number;
@@ -17,6 +20,7 @@ class ShipDetails {
     heading: number,
     lat: number,
     lng: number,
+    timestamp: string,
     anomalyScore: number,
     description: string,
     maxAnomalyScore: number,
@@ -29,6 +33,7 @@ class ShipDetails {
     this.heading = heading;
     this.lat = lat;
     this.lng = lng;
+    this.timestamp = timestamp;
     this.anomalyScore = anomalyScore;
     this.explanation = description;
     this.maxAnomalyScore = maxAnomalyScore;
@@ -48,6 +53,10 @@ class ShipDetails {
     return [
       { type: "Anomaly Score", value: this.anomalyScore + "%" },
       { type: "Explanation", value: this.explanation },
+      {
+        type: "Last AIS signal",
+        value: TimeUtilities.computeTimeDifference(this.timestamp) + " ago",
+      },
       {
         type: "Highest Recorded Anomaly Score",
         value: this.maxAnomalyScore.toString() + "%",

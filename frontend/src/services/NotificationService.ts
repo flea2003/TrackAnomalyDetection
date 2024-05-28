@@ -108,6 +108,7 @@ export class NotificationService {
         item.currentShipDetails.currentAISSignal.heading,
         item.currentShipDetails.currentAISSignal.latitude,
         item.currentShipDetails.currentAISSignal.longitude,
+        "",
         item.currentShipDetails.currentAnomalyInformation.score,
         item.currentShipDetails.currentAnomalyInformation.explanation,
         item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,

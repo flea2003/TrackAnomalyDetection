@@ -1,4 +1,11 @@
 import ShipDetails from "../../model/ShipDetails";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
+
+beforeEach(() => {
+  // Remove refreshState function, so it does nothing.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ErrorNotificationService.refreshState = () => {};
+});
 
 test("Rounding of latitude and longitude", () => {
   const fake = new ShipDetails(
@@ -6,6 +13,7 @@ test("Rounding of latitude and longitude", () => {
     0,
     0.123456,
     0.12034,
+    "t1",
     0,
     "test",
     0,
@@ -25,6 +33,7 @@ test("getPropertyList returns a list of correct size", () => {
     0,
     0.123456,
     0.12034,
+    "t1",
     0,
     "test",
     0,
@@ -36,6 +45,26 @@ test("getPropertyList returns a list of correct size", () => {
 
   // Test that the list has the correct size
   expect(fake.getPropertyList().length).toBe(9);
+});
+
+test("getPropertyList returns correct id", () => {
+  const fake = new ShipDetails(
+    1,
+    0,
+    0.123456,
+    0.12034,
+    "t1",
+    0,
+    "test",
+    0,
+    "time",
+    "p1",
+    1,
+    350.0,
+  );
+
+  // Test that the id is correct
+  expect(fake.getPropertyList()[0].value).toBe("1");
 });
 
 test("getPropertyList returns correct explanation", () => {

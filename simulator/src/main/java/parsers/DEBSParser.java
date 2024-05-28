@@ -86,6 +86,12 @@ public record DEBSParser(BufferedReader reader) implements Parser {
         return new Timestamp(year, month, day, hour, minute);
     }
 
+    /**
+     * Parses the date from a string to the OffsetDateTime object which uses ISO8601 standard.
+     *
+     * @param date the date as a string
+     * @return the parsed date  
+     */
     private OffsetDateTime parseToISO8601(String date) {
 
         Timestamp t = parseDate(date);

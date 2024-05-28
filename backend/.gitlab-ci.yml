@@ -1,6 +1,6 @@
 backend_build:
   stage: build
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: []
   before_script:
     - cd backend
@@ -10,7 +10,7 @@ backend_build:
 
 backend_tests:
   stage: test
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["backend_build"]
   before_script:
     - cd backend
@@ -32,7 +32,7 @@ backend_tests:
 
 backend_mutation_testing:
   stage: test
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["backend_build"]
   before_script:
     - cd backend
@@ -44,7 +44,7 @@ backend_mutation_testing:
 
 backend_checkstyle:
   stage: code_quality
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["backend_build"]
   before_script:
     - cd backend
@@ -54,7 +54,7 @@ backend_checkstyle:
 
 backend_pmd_static_analysis:
   stage: code_quality
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["backend_build"]
   before_script:
     - cd backend
@@ -64,7 +64,7 @@ backend_pmd_static_analysis:
 
 backend_statement_coverage:
   stage: collect_coverage
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["backend_tests"]
   before_script: cd backend
   script:
@@ -73,7 +73,7 @@ backend_statement_coverage:
 
 backend_branch_coverage:
   stage: collect_coverage
-  image: gradle:7.6.0-jdk17
+  image: gradle:8.7.0-jdk17
   needs: ["backend_tests"]
   before_script: cd backend
   script:

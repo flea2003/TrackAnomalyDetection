@@ -53,6 +53,7 @@ public class NotificationController {
     /**
      * Gets a certain notification from the database.
      *
+     * @param id notification id
      * @return needed Notification object
      */
     @GetMapping("/notifications/{id}")
