@@ -66,7 +66,7 @@ class ConstantManeuveringStatefulMapFunctionTest {
         // the 12th one is an anomaly
         assertThat(anomalies.get(11).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(11).getValue().getExplanation()).isEqualTo(
-                "Too much maneuvering (turned too many times): 11 strong turns (turns of more than 40 degrees) is more than threshold of 10 turns.\n");
+                "Maneuvering is too frequent: 11 strong turns (turns of more than 40 degrees) during the last 60 minutes is more than threshold of 10 turns.\n");
 
         // the 13th one is not anomaly (happens one hour later)
         assertThat(anomalies.get(12).getValue().getScore()).isEqualTo(0f);
@@ -98,7 +98,7 @@ class ConstantManeuveringStatefulMapFunctionTest {
         // the 28th one is an anomaly
         assertThat(anomalies.get(27).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(27).getValue().getExplanation()).isEqualTo(
-                "Too much maneuvering (turned too many times): 11 strong turns (turns of more than 40 degrees) is more than threshold of 10 turns.\n");
+                "Maneuvering is too frequent: 11 strong turns (turns of more than 40 degrees) during the last 60 minutes is more than threshold of 10 turns.\n");
     }
 
     // helper method to prepare AIS signals that are the same but which have the alternating heading

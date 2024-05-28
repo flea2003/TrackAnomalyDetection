@@ -56,9 +56,10 @@ public class ConstantManeuveringStatefulMapFunction extends HeuristicStatefulMap
 
         if (turnCount > TURNS_COUNT_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Too much maneuvering (turned too many times): " + turnCount
+            explanation += "Maneuvering is too frequent: " + turnCount
                     + " strong turns (turns of more than " + df.format(HEADING_DIFFERENCE_THRESHOLD)
-                    + " degrees) is more than threshold of " + TURNS_COUNT_THRESHOLD
+                    + " degrees) during the last " + df.format(TIME_FRAME_IN_MINUTES) + " minutes"
+                    + " is more than threshold of " + TURNS_COUNT_THRESHOLD
                     + " turns" + explanationEnding();
         }
 
