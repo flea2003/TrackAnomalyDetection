@@ -17,3 +17,7 @@
     font-weight: normal;
     overflow-wrap: break-word;
 }
+
+.object-details-entry-value ul {
+    padding-left: 15px;
+}
