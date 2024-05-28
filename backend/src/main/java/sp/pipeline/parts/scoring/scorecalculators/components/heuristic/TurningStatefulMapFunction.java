@@ -1,6 +1,7 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
 import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.circularMetric;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.getCorrectedHeading;
 
 import sp.model.AISSignal;
 import java.text.DecimalFormat;
@@ -9,7 +10,6 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
 
     private static final float HEADING_DIFFERENCE_THRESHOLD = 40;
     private static final float COURSE_DIFFERENCE_THRESHOLD = 40;
-    private static final float NO_HEADING = 511;
 
     /**
      * Checks if the current signal is an anomaly.
@@ -25,6 +25,11 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        // only check if there was a signal in the past
+        if (pastSignal == null) {
+            return new AnomalyScoreWithExplanation(false, 0f, "");
+        }
+
         boolean isAnomaly = false;
         String explanation = "";
 
@@ -62,21 +67,7 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     protected float getAnomalyScore() {
-        return 34f;
+        return 25f;
     }
 
-    /**
-     * Gets the heading of the signal. If the signal has not reported any heading
-     * (which is denoted by 511), then the course is returned instead.
-     *
-     * @param signal the AIS signal
-     * @return the heading if exists, or the course otherwise
-     */
-    private float getCorrectedHeading(AISSignal signal) {
-        if (signal.getHeading() == NO_HEADING) {
-            return signal.getCourse();
-        }
-
-        return signal.getHeading();
-    }
 }

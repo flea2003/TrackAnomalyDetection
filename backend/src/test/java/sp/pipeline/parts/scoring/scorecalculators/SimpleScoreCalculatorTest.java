@@ -59,7 +59,7 @@ class SimpleScoreCalculatorTest {
         List<AnomalyInformation> result = CollectSink.anomalyInfoList;
 
         assertThat(result).containsAll(List.of(
-            new AnomalyInformation(100f,
+            new AnomalyInformation(75f,
                     """
                             Time between two consecutive signals is too large: 14 minutes is more than threshold of 10 minutes, and ship's speed (between two signals) is too large: 15217.09 km/h is more than threshold of 6.0 km/h.
                             Speed is too big: 2223.89 km/min is faster than threshold of 55.5 km/min.

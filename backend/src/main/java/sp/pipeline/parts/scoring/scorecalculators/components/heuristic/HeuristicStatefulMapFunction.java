@@ -2,13 +2,14 @@ package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
 import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.state.ListState;
+import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
@@ -37,7 +38,8 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
      *     are also included in the same return object.
      */
-    protected abstract AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal);
+    protected abstract AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal)
+            throws Exception;
 
     /**
      * Gets the anomaly score of the heuristic. This score is given to the ship that
@@ -70,10 +72,10 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     /**
      * Initializes the function by initializing the value states.
      *
-     * @param config Flink configuration object
+     * @param parameters Flink configuration object
      */
     @Override
-    public void open(Configuration config) {
+    public void open(Configuration parameters) throws Exception {
         aisSignalValueState = getValueState("aisSignal", new TypeHint<>() {});
         lastDetectedAnomalyValueState = getValueState("lastDetectedAnomaly", new TypeHint<>() {});
     }
@@ -88,13 +90,28 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      * @return the created value state
      */
     private <T> ValueState<T> getValueState(String name, TypeHint<T> typeHint) {
-        ValueStateDescriptor<T> descriptor =
-                new ValueStateDescriptor<>(
-                        name,
-                        TypeInformation.of(typeHint)
-                );
+        ValueStateDescriptor<T> descriptor = new ValueStateDescriptor<>(
+                name, TypeInformation.of(typeHint)
+        );
 
         return getRuntimeContext().getState(descriptor);
+    }
+
+    /**
+     * Helper method for creating (initializing) a list state.
+     *
+     * @param name name of the state
+     * @param typeHint type hint for the descriptor (cannot be extracted since Flink then
+     *                 shows errors about generic method)
+     * @param <T> the type of the objects stored in the list state
+     * @return the created list state
+     */
+    protected <T> ListState<T> getListState(String name, TypeHint<T> typeHint) {
+        ListStateDescriptor<T> descriptor = new ListStateDescriptor<>(
+                name, TypeInformation.of(typeHint)
+        );
+
+        return getRuntimeContext().getListState(descriptor);
     }
 
     /**
@@ -103,10 +120,10 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      *
      * @param value The input value (AIS signal)
      * @return the computed Anomaly Information object
-     * @exception IOException exception thrown by interaction with value states
+     * @exception Exception exception thrown by interaction with value states
      */
     @Override
-    public AnomalyInformation map(AISSignal value) throws IOException {
+    public AnomalyInformation map(AISSignal value) throws Exception {
         checkCurrentSignal(value);
 
         AnomalyInformation anomalyInfo;
@@ -151,16 +168,10 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
      * in the value state for the last detected anomaly.
      *
      * @param currentSignal current AIS signal
-     * @throws IOException if interaction with value states throw exception
+     * @throws Exception if interaction with value states throw exception
      */
-    private void checkCurrentSignal(AISSignal currentSignal) throws IOException {
+    private void checkCurrentSignal(AISSignal currentSignal) throws Exception {
         AISSignal pastSignal = getAisSignalValueState().value();
-
-        // only check if there was a signal in the past
-        if (pastSignal == null) {
-            return;
-        }
-
         AnomalyScoreWithExplanation result = checkForAnomaly(currentSignal, pastSignal);
 
         if (result.isAnomaly()) {

@@ -6,6 +6,8 @@ import java.time.OffsetDateTime;
 
 public class Tools {
 
+    private static final float NO_HEADING = 511;
+
     /**
      * Util static class that calculates the globe distance between 2 points.
      *
@@ -91,6 +93,21 @@ public class Tools {
                 currentSignal.getLatitude(), currentSignal.getLongitude(),
                 pastSignal.getLatitude(), pastSignal.getLongitude()
         );
+    }
+
+    /**
+     * Gets the heading of the signal. If the signal has not reported any heading
+     * (which is denoted by 511), then the course is returned instead.
+     *
+     * @param signal the AIS signal
+     * @return the heading if exists, or the course otherwise
+     */
+    public static float getCorrectedHeading(AISSignal signal) {
+        if (signal.getHeading() == NO_HEADING) {
+            return signal.getCourse();
+        }
+
+        return signal.getHeading();
     }
 
 }
