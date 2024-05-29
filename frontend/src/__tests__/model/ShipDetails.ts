@@ -7,7 +7,7 @@ beforeEach(() => {
   ErrorNotificationService.refreshState = () => {};
 });
 
-test("Rounding of latitude and longitude", () => {
+test("Test ship details", () => {
   const fake = new ShipDetails(
     1,
     0,
@@ -24,83 +24,46 @@ test("Rounding of latitude and longitude", () => {
   );
 
   // Test that the rounding is done correctly. Assumes that the rounding is 1000
-  expect(fake.getPropertyList()[7].value).toBe("0.123, 0.12");
-});
-
-test("getPropertyList returns a list of correct size", () => {
-  const fake = new ShipDetails(
-    1,
-    0,
-    0.123456,
-    0.12034,
-    "t1",
-    0,
-    "test",
-    0,
-    "time",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the list has the correct size
-  expect(fake.getPropertyList().length).toBe(9);
-});
-
-test("getPropertyList returns correct id", () => {
-  const fake = new ShipDetails(
-    1,
-    0,
-    0.123456,
-    0.12034,
-    "t1",
-    0,
-    "test",
-    0,
-    "time",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the id is correct
-  expect(fake.getPropertyList()[0].value).toBe("1");
-});
-
-test("getPropertyList returns correct explanation", () => {
-  const fake = new ShipDetails(
-    1,
-    0,
-    0.123456,
-    0.12034,
-    0,
-    "test",
-    0,
-    "time",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the explanation is correct
-  expect(fake.getPropertyList()[1].value).toBe("test");
-});
-
-test("getPropertyList returns correct heading", () => {
-  const fake = new ShipDetails(
-    1,
-    0,
-    0.123456,
-    0.12034,
-    0,
-    "test",
-    0,
-    "time",
-    "p1",
-    1,
-    350.0,
-  );
-
-  // Test that the heading is correct
-  expect(fake.getPropertyList()[4].value).toBe("0");
+  expect(fake.getPropertyList()).toStrictEqual([
+    {
+      type: "Anomaly Score",
+      value: "0%",
+    },
+    {
+      type: "Explanation",
+      value: "test",
+    },
+    {
+      type: "Last AIS signal",
+      value: "Not available ago",
+    },
+    {
+      type: "Highest Recorded Anomaly Score",
+      value: "0%",
+    },
+    {
+      type: "Timestamp of the Highest Anomaly Score",
+      value: "time",
+    },
+    {
+      type: "Heading",
+      value: "0",
+    },
+    {
+      type: "Departure Port",
+      value: "p1",
+    },
+    {
+      type: "Course",
+      value: "1",
+    },
+    {
+      type: "Position",
+      value: "0.123, 0.12",
+    },
+    {
+      type: "Speed",
+      value: "350",
+    },
+  ]);
 });

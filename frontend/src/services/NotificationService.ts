@@ -52,6 +52,8 @@ export class NotificationService {
   static queryBackendForAllNotificationsForShip: (
     shipID: number,
   ) => Promise<ShipNotification[]> = async (shipID) => {
+    if (shipID < 0) return;
+
     return await HttpSender.get(
       NotificationService.allNotificationsEndpoint + "/" + shipID,
     );
@@ -99,7 +101,6 @@ export class NotificationService {
   static extractNotificationDetails: (
     item: NotificationResponseItem,
   ) => ShipNotification = (item) => {
-    console.log(item);
     return new ShipNotification(
       item.id,
       item.read,
@@ -108,7 +109,7 @@ export class NotificationService {
         item.currentShipDetails.currentAISSignal.heading,
         item.currentShipDetails.currentAISSignal.latitude,
         item.currentShipDetails.currentAISSignal.longitude,
-        "",
+        item.currentShipDetails.currentAISSignal.timestamp,
         item.currentShipDetails.currentAnomalyInformation.score,
         item.currentShipDetails.currentAnomalyInformation.explanation,
         item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
