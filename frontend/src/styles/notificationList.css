@@ -1,5 +1,5 @@
 #notification-list-container {
-    width: 20%;
+    width: var(--middle-column-width);
     text-align: center;
     display: flex;
     border-left: 1px solid black;
@@ -25,25 +25,22 @@
 }
 
 #notification-list-mark-all-button {
-    height: 100%;
-    width: 100%;
+    margin-right: 5px;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding-left: 7px;
+    padding-right: 7px;
     cursor: pointer;
-    background: lightgray;
-    border-radius: 3px;
 }
 
 #notification-list-mark-all-button:hover {
     background: darkgray;
 }
 
-#notification-list-mark-all-button {
-    height: var(--anomaly-list-closing-icon-size);
-    width: var(--notification-list-mark-all-button-length);
-}
-
 #notification-list-button-button-div {
     padding: 1px;
-    margin-right: 2px;
+    margin-right: 1px;
 }
 
 #notification-list-internal-container {
@@ -52,4 +49,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+#notification-list-name-text {
+    font-weight: bold;
 }

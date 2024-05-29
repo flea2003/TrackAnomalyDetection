@@ -1,6 +1,7 @@
 package sp.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sp.model.AnomalyInformation;
@@ -42,5 +43,11 @@ public class TestNotification {
         ));
 
         assertThat(notification2).isEqualTo(notification);
+    }
+
+    @Test
+    void testGedSerde() throws JsonProcessingException {
+        assertThat(Notification.getSerde()).isExactlyInstanceOf(Jackson2Serde.class);
+        assertThat(Notification.getSerde()).isExactlyInstanceOf(Jackson2Serde.class);
     }
 }

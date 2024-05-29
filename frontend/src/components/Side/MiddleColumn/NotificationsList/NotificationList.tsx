@@ -51,7 +51,7 @@ function NotificationList({
               );
             }}
           >
-            Read
+            Mark read
           </button>
         </div>
       </Stack>

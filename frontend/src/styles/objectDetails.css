@@ -1,5 +1,5 @@
 #object-details-container {
-    width: 20%;
+    width: var(--middle-column-width);
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -40,7 +40,7 @@
     justify-content: flex-start;
     flex-shrink: 0;
     overflow-y: auto;
-    height: calc(60vh - var(--object-details-title-height));
+    height: 70vh;
     padding: 3px;
 }
 

@@ -10,7 +10,6 @@ import sp.utils.UtilsObjectMapper;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-@ToString
 @Getter
 @Setter
 public class Notification {

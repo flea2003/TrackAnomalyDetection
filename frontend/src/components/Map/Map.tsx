@@ -80,6 +80,10 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
           );
           return;
         }
+
+        // Check if requested ship still exists
+        if (ships.find(x => x.id === ship.id) === undefined) return;
+
         map.flyTo(
           [ship.lat, ship.lng],
           mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],

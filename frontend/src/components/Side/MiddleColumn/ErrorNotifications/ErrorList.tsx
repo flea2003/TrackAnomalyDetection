@@ -33,13 +33,13 @@ function ErrorList({ pageChanger }: ErrorListProps) {
           data-testid="error-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
         />
-
+        <div id="error-list-name-text">Error list</div>
         <button
           id="error-list-mark-all-button"
           data-testid="error-list-mark-all-button"
           onClick={() => ErrorNotificationService.markAllAsRead()}
         >
-          Mark all as read
+          Mark read
         </button>
       </Stack>
       <List

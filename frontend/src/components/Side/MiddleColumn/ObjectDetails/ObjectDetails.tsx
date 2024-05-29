@@ -52,7 +52,6 @@ function ObjectDetails(props: ObjectDetailsProps) {
       <List className="object-details-properties-list">
         {getPropertyElements(ship)}
       </List>
-
       <Stack className={"object-details-notification-list"}>
         <div className="object-details-notification-title">Notifications</div>
         <NotificationListWithoutTitle

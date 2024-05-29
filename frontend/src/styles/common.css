@@ -1,6 +1,7 @@
 /* This css file is meant for managing the root layout and the color schemes. */
 
 :root {
+    --middle-column-width: 20%;
 
     --anomaly-list-closing-icon-size: 20px;
     --anomaly-list-closing-icon-margin: 10px;

@@ -8,6 +8,7 @@ import "../../../../styles/common.css";
 import "../../../../styles/notificationList.css";
 import "../../../../styles/notificationEntry.css";
 import { NotificationService } from "../../../../services/NotificationService";
+import TimeUtilities from "../../../../utils/TimeUtilities";
 
 interface NotificationEntryProps {
   notification: ShipNotification;
@@ -38,9 +39,9 @@ function ShipNotificationEntry({
   const id = notification.id;
   const shipAnomalyScore = notification.shipDetails.anomalyScore;
   const shipId = notification.shipDetails.id % 1000;
-  const date = notification.shipDetails.correspondingTimestamp;
+  const date = TimeUtilities.reformatTimestamp(notification.shipDetails.correspondingTimestamp);
 
-  // Once the 'read all' button is clicked on, all notifictions should be set
+  // Once the 'read all' button is clicked on, all notifications should be set
   // as read in the backend
   const onClick = () => {
     pageChanger({ currentPage: "notificationDetails", shownShipId: id });

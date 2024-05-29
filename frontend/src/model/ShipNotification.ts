@@ -1,4 +1,5 @@
 import ShipDetails from "./ShipDetails";
+import TimeUtilities from "../utils/TimeUtilities";
 
 class ShipNotification {
   id: number;
@@ -30,7 +31,7 @@ class ShipNotification {
       { type: "Ship ID", value: this.shipDetails.id },
       {
         type: "Time of the anomaly",
-        value: this.shipDetails.correspondingTimestamp,
+        value: TimeUtilities.reformatTimestamp(this.shipDetails.correspondingTimestamp),
       },
       { type: "Anomaly Score", value: this.shipDetails.anomalyScore + "%" },
       { type: "Explanation", value: this.shipDetails.explanation },

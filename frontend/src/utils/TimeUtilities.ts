@@ -29,7 +29,39 @@ class TimeUtilities {
       (timeDifference % (1000 * 60 * 60)) / (1000 * 60),
     );
 
-    return `${days}d, ${hours}h, ${minutes}m`;
+    return `${days}d ${hours}h ${minutes}m`;
+  }
+
+
+  /**
+   * Given the timestamp, returns properly formatted string
+   * @param timestamp - string representation of the ISO-8601 timestamp
+   */
+  static reformatTimestamp(timestamp: string) {
+    if (timestamp === undefined) return "";
+    const signalTime = new Date(timestamp);
+    if (Number.isNaN(signalTime.valueOf())) {
+      ErrorNotificationService.addError("Invalid timestamp format");
+      return "Not available";
+    }
+
+    const year = this.prependZero(signalTime.getFullYear());
+    const month = this.prependZero(signalTime.getMonth());
+    const day = this.prependZero(signalTime.getDay());
+    const hour = this.prependZero(signalTime.getHours());
+    const minute = this.prependZero(signalTime.getMinutes());
+
+    return year + '-' + month + '-' + day + ' ' + hour + ':' + minute;
+  }
+
+  /**
+   * Method that prepends zero to digits when reformatting
+   *
+   * @param value integer that is considered for prependind
+   */
+  static prependZero(value: number) {
+    if (value >= 0 && value < 10) return "0" + value;
+    else return value+"";
   }
 
   /**
