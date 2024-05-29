@@ -1,13 +1,9 @@
 import HttpSender from "../../utils/HttpSender";
-import ShipService from "../../services/ShipService";
-import APIResponseItem from "../../templates/APIResponseItem";
 import ShipDetails from "../../model/ShipDetails";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
-import spyOn = jest.spyOn;
 import NotificationResponseItem from "../../templates/NotificationResponseItem";
 import { NotificationService } from "../../services/NotificationService";
 import ShipNotification from "../../model/ShipNotification";
-import notificationResponseItem from "../../templates/NotificationResponseItem";
 
 const fakeNotificationResponseItem1: NotificationResponseItem = {
   id: 0,

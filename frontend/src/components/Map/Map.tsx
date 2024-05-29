@@ -82,7 +82,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
         }
 
         // Check if requested ship still exists
-        if (ships.find(x => x.id === ship.id) === undefined) return;
+        if (ships.find((x) => x.id === ship.id) === undefined) return;
 
         map.flyTo(
           [ship.lat, ship.lng],

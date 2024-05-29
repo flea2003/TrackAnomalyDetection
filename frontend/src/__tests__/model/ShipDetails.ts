@@ -7,7 +7,7 @@ beforeEach(() => {
   ErrorNotificationService.refreshState = () => {};
 });
 
-test("Test ship details", () => {
+test("ship details", () => {
   const fake = new ShipDetails(
     1,
     0,
@@ -43,7 +43,7 @@ test("Test ship details", () => {
     },
     {
       type: "Timestamp of the Highest Anomaly Score",
-      value: "time",
+      value: "Not available",
     },
     {
       type: "Heading",

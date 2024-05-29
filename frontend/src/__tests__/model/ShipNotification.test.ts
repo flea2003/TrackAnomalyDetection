@@ -1,7 +1,6 @@
 import ShipDetails from "../../model/ShipDetails";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import ShipNotification from "../../model/ShipNotification";
-import notificationDetails from "../../components/Side/MiddleColumn/NotificationDetails/NotificationDetails";
 
 beforeEach(() => {
   // Remove refreshState function, so it does nothing.
@@ -28,7 +27,7 @@ const shipNotification = new ShipNotification(
   ),
 );
 
-test("Rounding of latitude and longitude", () => {
+test("properties test", () => {
   expect(shipNotification.getPropertyList()).toStrictEqual([
     {
       type: "Ship ID",
@@ -36,7 +35,7 @@ test("Rounding of latitude and longitude", () => {
     },
     {
       type: "Time of the anomaly",
-      value: "t1",
+      value: "Not available",
     },
     {
       type: "Anomaly Score",

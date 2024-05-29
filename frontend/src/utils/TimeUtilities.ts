@@ -32,26 +32,23 @@ class TimeUtilities {
     return `${days}d ${hours}h ${minutes}m`;
   }
 
-
   /**
    * Given the timestamp, returns properly formatted string
    * @param timestamp - string representation of the ISO-8601 timestamp
    */
   static reformatTimestamp(timestamp: string) {
-    if (timestamp === undefined) return "";
     const signalTime = new Date(timestamp);
     if (Number.isNaN(signalTime.valueOf())) {
       ErrorNotificationService.addError("Invalid timestamp format");
       return "Not available";
     }
+    const year = this.prependZero(signalTime.getUTCFullYear());
+    const month = this.prependZero(signalTime.getUTCMonth() + 1);
+    const day = this.prependZero(signalTime.getUTCDate());
+    const hour = this.prependZero(signalTime.getUTCHours());
+    const minute = this.prependZero(signalTime.getUTCMinutes());
 
-    const year = this.prependZero(signalTime.getFullYear());
-    const month = this.prependZero(signalTime.getMonth());
-    const day = this.prependZero(signalTime.getDay());
-    const hour = this.prependZero(signalTime.getHours());
-    const minute = this.prependZero(signalTime.getMinutes());
-
-    return year + '-' + month + '-' + day + ' ' + hour + ':' + minute;
+    return year + "-" + month + "-" + day + " " + hour + ":" + minute;
   }
 
   /**
@@ -61,7 +58,7 @@ class TimeUtilities {
    */
   static prependZero(value: number) {
     if (value >= 0 && value < 10) return "0" + value;
-    else return value+"";
+    else return value + "";
   }
 
   /**

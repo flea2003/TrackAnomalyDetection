@@ -63,7 +63,7 @@ class ShipDetails {
       },
       {
         type: "Timestamp of the Highest Anomaly Score",
-        value: TimeUtilities.reformatTimestamp(this.correspondingTimestamp)
+        value: TimeUtilities.reformatTimestamp(this.correspondingTimestamp),
       },
       { type: "Heading", value: this.heading.toString() },
       { type: "Departure Port", value: this.departurePort },

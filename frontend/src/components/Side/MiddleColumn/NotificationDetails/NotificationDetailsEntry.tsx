@@ -2,7 +2,6 @@ import React from "react";
 
 import "../../../../styles/common.css";
 import "../../../../styles/objectDetailsEntry.css";
-import ObjectDetailsEntry from "../ObjectDetails/ObjectDetailsEntry";
 
 /**
  * This component is a single entry in the Notification details. It displays a

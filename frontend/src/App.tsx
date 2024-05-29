@@ -80,7 +80,7 @@ function App() {
           setNotifications(notificationsArray);
         },
       );
-    }, 1000);
+    }, 500);
   }, []);
 
   // Return the main view of the application
