@@ -105,22 +105,26 @@ public class TurningStatefulMapFunctionTest {
 
     @Test
     void testHeading511() throws Exception {
-        // Heading 511 in aisSignal1
         OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T06:00Z");
+        OffsetDateTime timestamp3 = OffsetDateTime.parse("2024-12-30T07:00Z");
+
+        // Heading 511 in aisSignal1 and aisSignal3
         AISSignal aisSignal1 = new AISSignal(1, 20, 10, 10, 20, 511, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 20, 10, 10, 20, 22, timestamp2, "Malta");
+        AISSignal aisSignal3 = new AISSignal(1, 20, 10, 10, 20, 511, timestamp2, "Malta");
 
         testHarness.processElement(aisSignal1, 10);
-
-        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:55Z");
-        AISSignal aisSignal2 = new AISSignal(1, 20, 10, 10, 20, 22, timestamp2, "Malta");
-
         testHarness.processElement(aisSignal2, 12);
-
+        testHarness.processElement(aisSignal3, 13);
         var anomalies = testHarness.extractOutputStreamRecords();
 
-        assertThat(anomalies.size()).isEqualTo(2);
-        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0.0f);
-        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo("");
+        assertThat(anomalies.size()).isEqualTo(3);
+        assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(25f);
+        assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("Heading was not given (value 511).\n");
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(0f);
+        assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(25f);
+        assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo("Heading was not given (value 511).\n");
     }
 
     @Test
@@ -159,6 +163,27 @@ public class TurningStatefulMapFunctionTest {
         // fourth one is non-anomaly since it's >30 minutes after last detected anomaly
         assertThat(anomalies.get(3).getValue().getScore()).isEqualTo(0f);
         assertThat(anomalies.get(3).getValue().getExplanation()).isEqualTo("");
+    }
+
+    @Test
+    void testHeadingDifference() throws Exception {
+        OffsetDateTime timestamp1 = OffsetDateTime.parse("2024-12-30T04:50Z");
+        OffsetDateTime timestamp2 = OffsetDateTime.parse("2024-12-30T04:51Z");
+
+        // signals only differ in headings
+        AISSignal aisSignal1 = new AISSignal(1, 20, 10, 10, 20, 0, timestamp1, "Malta");
+        AISSignal aisSignal2 = new AISSignal(1, 20, 10, 10, 20, 41, timestamp2, "Malta");
+
+        testHarness.processElement(aisSignal1, 1);
+        testHarness.processElement(aisSignal2, 2);
+        var anomalies = testHarness.extractOutputStreamRecords();
+
+        assertThat(anomalies.size()).isEqualTo(2);
+        assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0f);
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
+        assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
+                "Heading difference between two consecutive signals is too large: 41 degrees is more than threshold of 40 degrees.\n"
+        );
     }
 
 }

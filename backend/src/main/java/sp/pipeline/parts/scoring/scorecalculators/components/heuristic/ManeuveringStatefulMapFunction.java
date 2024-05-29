@@ -17,6 +17,7 @@ public class ManeuveringStatefulMapFunction extends HeuristicStatefulMapFunction
     private static final float TIME_FRAME_IN_MINUTES = 60f;
     private static final float HEADING_DIFFERENCE_THRESHOLD = 40f;
     private static final int TURNS_COUNT_THRESHOLD = 10;
+    private static final float NO_HEADING = 511f;
 
     private transient ListState<AISSignal> previousSignalsListState;
 
@@ -106,6 +107,7 @@ public class ManeuveringStatefulMapFunction extends HeuristicStatefulMapFunction
 
     /**
      * Gets the list of heading difference among each pair of consecutive signals.
+     * Skips the pairs of signals where one of the signals has no heading.
      *
      * @param signals the list of ship's AIS signals
      * @return the list of heading differences
@@ -116,7 +118,14 @@ public class ManeuveringStatefulMapFunction extends HeuristicStatefulMapFunction
             AISSignal signal1 = signals.get(i);
             AISSignal signal2 = signals.get(i + 1);
 
-            turnAmplitudes.add(getCorrectedHeading(signal1) - getCorrectedHeading(signal2));
+            float pastHeading = signal1.getHeading();
+            float currentHeading = signal2.getHeading();
+
+            if (pastHeading == NO_HEADING || currentHeading == NO_HEADING) {
+                continue;
+            }
+
+            turnAmplitudes.add(pastHeading - currentHeading);
         }
 
         return turnAmplitudes;

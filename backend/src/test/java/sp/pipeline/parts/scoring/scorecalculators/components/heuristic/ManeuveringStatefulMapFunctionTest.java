@@ -101,6 +101,27 @@ class ManeuveringStatefulMapFunctionTest {
                 "Maneuvering is too frequent: 11 strong turns (turns of more than 40 degrees) during the last 60 minutes is more than threshold of 10 turns.\n");
     }
 
+    @Test
+    void noHeadingsShouldBeSkipped() throws Exception {
+        // The list will have alternating headings between 511 (NO_HEADING value) and 50
+        List<AISSignal> signals = getAlternatingSignals(12, List.of(511f, 50f));
+
+        // execute the testHarness
+        for (int i = 0; i < signals.size(); i++) {
+            testHarness.processElement(signals.get(i), i);
+        }
+
+        // assert the result
+        var anomalies = testHarness.extractOutputStreamRecords();
+
+        assertThat(anomalies).hasSize(12);
+
+        // all should not be anomalies (since 511 skipped)
+        for (int i = 0; i < 12; i++) {
+            assertThat(anomalies.get(i).getValue().getScore()).isEqualTo(0f);
+        }
+    }
+
     // helper method to prepare AIS signals that are the same but which have the alternating heading
     private List<AISSignal> getAlternatingSignals(int count, List<Float> alternatingHeadings) {
         List<AISSignal> signals = new ArrayList<>();

@@ -1,7 +1,6 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
 import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.circularMetric;
-import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.getCorrectedHeading;
 
 import sp.model.AISSignal;
 import java.text.DecimalFormat;
@@ -10,6 +9,7 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
 
     private static final float HEADING_DIFFERENCE_THRESHOLD = 40;
     private static final float COURSE_DIFFERENCE_THRESHOLD = 40;
+    private static final float NO_HEADING = 511f;
 
     /**
      * Checks if the current signal is an anomaly.
@@ -25,38 +25,113 @@ public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
-        // only check if there was a signal in the past
-        if (pastSignal == null) {
-            return new AnomalyScoreWithExplanation(false, 0f, "");
-        }
-
         boolean isAnomaly = false;
-        String explanation = "";
-
+        StringBuilder explanationBuilder = new StringBuilder();
         DecimalFormat df = getDecimalFormatter();
 
-        // Check heading difference
-        if (circularMetric(getCorrectedHeading(pastSignal), getCorrectedHeading(currentSignal)) > HEADING_DIFFERENCE_THRESHOLD) {
-            isAnomaly = true;
-            explanation += "Heading difference between two consecutive signals is too large: "
-                    + df.format(circularMetric(pastSignal.getHeading(), currentSignal.getHeading()))
-                    + " degrees is more than threshold of " + df.format(HEADING_DIFFERENCE_THRESHOLD)
-                    + " degrees"
-                    + explanationEnding();
+        isAnomaly |= checkForHeadingToBePresent(currentSignal.getHeading(), explanationBuilder, df);
+
+        // Only proceed to the next checks if there is a past signal
+        if (pastSignal == null) {
+            return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanationBuilder.toString());
         }
 
-        // Check course difference
+        isAnomaly |= checkForHeadingDifference(currentSignal, pastSignal, explanationBuilder, df);
+        isAnomaly |= checkForCourseDifference(currentSignal, pastSignal, explanationBuilder, df);
+
+        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanationBuilder.toString());
+
+    }
+
+    /**
+     * Checks if the given heading is present. The heading is considered to be present
+     * when its value is not equal to 511.
+     * Modifies the explanationBuilder if needed.
+     *
+     * @param heading the heading given in the AIS signal
+     * @param explanationBuilder the StringBuilder for explanation string
+     * @param df DecimalFormat to use for floating-point numbers
+     * @return true if heading is not present, false otherwise
+     */
+    private boolean checkForHeadingToBePresent(float heading, StringBuilder explanationBuilder, DecimalFormat df) {
+        // Inform if the heading was not sent (code 511)
+        if (heading == NO_HEADING) {
+            explanationBuilder
+                    .append("Heading was not given (value ")
+                    .append(df.format(NO_HEADING))
+                    .append(")")
+                    .append(explanationEnding());
+
+            return true; // anomaly
+        }
+
+        return false; // not anomaly
+    }
+
+    /**
+     * Checks if the heading difference between two consecutive signals is too large.
+     * If any of the headings is not given, the check is skipped.
+     * Modifies the explanationBuilder if needed.
+     *
+     * @param currentSignal the current AIS signal
+     * @param pastSignal the past AIS signal
+     * @param explanationBuilder the StringBuilder for explanation string
+     * @param df DecimalFormat to use for floating-point numbers
+     * @return true if headings are present and the difference is too large,
+     *     false otherwise
+     */
+    private boolean checkForHeadingDifference(AISSignal currentSignal, AISSignal pastSignal,
+                                              StringBuilder explanationBuilder, DecimalFormat df) {
+
+        float currentHeading = currentSignal.getHeading();
+        float pastHeading = pastSignal.getHeading();
+
+        // The heading difference will only be checked if both headings were sent
+        if (pastHeading == NO_HEADING || currentHeading == NO_HEADING) {
+            return false; // not anomaly
+        }
+
+        if (circularMetric(pastHeading, currentHeading) <= HEADING_DIFFERENCE_THRESHOLD) {
+            return false; // not anomaly
+        }
+
+        explanationBuilder
+                .append("Heading difference between two consecutive signals is too large: ")
+                .append(df.format(circularMetric(pastSignal.getHeading(), currentSignal.getHeading())))
+                .append(" degrees is more than threshold of ")
+                .append(df.format(HEADING_DIFFERENCE_THRESHOLD))
+                .append(" degrees")
+                .append(explanationEnding());
+
+        return true; // anomaly
+    }
+
+    /**
+     * Checks if the course difference between two consecutive signals is too large.
+     * Modifies the explanationBuilder if needed.
+     *
+     * @param currentSignal the current AIS signal
+     * @param pastSignal the past AIS signal
+     * @param explanationBuilder the StringBuilder for explanation string
+     * @param df DecimalFormat to use for floating-point numbers
+     * @return true if course difference is too large
+     */
+    private boolean checkForCourseDifference(AISSignal currentSignal, AISSignal pastSignal,
+                                             StringBuilder explanationBuilder, DecimalFormat df) {
+
         if (circularMetric(pastSignal.getCourse(), currentSignal.getCourse()) > COURSE_DIFFERENCE_THRESHOLD) {
-            isAnomaly = true;
-            explanation += "Course difference between two consecutive signals is too large: "
-                    + df.format(circularMetric(pastSignal.getCourse(), currentSignal.getCourse()))
-                    + " degrees is more than threshold of " + df.format(COURSE_DIFFERENCE_THRESHOLD)
-                    + " degrees"
-                    + explanationEnding();
+            explanationBuilder
+                    .append("Course difference between two consecutive signals is too large: ")
+                    .append(df.format(circularMetric(pastSignal.getCourse(), currentSignal.getCourse())))
+                    .append(" degrees is more than threshold of ")
+                    .append(df.format(COURSE_DIFFERENCE_THRESHOLD))
+                    .append(" degrees")
+                    .append(explanationEnding());
+
+            return true; // anomaly
         }
 
-        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
-
+        return false; // not anomaly
     }
 
     /**
