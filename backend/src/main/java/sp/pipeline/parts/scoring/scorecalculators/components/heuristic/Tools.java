@@ -92,5 +92,4 @@ public class Tools {
                 pastSignal.getLatitude(), pastSignal.getLongitude()
         );
     }
-
 }

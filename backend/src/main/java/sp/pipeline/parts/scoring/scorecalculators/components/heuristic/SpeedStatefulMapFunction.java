@@ -26,6 +26,11 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      *     are also included in the same return object.
      */
     protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        // only check if there was a signal in the past
+        if (pastSignal == null) {
+            return new AnomalyScoreWithExplanation(false, 0f, "");
+        }
+
         String explanation = "";
         boolean isAnomaly = false;
 
@@ -103,6 +108,6 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     protected float getAnomalyScore() {
-        return 33f;
+        return 25f;
     }
 }
