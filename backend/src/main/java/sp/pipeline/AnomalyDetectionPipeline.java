@@ -55,6 +55,34 @@ public class AnomalyDetectionPipeline {
     }
 
     /**
+     * An overloaded constructor (same as above) that allows to inject a custom
+     * FlinkEnv. Used for testing purposes
+     *
+     * @param streamUtils utility class for setting up streams
+     * @param idAssignmentBuilder builder for the id assignment part of the pipeline
+     * @param scoreCalculationBuilder builder for the score calculation part of the pipeline
+     * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
+     * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
+     * @param flinkEnv injected Flink environment
+     */
+    public AnomalyDetectionPipeline(
+            StreamUtils streamUtils,
+            IdAssignmentBuilder idAssignmentBuilder,
+            ScoreCalculationBuilder scoreCalculationBuilder,
+            ScoreAggregationBuilder scoreAggregationBuilder,
+            NotificationsDetectionBuilder notificationsDetectionBuilder,
+            StreamExecutionEnvironment flinkEnv
+    ) {
+        this.streamUtils = streamUtils;
+        this.idAssignmentBuilder = idAssignmentBuilder;
+        this.scoreCalculationBuilder = scoreCalculationBuilder;
+        this.scoreAggregationBuilder = scoreAggregationBuilder;
+        this.notificationsDetectionBuilder = notificationsDetectionBuilder;
+        this.flinkEnv = flinkEnv;
+        buildPipeline();
+    }
+
+    /**
      * Closes the pipeline by closing KafkaStreams and Flink environment.
      *
      * @throws Exception when closing Flink environment throws exception
@@ -68,8 +96,6 @@ public class AnomalyDetectionPipeline {
      * Private helper method for building the pipeline step by step.
      */
     private void buildPipeline()  {
-
-        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // Build the pipeline part that assigns IDs to incoming AIS signals (Flink)
         DataStream<AISSignal> streamWithAssignedIds = idAssignmentBuilder.buildIdAssignmentPart(flinkEnv);

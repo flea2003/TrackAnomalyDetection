@@ -14,12 +14,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.ClassRule;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import sp.dtos.ExternalAISSignal;
+import sp.model.AISSignal;
 import sp.pipeline.AnomalyDetectionPipeline;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
@@ -35,8 +34,8 @@ import sp.pipeline.utils.json.JsonMapper;
 import sp.services.NotificationService;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,8 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 class AnomalyDetectionPipelineTest {
-
-
     @ClassRule
     public static MiniClusterWithClientResource flinkCluster =
             new MiniClusterWithClientResource(
@@ -54,16 +51,27 @@ class AnomalyDetectionPipelineTest {
                             .setNumberTaskManagers(1)
                             .build());
 
-    private static EmbeddedKafkaZKBroker embeddedKafka;
-    private static String rawAISTopic;
-    private static String identifiedAISTopic;
-    private static String scoresTopic;
+    private EmbeddedKafkaZKBroker embeddedKafka;
     private static final int kafkaPort = 50087;
     private static final int zkPort = 50082;
+    private PipelineConfiguration config;
+    private StreamExecutionEnvironment env;
 
-    private static PipelineConfiguration config;
+    // Items to be inherited by children
+    protected NotificationService notificationService;
+    protected String rawAISTopic;
+    protected String identifiedAISTopic;
+    protected String scoresTopic;
+    protected AnomalyDetectionPipeline anomalyDetectionPipeline;
 
-    private static void loadConfigFile() throws IOException {
+
+    /**
+     * Loads the configuration file, and also updates the server address
+     * according to our hardcoded port.
+     *
+     * @throws IOException if config cannot be loaded
+     */
+    private void loadConfigFile() throws IOException {
         // Load the configuration file and update it were
         config = new PipelineConfiguration("kafka-connection.properties");
         config.updateConfiguration("bootstrap.servers", "localhost:" + kafkaPort);
@@ -74,8 +82,8 @@ class AnomalyDetectionPipelineTest {
         scoresTopic = config.getCalculatedScoresTopicName();
     }
 
-    @BeforeAll
-    static void setup() throws IOException {
+    @BeforeEach
+    void setup() throws IOException {
         loadConfigFile();
 
         // Setup embedded kafka
@@ -86,18 +94,16 @@ class AnomalyDetectionPipelineTest {
         embeddedKafka.afterPropertiesSet();
     }
 
-    @AfterAll
-    static void tearDown() {
+    @AfterEach
+    void tearDown() {
         embeddedKafka.destroy();
     }
 
-
-    private AnomalyDetectionPipeline anomalyDetectionPipeline;
-    private NotificationService notificationService;
-    private StreamUtils streamUtils;
-    private StreamExecutionEnvironment env;
-
-    private void setupPipelineComponents() throws IOException {
+    /**
+     * Sets up the pipeline object, injecting all required dependencies
+     * and mocking the notificationsService.
+     */
+    protected void setupPipelineComponents() {
         env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(10);
 
@@ -108,6 +114,7 @@ class AnomalyDetectionPipelineTest {
         ScoreCalculationStrategy scoreCalculationStrategy;
         CurrentStateAggregator currentStateAggregator;
         NotificationsAggregator notificationsAggregator;
+        StreamUtils streamUtils;
 
         // Mock the notification service class (to mock the DB)
         notificationService = mock(NotificationService.class);
@@ -124,7 +131,6 @@ class AnomalyDetectionPipelineTest {
         scoreAggregationBuilder = new ScoreAggregationBuilder(config, currentStateAggregator);
         notificationsDetectionBuilder = new NotificationsDetectionBuilder(notificationsAggregator);
 
-
         // Create the pipeline itself
         anomalyDetectionPipeline = new AnomalyDetectionPipeline(
                 streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder,
@@ -132,62 +138,67 @@ class AnomalyDetectionPipelineTest {
         );
     }
 
-
-    @Test
-    void testKafkaProducerAndConsumer() throws ExecutionException, InterruptedException, IOException {
-        System.out.println("Setting up pipeline components...");
-        setupPipelineComponents();
-
-        System.out.println("Running pipeline...");
-        anomalyDetectionPipeline.runPipeline();
-        Thread.sleep(5000);
-
-        // Producer properties
+    /**
+     * Given a topic and a list of strings, produces them to the topic.
+     *
+     * @param topic the topic name
+     * @param items a list of strings to produce to that topic
+     * @throws ExecutionException in case producing does not work out
+     * @throws InterruptedException in case producing does not work out
+     */
+    public void produceToTopic(String topic, List<String> items) throws ExecutionException, InterruptedException {
+        // Create a producer
         Map<String, Object> producerProps = KafkaTestUtils.producerProps(embeddedKafka);
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps);
 
-        // Consumer properties
-        Map<String, Object> consumerProps = new HashMap<>(KafkaTestUtils.consumerProps("testGroup" , "true", embeddedKafka));
+        for (String item : items) {
+            ProducerRecord<String, String> record = new ProducerRecord<>(topic, item);
+            producer.send(record).get();
+        }
+    }
+
+    protected List<String> getItemsFromTopic(String topic, int count, int seconds) {
+        // Create a consumer
+        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafka);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps);
-        embeddedKafka.consumeFromAnEmbeddedTopic(consumer, identifiedAISTopic);
+        embeddedKafka.consumeFromAnEmbeddedTopic(consumer, topic);
 
-        // Send a message to the raw ships topic
-        ExternalAISSignal fakeSignal = new ExternalAISSignal("producer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(), "port");
-        ProducerRecord<String, String> record = new ProducerRecord<>(rawAISTopic, JsonMapper.toJson(fakeSignal));
-        RecordMetadata metadata = producer.send(record).get();
-
-        // Consume the message from the topic
-        System.out.println("Now sleeping for 5s...");
-        Thread.sleep(5000);
-
-        DataStream<String> str = env.fromSource(streamUtils.getFlinkStreamConsumingFromKafka(identifiedAISTopic), WatermarkStrategy.noWatermarks(), "AIS Source");
-        str.map(x -> {
-            System.out.println("Received (IN TEST): " + x);
-            return x;
-        }).print();
-
-        ConsumerRecord<String, String> singleRecord = null;
-
-
-        for(int i = 0; i < 500; i++) {
-            ConsumerRecords<String, String> records = KafkaTestUtils.getRecords(consumer, Duration.of(2, java.time.temporal.ChronoUnit.SECONDS));
-            for (ConsumerRecord<String, String> r : records) {
-                System.out.println("record = " + r);
-            }
-            try {
-              singleRecord = records.iterator().next();
-              System.out.println("[ WE WON ] record = " + singleRecord);
-              break;
-            } catch (Exception e) {
-                System.out.println("No records found, yet... retrying in 1s...");
-            }
-            Thread.sleep(1000);
+        List<String> items = new ArrayList<>();
+        ConsumerRecords<String, String> records = KafkaTestUtils.getRecords(consumer, Duration.of(seconds, java.time.temporal.ChronoUnit.SECONDS));
+        for (ConsumerRecord<String, String> record : records) {
+            items.add(record.value());
         }
 
-        // Assert the message content
-        assertNotNull(singleRecord);
-        assertEquals("value", singleRecord.value());
+        if (items.size() != count) {
+            throw new RuntimeException("Not enough records were consumed in time. Got " + items.size() + " but expected " + count + " record(s)");
+        }
+
+        return items;
+    }
+
+    @Test
+    void testKafkaProducerAndConsumer() throws ExecutionException, InterruptedException, IOException {
+        setupPipelineComponents();
+        anomalyDetectionPipeline.runPipeline();
+        Thread.sleep(5000);
+
+        // Send a message to the raw ships topic
+        ExternalAISSignal fakeSignal = new ExternalAISSignal("producer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
+        produceToTopic(rawAISTopic, List.of(JsonMapper.toJson(fakeSignal)));
+
+        // Get the strings produced to the identified ships topic
+        List<String> list = getItemsFromTopic(identifiedAISTopic, 1, 5);
+
+        // Calculate the expected AIS signal
+        long expectedID = 1098835837;
+        AISSignal expectedAISSignal = new AISSignal(fakeSignal, expectedID);
+
+        // Deserialize the received AIS signal
+        AISSignal aisSignal = JsonMapper.fromJson(list.get(0), AISSignal.class);
+
+        // Make sure they are equal (ignoring received time)
+        assertEquals(expectedAISSignal, aisSignal);
     }
 }

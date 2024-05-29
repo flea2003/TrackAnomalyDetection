@@ -19,15 +19,15 @@ public class PipelineConfiguration {
     private static final String KAFKA_SERVER_ADDRESS_PROPERTY = "kafka.server.address";
     private static final String KAFKA_STORE_NAME_PROPERTY = "kafka.store.name";
 
-    private final String rawIncomingAisTopicName;
+    private String rawIncomingAisTopicName;
 
-    private final String incomingAisTopicName;
+    private String incomingAisTopicName;
 
-    private final String calculatedScoresTopicName;
+    private String calculatedScoresTopicName;
 
-    private final String kafkaServerAddress;
+    private String kafkaServerAddress;
 
-    private final String kafkaStoreName;
+    private String kafkaStoreName;
 
     private Properties savedConfiguration;
 
@@ -42,12 +42,15 @@ public class PipelineConfiguration {
                                  String configPath) throws IOException {
         loadConfig(configPath);
 
+        updateLocalFields();
+    }
+
+    private void updateLocalFields() {
         rawIncomingAisTopicName = savedConfiguration.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
         incomingAisTopicName = savedConfiguration.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
         calculatedScoresTopicName = savedConfiguration.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
         kafkaServerAddress = savedConfiguration.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
         kafkaStoreName = savedConfiguration.getProperty(KAFKA_STORE_NAME_PROPERTY);
-
     }
 
     /**
@@ -67,6 +70,18 @@ public class PipelineConfiguration {
         }
 
         this.savedConfiguration = config;
+    }
+
+    /**
+     * Edits the configuration file with the specified key and value.
+     * Used for testing purposes
+     *
+     * @param key the key to edit
+     * @param value the value to set
+     */
+    public void updateConfiguration(String key, String value) {
+        savedConfiguration.setProperty(key, value);
+        updateLocalFields();
     }
 
     /**
