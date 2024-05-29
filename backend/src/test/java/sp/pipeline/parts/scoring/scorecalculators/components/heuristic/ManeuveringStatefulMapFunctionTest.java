@@ -15,17 +15,17 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ConstantManeuveringStatefulMapFunctionTest {
+class ManeuveringStatefulMapFunctionTest {
 
-    private ConstantManeuveringStatefulMapFunction constantManeuveringStatefulMapFunction;
+    private ManeuveringStatefulMapFunction maneuveringStatefulMapFunction;
     private KeyedOneInputStreamOperatorTestHarness<Long, AISSignal, AnomalyInformation> testHarness;
 
     @BeforeEach
     void setUp() throws Exception {
-        constantManeuveringStatefulMapFunction = new ConstantManeuveringStatefulMapFunction();
+        maneuveringStatefulMapFunction = new ManeuveringStatefulMapFunction();
 
         testHarness = new KeyedOneInputStreamOperatorTestHarness<>(
-                new StreamMap<>(constantManeuveringStatefulMapFunction),
+                new StreamMap<>(maneuveringStatefulMapFunction),
                 AISSignal::getId,
                 Types.LONG
         );
@@ -37,7 +37,7 @@ class ConstantManeuveringStatefulMapFunctionTest {
     void tearDown() throws Exception {
         testHarness.close();
         testHarness = null;
-        constantManeuveringStatefulMapFunction = null;
+        maneuveringStatefulMapFunction = null;
     }
 
     @Test

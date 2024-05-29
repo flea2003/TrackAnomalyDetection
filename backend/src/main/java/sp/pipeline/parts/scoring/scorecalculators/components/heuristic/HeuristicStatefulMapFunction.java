@@ -3,7 +3,10 @@ package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.OffsetDateTime;
+import java.util.Locale;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,11 +65,16 @@ public abstract class HeuristicStatefulMapFunction extends RichMapFunction<AISSi
     /**
      * DecimalFormatter for writing floating-point numbers in explanation strings.
      * The format is configured to allow maximum two decimal places.
+     * The used locale in the formatter is `Locale.ENGLISH`, so that dot is used as a
+     * decimal separator.
      *
      * @return the formatter object
      */
     protected DecimalFormat getDecimalFormatter() {
-        return new DecimalFormat("#.##");
+        return new DecimalFormat(
+                "#.##",
+                new DecimalFormatSymbols(Locale.ENGLISH)
+        );
     }
 
     /**

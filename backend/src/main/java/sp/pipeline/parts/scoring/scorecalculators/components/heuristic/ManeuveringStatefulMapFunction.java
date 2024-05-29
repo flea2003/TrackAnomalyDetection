@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public class ConstantManeuveringStatefulMapFunction extends HeuristicStatefulMapFunction {
+public class ManeuveringStatefulMapFunction extends HeuristicStatefulMapFunction {
 
     private static final float TIME_FRAME_IN_MINUTES = 60f;
     private static final float HEADING_DIFFERENCE_THRESHOLD = 40f;
