@@ -125,6 +125,10 @@ public class ScoreAggregationBuilder {
                                 .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.getKafkaStoreName())
                                 .withValueSerde(CurrentShipDetails.getSerde())
                 );
+
+        KStream<Long, CurrentShipDetails> detailsStream = table.toStream();
+        detailsStream.to("azazaz");
+
         return table;
     }
 }
