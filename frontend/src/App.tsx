@@ -1,5 +1,6 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
+import { Client } from "@stomp/stompjs"
 import { useState, useEffect } from "react";
 import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
@@ -68,38 +69,52 @@ function App() {
     );
   }, []);
 
+  /**
+   * Configure the WebSockets connection.
+   */
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8081/ws");
+    const stompClient = new Client({
+      brokerURL: 'ws://localhost:8081/details',
+      debug: function (str) {
+        console.log(str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+    });
 
-    socket.onmessage = (event) => {
-      try {
-        const apiResponse = JSON.parse(event.data) as APIResponseItem;
-        const shipDetails = ShipService.extractCurrentShipDetails(apiResponse);
-        setShips((prevShips) => {
-          const updatedShipsMap: Map<number, ShipDetails> = new Map(prevShips);
-          updatedShipsMap.set(shipDetails.id, shipDetails);
-          return updatedShipsMap;
-        });
-      } catch (error) {
-        ErrorNotificationService.addError("WebSocket connection error");
-      }
+    stompClient.onConnect = function (frame) {
+      console.log('Connected: ' + frame);
+      stompClient.subscribe('/topic/details', function (message) {
+        try {
+          const apiResponse = JSON.parse(message.body) as APIResponseItem;
+          const shipDetails = ShipService.extractCurrentShipDetails(apiResponse);
+          console.log(shipDetails);
+          setShips((prevShips) => {
+            return prevShips.set(shipDetails.id, shipDetails);
+          });
+        } catch (error) {
+          ErrorNotificationService.addError("Data fetching error");
+        }
+      });
     };
 
-    socket.onopen = () => {
-      console.log("WebSocket connection opened");
+    stompClient.onWebSocketClose = function (closeEvent) {
+      ErrorNotificationService.addError('Websocket connection error');
+    }
+
+    stompClient.onStompError = function (frame) {
+      ErrorNotificationService.addError('Websocket broker error: ' + frame.headers['message']);
     };
 
-    socket.onclose = () => {
-      ErrorNotificationService.addError("WebSocket connection closed");
-    };
-
-    socket.onerror = (error) => {
-      ErrorNotificationService.addError("WebSocket connection error");
-    };
+    stompClient.activate();
 
     return () => {
-      socket.close();
-    };
+      if (stompClient) {
+        stompClient.deactivate();
+      }
+    }
+
   }, []);
 
   // Return the main view of the application

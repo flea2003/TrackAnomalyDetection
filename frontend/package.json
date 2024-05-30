@@ -6,6 +6,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/material": "^5.15.17",
+    "@stomp/stompjs": "^7.0.0",
     "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^15.0.7",
     "@testing-library/user-event": "^14.5.2",
@@ -23,7 +24,8 @@
     "react-router-dom": "^6.23.0",
     "react-scripts": "5.0.1",
     "typescript": "^5.4.5",
-    "web-vitals": "^3.5.2"
+    "web-vitals": "^3.5.2",
+    "wscat": "^5.2.1"
   },
   "overrides": {
     "typescript": "^5.4.5"
@@ -40,7 +42,8 @@
   },
   "eslintConfig": {
     "plugins": [
-      "@typescript-eslint", "prettier"
+      "@typescript-eslint",
+      "prettier"
     ],
     "extends": [
       "react-app",
@@ -51,9 +54,7 @@
       "prettier"
     ]
   },
-  "prettier": {
-
-  },
+  "prettier": {},
   "browserslist": {
     "production": [
       ">0.2%",
