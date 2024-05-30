@@ -115,6 +115,8 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok:1.18.32'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
 
+	implementation group: 'org.apache.calcite.avatica', name: 'avatica-core', version: '1.25.0'
+
 	// Flink test utils
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testCompileOnly "org.apache.flink:flink-test-utils:${flinkVersion}"

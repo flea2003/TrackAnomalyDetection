@@ -78,3 +78,8 @@ rm -rf /tmp/kafka-logs /tmp/zookeeper
 ### Start the pipeline and web server
 Run the main project in IntelliJ (or just Gradle). This will start the pipeline and start listening for messages in the needed Kafka topics.
 
+### APACHE DRUID
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -d @backend/src/main/resources/ship-scores-kafka-supervisor.json http://localhost:8081/druid/indexer/v1/supervisor
+```

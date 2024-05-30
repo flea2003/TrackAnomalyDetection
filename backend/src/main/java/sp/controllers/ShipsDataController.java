@@ -65,4 +65,22 @@ public class ShipsDataController {
             return new ResponseEntity<>(HttpStatus.TOO_EARLY);
         }
     }
+
+    /**
+     * Retrieves all the CurrentShipDetails of a corresponding ship.
+     *
+     * @param id - the id of the ships that we retrieve the information of
+     * @return - a list of CurrentShipDetails of the corresponding ship, or
+     *      500 error code in case the sql query fails.
+     */
+    @GetMapping("/ships/history/{id}")
+    public ResponseEntity<List<CurrentShipDetails>> getHistoryShip(
+        @PathVariable Long id
+    ) {
+        try {
+            return ResponseEntity.ok(this.shipsDataService.getHistoryOfShip(id));
+        } catch (PipelineException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -6,7 +6,7 @@
       "consumerProperties": {
         "bootstrap.servers": "localhost:9092"
       },
-      "topic": "azazaz",
+      "topic": "ship-details",
       "inputFormat": {
         "type": "kafka",
         "keyFormat": {

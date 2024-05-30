@@ -129,8 +129,9 @@ public class ScoreAggregationBuilder {
                                 .withValueSerde(CurrentShipDetails.getSerde())
                 );
 
+        // Kafka topic from which Apache Druid will ingest Ship Information data
         KStream<Long, CurrentShipDetails> detailsStream = table.toStream();
-        detailsStream.to("azazaz");
+        detailsStream.to("ship-details");
 
         return table;
     }
