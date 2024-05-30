@@ -50,7 +50,7 @@ public class AnomalyDetectionPipeline {
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
-
+        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
         buildPipeline();
     }
 
