@@ -18,6 +18,10 @@ public class WebSocketSessionManager {
         this.activeSessions.remove(sessionId);
     }
 
+    public boolean isActive(String sessionId) {
+        return this.activeSessions.contains(sessionId);
+    }
+
     public boolean checkForOpenConnections() {
         return !this.activeSessions.isEmpty();
     }

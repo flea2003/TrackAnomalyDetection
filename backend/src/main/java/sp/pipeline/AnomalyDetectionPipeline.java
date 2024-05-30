@@ -236,7 +236,7 @@ public class AnomalyDetectionPipeline {
                                 // Publish the new CurrentShipDetails state to the clients
                                 // Message is forwarded to the client side only if an WebSocket connection is open
                                 System.out.println("received instance");
-                                System.out.println("connection status: "+this.webSocketShipDataService.checkForOpenConnections());
+                                System.out.println("connection status: " + this.webSocketShipDataService.checkForOpenConnections());
                                 if (this.webSocketShipDataService.checkForOpenConnections()) {
                                     this.webSocketShipDataService.sendCurrentShipDetails(newShipState);
                                 }
