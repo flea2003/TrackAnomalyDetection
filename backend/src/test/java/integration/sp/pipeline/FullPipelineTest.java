@@ -33,6 +33,7 @@ public class FullPipelineTest extends GenericPipelineTest {
 
         testSignalIDAssignment(fakeSignal);
         testFetchingFromService(fakeSignal);
+        testSendingNonJsonMessages();
     }
 
     /**
@@ -89,4 +90,24 @@ public class FullPipelineTest extends GenericPipelineTest {
         assertThat(details.getCurrentAnomalyInformation().getScore()).isEqualTo(0);
     }
 
+    /**
+     * After sending that one single signal, also send some trash signals to all topics.
+     * Make sure the system does not crash and the current state still contains exactly 1
+     * ship.
+     *
+     * @throws Exception in case something fails
+     */
+    void testSendingNonJsonMessages() throws Exception {
+        // Send some trash messages to all 3 topics
+        List<String> messages = List.of("non json trash", "some other trash", "a");
+        produceToTopic(rawAISTopic, messages);
+        produceToTopic(identifiedAISTopic, messages);
+        produceToTopic(scoresTopic, messages);
+
+        // Wait for 5 seconds to be fully sure
+        Thread.sleep(5000);
+
+        // Make sure that after this, the pipeline has not crashed and there still is only 1 ship
+        assertThat(shipsDataService.getCurrentShipDetails().size()).isEqualTo(1);
+    }
 }
