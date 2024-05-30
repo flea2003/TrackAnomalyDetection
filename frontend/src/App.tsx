@@ -57,20 +57,8 @@ function App() {
   // Put the ships as state
   const [ships, setShips] = useState<Map<number, ShipDetails>>(new Map());
 
-  // Leveraging the useEffect hook we fetch the latest state of the
-  // backend table storing ship details whenever the main App component
-  // is mounted or updated
-  useEffect(() => {
-    // Query for ship data in the backend
-    ShipService.queryBackendForShipsArray().then(
-      (shipsArray: ShipDetails[]) => {
-        setShips(ShipService.constructMap(shipsArray));
-      },
-    );
-  }, []);
-
   /**
-   * Configure the WebSockets connection.
+   * Configure the WebSocket connection.
    */
   useEffect(() => {
     const stompClient = new Client({
@@ -101,6 +89,18 @@ function App() {
 
     stompClient.onWebSocketClose = function (closeEvent) {
       ErrorNotificationService.addError('Websocket connection error');
+      setShips(new Map());
+    }
+
+    // Leveraging the beforeConnect hook we fetch the latest state of the
+    // backend table storing ship details before opening a WebSocket connection
+    // with the backend STOMP broker
+    stompClient.beforeConnect = async () => {
+      ShipService.queryBackendForShipsArray().then(
+        (shipsArray: ShipDetails[]) => {
+          setShips(ShipService.constructMap(shipsArray));
+        },
+      );
     }
 
     stompClient.onStompError = function (frame) {
