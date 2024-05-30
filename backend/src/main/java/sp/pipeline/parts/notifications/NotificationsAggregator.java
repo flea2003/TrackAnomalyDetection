@@ -25,7 +25,7 @@ public class NotificationsAggregator {
         this.notificationService = notificationService;
 
         // Could later be added to configurations file
-        this.notificationThreshold = 30;
+        this.notificationThreshold = 20;
     }
 
     /**
@@ -51,10 +51,14 @@ public class NotificationsAggregator {
         // Retrieve current ship details from the previous notification
         CurrentShipDetails previousShipDetails = previousNotification.getCurrentShipDetails();
 
-        // Convert the newly arrived JSON string to the new CurrentShipDetails object
         // Check if the stored previous anomaly object has null fields, which would mean that the backend has just
         // started, and so the most recent notification information should be retrieved
         if (previousShipDetails == null) previousShipDetails = extractFromJPA(newShipDetails, shipID);
+
+        // In case the last shipDetails does not yet have any anomaly information, just return the latest information
+        if (previousShipDetails.getCurrentAnomalyInformation() == null) {
+            return new Notification(newShipDetails);
+        }
 
         // Extract previous and new anomaly scores to ease up the readability
         float previousScore = previousShipDetails.getCurrentAnomalyInformation().getScore();
@@ -112,8 +116,8 @@ public class NotificationsAggregator {
             // If there were no notifications saved (meaning that ship has not yet ever became anomalous), set the
             // previous state as the newly arrived one
             currentShipDetails = newShipDetails;
-
-            if (currentShipDetails.getCurrentAnomalyInformation().getScore() >= notificationThreshold) {
+            if (currentShipDetails.getCurrentAnomalyInformation() != null &&
+                    currentShipDetails.getCurrentAnomalyInformation().getScore() >= notificationThreshold) {
 
                 // If that newest anomaly score exceeds the threshold, add a new notification to the database
                 // TODO: here also a query to the AIS signals database will have to take place, to retrieve a

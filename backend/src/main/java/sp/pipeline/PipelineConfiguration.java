@@ -45,6 +45,9 @@ public class PipelineConfiguration {
         updateLocalFields();
     }
 
+    /**
+     * Based in savedConfiguration, updates local fields
+     */
     private void updateLocalFields() {
         rawIncomingAisTopicName = savedConfiguration.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
         incomingAisTopicName = savedConfiguration.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
