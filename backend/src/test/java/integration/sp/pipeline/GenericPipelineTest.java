@@ -62,6 +62,7 @@ class GenericPipelineTest {
         config = new PipelineConfiguration("kafka-connection.properties");
         config.updateConfiguration("bootstrap.servers", "localhost:" + kafkaPort);
         config.updateConfiguration("kafka.server.address", "localhost:" + kafkaPort);
+        config.updateConfiguration("application.id", "anomaly-detection-pipeline-test");
 
         rawAISTopic = config.getRawIncomingAisTopicName();
         identifiedAISTopic = config.getIncomingAisTopicName();
