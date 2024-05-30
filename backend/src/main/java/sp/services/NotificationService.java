@@ -48,6 +48,7 @@ public class NotificationService {
      * Method for adding a new notification to the database.
      *
      * @param notification notification object
+     * @return the added notification
      */
     public Notification addNotification(Notification notification) {
         return notificationRepository.save(notification);

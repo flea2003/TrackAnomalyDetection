@@ -64,6 +64,7 @@ public class IdAssignmentBuilder {
      * @param kafkaSource the source of raw AIS signals
      * @param signalsSink the sink for the AISSignal objects with assigned internal IDs
      * @param flinkEnv the Flink execution environment
+     * @return the constructed stream
      */
     public DataStream<AISSignal> buildIdAssignmentPart(KafkaSource<String> kafkaSource,
                                                        KafkaSink<String> signalsSink,

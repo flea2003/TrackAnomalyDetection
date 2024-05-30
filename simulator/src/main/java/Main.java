@@ -32,7 +32,7 @@ public class Main {
         Parser parser = new DEBSParser(getReader(dataSetName));
         try (KafkaProducer<String, String> producer = createProducer(serverName)) {
             Simulator simulator = new Simulator(parser, startTime, endTimestamp, topicName, producer);
-            simulator.setSpeed(1);
+            simulator.setSpeed(60);
 
             simulator.startStream();
         }
@@ -61,6 +61,6 @@ public class Main {
      * @throws FileNotFoundException throw in case the file is not found
      */
     private static BufferedReader getReader(String fileName) throws FileNotFoundException {
-        return new BufferedReader(new FileReader("simulator/streaming_data/" + fileName));
+        return new BufferedReader(new FileReader("streaming_data/" + fileName));
     }
 }

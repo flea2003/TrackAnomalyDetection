@@ -3,51 +3,146 @@ package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.circularMetric;
 
 import sp.model.AISSignal;
-import sp.model.AnomalyInformation;
+import java.text.DecimalFormat;
 
 public class TurningStatefulMapFunction extends HeuristicStatefulMapFunction {
 
-    private static final String goodMsg = "The ship's turning direction is ok.";
-    private static final String badMsg = "The ship's turning direction is anomalous.";
-    private static final int NO_HEADING = 511;
+    private static final float HEADING_DIFFERENCE_THRESHOLD = 40;
+    private static final float COURSE_DIFFERENCE_THRESHOLD = 40;
+    private static final float NO_HEADING = 511f;
 
     /**
-     * Performs a stateful map operation that receives an AIS signal and produces an
-     * AnomalyInformation based on the predefined heuristics for the turning direction of the ship.
+     * Checks if the current signal is an anomaly.
+     * Ship is considered an anomaly when at least one of the following is true:
+     * - heading value between the signals changed too much
+     * - course value between the signals changed too much
      *
-     * @param value The input value.
-     * @return the computed Anomaly Information object
-     * @throws Exception exception from value state descriptors
+     * @param currentSignal current AIS signal
+     * @param pastSignal past AIS signal (non-null object)
+     * @return AnomalyScoreWithExplanation object which indicates whether the current
+     *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
+     *     are also included in the same return object.
      */
     @Override
-    public AnomalyInformation map(AISSignal value) throws Exception {
-        float valueHeading = value.getHeading();
-        float valueCourse = value.getCourse();
+    protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        boolean isAnomaly = false;
+        StringBuilder explanationBuilder = new StringBuilder();
+        DecimalFormat df = getDecimalFormatter();
 
-        // A 511 heading means that no heading is reported, so we just take it to be equal to the heading value of the ship
-        if (valueHeading == NO_HEADING) {
-            valueHeading = valueCourse;
+        isAnomaly |= checkForHeadingToBePresent(currentSignal.getHeading(), explanationBuilder, df);
+
+        // Only proceed to the next checks if there is a past signal
+        if (pastSignal == null) {
+            return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanationBuilder.toString());
         }
 
-        AISSignal pastAISSignal = getAisSignalValueState().value();
+        isAnomaly |= checkForHeadingDifference(currentSignal, pastSignal, explanationBuilder, df);
+        isAnomaly |= checkForCourseDifference(currentSignal, pastSignal, explanationBuilder, df);
 
-        // In the case that our stateful map has encountered signals in the past
-        if (pastAISSignal != null) {
-            float pastValueHeading = getAisSignalValueState().value().getHeading();
-            float pastValueCourse = getAisSignalValueState().value().getCourse();
+        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanationBuilder.toString());
 
-            if (pastValueHeading == NO_HEADING) {
-                pastValueHeading = pastValueCourse;
-            }
-
-            boolean headingDifferenceIsGood = circularMetric(pastValueHeading, valueHeading) < 40;
-            boolean courseDifferenceIsGood = circularMetric(pastValueCourse, valueCourse) < 40;
-
-
-            if (!headingDifferenceIsGood || !courseDifferenceIsGood) {
-                getLastDetectedAnomalyTime().update(value.getTimestamp());
-            }
-        }
-        return super.setAnomalyInformationResult(value, 34f, badMsg, goodMsg);
     }
+
+    /**
+     * Checks if the given heading is present. The heading is considered to be present
+     * when its value is not equal to 511.
+     * Modifies the explanationBuilder if needed.
+     *
+     * @param heading the heading given in the AIS signal
+     * @param explanationBuilder the StringBuilder for explanation string
+     * @param df DecimalFormat to use for floating-point numbers
+     * @return true if heading is not present, false otherwise
+     */
+    private boolean checkForHeadingToBePresent(float heading, StringBuilder explanationBuilder, DecimalFormat df) {
+        // Inform if the heading was not sent (code 511)
+        if (heading == NO_HEADING) {
+            explanationBuilder
+                    .append("Heading was not given (value ")
+                    .append(df.format(NO_HEADING))
+                    .append(")")
+                    .append(explanationEnding());
+
+            return true; // anomaly
+        }
+
+        return false; // not anomaly
+    }
+
+    /**
+     * Checks if the heading difference between two consecutive signals is too large.
+     * If any of the headings is not given, the check is skipped.
+     * Modifies the explanationBuilder if needed.
+     *
+     * @param currentSignal the current AIS signal
+     * @param pastSignal the past AIS signal
+     * @param explanationBuilder the StringBuilder for explanation string
+     * @param df DecimalFormat to use for floating-point numbers
+     * @return true if headings are present and the difference is too large,
+     *     false otherwise
+     */
+    private boolean checkForHeadingDifference(AISSignal currentSignal, AISSignal pastSignal,
+                                              StringBuilder explanationBuilder, DecimalFormat df) {
+
+        float currentHeading = currentSignal.getHeading();
+        float pastHeading = pastSignal.getHeading();
+
+        // The heading difference will only be checked if both headings were sent
+        if (pastHeading == NO_HEADING || currentHeading == NO_HEADING) {
+            return false; // not anomaly
+        }
+
+        if (circularMetric(pastHeading, currentHeading) <= HEADING_DIFFERENCE_THRESHOLD) {
+            return false; // not anomaly
+        }
+
+        explanationBuilder
+                .append("Heading difference between two consecutive signals is too large: ")
+                .append(df.format(circularMetric(pastSignal.getHeading(), currentSignal.getHeading())))
+                .append(" degrees is more than threshold of ")
+                .append(df.format(HEADING_DIFFERENCE_THRESHOLD))
+                .append(" degrees")
+                .append(explanationEnding());
+
+        return true; // anomaly
+    }
+
+    /**
+     * Checks if the course difference between two consecutive signals is too large.
+     * Modifies the explanationBuilder if needed.
+     *
+     * @param currentSignal the current AIS signal
+     * @param pastSignal the past AIS signal
+     * @param explanationBuilder the StringBuilder for explanation string
+     * @param df DecimalFormat to use for floating-point numbers
+     * @return true if course difference is too large
+     */
+    private boolean checkForCourseDifference(AISSignal currentSignal, AISSignal pastSignal,
+                                             StringBuilder explanationBuilder, DecimalFormat df) {
+
+        if (circularMetric(pastSignal.getCourse(), currentSignal.getCourse()) > COURSE_DIFFERENCE_THRESHOLD) {
+            explanationBuilder
+                    .append("Course difference between two consecutive signals is too large: ")
+                    .append(df.format(circularMetric(pastSignal.getCourse(), currentSignal.getCourse())))
+                    .append(" degrees is more than threshold of ")
+                    .append(df.format(COURSE_DIFFERENCE_THRESHOLD))
+                    .append(" degrees")
+                    .append(explanationEnding());
+
+            return true; // anomaly
+        }
+
+        return false; // not anomaly
+    }
+
+    /**
+     * Gets the anomaly score of the heuristic. This score is given to the ship that
+     * is considered an anomaly based on the heuristic.
+     *
+     * @return the anomaly score of the heuristic
+     */
+    @Override
+    protected float getAnomalyScore() {
+        return 25f;
+    }
+
 }
