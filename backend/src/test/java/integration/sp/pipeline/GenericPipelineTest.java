@@ -26,6 +26,8 @@ import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
 import sp.pipeline.utils.StreamUtils;
 import sp.services.NotificationService;
+import sp.services.ShipsDataService;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -33,13 +35,6 @@ import java.util.concurrent.ExecutionException;
 import static org.mockito.Mockito.mock;
 
 class GenericPipelineTest {
-    @ClassRule
-    public static MiniClusterWithClientResource flinkCluster =
-            new MiniClusterWithClientResource(
-                    new MiniClusterResourceConfiguration.Builder()
-                            .setNumberSlotsPerTaskManager(2)
-                            .setNumberTaskManagers(1)
-                            .build());
 
     private EmbeddedKafkaZKBroker embeddedKafka;
     private static final int kafkaPort = 50087;
@@ -53,6 +48,7 @@ class GenericPipelineTest {
     protected String identifiedAISTopic;
     protected String scoresTopic;
     protected AnomalyDetectionPipeline anomalyDetectionPipeline;
+    protected ShipsDataService shipsDataService;
 
 
     /**
@@ -92,8 +88,10 @@ class GenericPipelineTest {
     /**
      * Sets up the pipeline object, injecting all required dependencies
      * and mocking the notificationsService.
+     * The pipeline is also started with the creation of shipsDataService (it starts the pipeline
+     * in the constructor).
      */
-    protected void setupPipelineComponents() {
+    protected void setupPipelineComponentsAndRun() {
         env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(10);
 
@@ -126,6 +124,9 @@ class GenericPipelineTest {
                 streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder,
                 env
         );
+
+        // Instantiate Service classes for querying
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
     }
 
     /**
