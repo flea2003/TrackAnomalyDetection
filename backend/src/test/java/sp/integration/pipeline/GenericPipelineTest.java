@@ -1,8 +1,6 @@
 package sp.integration.pipeline;
 
-import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -10,7 +8,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.*;
 import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
@@ -28,11 +25,11 @@ import sp.pipeline.utils.StreamUtils;
 import sp.repositories.NotificationRepository;
 import sp.services.NotificationService;
 import sp.services.ShipsDataService;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.spy;
 
@@ -61,11 +58,21 @@ class GenericPipelineTest {
      * @throws IOException if config cannot be loaded
      */
     private void loadConfigFile() throws IOException {
+        String randomUUID = UUID.randomUUID().toString();
+
         // Load the configuration file and update it were
         config = new PipelineConfiguration("kafka-connection.properties");
         config.updateConfiguration("bootstrap.servers", "localhost:" + kafkaPort);
         config.updateConfiguration("kafka.server.address", "localhost:" + kafkaPort);
-        config.updateConfiguration("application.id", "anomaly-detection-pipeline-test");
+
+        // Setup log directory and application ID to something random so that different tests do not clash
+        config.updateConfiguration("application.id", "anomaly-detection-pipeline-test-" + randomUUID);
+        config.updateConfiguration("kafka.logs.dir", System.getProperty("java.io.tmpdir") + "/spring.kafka." + randomUUID);
+
+        // Set the topic names to something a bit random as well so that tests do not clash
+        config.updateConfiguration("incoming.ais-raw.topic.name", "ships-raw-AIS" + "-" + randomUUID);
+        config.updateConfiguration("incoming.ais.topic.name", "ships-AIS" + "-" + randomUUID);
+        config.updateConfiguration("calculated.scores.topic.name", "ships-scores" + "-" + randomUUID);
 
         rawAISTopic = config.getRawIncomingAisTopicName();
         identifiedAISTopic = config.getIncomingAisTopicName();
@@ -86,6 +93,7 @@ class GenericPipelineTest {
 
     @AfterEach
     void tearDown() {
+        embeddedKafka.doWithAdmin(x -> x.deleteTopics(List.of(rawAISTopic, identifiedAISTopic, scoresTopic)));
         embeddedKafka.destroy();
     }
 

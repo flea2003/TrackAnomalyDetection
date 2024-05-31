@@ -31,7 +31,7 @@ public class Notification {
      */
     public Notification(CurrentShipDetails currentShipDetails) {
         this.currentShipDetails = currentShipDetails;
-        this.shipID = currentShipDetails.getCurrentAISSignal().getId();
+        this.shipID = currentShipDetails.getCurrentAnomalyInformation().getId();
     }
 
     /**

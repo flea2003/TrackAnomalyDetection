@@ -7,6 +7,7 @@ import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.hash.HashCode;
 import sp.dtos.ExternalAISSignal;
+import sp.exceptions.NotificationNotFoundException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
@@ -45,6 +46,9 @@ public class FullPipelineTest extends GenericPipelineTest {
     @Test
     void testSimpleFlow() throws Exception {
         setupPipelineComponentsAndRun();
+
+        // Make sure the notification DB says that no such notification exists
+        doThrow(new NotificationNotFoundException()).when(notificationService).getNewestNotificationForShip(any());
 
         // Send a message to the raw ships topic
         ExternalAISSignal fakeSignal = new ExternalAISSignal("producer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
@@ -132,33 +136,40 @@ public class FullPipelineTest extends GenericPipelineTest {
 
     /**
      * Simulates some ships behaving in an anomalous way and asserts their behaviour.
-     * In doing so, also tests:
-     *      - Ship ID calculation
-     *      - Getting all current ship details from a service
-     *      - Getting individual current ship details from a service
-     *      - Notifications: if score is above something, if a notification was sent or was not sent
      */
     @Test
     void testAnomalousShips() throws Exception {
         setupPipelineComponentsAndRun();
         Thread.sleep(5000);
 
-        testSingleShipBadSpeed();
+        testTwoShipsOneVeryBad();
     }
 
-    void testSingleShipBadSpeed() throws Exception {
+    /**
+     * Performs a test where one of the ships is anomalous, but since it sends only one signal, it is not considered
+     * anomalous. And the second ship is anomalous for 2 reasons: strange speed and too large interval between signals.
+     * In doing so, this particular test also tests:
+     *      - notifications
+     *      - ID assignment
+     *      - anomalous behaviour calculation
+     *      - getting individual ship details
+     * @throws Exception in case something goes wrong
+     */
+    void testTwoShipsOneVeryBad() throws Exception {
 
         // Make sure that notificationRepository does nothing when something is added (Mockito)
+        // And that it says that no saved notification is present in the DB
         Notification fakeNotification = new Notification();
         when(notificationRepository.save(any())).thenReturn(fakeNotification);
+        when(notificationRepository.findNotificationByShipID(any())).thenReturn(List.of());
 
         // Create 2 different ships with anomalous speeds. The first and third signals are from the same ship and the second
-        // is from antoher. Additionally, the first 2 ships have the same shipHash (but different producer ID),
-        // so we are also testing if ID assignment works
+        // is from another. Additionally, the first 2 ships have the same shipHash (but different producer ID),
+        // so we are also testing if ID assignment works.
         List<ExternalAISSignal> signals = List.of(
                 new ExternalAISSignal("producer1", "1", 80f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port"),
                 new ExternalAISSignal("producer2", "1", 100f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port"),
-                new ExternalAISSignal("producer1", "1", 80f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")).plusMinutes(1), "port")
+                new ExternalAISSignal("producer1", "1", 80f, 10f, 10f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")).plusMinutes(31), "port")
         );
 
         List<String> messages = new ArrayList<>();
