@@ -1,14 +1,11 @@
-## Building the project
+## Setting up the project
 First, you need to install Java 17. 
 
-Then, you need to install Kafka. We use `kafka_2.13-3.7.0.tgz` from the [official website](https://kafka.apache.org/downloads).
-You can download the exact Kafka configuration here: [kafka_2.13-3.7.0.tgz](https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz).
+Then, you need to install Kafka. We use `kafka_2.13-3.6.2.tgz ` from the [official website](https://kafka.apache.org/downloads).
+You can download the exact Kafka configuration here: [kafka_2.13-3.6.2.tgz](https://downloads.apache.org/kafka/3.6.2/kafka_2.13-3.6.2.tgz).
 Afterwards, it needs to be extracted.
 
-If you use Windows, then WSL will have to be used to run Kafka. There are instructions for this online, but it should be as simple as just running all of this on WSL.
-
-Inside of the Kafka folder, we modify the properties in the `config` folder as follows:
-- [At the moment we use fully default settings].
+If you use Windows, then WSL will have to be used to run Kafka. There are instructions for this online, but it is be as simple as just running all of this on WSL.
 
 Afterwards, start 3 bash terminals. Locate to the kafka folder in each of the terminals.
 In the first one, run the following command to start the Zookeeper server:
@@ -34,23 +31,25 @@ bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
 ```
 
-Additionally, the following JVM argument needs to be added (Edit configurations -> Modify options -> (Java) Add VM options):
+Additionally, the following JVM arguments need to be added (in IntelIJ: Edit configurations -> Modify options -> (Java) Add VM options):
 ```
 --add-opens java.base/java.util=ALL-UNNAMED
 --add-opens java.base/java.time=ALL-UNNAMED
 --add-opens=java.base/java.lang=ALL-UNNAMED
 ```
 ## Running the project
-In order to run the back-end of the project, multiple steps will have to be made.
+In order to run the back-end of the project, a few steps will have to be made.
 
-### Start the Kafka server
-Open 2 terminals and locate to the kafka folder in each of them. In the first one, run the following command to start the Zookeeper server:
+Make sure that Kafka and Zookeeper are running as described above. Leave these two terminals running for as long as you want to run the back-end.
+
+### Start the pipeline and web server
+Run the main project in IntelliJ (or just Gradle). This will start the pipeline and start listening for messages in the needed Kafka topics.
 ```bash
-bin/zookeeper-server-start.sh config/zookeeper.properties
+./gradlew bootRun
+```
 
-Leave these terminals running for as long as you want to run the back-end.
-
-In between restarts of application, the hashmap storing the scores and positions should be cleaned up.
+### Handling restarts of application
+In between restarts of application, the Kafka Store storing the scores and positions should be cleaned up.
 Do that by running the following command on yet another terminal window (while Kafka and Zookeeper are running):
 ```bash
 bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeline
@@ -73,8 +72,3 @@ Sometimes Kafka might not start if the logs of Zookeeper and the Kafka server ar
 ```bash
 rm -rf /tmp/kafka-logs /tmp/zookeeper
 ```
-
-
-### Start the pipeline and web server
-Run the main project in IntelliJ (or just Gradle). This will start the pipeline and start listening for messages in the needed Kafka topics.
-
