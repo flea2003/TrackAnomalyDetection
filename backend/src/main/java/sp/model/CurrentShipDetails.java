@@ -1,5 +1,6 @@
 package sp.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonSerialize
+@JsonDeserialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 public class CurrentShipDetails implements Serializable {
