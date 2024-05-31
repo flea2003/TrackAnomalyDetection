@@ -57,11 +57,6 @@ public class NotificationsAggregator {
         // started, and so the most recent notification information should be retrieved
         if (previousShipDetails == null) previousShipDetails = extractFromJPA(newShipDetails, shipID);
 
-        // In case the last shipDetails does not yet have any anomaly information, just return the latest information
-        if (previousShipDetails.getCurrentAnomalyInformation() == null) {
-            return new Notification(newShipDetails);
-        }
-
         // Extract previous and new anomaly scores to ease up the readability
         float previousScore = previousShipDetails.getCurrentAnomalyInformation().getScore();
         float newScore = newShipDetails.getCurrentAnomalyInformation().getScore();
@@ -75,9 +70,9 @@ public class NotificationsAggregator {
             resultingInformation = previousShipDetails;
         else if (!previousScoreWasHigh && !newScoreIsHigh)
             resultingInformation = previousShipDetails;
-        else if (previousScoreWasHigh && !newScoreIsHigh)
+        else if (previousScoreWasHigh) // && !newScoreIsHigh
             resultingInformation = newShipDetails;
-        else { // if previous score was low and new score is high, add a new notification
+        else { // !previousScoreWasHigh && newScoreIsHigh
             resultingInformation = newShipDetails;
             notificationService.addNotification(new Notification(newShipDetails));
         }

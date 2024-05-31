@@ -23,6 +23,7 @@ import sp.services.ShipsDataService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 // TODO include MaxAnomalyScoreDetails objects
@@ -36,6 +37,7 @@ public class TestShipsDataService {
     CurrentShipDetails currentShipDetails3;
     CurrentShipDetails currentShipDetails4;
     ShipInformationExtractor shipInformationExtractorBroken;
+    AnomalyDetectionPipeline anomalyDetectionPipeline;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -83,7 +85,7 @@ public class TestShipsDataService {
 
 
 
-        AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
+        anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
 
         ShipInformationExtractor shipInformationExtractor = Mockito.mock(ShipInformationExtractor.class);
@@ -116,6 +118,16 @@ public class TestShipsDataService {
         } catch (Exception e) {
             fail("Exception thrown but not Expected");
         }
+    }
+
+    @Test
+    void testGetIndividualAISPipelineStartingException() throws PipelineException, PipelineStartingException {
+        ShipInformationExtractor fakeExtractor = Mockito.mock(ShipInformationExtractor.class);
+        when(anomalyDetectionPipeline.getShipInformationExtractor()).thenReturn(fakeExtractor);
+        when(fakeExtractor.getCurrentShipDetails()).thenThrow(new PipelineStartingException("Something wroong"));
+        assertThrows(PipelineStartingException.class, () -> {
+           shipsDataService.getIndividualCurrentShipDetails(1L);
+        });
     }
 
     @Test

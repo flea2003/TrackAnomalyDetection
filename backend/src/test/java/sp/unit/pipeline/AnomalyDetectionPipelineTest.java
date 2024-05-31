@@ -1,5 +1,6 @@
 package sp.unit.pipeline;
 
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -19,13 +20,15 @@ import sp.services.NotificationService;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @Execution(ExecutionMode.SAME_THREAD)
 class AnomalyDetectionPipelineTest {
 
     private AnomalyDetectionPipeline anomalyDetectionPipeline;
     private NotificationService notificationService;
+    private StreamExecutionEnvironment flinkEnv;
 
     private void setupPipelineComponents() throws IOException {
         StreamUtils streamUtils;
@@ -37,6 +40,7 @@ class AnomalyDetectionPipelineTest {
         CurrentStateAggregator currentStateAggregator;
         PipelineConfiguration config;
         NotificationsAggregator notificationsAggregator;
+        flinkEnv = spy(StreamExecutionEnvironment.getExecutionEnvironment());
 
         // Mock the notification service class (to mock the DB)
         notificationService = mock(NotificationService.class);
@@ -58,7 +62,8 @@ class AnomalyDetectionPipelineTest {
 
         // Create the pipeline itself
         anomalyDetectionPipeline = new AnomalyDetectionPipeline(
-            streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder
+                streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder,
+                flinkEnv
         );
     }
 
@@ -67,6 +72,15 @@ class AnomalyDetectionPipelineTest {
         assertDoesNotThrow(() -> {
             setupPipelineComponents();
             anomalyDetectionPipeline.closePipeline();
+        });
+    }
+
+    @Test
+    void testRunPipelineRuntimeException() throws Exception {
+        setupPipelineComponents();
+        doThrow(new RuntimeException()).when(flinkEnv).executeAsync();
+        assertThrows(RuntimeException.class, () -> {
+           anomalyDetectionPipeline.runPipeline();
         });
     }
 }
