@@ -18,6 +18,7 @@ import sp.pipeline.utils.StreamUtils;
 import sp.services.NotificationService;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,6 +48,10 @@ class AnomalyDetectionPipelineTest {
 
         // Create the configuration
         config = new PipelineConfiguration("kafka-connection.properties");
+
+        // Change application id to make sure different streams do not clash
+        String randomUUID = UUID.randomUUID().toString();
+        config.updateConfiguration("application.id", "anomaly-detection-pipeline-test-" + randomUUID);
 
         // Create the core objects
         scoreCalculationStrategy = new SimpleScoreCalculator();

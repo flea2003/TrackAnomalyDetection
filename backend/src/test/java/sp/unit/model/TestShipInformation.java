@@ -3,9 +3,7 @@ package sp.unit.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.model.AISSignal;
-import sp.model.AnomalyInformation;
-import sp.model.ShipInformation;
+import sp.model.*;
 import sp.pipeline.utils.json.JsonMapper;
 
 import java.time.OffsetDateTime;
