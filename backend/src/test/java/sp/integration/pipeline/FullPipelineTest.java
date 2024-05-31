@@ -1,11 +1,9 @@
 package sp.integration.pipeline;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.hash.HashCode;
 import sp.dtos.ExternalAISSignal;
 import sp.exceptions.NotificationNotFoundException;
 import sp.model.AISSignal;
@@ -13,13 +11,9 @@ import sp.model.CurrentShipDetails;
 import sp.model.Notification;
 import sp.pipeline.utils.json.JsonMapper;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

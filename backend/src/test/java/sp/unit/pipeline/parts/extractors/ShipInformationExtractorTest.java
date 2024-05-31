@@ -6,6 +6,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -67,6 +69,10 @@ class ShipInformationExtractorTest {
 
         // Create the configuration
         config = new PipelineConfiguration("kafka-connection.properties");
+
+        // Change application id to make sure different streams do not clash
+        String randomUUID = UUID.randomUUID().toString();
+        config.updateConfiguration("application.id", "anomaly-detection-pipeline-test-" + randomUUID);
 
         // Create the core objects
         scoreCalculationStrategy = new SimpleScoreCalculator();
