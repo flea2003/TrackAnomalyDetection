@@ -18,6 +18,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -127,6 +128,27 @@ class ShipsDataControllerTest {
         ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getCurrentShipDetails();
 
         assertEquals(HttpStatus.TOO_EARLY, response.getStatusCode());
+    }
+
+    @Test
+    void getShipDetailsHistory() throws PipelineException{
+        AnomalyInformation info1 = new AnomalyInformation(1, "explanation1", time1, 1L);
+        AnomalyInformation info2 = new AnomalyInformation(2, "explanation2", time1, 2L);
+        CurrentShipDetails details1 = new CurrentShipDetails(info1, null, null);
+        CurrentShipDetails details2 = new CurrentShipDetails(info2, null, null);
+        when(shipsDataService.getHistoryOfShip(5))
+            .thenReturn(List.of(details1, details2));
+
+        ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getHistoryShip(5L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactlyInAnyOrder(details1, details2);
+    }
+
+    @Test
+    void getShipDetailsServerError() throws PipelineException{
+        when(shipsDataService.getHistoryOfShip(5L)).thenThrow(new PipelineException());
+        ResponseEntity<List<CurrentShipDetails>>response = shipsDataController.getHistoryShip(5L);
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

@@ -23,6 +23,8 @@ public class ShipsDataService {
     private final AnomalyDetectionPipeline anomalyDetectionPipeline;
     private final DruidConfig druidConfig;
     private final Integer activeTime = 30;
+    private final ResultSetReader<CurrentShipDetails> resultSetReader;
+
 
     /**
      * Constructor for service class.
@@ -32,9 +34,11 @@ public class ShipsDataService {
      * @param druidConfig the database object of Apache Druid
      */
     @Autowired
-    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline, DruidConfig druidConfig) {
+    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline, ResultSetReader<CurrentShipDetails>resultSetReader,
+                            DruidConfig druidConfig) {
         this.anomalyDetectionPipeline = anomalyDetectionPipeline;
         this.druidConfig = druidConfig;
+        this.resultSetReader = resultSetReader;
         anomalyDetectionPipeline.runPipeline();
     }
 
@@ -77,14 +81,11 @@ public class ShipsDataService {
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
         try {
-
             String str = FileReader.readQueryFromFile("src/main/java/sp/services/sql/queries/history.sql");
             PreparedStatement statement = druidConfig.connection()
                 .prepareStatement(str);
             statement.setLong(1, id);
-            ResultSetReader<CurrentShipDetails> resultSetReader = new ResultSetReader<>();
             return resultSetReader.extractQueryResults(statement.executeQuery(), CurrentShipDetails.class);
-
         } catch (SQLException e) {
             throw new PipelineException();
         }

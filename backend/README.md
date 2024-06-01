@@ -1,6 +1,45 @@
 ## Building the project
 First, you need to install Java 17. 
 
+### APACHE DRUID
+
+In order to utilize all the functionalities of the backend you need to install [Apache Druid Database](https://druid.apache.org/).
+
+You can install it by [downloading](https://www.apache.org/dyn/closer.cgi?path=/druid/29.0.1/apache-druid-29.0.1-bin.tar.gz) it from the official website.
+
+The database is designed to run on Linux - based Operating Systems. However it also works on WSL.
+
+After installing Druid, in your terminal, extract the file and change directories to the distribution directory:
+
+```bash
+tar -xzf apache-druid-29.0.1-bin.tar.gz
+cd apache-druid-29.0.1
+```
+
+One can start Druid by running the following command in the terminal: 
+```bash
+./bin/start-druid 
+```
+
+In WSL, when trying to run Druid you can get a ``CANNOT CREATE FIFO`` error. This is due to the fact that FIFO file can't be created over mounted drive
+(`/mnt/c`, for example). An easy solution to this is copying the entire Druid installation folder to any internal folder (`/usr/share`, for example).
+
+In order to further explore Druid you can access the application console available at [http://localhost:8888](http://localhost:8888).
+
+You can ingest data to Druid by running the following command in terminal:
+
+```bash
+curl -X POST -H 'Content-Type: application/json' -d @backend/src/main/resources/ship-scores-kafka-supervisor.json http://localhost:8081/druid/indexer/v1/supervisor
+```
+
+This will create a configuration where ship data is retrieved from a Kafka topic called `ship-details` located at `localhost:9092`.
+
+Note: It is enough to run this configuration command only once. Even after closing the database and opening it again, it will continue to ingest data from the same topic.
+
+Also, the consumed data is deeply stored on the disk every hour with the current configuration, so if a crash happens, at most one hour of ship data will be lost from the database.
+
+### Kafka
+
 Then, you need to install Kafka. We use `kafka_2.13-3.7.0.tgz` from the [official website](https://kafka.apache.org/downloads).
 You can download the exact Kafka configuration here: [kafka_2.13-3.7.0.tgz](https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz).
 Afterwards, it needs to be extracted.
@@ -77,9 +116,3 @@ rm -rf /tmp/kafka-logs /tmp/zookeeper
 
 ### Start the pipeline and web server
 Run the main project in IntelliJ (or just Gradle). This will start the pipeline and start listening for messages in the needed Kafka topics.
-
-### APACHE DRUID
-
-```bash
-curl -X POST -H 'Content-Type: application/json' -d @backend/src/main/resources/ship-scores-kafka-supervisor.json http://localhost:8081/druid/indexer/v1/supervisor
-```

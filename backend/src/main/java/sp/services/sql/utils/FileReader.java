@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.sql.SQLException;
 
 public class FileReader {
-
     /**
      * Helper method to parse developer defined SQL queries.
      *

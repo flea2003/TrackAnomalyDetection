@@ -18,7 +18,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonSerialize
-@JsonDeserialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 public class CurrentShipDetails implements Serializable {
@@ -35,20 +34,4 @@ public class CurrentShipDetails implements Serializable {
     public static Serde<CurrentShipDetails> getSerde() {
         return new Jackson2Serde<>(new UtilsObjectMapper(), CurrentShipDetails.class);
     }
-
-    /**
-     * Converts a JSON string to an AISUpdate object.
-     *
-     * @param val the JSON string to convert
-     * @return the converted AISUpdate object
-     */
-    public static CurrentShipDetails fromJson(String val) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(val, CurrentShipDetails.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

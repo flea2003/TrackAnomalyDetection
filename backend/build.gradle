@@ -115,11 +115,6 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok:1.18.32'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
 
-	// https://mvnrepository.com/artifact/commons-dbutils/commons-dbutils
-	implementation group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
-
-	implementation group: 'org.apache.calcite.avatica', name: 'avatica-core', version: '1.25.0'
-
 	// Flink test utils
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testCompileOnly "org.apache.flink:flink-test-utils:${flinkVersion}"
@@ -132,20 +127,18 @@ dependencies {
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
 
 	// For JPA:
+	implementation group: 'org.apache.calcite.avatica', name: 'avatica-core', version: '1.25.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.h2database:h2'
 
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
 
-	testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
-	testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
-
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
+	testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
 
+	// Some JSON Utils
 	implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
-
-	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 // For Flink

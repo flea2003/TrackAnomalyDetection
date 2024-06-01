@@ -9,8 +9,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 import sp.pipeline.utils.json.JsonMapper;
 
+@Service
 public class ResultSetReader<T> {
 
     /**
@@ -24,7 +26,7 @@ public class ResultSetReader<T> {
     public List<T> extractQueryResults(ResultSet resultSet, Class<T> classType) throws SQLException {
         List<T> extractedResults = new ArrayList<>();
         while (resultSet.next()) {
-            extractedResults.add(exctractRow(resultSet, classType));
+            extractedResults.add(extractRow(resultSet, classType));
         }
         return extractedResults;
     }
@@ -37,7 +39,7 @@ public class ResultSetReader<T> {
      * @return - the retrieved list of the classType
      * @throws SQLException - Exception if something went wrong
      */
-    private T exctractRow(ResultSet resultSet, Class<T> classType) throws SQLException {
+    private T extractRow(ResultSet resultSet, Class<T> classType) throws SQLException {
         JsonObject jsonObject = new JsonObject();
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();

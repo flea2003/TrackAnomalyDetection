@@ -9,16 +9,16 @@ import java.time.OffsetDateTime;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 @JsonSerialize
 @JsonDeserialize
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@EqualsAndHashCode
 public class MaxAnomalyScoreDetails implements Serializable {
-    private Float maxAnomalyScore;
+    private final Float maxAnomalyScore;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private OffsetDateTime correspondingTimestamp;
+    private final OffsetDateTime correspondingTimestamp;
 }

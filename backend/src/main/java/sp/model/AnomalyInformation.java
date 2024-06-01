@@ -8,7 +8,6 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Builder
-@JsonDeserialize
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Setter
