@@ -1,13 +1,8 @@
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import helperobjects.AISSignal;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
-
 import java.time.OffsetDateTime;
-import java.util.Properties;
 
 public class ShipSignalSender {
     private final KafkaProducer<String, String> producer;
@@ -16,36 +11,48 @@ public class ShipSignalSender {
     private final int minIntervalBetweenSignals;
     private final int maxIntervalBetweenSignals;
 
+
+    private float longitude = (float) (Math.random() * 360 - 180);
+    private float latitude = (float) (Math.random() * 180 - 90);
+    private float speed = (float) (Math.random() * 30);
+    private float course = (float) (Math.random() * 360);
+    private float heading = (float) (Math.random() * 360);
+
+    // Create a field for the last timestamp
+    private OffsetDateTime timestampForNewSignal;
+
+    /**
+     * Default constructor for signal sender.
+     *
+     * @param topicName the topic to produce to
+     * @param producer the producer (thread safe)
+     * @param index index of the ship
+     * @param minIntervalBetweenSignals minimal interval between consecutive signals (in seconds)
+     * @param maxIntervalBetweenSignals maximal interval between consecutive signals (in seconds)
+     */
     public ShipSignalSender(
-            String serverName,
             String topicName,
+            KafkaProducer<String, String> producer,
             int index,
             int minIntervalBetweenSignals,
             int maxIntervalBetweenSignals
     ) {
-        this.producer = createProducer(serverName);
         this.topicName = topicName;
+        this.producer = producer;
         this.index = index;
         this.minIntervalBetweenSignals = minIntervalBetweenSignals;
         this.maxIntervalBetweenSignals = maxIntervalBetweenSignals;
+        timestampForNewSignal = OffsetDateTime.now();
     }
 
-    public void start() throws JsonProcessingException {
-
-        float longitude = (float) (Math.random() * 360 - 180);
-        float latitude = (float) (Math.random() * 180 - 90);
-        float speed = (float) (Math.random() * 30);
-        float course = (float) (Math.random() * 360);
-        float heading = (float) (Math.random() * 360);
-
-        // Start sending signals
-        while (true) {
-            // Wait a random amount of time
-            try {
-                Thread.sleep((long) (Math.random() * (maxIntervalBetweenSignals - minIntervalBetweenSignals) + minIntervalBetweenSignals));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    /**
+     * Method is called every ~500ms. Check if it is time to send a signal.
+     * If it is sends and sets the time for the next signal.
+     *
+     * @throws JsonProcessingException in case converting to JSON fails
+     */
+    public void step() throws JsonProcessingException {
+        if (timestampForNewSignal.isBefore(OffsetDateTime.now())) {
 
             // Slightly randomly update the values
             longitude += (float) ((Math.random() - 0.5) * 0.1);
@@ -66,21 +73,13 @@ public class ShipSignalSender {
                     OffsetDateTime.now(),
                     "departurePort"
             );
-            producer.send(new ProducerRecord<>(topicName, signal.toJson()));
-        }
-    }
 
-    /**
-     * Returns a Kafka producer.
-     *
-     * @param server name of the server
-     * @return Kafka producer with specified configurations
-     */
-    private static KafkaProducer<String, String> createProducer(String server) {
-        Properties properties = new Properties();
-        properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, server);
-        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        return new KafkaProducer<>(properties);
+            producer.send(new ProducerRecord<>(topicName, signal.toJson()));
+
+            // Update the timestamp
+            timestampForNewSignal = OffsetDateTime.now().plusSeconds(
+                    minIntervalBetweenSignals + (int) (Math.random() * (maxIntervalBetweenSignals - minIntervalBetweenSignals))
+            );
+        }
     }
 }
