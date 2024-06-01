@@ -1,6 +1,8 @@
 package sp.services;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -31,10 +33,12 @@ public class ShipsDataService {
      *
      * @param anomalyDetectionPipeline object that is responsible for managing and handling the stream of data and
      *     anomaly information computation
+     * @param resultSetReader - the object which retrieves the ShipDetails from the SQL queries
      * @param druidConfig the database object of Apache Druid
      */
     @Autowired
-    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline, ResultSetReader<CurrentShipDetails>resultSetReader,
+    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline,
+                            ResultSetReader<CurrentShipDetails> resultSetReader,
                             DruidConfig druidConfig) {
         this.anomalyDetectionPipeline = anomalyDetectionPipeline;
         this.druidConfig = druidConfig;
@@ -80,14 +84,23 @@ public class ShipsDataService {
      * @throws PipelineException - in case the query doesn't succeed
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
+        String query;
         try {
-            String str = FileReader.readQueryFromFile("src/main/java/sp/services/sql/queries/history.sql");
-            PreparedStatement statement = druidConfig.connection()
-                .prepareStatement(str);
-            statement.setLong(1, id);
-            return resultSetReader.extractQueryResults(statement.executeQuery(), CurrentShipDetails.class);
+            query = FileReader.readQueryFromFile("src/main/java/sp/services/sql/queries/history.sql");
         } catch (SQLException e) {
-            throw new PipelineException();
+            throw new PipelineException("Error reading SQL query from file");
+        }
+
+        try (Connection connection = druidConfig.connection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, id);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSetReader.extractQueryResults(resultSet, CurrentShipDetails.class);
+            }
+
+        } catch (SQLException e) {
+            throw new PipelineException("Error executing SQL query");
         }
     }
 }

@@ -12,15 +12,16 @@ public class FileReader {
      */
     public static String readQueryFromFile(String filePath) throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();
-        try {
-            BufferedReader reader = new BufferedReader(new java.io.FileReader(filePath));
-            String line;
-            while ((line = reader.readLine()) != null) {
+        try (java.io.FileReader fileReader = new java.io.FileReader(filePath);
+            BufferedReader reader = new BufferedReader(fileReader)) {
+            String line = reader.readLine();
+            while (line != null) {
                 queryBuilder.append(line).append("\n");
+                line = reader.readLine();
             }
             return queryBuilder.toString().trim();
         } catch (Exception e) {
-            throw new SQLException();
+            throw new SQLException("Error reading query from file", e);
         }
     }
 
