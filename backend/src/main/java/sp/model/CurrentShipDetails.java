@@ -1,5 +1,7 @@
 package sp.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.giladam.kafka.jacksonserde.Jackson2Serde;
@@ -33,4 +35,20 @@ public class CurrentShipDetails implements Serializable {
     public static Serde<CurrentShipDetails> getSerde() {
         return new Jackson2Serde<>(new UtilsObjectMapper(), CurrentShipDetails.class);
     }
+
+    /**
+     * Converts a JSON string to an AISUpdate object.
+     *
+     * @param val the JSON string to convert
+     * @return the converted AISUpdate object
+     */
+    public static CurrentShipDetails fromJson(String val) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(val, CurrentShipDetails.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

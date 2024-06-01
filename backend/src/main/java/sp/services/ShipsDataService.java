@@ -1,13 +1,9 @@
 package sp.services;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.NotExistingShipException;
@@ -86,7 +82,7 @@ public class ShipsDataService {
             PreparedStatement statement = druidConfig.connection()
                 .prepareStatement(str);
             statement.setLong(1, id);
-            ResultSetReader<CurrentShipDetails>resultSetReader = new ResultSetReader<>();
+            ResultSetReader<CurrentShipDetails> resultSetReader = new ResultSetReader<>();
             return resultSetReader.extractQueryResults(statement.executeQuery(), CurrentShipDetails.class);
 
         } catch (SQLException e) {
