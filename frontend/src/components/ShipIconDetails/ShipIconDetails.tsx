@@ -1,8 +1,9 @@
 import React, { CSSProperties } from "react";
-import ShipDetails from "../../model/ShipDetails";
 import "../../styles/shipIconDetails.css";
 import TimeUtilities from "../../utils/TimeUtilities";
-interface ShipIconDetailsType {
+import ShipDetails from "../../model/ShipDetails";
+
+export interface ShipIconDetailsType {
   show: boolean;
   x: number;
   y: number;

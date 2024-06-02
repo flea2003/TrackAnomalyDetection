@@ -24,11 +24,18 @@ plugins {
 
 ext {
 	flinkVersion = '1.19.0'
-	kafkaVersion = '3.7.0'
+	kafkaVersion = '3.6.2'
 	scalaBinaryVersion = '_2.12'
 	slf4jVersion = '1.7.36'
 	log4jVersion = '2.17.1'
 	jacksonVersion = '2.15.0'
+
+	// these jvmArgs are needed by Flink code
+	additionalJvmArgs = [
+			'--add-opens=java.base/java.util=ALL-UNNAMED',
+			'--add-opens=java.base/java.lang=ALL-UNNAMED',
+			'--add-opens=java.base/java.time=ALL-UNNAMED'
+	]
 }
 
 tasks.withType(JavaCompile) {
@@ -43,19 +50,11 @@ java {
 }
 
 bootRun{
-	jvmArgs = [
-			'--add-opens=java.base/java.util=ALL-UNNAMED',
-			'--add-opens=java.base/java.lang=ALL-UNNAMED',
-			'--add-opens=java.base/java.time=ALL-UNNAMED'
-	]
+	jvmArgs = additionalJvmArgs
 }
 
 test {
-	jvmArgs += [
-			'--add-opens=java.base/java.util=ALL-UNNAMED',
-			'--add-opens=java.base/java.lang=ALL-UNNAMED',
-			'--add-opens=java.base/java.time=ALL-UNNAMED'
-	]
+	jvmArgs += additionalJvmArgs
 }
 
 checkstyle {
@@ -124,15 +123,23 @@ dependencies {
 	implementation group: 'org.apache.flink', name: 'flink-core', version: "${flinkVersion}"
 	implementation group: 'org.apache.flink', name: 'flink-queryable-state-client-java', version: "${flinkVersion}"
 	implementation "org.apache.flink:flink-queryable-state-runtime:${flinkVersion}"
-	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.7.0'
+	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: "${kafkaVersion}"
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
 
 	// For JPA:
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.h2database:h2'
 
+	// For testing kafka
+	testImplementation 'org.springframework.kafka:spring-kafka-test:3.1.0'
+
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
+
+	testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
+	testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
+
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
 }
 
 // For Flink
@@ -183,7 +190,7 @@ jacocoTestReport {
 }
 
 pitest {
-	//adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
+	// adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
 	// check https://github.com/pitest/pitest-junit5-plugin?tab=readme-ov-file#gradle
 	junit5PluginVersion = '1.2.1'
 
@@ -191,6 +198,8 @@ pitest {
 	threads = 4
 	timestampedReports = false
 	outputFormats = ['XML', 'HTML']
+
+	jvmArgs = additionalJvmArgs
 }
 
 

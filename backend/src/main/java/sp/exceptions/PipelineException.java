@@ -12,7 +12,7 @@ public class PipelineException extends Exception {
     /**
      * Constructor which initializes the exception with a predefined message.
      *
-     * @param message - the message
+     * @param message message
      */
     public PipelineException(String message) {
         super(message);

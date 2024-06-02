@@ -1,6 +1,12 @@
 import TimeUtilities from "../../utils/TimeUtilities";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 
+beforeEach(() => {
+  // Remove refreshState function, so it does nothing.
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ErrorNotificationService.refreshState = () => {};
+});
+
 test("Check for invalid conversion", () => {
   const invalidTimestamp = "it's eleven o'clock";
   const spyOnErrorServiceMethod = jest.spyOn(
