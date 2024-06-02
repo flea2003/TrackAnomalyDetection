@@ -42,7 +42,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         setupPipelineComponentsAndRun();
 
         // Make sure the notification DB says that no such notification exists
-        doThrow(new NotificationNotFoundException()).when(notificationService).getNewestNotificationForShip(any());
+        when(notificationRepository.findNotificationByShipID(any())).thenReturn(List.of());
 
         // Send a message to the raw ships topic
         ExternalAISSignal fakeSignal = new ExternalAISSignal("producer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
@@ -55,7 +55,7 @@ public class FullPipelineTest extends GenericPipelineTest {
 
     /**
      * Test whether ID assignment works properly. I.e., a simple signal was sent (in the calling method)
-     * to raw ships topic and now we check if the AIS topic contains the identified signals
+     * to raw ships topic, and now we check if the AIS topic contains the identified signals
      *
      * @param sentSignal the raw signal that was sent
      * @throws Exception if something fails
@@ -84,8 +84,8 @@ public class FullPipelineTest extends GenericPipelineTest {
      * @throws Exception if something fails
      */
     void testFetchingFromService(ExternalAISSignal sentSignal) throws Exception {
-        // Wait 5 seconds for the data to be processed
-        Thread.sleep(5000);
+        // Wait 3 seconds for the data to be processed
+        Thread.sleep(3000);
 
         // Get the details of all ships
         List<CurrentShipDetails> allDetails = shipsDataService.getCurrentShipDetails();
@@ -116,7 +116,13 @@ public class FullPipelineTest extends GenericPipelineTest {
      */
     void testSendingNonJsonMessages() throws Exception {
         // Send some trash messages to all 3 topics
-        List<String> messages = List.of("non json trash", "some other trash", "a");
+        List<String> messages = List.of(
+                "non json trash",
+                "some other trash",
+                "{a: b}",
+                "{\"trashKey\": \"trashValueNoBracket\""
+        );
+
         produceToTopic(rawAISTopic, messages);
         produceToTopic(identifiedAISTopic, messages);
         produceToTopic(scoresTopic, messages);
@@ -134,9 +140,8 @@ public class FullPipelineTest extends GenericPipelineTest {
     @Test
     void testAnomalousShips() throws Exception {
         setupPipelineComponentsAndRun();
-        Thread.sleep(5000);
 
-        testTwoShipsOneVeryBad();
+        testForOneVeryAnomalousShipAndOneNot();
     }
 
     /**
@@ -149,7 +154,7 @@ public class FullPipelineTest extends GenericPipelineTest {
      *      - getting individual ship details
      * @throws Exception in case something goes wrong
      */
-    void testTwoShipsOneVeryBad() throws Exception {
+    void testForOneVeryAnomalousShipAndOneNot() throws Exception {
 
         // Make sure that notificationRepository does nothing when something is added (Mockito)
         // And that it says that no saved notification is present in the DB
@@ -207,7 +212,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         float score1 = details.get(0).getCurrentAnomalyInformation().getScore();
         float score2 = details.get(1).getCurrentAnomalyInformation().getScore();
 
-        // Assert that the first one is an anomaly (since 2 signals were sent and it is fast)
+        // Assert that the first one is an anomaly (since 2 signals were sent, and it is fast)
         // And the second one is not an anomaly, since only 1 signal was sent
         assertThat(score1).isGreaterThan(0);
         assertThat(score2).isEqualTo(0);

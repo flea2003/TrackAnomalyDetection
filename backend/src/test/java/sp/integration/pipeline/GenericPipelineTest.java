@@ -33,6 +33,14 @@ import java.util.concurrent.ExecutionException;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.spy;
 
+/**
+ * The following class contains methods for running an integration test.
+ * It handles starting and destroying the Kafka/Flink cluster in between tests (the
+ * class has a setupPipelineComponentsAndRun() method for that and @BeforeEach and
+ * an @AfterEach for loading config and destroying the cluster.
+ * It also has 2 helper methods for producing to a Kafka topic and consuming from it.
+ * Integration test classes should inherit from this class to simplify testing.
+ */
 class GenericPipelineTest {
 
     private EmbeddedKafkaZKBroker embeddedKafka;
@@ -79,6 +87,12 @@ class GenericPipelineTest {
         scoresTopic = config.getCalculatedScoresTopicName();
     }
 
+    /**
+     * Loads the configuration file and starts and Embedded Kafka server. I.e., it creates a Zookeeper
+     * instance and a Kafka server instance. It uses EmbeddedKafkaZKBroker, since we are using zookeeper (ZK)
+     * for in our application. We could also use EmbeddedKafkaKraftBroker, if we used Kraft instead of zookeeper.
+     * @throws IOException if loading the config fails
+     */
     @BeforeEach
     void setup() throws IOException {
         loadConfigFile();
@@ -92,9 +106,10 @@ class GenericPipelineTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         embeddedKafka.doWithAdmin(x -> x.deleteTopics(List.of(rawAISTopic, identifiedAISTopic, scoresTopic)));
         embeddedKafka.destroy();
+        env.close();
     }
 
     /**
@@ -155,11 +170,12 @@ class GenericPipelineTest {
         Map<String, Object> producerProps = KafkaTestUtils.producerProps(embeddedKafka);
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps);
 
-        for (String item : items) {
-            ProducerRecord<String, String> record = new ProducerRecord<>(topic, item);
-            producer.send(record).get();
+        try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps)) {
+            for (String item : items) {
+                ProducerRecord<String, String> record = new ProducerRecord<>(topic, item);
+                producer.send(record).get();
+            }
         }
     }
 
