@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -19,6 +18,7 @@ import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.MaxAnomalyScoreDetails;
 import sp.pipeline.utils.json.JsonMapper;
+import sp.utils.sql.ResultSetReader;
 
 class ResultSetReaderTest {
     AnomalyInformation anomalyInformation1;
@@ -36,8 +36,8 @@ class ResultSetReaderTest {
     public void setUp(){
         offsetDateTime1 = OffsetDateTime.of(2004, 1, 27, 1,1,0,0, ZoneOffset.ofHours(0));
         offsetDateTime2 = OffsetDateTime.of(2004, 1, 27, 1,2,0,0, ZoneOffset.ofHours(0));
-        aisSignal1 = new AISSignal(123L, 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, offsetDateTime1, "New York");;
-        aisSignal2 = new AISSignal(123L, 23.5f, 130.0f, 45.0f, 180.0f, 90.0f, offsetDateTime2, "New York");;
+        aisSignal1 = new AISSignal(123L, 22.5f, 130.0f, 45.0f, 180.0f, 90.0f, offsetDateTime1, "New York");
+        aisSignal2 = new AISSignal(123L, 23.5f, 130.0f, 45.0f, 180.0f, 90.0f, offsetDateTime2, "New York");
         anomalyInformation1 = new AnomalyInformation(0.5F, "explanation", offsetDateTime1, 123L);
         anomalyInformation2 = new AnomalyInformation(0.5F, "explanation", offsetDateTime2, 123L);
         maxAnomalyScoreDetails1 = new MaxAnomalyScoreDetails(33F, offsetDateTime1);
@@ -70,7 +70,7 @@ class ResultSetReaderTest {
     }
 
     @Test
-    void extractQueryResultsEmptyTest() throws SQLException, IOException{
+    void extractQueryResultsEmptyTest() throws SQLException{
         ResultSetReader<CurrentShipDetails> resultSetReader = new ResultSetReader<>();
 
         ResultSet resultSet = Mockito.mock(ResultSet.class);

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
@@ -21,8 +22,9 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
-import sp.services.sql.utils.ResultSetReader;
 import sp.utils.DruidConfig;
+import sp.utils.sql.FileReader;
+import sp.utils.sql.ResultSetReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -31,7 +33,6 @@ import static org.mockito.Mockito.*;
 
 // TODO include MaxAnomalyScoreDetails objects
 public class TestShipsDataService {
-
     private ShipsDataService shipsDataService;
     private ShipsDataService shipsDataServiceBroken;
     private AISSignal signal3;
@@ -85,11 +86,11 @@ public class TestShipsDataService {
             put(4L, currentShipDetails4);
         }};
 
-        ResultSetReader<CurrentShipDetails>resultSetReader = Mockito.mock(ResultSetReader.class);
+        ResultSetReader<CurrentShipDetails> resultSetReader = Mockito.mock(ResultSetReader.class);
         when(resultSetReader.extractQueryResults(any(), any())).thenReturn(List.of(currentShipDetails1,
             currentShipDetails2, currentShipDetails3, currentShipDetails4));
 
-        DruidConfig druidConfig = Mockito.mock(DruidConfig.class);
+        druidConfig = Mockito.mock(DruidConfig.class);
         Connection connection = Mockito.mock(Connection.class);
         when(druidConfig.connection()).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
@@ -178,7 +179,7 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getAllCurrentShipDetils(){
+    void getAllCurrentShipDetails(){
         try {
             assertThat(shipsDataService.getCurrentShipDetails()).containsExactlyElementsOf(List.of(currentShipDetails1,
                 currentShipDetails2, currentShipDetails3, currentShipDetails4));
@@ -194,15 +195,23 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getHistoryOfShip() throws PipelineException, PipelineStartingException{
+    void getHistoryOfShip() throws PipelineException{
         List<CurrentShipDetails> result = shipsDataService.getHistoryOfShip(5L);
         assertThat(result).containsExactlyElementsOf(List.of(currentShipDetails1, currentShipDetails2,
             currentShipDetails3, currentShipDetails4));
     }
 
     @Test
-    void getHistoryOfShipException() throws PipelineException, PipelineStartingException{
+    void getHistoryOfShipException(){
         assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
+    }
+
+    @Test
+    void getHistoryOfShipSQLNotFound(){
+        try(MockedStatic<FileReader> fileReader = mockStatic(FileReader.class)) {
+            fileReader.when(() -> FileReader.readQueryFromFile(anyString())).thenThrow(SQLException.class);
+            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
+        }
     }
 
 }

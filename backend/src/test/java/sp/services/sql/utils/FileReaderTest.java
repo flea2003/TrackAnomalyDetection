@@ -5,12 +5,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
+import sp.utils.sql.FileReader;
 
 class FileReaderTest {
 
     @Test
     void readQueryFromFileTest() throws SQLException {
-        assertThat(FileReader.readQueryFromFile("src/test/java/sp/services/sql/utils/queries/test.sql"))
+        assertThat(FileReader.readQueryFromFile("src/test/resources/test.sql"))
             .isEqualTo("TEST 123");
     }
 

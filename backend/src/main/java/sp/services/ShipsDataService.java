@@ -15,9 +15,9 @@ import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
 import java.util.HashMap;
 import java.util.List;
-import sp.services.sql.utils.FileReader;
-import sp.services.sql.utils.ResultSetReader;
 import sp.utils.DruidConfig;
+import sp.utils.sql.FileReader;
+import sp.utils.sql.ResultSetReader;
 
 
 @Service
@@ -86,13 +86,14 @@ public class ShipsDataService {
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
         String query;
         try {
-            query = FileReader.readQueryFromFile("src/main/java/sp/services/sql/queries/history.sql");
+            query = FileReader.readQueryFromFile("src/main/resources/history.sql");
         } catch (SQLException e) {
             throw new PipelineException("Error reading SQL query from file");
         }
 
         try (Connection connection = druidConfig.connection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+            PreparedStatement statement = connection.prepareStatement(query)) {
+            // in the sql query, the parameter 1 is the id that we query on
             statement.setLong(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {

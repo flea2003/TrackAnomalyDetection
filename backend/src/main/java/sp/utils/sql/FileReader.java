@@ -1,4 +1,4 @@
-package sp.services.sql.utils;
+package sp.utils.sql;
 
 import java.io.BufferedReader;
 import java.sql.SQLException;

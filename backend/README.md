@@ -5,9 +5,11 @@ First, you need to install Java 17.
 
 In order to utilize all the functionalities of the backend you need to install [Apache Druid Database](https://druid.apache.org/).
 
+We advise to start first the database and after that the other components of the system.
+
 You can install it by [downloading](https://www.apache.org/dyn/closer.cgi?path=/druid/29.0.1/apache-druid-29.0.1-bin.tar.gz) it from the official website.
 
-The database is designed to run on Linux - based Operating Systems. However it also works on WSL.
+The database is designed to run on Unix-like OS (such as, Linux or Mac OS X). Even though Windows is not supported, it also works on WSL.
 
 After installing Druid, in your terminal, extract the file and change directories to the distribution directory:
 
@@ -26,24 +28,44 @@ In WSL, when trying to run Druid you can get a ``CANNOT CREATE FIFO`` error. Thi
 
 In order to further explore Druid you can access the application console available at [http://localhost:8888](http://localhost:8888).
 
-You can ingest data to Druid by running the following command in terminal:
+The configuration file for the database is located in the folder `backend/src/main/resources/ship-scores-kafka-supervisor.json`.
+
+When located in the root file of the project you can ingest data to Druid by running the following command in terminal:
 
 ```bash
 curl -X POST -H 'Content-Type: application/json' -d @backend/src/main/resources/ship-scores-kafka-supervisor.json http://localhost:8081/druid/indexer/v1/supervisor
 ```
 
-This will create a configuration where ship data is retrieved from a Kafka topic called `ship-details` located at `localhost:9092`.
+This will create a configuration where ship data is retrieved from a Kafka topic called `ship-details` located at `localhost:9092`. This configuration will create a so-called supervisor.
+
+When successful, the message `{"id" : "ship-details"}` will be printed in the terminal. In addition, there will be a supervisor named `ship-details` added to the [console](http://localhost:8888/unified-console.html#supervisors).
+
+After finishing the execution of the system, one might want to delete the configuration file from the database.
+
+In order to see the id of the active supervisors you can run 
+```bash
+curl "http://localhost:8888/druid/indexer/v1/supervisor?full=null"
+```
+After identifying the id of the supervisor that you want to terminate, you can run the following command:
+```bash
+curl --request POST "http://localhost:8888/druid/indexer/v1/supervisor/id/terminate"
+```
+Where `id` is the identifier of the supervisor that you want to terminate. Note that the terminated supervisors still exist in the metadata store and their history can be retrieved.
+
+You can find a more extensive list of supervisors' API at on the official [website](https://druid.apache.org/docs/latest/api-reference/supervisor-api/).
 
 Note: It is enough to run this configuration command only once. Even after closing the database and opening it again, it will continue to ingest data from the same topic.
 
-Also, the consumed data is deeply stored on the disk every hour with the current configuration, so if a crash happens, at most one hour of ship data will be lost from the database.
+Also, the consumed data is deeply stored(stored on the disk) every hour with the current configuration, so if a crash happens, at most one hour of ship data will be lost from the database.
 
 One issue which will be fixed before merging is that Druid reads the data from the topic by considering its offset. 
 In other words, if the topic is deleted and the details are re-written from the offset `0`, Druid will simply overwrite the processed ship details.
 
 ### Kafka
 
-Then, you need to install Kafka. We use `kafka_2.13-3.7.0.tgz` from the [official website](https://kafka.apache.org/downloads).
+We recommend starting Kafka after starting the Apache Druid database.
+
+First, you need to install Kafka. We use `kafka_2.13-3.7.0.tgz` from the [official website](https://kafka.apache.org/downloads).
 You can download the exact Kafka configuration here: [kafka_2.13-3.7.0.tgz](https://downloads.apache.org/kafka/3.7.0/kafka_2.13-3.7.0.tgz).
 Afterwards, it needs to be extracted.
 
@@ -53,6 +75,8 @@ Inside of the Kafka folder, we modify the properties in the `config` folder as f
 - [At the moment we use fully default settings].
 
 Afterwards, start 3 bash terminals. Locate to the kafka folder in each of the terminals.
+
+Note: if you have managed to start the Druid database, you can omit this step.
 In the first one, run the following command to start the Zookeeper server:
 ```bash
 bin/zookeeper-server-start.sh config/zookeeper.properties
