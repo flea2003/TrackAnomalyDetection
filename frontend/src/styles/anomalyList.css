@@ -1,5 +1,5 @@
 #anomaly-list-container {
-    width: 10%;
+    width: 8%;
     text-align: center;
     display: flex;
 }
@@ -30,25 +30,19 @@
     font-size: 1.2em;
 }
 
-.modify-button {
-    font-size: 0.6em;
-    cursor: pointer;
-    border: none;
-    background: none;
-    padding: 1px;
-}
-
-.modify-button:hover {
+.modify-button-container:hover {
     background-color: lightblue;
 }
 
 .modify-button-container {
-    width: 50%;
+    width: 80%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
+    font-size: 0.6em;
+    justify-content: flex-end;
     align-items: center;
-    padding: 1px;
+    padding: 2px 2px 1px 1px;
+    cursor: pointer;
 }
 
 .modify-threshold-slide {
@@ -68,7 +62,7 @@
 
 input[type="range"] {
     -webkit-appearance: none;
-    width: 75%;
+    width: 70%;
     height: 10px;
     background: grey;
     border-radius: 2px;

@@ -4,11 +4,9 @@ import AnomalyListEntry from "./AnomalyListEntry";
 import List from "@mui/material/List";
 import { CurrentPage } from "../../../../App";
 import ShipDetails from "../../../../model/ShipDetails";
-import closeIcon from "../../../../assets/icons/close.svg";
 
 import "../../../../styles/common.css";
 import "../../../../styles/anomalyList.css";
-import AnomalyTitleWithSlider from "./AnomalyTitleWithSlider";
 import ShipThresholdModifier from "./AnomalyTitleWithSlider";
 
 interface AnomalyListProps {
@@ -44,7 +42,7 @@ function AnomalyList({
 
   return (
     <Stack id="anomaly-list-container" data-testid="anomaly-list-container">
-      <ShipThresholdModifier pageChanger={pageChanger}/>
+      <ShipThresholdModifier pageChanger={pageChanger} />
       <List
         id="anomaly-list-internal-container"
         style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}

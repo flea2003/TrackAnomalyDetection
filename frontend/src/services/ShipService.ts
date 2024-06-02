@@ -19,6 +19,7 @@ class ShipService {
    * @returns a promise that resolves to an array of ShipDetails.
    */
   static queryBackendForShipsArray: () => Promise<ShipDetails[]> = async () => {
+    console.log(ShipService.filterThreshold);
     const response = await HttpSender.get(
       ShipService.shipsCurrentDetailsEndpoint,
     );
@@ -39,13 +40,12 @@ class ShipService {
     }
 
     const filteredShipsOnThreshold = responseWithoutNulls
-      .map((item: APIResponseItem) => ShipService.extractCurrentShipDetails(item))
-      .filter((ship) => ship.anomalyScore >= ShipService.filterThreshold)
+      .map((item: APIResponseItem) =>
+        ShipService.extractCurrentShipDetails(item),
+      )
+      .filter((ship) => ship.anomalyScore >= ShipService.filterThreshold);
 
-    return ShipService.sortList(
-      filteredShipsOnThreshold,
-      "desc",
-    );
+    return ShipService.sortList(filteredShipsOnThreshold, "desc");
   };
 
   /**

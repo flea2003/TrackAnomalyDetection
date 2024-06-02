@@ -175,22 +175,7 @@ test("backend-fetching-null-anomaly-info", async () => {
     .fn()
     .mockReturnValue(Promise.resolve([fakeAPIResItemNoAnomalyInfo]));
   const result = await ShipService.queryBackendForShipsArray();
-  expect(result).toStrictEqual([
-    new ShipDetails(
-      1,
-      1,
-      47.0,
-      29.0,
-      "t1",
-      -1,
-      "Information not available (yet)",
-      0,
-      "Information not available (yet)",
-      "p1",
-      90,
-      350.0,
-    ),
-  ]);
+  expect(result).toStrictEqual([]); // Now if anomaly score is not computed, we don't show it!
 });
 
 test("sorting-valid-list-descending-ascending", async () => {

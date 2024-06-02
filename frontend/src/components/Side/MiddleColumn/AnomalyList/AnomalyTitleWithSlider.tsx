@@ -2,16 +2,16 @@ import React from "react";
 import { useState } from "react";
 import "../../../../styles/anomalyList.css";
 import closeIcon from "../../../../assets/icons/close.svg";
+import extendIcon from "../../../../assets/icons/extend_info.svg";
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../../App";
 import ShipService from "../../../../services/ShipService";
 
-interface ObjectDetailsProps{
+interface ObjectDetailsProps {
   pageChanger: (currentPage: CurrentPage) => void;
 }
 
 const AnomalyTitleWithSlider = (props: ObjectDetailsProps) => {
-
   // State to manage the visibility of the extended container
   const [isExtended, setIsExtended] = useState(false);
   // State to manage the slider value
@@ -19,7 +19,7 @@ const AnomalyTitleWithSlider = (props: ObjectDetailsProps) => {
 
   // Function used to alter the state of whether the slider is shown or not
   const toggleExtended = () => {
-    setIsExtended(prevState => !prevState);
+    setIsExtended((prevState) => !prevState);
   };
 
   // Function to handle the change in slider
@@ -36,25 +36,28 @@ const AnomalyTitleWithSlider = (props: ObjectDetailsProps) => {
           alt="Close"
           id="anomaly-list-close-icon"
           data-testid="anomaly-list-close-icon"
-          onClick={() => props.pageChanger({ currentPage: "none", shownItemId: -1 })}
+          onClick={() =>
+            props.pageChanger({ currentPage: "none", shownItemId: -1 })
+          }
         />
-        <div className="modify-button-container">
-          <button className="modify-button" onClick={toggleExtended}>Threshold</button>
+        <div className="modify-button-container" onClick={toggleExtended}>
+          Threshold
+          <img src={extendIcon} alt="close" />
         </div>
       </Stack>
       {isExtended && (
         <span className="modify-threshold-slide-container">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              className="modify-threshold-slide"
-              value={threshold}
-              onChange={handleSliderChange}
-            />
-            {threshold}
+          <input
+            type="range"
+            min="0"
+            max="100"
+            className="modify-threshold-slide"
+            value={threshold}
+            onChange={handleSliderChange}
+          />
+          {threshold}%
         </span>
-        )}
+      )}
     </Stack>
   );
 };
