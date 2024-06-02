@@ -23,6 +23,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 public class FullPipelineTest extends GenericPipelineTest {
 
+    // Specify as a rule what type of Flink cluster to create. I.e.,
+    // in this case, a simple Flink mini-cluster is created
     @ClassRule
     public static MiniClusterWithClientResource flinkCluster =
             new MiniClusterWithClientResource(
@@ -47,6 +49,9 @@ public class FullPipelineTest extends GenericPipelineTest {
         // Send a message to the raw ships topic
         ExternalAISSignal fakeSignal = new ExternalAISSignal("producer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
         produceToTopic(rawAISTopic, List.of(JsonMapper.toJson(fakeSignal)));
+
+        // Wait 3 seconds for the data to be processed
+        Thread.sleep(3000);
 
         testSignalIDAssignment(fakeSignal);
         testFetchingFromService(fakeSignal);
@@ -84,8 +89,6 @@ public class FullPipelineTest extends GenericPipelineTest {
      * @throws Exception if something fails
      */
     void testFetchingFromService(ExternalAISSignal sentSignal) throws Exception {
-        // Wait 3 seconds for the data to be processed
-        Thread.sleep(3000);
 
         // Get the details of all ships
         List<CurrentShipDetails> allDetails = shipsDataService.getCurrentShipDetails();

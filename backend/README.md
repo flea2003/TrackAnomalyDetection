@@ -31,7 +31,7 @@ bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
 ```
 
-Additionally, the following JVM arguments need to be added (in IntelIJ: Edit configurations -> Modify options -> (Java) Add VM options):
+Additionally, the following JVM arguments need to be added (in IntelliJ: Edit configurations -> Modify options -> (Java) Add VM options):
 ```
 --add-opens java.base/java.util=ALL-UNNAMED
 --add-opens java.base/java.time=ALL-UNNAMED
