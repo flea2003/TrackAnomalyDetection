@@ -40,15 +40,7 @@ public class NotificationsDetectionBuilder {
     public void buildNotifications(KTable<Long, CurrentShipDetails> state) {
         // Construct a stream for computed AnomalyInformation objects
         KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
-        /*
-        // Use the following code for easier testing (and also comment out the first line in the method)
 
-        KStream<Long, String> firstStream = builder.stream(calculatedScoresTopicName);
-        KStream<Long, AnomalyInformation> second = firstStream.mapValues(x -> {try { return AnomalyInformation
-        .fromJson(x); } catch (JsonProcessingException e) {  throw new RuntimeException(e); }  });
-        KStream<Long, AnomalyInformation> third = second.selectKey((key, value) -> value.getId());
-        KStream<Long, CurrentShipDetails> streamOfUpdates = third.mapValues(x -> new CurrentShipDetails(x, null));
-        */
         // Construct the KTable (state that is stored) by aggregating the merged stream
         KafkaJson.serialize(streamOfUpdates)
                 .groupByKey()

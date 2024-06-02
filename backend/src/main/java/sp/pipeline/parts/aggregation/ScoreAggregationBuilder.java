@@ -127,6 +127,7 @@ public class ScoreAggregationBuilder {
                         Materialized
                                 .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.getKafkaStoreName())
                                 .withValueSerde(CurrentShipDetails.getSerde())
+                                .withCachingDisabled()
                 );
 
         // Kafka topic from which Apache Druid will ingest Ship Information data

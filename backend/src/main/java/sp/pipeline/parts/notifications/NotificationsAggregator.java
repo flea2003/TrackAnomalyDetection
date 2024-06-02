@@ -45,43 +45,38 @@ public class NotificationsAggregator {
      *      threshold or below)
      */
     public Notification aggregateSignals(Notification previousNotification, CurrentShipDetails newShipDetails, Long shipID) {
-        // Information that will be returned as the updated result for the state
-        CurrentShipDetails resultingInformation;
+        // If the current ship details does not have any anomaly information, it is useless for notification calculation,
+        // so skip it and wait until at some point, anomaly information comes
+        if (newShipDetails.getCurrentAnomalyInformation() == null)
+            return previousNotification;
 
         // Retrieve current ship details from the previous notification
         CurrentShipDetails previousShipDetails = previousNotification.getCurrentShipDetails();
 
-        // Convert the newly arrived JSON string to the new CurrentShipDetails object
         // Check if the stored previous anomaly object has null fields, which would mean that the backend has just
         // started, and so the most recent notification information should be retrieved
         if (previousShipDetails == null) previousShipDetails = extractFromJPA(newShipDetails, shipID);
 
-        // Extract previous and new anomaly scores to ease up the readability
+        // Extract previous and new anomaly scores
         float previousScore = previousShipDetails.getCurrentAnomalyInformation().getScore();
         float newScore = newShipDetails.getCurrentAnomalyInformation().getScore();
+        boolean previousScoreWasHigh = previousScore >= notificationThreshold;
+        boolean newScoreIsHigh = newScore >= notificationThreshold;
 
-        // Check if the score of the previously stored notification is above the threshold.
-        if (previousScore >= notificationThreshold) {
+        // Information that will be returned as the updated result for the state
+        CurrentShipDetails resultingInformation;
 
-            // If the previously stored score is above the threshold, and also the newly arrived information object
-            // score is above the threshold, then return the old information as the updated state
-            if (newScore >= notificationThreshold) resultingInformation = previousShipDetails;
-
-            // If the previously stored score is above the threshold, and the newly arrived information score is below
-            // the threshold, return that new information as the new state
-            else  resultingInformation = newShipDetails;
-        } else {
-            // If the previously stored score is below the threshold, and also the newly arrived information object
-            // score is below the threshold, then return the old information as the updated state
-            if (newScore < notificationThreshold) resultingInformation = previousShipDetails;
-            else {
-                // If the previously stored score is below the threshold, and the newly arrived information object score is
-                // above the threshold, then return the new information as the updated state, and save the new notification in DB
-                resultingInformation = newShipDetails;
-                notificationService.addNotification(new Notification(newShipDetails));
-            }
+        if (previousScoreWasHigh && newScoreIsHigh)
+            resultingInformation = previousShipDetails;
+        else if (!previousScoreWasHigh && !newScoreIsHigh)
+            resultingInformation = previousShipDetails;
+        else if (previousScoreWasHigh) // && !newScoreIsHigh
+            resultingInformation = newShipDetails;
+        else { // !previousScoreWasHigh && newScoreIsHigh
+            resultingInformation = newShipDetails;
+            notificationService.addNotification(new Notification(newShipDetails));
         }
-        // TODO: in the future, also logic for checking if new TYPES of anomalies emerged will need to be added
+
         return new Notification(resultingInformation);
     }
 
@@ -112,9 +107,7 @@ public class NotificationsAggregator {
             // If there were no notifications saved (meaning that ship has not yet ever became anomalous), set the
             // previous state as the newly arrived one
             currentShipDetails = newShipDetails;
-
             if (currentShipDetails.getCurrentAnomalyInformation().getScore() >= notificationThreshold) {
-
                 // If that newest anomaly score exceeds the threshold, add a new notification to the database
                 // TODO: here also a query to the AIS signals database will have to take place, to retrieve a
                 //  corresponding AIS signal
