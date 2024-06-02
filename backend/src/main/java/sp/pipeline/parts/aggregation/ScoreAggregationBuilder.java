@@ -127,6 +127,7 @@ public class ScoreAggregationBuilder {
                         Materialized
                                 .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.getKafkaStoreName())
                                 .withValueSerde(CurrentShipDetails.getSerde())
+                                .withCachingDisabled()
                 );
         return table;
     }

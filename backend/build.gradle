@@ -24,7 +24,7 @@ plugins {
 
 ext {
 	flinkVersion = '1.19.0'
-	kafkaVersion = '3.7.0'
+	kafkaVersion = '3.6.2'
 	scalaBinaryVersion = '_2.12'
 	slf4jVersion = '1.7.36'
 	log4jVersion = '2.17.1'
@@ -123,12 +123,15 @@ dependencies {
 	implementation group: 'org.apache.flink', name: 'flink-core', version: "${flinkVersion}"
 	implementation group: 'org.apache.flink', name: 'flink-queryable-state-client-java', version: "${flinkVersion}"
 	implementation "org.apache.flink:flink-queryable-state-runtime:${flinkVersion}"
-	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '3.7.0'
+	implementation group: 'org.apache.kafka', name: 'kafka-clients', version: "${kafkaVersion}"
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
 
 	// For JPA:
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.h2database:h2'
+
+	// For testing kafka
+	testImplementation 'org.springframework.kafka:spring-kafka-test:3.1.0'
 
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
