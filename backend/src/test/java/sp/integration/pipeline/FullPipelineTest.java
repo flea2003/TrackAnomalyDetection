@@ -5,7 +5,6 @@ import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import sp.dtos.ExternalAISSignal;
-import sp.exceptions.NotificationNotFoundException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
