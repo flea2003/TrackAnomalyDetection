@@ -72,7 +72,6 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Speed is too big: 840.06 km/min is faster than threshold of 55.5 km/min.
                         Speed is inaccurate: the approximated speed of 840.06 km/min is different from reported speed of 22 km/min by more than allowed margin of 10 km/min.
                         """
         );
@@ -133,6 +132,7 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
+                        Speed is too big: 60 km/min is faster than threshold of 55.5 km/min.
                         Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 60 km/min by more than allowed margin of 10 km/min.
                         Acceleration is too big: 50 km/min^2 is bigger than threshold of 50 km/min^2.
                         """
@@ -141,6 +141,7 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo(
                 """
+                        Speed is too big: 110 km/min is faster than threshold of 55.5 km/min.
                         Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 110 km/min by more than allowed margin of 10 km/min.
                         """
         );
