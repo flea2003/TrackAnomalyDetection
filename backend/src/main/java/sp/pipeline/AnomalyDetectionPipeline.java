@@ -15,6 +15,7 @@ import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
+import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
 
 @Service
@@ -29,6 +30,7 @@ public class AnomalyDetectionPipeline {
     private final ScoreCalculationBuilder scoreCalculationBuilder;
     private final ScoreAggregationBuilder scoreAggregationBuilder;
     private final NotificationsDetectionBuilder notificationsDetectionBuilder;
+    private final WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
     /**
      * Constructor for the AnomalyDetectionPipeline class.
@@ -44,13 +46,15 @@ public class AnomalyDetectionPipeline {
                                     IdAssignmentBuilder idAssignmentBuilder,
                                     ScoreCalculationBuilder scoreCalculationBuilder,
                                     ScoreAggregationBuilder scoreAggregationBuilder,
-                                    NotificationsDetectionBuilder notificationsDetectionBuilder) {
+                                    NotificationsDetectionBuilder notificationsDetectionBuilder,
+                                    WebSocketBroadcasterBuilder webSocketBroadcasterBuilder) {
         this.streamUtils = streamUtils;
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
         this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+        this.webSocketBroadcasterBuilder = webSocketBroadcasterBuilder;
         buildPipeline();
     }
 
@@ -71,7 +75,8 @@ public class AnomalyDetectionPipeline {
             ScoreCalculationBuilder scoreCalculationBuilder,
             ScoreAggregationBuilder scoreAggregationBuilder,
             NotificationsDetectionBuilder notificationsDetectionBuilder,
-            StreamExecutionEnvironment flinkEnv
+            StreamExecutionEnvironment flinkEnv,
+            WebSocketBroadcasterBuilder webSocketBroadcasterBuilder
     ) {
         this.streamUtils = streamUtils;
         this.idAssignmentBuilder = idAssignmentBuilder;
@@ -79,6 +84,7 @@ public class AnomalyDetectionPipeline {
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
         this.flinkEnv = flinkEnv;
+        this.webSocketBroadcasterBuilder = webSocketBroadcasterBuilder;
         buildPipeline();
     }
 
@@ -107,6 +113,9 @@ public class AnomalyDetectionPipeline {
 
         // Build the pipeline part that aggregates the scores (Kafka Streams)
         this.state = scoreAggregationBuilder.buildScoreAggregationPart(builder);
+
+        // Build the pipeline part that broadcasts ship details via websockets
+        this.webSocketBroadcasterBuilder.enableBroadcasting(this.state);
 
         // Build the pipeline part that produces notifications (Kafka Streams)
         notificationsDetectionBuilder.buildNotifications(this.state);

@@ -46,6 +46,8 @@ class AnomalyDetectionPipelineTest {
         // Mock the notification service class (to mock the DB)
         notificationService = mock(NotificationService.class);
 
+        // Mock the web
+
         // Create the configuration
         config = new PipelineConfiguration("kafka-connection.properties");
 
