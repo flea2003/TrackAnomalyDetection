@@ -8,6 +8,8 @@ import closeIcon from "../../../../assets/icons/close.svg";
 
 import "../../../../styles/common.css";
 import "../../../../styles/anomalyList.css";
+import AnomalyTitleWithSlider from "./AnomalyTitleWithSlider";
+import ShipThresholdModifier from "./AnomalyTitleWithSlider";
 
 interface AnomalyListProps {
   ships: ShipDetails[];
@@ -42,15 +44,7 @@ function AnomalyList({
 
   return (
     <Stack id="anomaly-list-container" data-testid="anomaly-list-container">
-      <Stack id="anomaly-list-title-container" direction="row">
-        <img
-          src={closeIcon}
-          alt="Close"
-          id="anomaly-list-close-icon"
-          data-testid="anomaly-list-close-icon"
-          onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
-        />
-      </Stack>
+      <ShipThresholdModifier pageChanger={pageChanger}/>
       <List
         id="anomaly-list-internal-container"
         style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}

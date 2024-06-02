@@ -1,7 +1,7 @@
 import { CurrentPage } from "../../../App";
 import AnomalyList from "./AnomalyList/AnomalyList";
 import ObjectDetails from "./ObjectDetails/ObjectDetails";
-import React, { JSX } from "react";
+import React, { JSX, useState } from "react";
 import ShipDetails from "../../../model/ShipDetails";
 import ErrorList from "./ErrorNotifications/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
