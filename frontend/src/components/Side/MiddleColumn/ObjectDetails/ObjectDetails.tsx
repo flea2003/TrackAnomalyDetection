@@ -8,7 +8,6 @@ import "../../../../styles/common.css";
 import "../../../../styles/objectDetails.css";
 import returnIcon from "../../../../assets/icons/back.svg";
 import { CurrentPage } from "../../../../App";
-import ErrorNotificationService from "../../../../services/ErrorNotificationService";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
