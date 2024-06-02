@@ -1,6 +1,7 @@
 package sp.model;
 
 import lombok.*;
+import java.io.Serializable;
 
 @Getter
 @Builder
@@ -9,7 +10,7 @@ import lombok.*;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class ShipInformation {
+public class ShipInformation implements Serializable {
     private long shipId;
     private AnomalyInformation anomalyInformation;
     private AISSignal aisSignal;
