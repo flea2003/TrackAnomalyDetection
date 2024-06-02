@@ -134,7 +134,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
               handleMouseOutShipIcon(e, setHoverInfo);
               pageChanger({
                 currentPage: "objectDetails",
-                shownShipId: ship.id,
+                shownItemId: ship.id,
               });
             })
             .on("mouseover", (e) => {

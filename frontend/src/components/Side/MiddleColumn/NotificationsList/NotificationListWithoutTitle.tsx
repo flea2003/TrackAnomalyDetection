@@ -14,6 +14,16 @@ interface NotificationListProps {
   mapCenteringFun: (details: ShipDetails) => void;
 }
 
+/**
+ * Component that stores only the scrollable list of all notification entries.
+ * It is used by both object details and notification list components.
+ *
+ * @param notifications a list of all notifications that are displayed
+ * @param ships a list of all ships on the map
+ * @param pageChanger page changer function
+ * @param mapCenteringFun map centering function
+ * @constructor
+ */
 function NotificationListWithoutTitle({
   notifications,
   ships,

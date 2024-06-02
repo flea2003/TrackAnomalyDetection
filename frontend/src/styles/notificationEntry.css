@@ -1,13 +1,15 @@
 .notification-list-entry-not-read, .notification-list-entry-read {
-    width: 95%;
+    width: 100%;
     height: 45px;
-    background: orange;
     font-weight: bold;
-
+/*
     margin-top: 1px;
     margin-bottom: 1px;
+*/
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
 
-    border: 1px solid black;
     padding: 2px;
 
     display: flex;
@@ -15,12 +17,11 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    background: lightgray;
 }
 
 .notification-list-entry-read {
-    background: lightgray;
     font-weight: normal;
-
 }
 
 .notification-list-entry-read:hover, .notification-list-entry-not-read:hover {
@@ -28,7 +29,7 @@
     transform: scale(1.01);
 }
 
-.notification-list-entry-icon-id-container {
+.notification-list-ship-entry-icon-id-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -42,8 +43,8 @@
 
 .notification-list-entry-date {
     font-size: 0.6em;
-    width: 60%;
     text-align: center;
+    padding-right: 3px;
 }
 
 .notification-list-entry-id {
@@ -52,7 +53,7 @@
     text-align:center;
 }
 
-.notification-list-entry-icon-container {
+.notification-list-ship-entry-icon-container {
     font-size: var(--notification-list-entry-font-size);
     height: 100%;
     width: var(--notification-list-entry-icon-container-width);
@@ -62,7 +63,11 @@
     padding: 3px;
 }
 
-.notification-list-entry-icon{
+.notification-list-ship-entry-icon{
     height: 25px;
     width: 25px;
+}
+
+.notification-list-bell-entry-icon {
+    margin-left: 6px;
 }

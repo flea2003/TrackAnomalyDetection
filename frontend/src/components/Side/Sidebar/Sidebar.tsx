@@ -2,15 +2,15 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../App";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
-
-import "../../../styles/common.css";
-import "../../../styles/sidebar.css";
-
 import shipIcon from "../../../assets/icons/ship.png";
-import bellIcon from "../../../assets/icons/bell-notification.svg";
+import bellIconNotRead from "../../../assets/icons/regular-notifications/bell-notification-not-read.svg";
+import bellIconRead from "../../../assets/icons/regular-notifications/bell-notification-read.svg";
 import settingsIcon from "../../../assets/icons/settings.svg";
 import bugIcon from "../../../assets/icons/bug.svg";
 import { NotificationService } from "../../../services/NotificationService";
+
+import "../../../styles/common.css";
+import "../../../styles/sidebar.css";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -32,13 +32,13 @@ function Sidebar({ pageChanger }: SidebarProps) {
 
   // Define the click handlers for the icons
   const onShipIconClicked = () =>
-    pageChanger({ currentPage: "anomalyList", shownShipId: -1 });
+    pageChanger({ currentPage: "anomalyList", shownItemId: -1 });
   const onBellIconClicked = () =>
-    pageChanger({ currentPage: "notificationList", shownShipId: -1 });
+    pageChanger({ currentPage: "notificationList", shownItemId: -1 });
   const onSettingsIconClicked = () =>
-    pageChanger({ currentPage: "settings", shownShipId: -1 });
+    pageChanger({ currentPage: "settings", shownItemId: -1 });
   const onBugIconClicked = () =>
-    pageChanger({ currentPage: "errors", shownShipId: -1 });
+    pageChanger({ currentPage: "errors", shownItemId: -1 });
 
   return (
     <Stack id="sidebar" data-testid="sidebar">
@@ -51,10 +51,14 @@ function Sidebar({ pageChanger }: SidebarProps) {
       </span>
       <span
         data-testid="sidebar-bell-icon"
-        className={getNotificationsIconClassName()}
+        className="sidebar-bell-icon"
         onClick={onBellIconClicked}
       >
-        <img src={bellIcon} className="sidebar-icon" alt={bellIconAlt} />
+        <img
+          src={getNotificationsBellType().toString()}
+          className="sidebar-icon"
+          alt={bellIconAlt}
+        />
       </span>
       <span
         data-testid="sidebar-settings-icon"
@@ -95,11 +99,11 @@ function getBugIconClassName() {
  * Changes the style of the notification bell background based on whether
  * there are any unread notifications
  */
-function getNotificationsIconClassName() {
+function getNotificationsBellType() {
   if (NotificationService.areAllRead()) {
-    return "sidebar-bell-icon-all-read";
+    return bellIconRead;
   }
-  return "sidebar-bell-icon-not-all-read";
+  return bellIconNotRead;
 }
 
 export default Sidebar;

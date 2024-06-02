@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    align-items: center;
     padding: 3px;
 }
 
@@ -53,6 +54,7 @@
     height: 10vh;
     flex-grow: 1;
     margin-top: 3px;
+    width: 90%;
 }
 
 .object-details-notification-title {

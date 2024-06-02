@@ -4,11 +4,12 @@ import closeIcon from "../../../../assets/icons/close.svg";
 import React from "react";
 import ShipNotification from "../../../../model/ShipNotification";
 import ShipDetails from "../../../../model/ShipDetails";
+import { NotificationService } from "../../../../services/NotificationService";
+import NotificationListWithoutTitle from "./NotificationListWithoutTitle";
+
 import "../../../../styles/common.css";
 import "../../../../styles/notificationList.css";
 import "../../../../styles/notificationEntry.css";
-import { NotificationService } from "../../../../services/NotificationService";
-import NotificationListWithoutTitle from "./NotificationListWithoutTitle";
 
 interface NotificationListProps {
   notifications: ShipNotification[];
@@ -17,20 +18,30 @@ interface NotificationListProps {
   mapCenteringFun: (details: ShipDetails) => void;
 }
 
+/**
+ * Visual component for scrollable list of notifications that were created, together
+ * with all other information (title, mark-all-as-read button, likely threshold choice), all
+ * stored in the middle column of the design.
+ *
+ * @param notifications a list of all notifications extracted from the database
+ * @param ships a list of all ships and their details. Needed for other functions.
+ * @param pageChanger page changer
+ * @param mapCenteringFun map centering function
+ * @constructor
+ */
 function NotificationList({
   notifications,
   ships,
   pageChanger,
   mapCenteringFun,
 }: NotificationListProps) {
-  // TODO: perhaps refactor all to separate functions!
   const image = (
     <img
       src={closeIcon}
       alt="Close"
       id="notification-list-close-icon"
       data-testid="notification-list-close-icon"
-      onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
+      onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
     />
   );
 
@@ -51,7 +62,7 @@ function NotificationList({
               );
             }}
           >
-            Mark read
+            Mark all as read
           </button>
         </div>
       </Stack>

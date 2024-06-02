@@ -16,7 +16,7 @@ import { NotificationService } from "./services/NotificationService";
  */
 export interface CurrentPage {
   currentPage: string;
-  shownShipId: number;
+  shownItemId: number;
 }
 
 function App() {
@@ -35,7 +35,7 @@ function App() {
   // Create state for current page
   const [currentPage, setCurrentPage] = useState({
     currentPage: "none",
-    shownShipId: -1,
+    shownItemId: -1,
   } as CurrentPage);
 
   // Create function that is called when the current page needs to be changed
@@ -46,7 +46,7 @@ function App() {
       !areShipDetailsOpened(currentPage)
     ) {
       // If we clicked the same icon for the second time
-      setCurrentPage({ currentPage: "none", shownShipId: -1 });
+      setCurrentPage({ currentPage: "none", shownItemId: -1 });
     } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);
@@ -103,7 +103,7 @@ function App() {
 function areShipDetailsOpened(currentPage: CurrentPage) {
   return (
     currentPage.currentPage === "objectDetails" &&
-    currentPage.shownShipId !== -1
+    currentPage.shownItemId !== -1
   );
 }
 

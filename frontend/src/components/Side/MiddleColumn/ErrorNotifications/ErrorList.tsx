@@ -4,12 +4,12 @@ import ErrorListEntry from "./ErrorListEntry";
 import List from "@mui/material/List";
 import { CurrentPage } from "../../../../App";
 import closeIcon from "../../../../assets/icons/close.svg";
-
-import "../../../../styles/common.css";
-import "../../../../styles/errorList.css";
 import ErrorNotificationService, {
   ErrorNotification,
 } from "../../../../services/ErrorNotificationService";
+
+import "../../../../styles/common.css";
+import "../../../../styles/errorList.css";
 
 interface ErrorListProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -31,7 +31,7 @@ function ErrorList({ pageChanger }: ErrorListProps) {
           alt="Close"
           id="error-list-close-icon"
           data-testid="error-list-close-icon"
-          onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
+          onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
         <div id="error-list-name-text">Error list</div>
         <button
@@ -39,7 +39,7 @@ function ErrorList({ pageChanger }: ErrorListProps) {
           data-testid="error-list-mark-all-button"
           onClick={() => ErrorNotificationService.markAllAsRead()}
         >
-          Mark read
+          Mark all as read
         </button>
       </Stack>
       <List

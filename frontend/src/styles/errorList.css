@@ -38,6 +38,7 @@
     padding-left: 7px;
     padding-right: 7px;
     cursor: pointer;
+    font-size: 0.8em;
 }
 
 #error-list-mark-all-button:hover {

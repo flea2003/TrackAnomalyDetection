@@ -3,11 +3,11 @@ import React, { JSX } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import Sidebar from "./Sidebar/Sidebar";
 import MiddleColumn from "./MiddleColumn/MiddleColumn";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
+import ShipNotification from "../../model/ShipNotification";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
-import ErrorNotificationService from "../../services/ErrorNotificationService";
-import ShipNotification from "../../model/ShipNotification";
 
 interface SideProps {
   currentPage: CurrentPage;

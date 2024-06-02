@@ -9,11 +9,7 @@ class TimeUtilities {
    */
   static computeTimeDifference(timestamp: string) {
     const signalTime = new Date(timestamp);
-    if (Number.isNaN(signalTime.valueOf())) {
-      ErrorNotificationService.addError("Invalid timestamp format");
-      return "Not available";
-    }
-
+    if (!this.isDateValid(signalTime)) return "Not available";
     const timeDifference =
       TimeUtilities.getCurrentTime().getTime() - signalTime.getTime();
     if (timeDifference <= 0) {
@@ -38,10 +34,7 @@ class TimeUtilities {
    */
   static reformatTimestamp(timestamp: string) {
     const signalTime = new Date(timestamp);
-    if (Number.isNaN(signalTime.valueOf())) {
-      ErrorNotificationService.addError("Invalid timestamp format");
-      return "Not available";
-    }
+    if (!this.isDateValid(signalTime)) return "Not available";
     const year = this.prependZero(signalTime.getUTCFullYear());
     const month = this.prependZero(signalTime.getUTCMonth() + 1);
     const day = this.prependZero(signalTime.getUTCDate());
@@ -66,6 +59,19 @@ class TimeUtilities {
    */
   static getCurrentTime = () => {
     return new Date();
+  };
+
+  /**
+   * Method that checks if the date is valid
+   *
+   * @param signalTime date that is being checked
+   */
+  static isDateValid = (signalTime: Date) => {
+    if (Number.isNaN(signalTime.valueOf())) {
+      ErrorNotificationService.addError("Invalid timestamp format");
+      return false;
+    }
+    return true;
   };
 }
 export default TimeUtilities;

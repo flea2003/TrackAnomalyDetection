@@ -48,7 +48,7 @@ function AnomalyList({
           alt="Close"
           id="anomaly-list-close-icon"
           data-testid="anomaly-list-close-icon"
-          onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
+          onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
       </Stack>
       <List

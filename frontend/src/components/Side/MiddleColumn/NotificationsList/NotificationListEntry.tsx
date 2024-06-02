@@ -4,11 +4,14 @@ import ShipDetails from "../../../../model/ShipDetails";
 import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
 import shipIcon from "../../../../assets/icons/ship.png";
+import bellIconNotRead from "../../../../assets/icons/regular-notifications/bell-notification-not-read.svg";
+import bellIconRead from "../../../../assets/icons/regular-notifications/bell-notification-read.svg";
+import { NotificationService } from "../../../../services/NotificationService";
+import TimeUtilities from "../../../../utils/TimeUtilities";
+
 import "../../../../styles/common.css";
 import "../../../../styles/notificationList.css";
 import "../../../../styles/notificationEntry.css";
-import { NotificationService } from "../../../../services/NotificationService";
-import TimeUtilities from "../../../../utils/TimeUtilities";
 
 interface NotificationEntryProps {
   notification: ShipNotification;
@@ -19,11 +22,17 @@ interface NotificationEntryProps {
 
 /**
  * This component corresponds to a single entry in the Notifications List.
- * It displays the short description of the notification that it ccorresponds
+ * It displays the short description of the notification that it corresponds
  * to and also allows to get more detailed information by clicking on it. The
  * object to render is passed as a prop.
+ *
+ * @param notification notification whose details are displayed
+ * @param shipDetails corresponding ship details for that notification
+ * @param pageChanger page changer function
+ * @param mapCenteringFun map centering function
+ * @constructor
  */
-function ShipNotificationEntry({
+function NotificationListEntry({
   notification,
   shipDetails,
   pageChanger,
@@ -33,8 +42,6 @@ function ShipNotificationEntry({
   const readStatusClassName = notification.isRead
     ? "notification-list-entry-read"
     : "notification-list-entry-not-read";
-
-  //console.log(readStatusClassName)
 
   const id = notification.id;
   const shipAnomalyScore = notification.shipDetails.anomalyScore;
@@ -46,7 +53,7 @@ function ShipNotificationEntry({
   // Once the 'read all' button is clicked on, all notifications should be set
   // as read in the backend
   const onClick = () => {
-    pageChanger({ currentPage: "notificationDetails", shownShipId: id });
+    pageChanger({ currentPage: "notificationDetails", shownItemId: id });
     mapCenteringFun(shipDetails);
     NotificationService.queryBackendToMarkANotificationAsRead(notification);
   };
@@ -58,20 +65,40 @@ function ShipNotificationEntry({
       spacing={0}
       onClick={onClick}
     >
-      <div className="notification-list-entry-icon-id-container">
-        <span className="notification-list-entry-icon-container">
+      <img
+        src={getNotificationsBellType(notification.isRead).toString()}
+        className="notification-list-bell-entry-icon"
+        alt={shipIconAltText}
+      />
+      <div className="notification-list-ship-entry-icon-id-container">
+        <span className="notification-list-ship-entry-icon-container">
           <img
             src={shipIcon}
-            className="notification-list-entry-icon"
+            className="notification-list-ship-entry-icon"
             alt={shipIconAltText}
           />
         </span>
         <span className="notification-list-entry-id">#{shipId}</span>
       </div>
-      <span className="notification-list-entry-score">{shipAnomalyScore}%</span>
+      {
+        <span className="notification-list-entry-score">
+          {shipAnomalyScore}%
+        </span>
+      }
       <span className="notification-list-entry-date">{date}</span>
     </Stack>
   );
 }
 
-export default ShipNotificationEntry;
+/**
+ * Changes the style of the notification bell background based on whether
+ * there are any unread notifications
+ */
+function getNotificationsBellType(readStatus: boolean) {
+  if (readStatus) {
+    return bellIconRead;
+  }
+  return bellIconNotRead;
+}
+
+export default NotificationListEntry;

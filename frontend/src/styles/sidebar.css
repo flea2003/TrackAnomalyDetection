@@ -1,6 +1,6 @@
 .sidebar-entry, .sidebar-bug-icon-all-read,
-.sidebar-bug-icon-not-all-read, .sidebar-bell-icon-all-read,
-.sidebar-bell-icon-not-all-read {
+.sidebar-bug-icon-not-all-read, .sidebar-bell-icon
+{
     width: 100%;
     height: 50px;
     border-bottom: 1px solid black;
@@ -16,16 +16,12 @@
 }
 
 .sidebar-entry:hover, .sidebar-bug-icon-all-read:hover,
-.sidebar-bug-icon-not-all-read:hover, .sidebar-bell-icon-all-read:hover,
-.sidebar-bell-icon-not-all-read:hover  {
+.sidebar-bug-icon-not-all-read:hover, .sidebar-bell-icon:hover
+{
     background-color: lightblue;
 }
 
 .sidebar-bug-icon-not-all-read {
     background-color: indianred;
-}
-
-.sidebar-bell-icon-not-all-read {
-    background-color: orange;
 }
 

@@ -39,9 +39,7 @@ class HttpSender {
         body: JSON.stringify({}),
       });
       if (!response.ok) {
-        ErrorNotificationService.addError(
-          "Error while marking notification as read",
-        );
+        ErrorNotificationService.addWarning("Error while fetching " + endpoint);
       }
     } catch (error) {
       if (error instanceof Error)
