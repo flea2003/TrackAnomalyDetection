@@ -37,7 +37,7 @@ import static org.powermock.api.mockito.PowerMockito.spy;
  * The following class contains methods for running an integration test.
  * It handles starting and destroying the Kafka/Flink cluster in between tests (the
  * class has a setupPipelineComponentsAndRun() method for that and @BeforeEach and
- * an @AfterEach for loading config and destroying the cluster.
+ * an @AfterEach for loading config and destroying the cluster).
  * It also has 2 helper methods for producing to a Kafka topic and consuming from it.
  * Integration test classes should inherit from this class to simplify testing.
  */
