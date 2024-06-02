@@ -55,7 +55,9 @@ class ShipDetails {
       { type: "Explanation", value: this.explanation },
       {
         type: "Last AIS signal",
-        value: TimeUtilities.computeTimeDifference(this.correspondingTimestamp) + " ago",
+        value:
+          TimeUtilities.computeTimeDifference(this.correspondingTimestamp) +
+          " ago",
       },
       {
         type: "Highest Recorded Anomaly Score",
