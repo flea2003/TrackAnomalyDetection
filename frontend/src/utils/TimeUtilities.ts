@@ -10,14 +10,14 @@ class TimeUtilities {
   static computeTimeDifference(timestamp: string) {
     const signalTime = new Date(timestamp);
     if (Number.isNaN(signalTime.valueOf())) {
-      ErrorNotificationService.addError("Invalid timestamp format");
+      ErrorNotificationService.addWarning("Invalid timestamp format");
       return "Not available";
     }
 
     const timeDifference =
       TimeUtilities.getCurrentTime().getTime() - signalTime.getTime();
     if (timeDifference <= 0) {
-      ErrorNotificationService.addError("Invalid timestamp value");
+      ErrorNotificationService.addWarning("Invalid timestamp value");
       return "Not available";
     }
 
