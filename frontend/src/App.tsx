@@ -66,28 +66,32 @@ function App() {
       debug: function (str) {
         console.log(str);
       },
-      reconnectDelay: 5000,
+      // Try to reconnect to the backend broker after 60 seconds.
+      reconnectDelay: 60000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
 
     stompClient.onConnect = function (frame) {
-      console.log("Connected: " + frame);
       stompClient.subscribe("/topic/details", function (message) {
         try {
           const apiResponse = JSON.parse(message.body) as APIResponseItem;
           const shipDetails =
             ShipService.extractCurrentShipDetails(apiResponse);
-          console.log(shipDetails);
           setShips((prevShips) => {
             return new Map(prevShips).set(shipDetails.id, shipDetails);
           });
         } catch (error) {
           ErrorNotificationService.addError("Data fetching error");
+          setShips((prevMap) => {return new Map()});
         }
       });
     };
 
+    /**
+     * Given that the backend closes the Websocket connection, report it.
+     * @param closeEvent the caught event
+     */
     stompClient.onWebSocketClose = function (closeEvent) {
       ErrorNotificationService.addError("Websocket connection error");
       setShips((prevMap) => {
@@ -95,9 +99,11 @@ function App() {
       });
     };
 
-    // Leveraging the beforeConnect hook we fetch the latest state of the
-    // backend table storing ship details before opening a WebSocket connection
-    // with the backend STOMP broker
+    /**
+     * Leveraging the beforeConnect hook we fetch the latest state of the
+     * backend table storing ship details before opening a WebSocket connection
+     * with the backend STOMP broker
+     */
     stompClient.beforeConnect = async () => {
       ShipService.queryBackendForShipsArray().then(
         (shipsArray: ShipDetails[]) => {
@@ -111,7 +117,7 @@ function App() {
         "Websocket broker error: " + frame.headers["message"],
       );
     };
-
+    // Initiate the connection with the backend-hosted STOMP broker
     stompClient.activate();
 
     return () => {
