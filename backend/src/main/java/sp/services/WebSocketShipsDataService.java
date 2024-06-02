@@ -7,22 +7,32 @@ import sp.model.CurrentShipDetails;
 import sp.utils.WebSocketSessionManager;
 
 @Service
-public class WebSocketShipDataService {
+public class WebSocketShipsDataService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final WebSocketSessionManager webSocketSessionManager;
 
     @Autowired
-    public WebSocketShipDataService(SimpMessagingTemplate simpMessagingTemplate,
-                                    WebSocketSessionManager webSocketSessionManager) {
+    public WebSocketShipsDataService(SimpMessagingTemplate simpMessagingTemplate,
+                                     WebSocketSessionManager webSocketSessionManager) {
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.webSocketSessionManager = webSocketSessionManager;
     }
 
+    /**
+     * Leveraging the SIMP template, broadcast the new CurrentShipDetails payload.
+     * The payload is sent to all the subscribed clients.
+     *
+     * @param payload latest CurrentShipDetails instance
+     */
     public void sendCurrentShipDetails(CurrentShipDetails payload) {
-        System.out.println("sending message");
         this.simpMessagingTemplate.convertAndSend("/topic/details", payload);
     }
 
+    /**
+     * Utility method for checking the existence of connected frontend clients.
+     *
+     * @return boolean flag indicating presence/absence of WebSocket connections
+     */
     public boolean checkForOpenConnections() {
         return this.webSocketSessionManager.checkForOpenConnections();
     }

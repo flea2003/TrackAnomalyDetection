@@ -16,12 +16,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
      * Expose the STOMP endpoint over WebSocket.
-     * @param registry - STOMP endpoints managing entity
+     *
+     * @param registry STOMP endpoints managing entity
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/details").
-                setAllowedOriginPatterns("*");
+        registry.addEndpoint("/details")
+                .setAllowedOriginPatterns("*");
     }
 
 

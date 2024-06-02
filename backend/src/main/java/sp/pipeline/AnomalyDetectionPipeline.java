@@ -35,8 +35,7 @@ import sp.model.ShipInformation;
 import sp.pipeline.aggregators.CurrentStateAggregator;
 import sp.pipeline.aggregators.NotificationsAggregator;
 import sp.pipeline.scorecalculators.ScoreCalculationStrategy;
-import sp.services.WebSocketShipDataService;
-
+import sp.services.WebSocketShipsDataService;
 import java.util.Objects;
 
 @Service
@@ -58,7 +57,7 @@ public class AnomalyDetectionPipeline {
     private final StreamUtils streamUtils;
     private final CurrentStateAggregator currentStateAggregator;
     private final NotificationsAggregator notificationsAggregator;
-    private final WebSocketShipDataService webSocketShipDataService;
+    private final WebSocketShipsDataService webSocketShipDataService;
 
     private StreamExecutionEnvironment flinkEnv;
     private KafkaStreams kafkaStreams;
@@ -74,7 +73,7 @@ public class AnomalyDetectionPipeline {
     public AnomalyDetectionPipeline(@Qualifier("simpleScoreCalculator")ScoreCalculationStrategy scoreCalculationStrategy,
                                     StreamUtils streamUtils, CurrentStateAggregator currentStateAggregator,
                                     NotificationsAggregator notificationsAggregator,
-                                    WebSocketShipDataService webSocketShipDataService)
+                                    WebSocketShipsDataService webSocketShipDataService)
         throws IOException {
 
         this.scoreCalculationStrategy = scoreCalculationStrategy;
@@ -235,8 +234,6 @@ public class AnomalyDetectionPipeline {
                                         currentStateAggregator.aggregateSignals(aggregatedShipDetails, valueJson);
                                 // Publish the new CurrentShipDetails state to the clients
                                 // Message is forwarded to the client side only if an WebSocket connection is open
-                                System.out.println("received instance");
-                                System.out.println("connection status: " + this.webSocketShipDataService.checkForOpenConnections());
                                 if (this.webSocketShipDataService.checkForOpenConnections()) {
                                     this.webSocketShipDataService.sendCurrentShipDetails(newShipState);
                                 }

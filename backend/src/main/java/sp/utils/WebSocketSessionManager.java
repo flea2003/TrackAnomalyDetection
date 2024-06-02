@@ -1,13 +1,13 @@
 package sp.utils;
 
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class WebSocketSessionManager {
-    private List<String> activeSessions = Collections.synchronizedList(new ArrayList<>());
+    private Set<String> activeSessions = Collections.synchronizedSet(new HashSet<>());
 
 
     public void addSession(String sessionId) {

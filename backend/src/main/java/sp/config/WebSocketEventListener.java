@@ -29,6 +29,11 @@ public class WebSocketEventListener implements ApplicationListener<ApplicationEv
         }
     }
 
+    /**
+     * Unregister client (session) upon a detected disconnection event.
+     *
+     * @param event recorded ApplicationEvent instance
+     */
     private void handleClientDisconnectEvent(ApplicationEvent event) {
         SessionDisconnectEvent disconnectEvent = (SessionDisconnectEvent) event;
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(disconnectEvent.getMessage());
@@ -38,6 +43,11 @@ public class WebSocketEventListener implements ApplicationListener<ApplicationEv
         }
     }
 
+    /**
+     * Register new client (session) upon a detected subscription request.
+     *
+     * @param event recorded ApplicationEvent instance
+     */
     private void handleClientSubscriptionEvent(ApplicationEvent event) {
         SessionSubscribeEvent subEvent = (SessionSubscribeEvent) event;
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(subEvent.getMessage());
