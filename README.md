@@ -17,7 +17,7 @@ for much more information:
 - [frontend](frontend/README.md)
 - [simulator](simulator/README.md)
 
-Additionally, there is a [stress-simulator](stress-simulator) Java project that acts as a manually-runnable test for the backend. Starting it is as simple as running the
+Additionally, there is a [stress-tester](stress-tester) Java project that acts as a manually-runnable test for the backend. Starting it is as simple as running the
 Gradle project. It is technically for internal usage only.
 
 ### Building the project

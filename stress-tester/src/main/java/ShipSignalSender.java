@@ -46,7 +46,7 @@ public class ShipSignalSender {
         float course = (float) (Math.random() * 360);
         float heading = (float) (Math.random() * 360);
         currentSignal = new AISSignal(
-                "stress-simulator",
+                "stress-tester",
                 "ship" + index,
                 speed,
                 longitude,
@@ -70,7 +70,7 @@ public class ShipSignalSender {
         float course = currentSignal.getCourse() + (float) (Math.random() * 10 - 5);
         float heading = currentSignal.getHeading() + (float) (Math.random() * 10 - 5);
         currentSignal = new AISSignal(
-                "stress-simulator",
+                "stress-tester",
                 "ship" + index,
                 speed,
                 longitude,
