@@ -11,15 +11,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-@ToString
 @Getter
 @Setter
 public class Notification implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long shipID;
+    private boolean isRead;
 
     @Column(length = 2048)
     private final CurrentShipDetails currentShipDetails;
@@ -32,6 +31,7 @@ public class Notification implements Serializable {
      */
     public Notification(CurrentShipDetails currentShipDetails) {
         this.currentShipDetails = currentShipDetails;
+        this.isRead = false;
         this.shipID = currentShipDetails.getCurrentAnomalyInformation().getId();
     }
 

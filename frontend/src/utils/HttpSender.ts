@@ -16,7 +16,7 @@ class HttpSender {
     try {
       const response = await fetch(this.url + endpoint);
       if (!response.ok) {
-        ErrorNotificationService.addError("Internal server error");
+        ErrorNotificationService.addError("Error while fetching");
       }
       return await response.json();
     } catch (error) {
@@ -26,6 +26,26 @@ class HttpSender {
         );
 
       return null;
+    }
+  }
+
+  static async put(endpoint: string): Promise<void> {
+    try {
+      const response = await fetch(this.url + endpoint, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+      if (!response.ok) {
+        ErrorNotificationService.addWarning("Error while fetching " + endpoint);
+      }
+    } catch (error) {
+      if (error instanceof Error)
+        ErrorNotificationService.addError(
+          "Error while fetching " + endpoint + ": " + error.message,
+        );
     }
   }
 }

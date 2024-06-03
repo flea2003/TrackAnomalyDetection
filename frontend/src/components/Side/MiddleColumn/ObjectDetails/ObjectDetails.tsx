@@ -3,16 +3,20 @@ import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import ShipDetails from "../../../../model/ShipDetails";
 import ObjectDetailsEntry from "./ObjectDetailsEntry";
+import returnIcon from "../../../../assets/icons/back.svg";
+import { CurrentPage } from "../../../../App";
+import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
+import ShipNotification from "../../../../model/ShipNotification";
 
 import "../../../../styles/common.css";
 import "../../../../styles/objectDetails.css";
-import returnIcon from "../../../../assets/icons/back.svg";
-import { CurrentPage } from "../../../../App";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
-  shipId: number;
+  notifications: ShipNotification[];
+  mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
+  shipId: number;
 }
 
 /**
@@ -29,6 +33,9 @@ function ObjectDetails(props: ObjectDetailsProps) {
 
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = allShips.find((ship) => ship.id === shipID);
+  const shipNotifications = props.notifications.filter(
+    (x) => x.shipDetails.id === shipID,
+  );
 
   if (ship === undefined) {
     return shipNotFoundElement();
@@ -38,14 +45,20 @@ function ObjectDetails(props: ObjectDetailsProps) {
     <Stack id="object-details-container">
       <div className="object-details-title-container">
         {getReturnIcon(pageChanger)}
-        <span className="object-details-title">Score {ship.anomalyScore}%</span>
+        <span className="object-details-title">Ship #{ship.id}</span>
       </div>
-      <List
-        style={{ maxHeight: "100%", overflow: "auto" }}
-        className="object-details-list"
-      >
+      <List className="object-details-properties-list">
         {getPropertyElements(ship)}
       </List>
+      <Stack className="object-details-notification-list">
+        <div className="object-details-notification-title">Notifications</div>
+        <NotificationListWithoutTitle
+          notifications={shipNotifications}
+          ships={props.ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={props.mapCenteringFun}
+        />
+      </Stack>
     </Stack>
   );
 }
@@ -77,7 +90,7 @@ function getPropertyElements(ship: ShipDetails) {
 
 function getReturnIcon(pageChanger: (currentPage: CurrentPage) => void) {
   const onReturnClicked = () => {
-    pageChanger({ currentPage: "anomalyList", shownShipId: -1 });
+    pageChanger({ currentPage: "anomalyList", shownItemId: -1 });
   };
 
   const returnIconAlt = "Return Icon";

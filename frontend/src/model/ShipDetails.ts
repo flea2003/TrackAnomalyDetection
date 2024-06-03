@@ -51,7 +51,7 @@ class ShipDetails {
    */
   getPropertyList() {
     return [
-      { type: "Ship ID", value: this.id.toString() },
+      { type: "Anomaly Score", value: this.anomalyScore + "%" },
       { type: "Explanation", value: this.explanation },
       {
         type: "Last AIS signal",
@@ -65,7 +65,7 @@ class ShipDetails {
       },
       {
         type: "Timestamp of the Highest Anomaly Score",
-        value: this.correspondingTimestamp,
+        value: TimeUtilities.reformatTimestamp(this.correspondingTimestamp),
       },
       { type: "Heading", value: this.heading.toString() },
       { type: "Departure Port", value: this.departurePort },
