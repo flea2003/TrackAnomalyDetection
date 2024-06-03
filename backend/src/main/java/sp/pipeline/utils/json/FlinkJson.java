@@ -21,7 +21,7 @@ public class FlinkJson {
             try {
                 collector.collect(JsonMapper.toJson(x));
             } catch (JsonProcessingException e) {
-                logger.error("Failed to serialize object to JSON, outgoing from Flink. Skipping this object. Object: " + x);
+                logger.error("Failed to serialize object to JSON, outgoing from Flink. Skipping this object. Object: {}", x);
             }
         }).returns(String.class);
 
@@ -40,7 +40,7 @@ public class FlinkJson {
             try {
                 collector.collect(JsonMapper.fromJson(x, classType));
             } catch (JsonProcessingException e) {
-                logger.error("Failed to deserialize JSON message, incoming to Flink. Skipping this message. Message: " + x);
+                logger.error("Failed to deserialize JSON message, incoming to Flink. Skipping this message. Message: {}", x);
             }
         }).returns(classType);
     }

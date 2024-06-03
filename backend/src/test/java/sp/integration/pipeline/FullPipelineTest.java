@@ -8,6 +8,7 @@ import sp.dtos.ExternalAISSignal;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
+import sp.pipeline.utils.binarization.SerializationMapper;
 import sp.pipeline.utils.json.JsonMapper;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         AISSignal expectedAISSignal = new AISSignal(sentSignal, expectedID);
 
         // Deserialize the received AIS signal
-        AISSignal aisSignal = JsonMapper.fromJson(list.get(0), AISSignal.class);
+        AISSignal aisSignal = SerializationMapper.fromSerializedString(list.get(0), AISSignal.class);
 
         // Make sure they are equal (ignoring received time)
         assertEquals(expectedAISSignal, aisSignal);

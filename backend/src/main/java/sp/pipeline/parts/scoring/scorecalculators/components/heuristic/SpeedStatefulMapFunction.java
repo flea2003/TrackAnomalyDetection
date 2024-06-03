@@ -37,9 +37,9 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         DecimalFormat df = getDecimalFormatter();
 
         // Compute and check speed between the signals
-        if (computeSpeed(currentSignal, pastSignal) > SPEED_THRESHOLD) {
+        if (currentSignal.getSpeed() > SPEED_THRESHOLD) {
             isAnomaly = true;
-            explanation += "Speed is too big: " + df.format(computeSpeed(currentSignal, pastSignal))
+            explanation += "Speed is too big: " + df.format(currentSignal.getSpeed())
                     + " km/min is faster than threshold of " + df.format(SPEED_THRESHOLD)
                     + " km/min" + explanationEnding();
         }

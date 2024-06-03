@@ -13,7 +13,7 @@ class TimeUtilities {
     const timeDifference =
       TimeUtilities.getCurrentTime().getTime() - signalTime.getTime();
     if (timeDifference <= 0) {
-      ErrorNotificationService.addError("Invalid timestamp value");
+      ErrorNotificationService.addWarning("Invalid timestamp value");
       return "Not available";
     }
 

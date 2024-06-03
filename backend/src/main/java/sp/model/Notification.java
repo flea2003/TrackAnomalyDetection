@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.apache.kafka.common.serialization.Serde;
 import sp.utils.UtilsObjectMapper;
+import java.io.Serializable;
 
 @Entity
 @AllArgsConstructor
@@ -12,7 +13,7 @@ import sp.utils.UtilsObjectMapper;
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
-public class Notification {
+public class Notification implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

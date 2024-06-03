@@ -10,7 +10,7 @@ import sp.model.AnomalyInformation;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.utils.StreamUtils;
-import sp.pipeline.utils.json.FlinkJson;
+import sp.pipeline.utils.binarization.FlinkSerialization;
 
 @Component
 public class ScoreCalculationBuilder {
@@ -54,6 +54,6 @@ public class ScoreCalculationBuilder {
         // Send the calculated AnomalyInformation objects to Kafka
         KafkaSink<String> scoresSink = streamUtils.createSinkFlinkToKafka(config.getKafkaServerAddress(),
                 config.getCalculatedScoresTopicName());
-        FlinkJson.serialize(updateStream).sinkTo(scoresSink);
+        FlinkSerialization.serialize(updateStream).sinkTo(scoresSink);
     }
 }

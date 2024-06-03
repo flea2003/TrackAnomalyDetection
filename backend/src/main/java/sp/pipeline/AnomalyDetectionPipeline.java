@@ -1,6 +1,7 @@
 package sp.pipeline;
 
 import lombok.Getter;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.streams.KafkaStreams;
@@ -50,7 +51,15 @@ public class AnomalyDetectionPipeline {
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
-        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        // For now, hardcode some flink properties. This will be completely redone in the next MR
+        // (we will be connecting to a remote cluster)
+        Configuration config = new Configuration();
+        config.setString("taskmanager.memory.fraction", "0.3");
+        config.setString("taskmanager.memory.network.max", "300 mb");
+
+        this.flinkEnv = StreamExecutionEnvironment.createLocalEnvironment(config);
+
         buildPipeline();
     }
 

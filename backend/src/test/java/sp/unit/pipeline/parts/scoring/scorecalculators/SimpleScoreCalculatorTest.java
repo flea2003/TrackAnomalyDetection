@@ -64,7 +64,6 @@ class SimpleScoreCalculatorTest {
             new AnomalyInformation(75f,
                     """
                             Time between two consecutive signals is too large: 14 minutes is more than threshold of 10 minutes, and ship's speed (between two signals) is too large: 15217.09 km/h is more than threshold of 6.0 km/h.
-                            Speed is too big: 2223.89 km/min is faster than threshold of 55.5 km/min.
                             Speed is inaccurate: the approximated speed of 2223.89 km/min is different from reported speed of 5 km/min by more than allowed margin of 10 km/min.
                             Heading difference between two consecutive signals is too large: 41 degrees is more than threshold of 40 degrees.
                             """

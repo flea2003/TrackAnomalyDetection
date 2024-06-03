@@ -5,7 +5,6 @@ import ShipDetails from "../../../../model/ShipDetails";
 import ObjectDetailsEntry from "./ObjectDetailsEntry";
 import returnIcon from "../../../../assets/icons/back.svg";
 import { CurrentPage } from "../../../../App";
-import ErrorNotificationService from "../../../../services/ErrorNotificationService";
 import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 import ShipNotification from "../../../../model/ShipNotification";
 
@@ -39,7 +38,6 @@ function ObjectDetails(props: ObjectDetailsProps) {
   );
 
   if (ship === undefined) {
-    ErrorNotificationService.addWarning("No ship found with ID " + shipID);
     return shipNotFoundElement();
   }
 
