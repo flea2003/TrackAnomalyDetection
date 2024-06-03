@@ -15,7 +15,6 @@
 #anomaly-list-close-icon {
     height: var(--anomaly-list-closing-icon-size);
     width: var(--anomaly-list-closing-icon-size);
-    padding: 1px;
 }
 
 #anomaly-list-close-icon:hover {

@@ -12,6 +12,7 @@
 .notification-details-notifier {
     text-align: center;
     font-weight: bold;
-    font-size: 2vh;
+    font-size: 1em;
+    align-self: center;
     margin: 5px;
 }
