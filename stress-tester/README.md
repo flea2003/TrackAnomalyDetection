@@ -16,3 +16,6 @@ running from Intellij, just open the project and let it build automatically.
 
 ## Running the project
 Run the project by executing the `./gradlew bootRun` command. This will start the stress-test simulator.
+
+Note that before starting this project, the backend and Kafka should be started and the required topics created. Please follow the
+detailed instructions in the `../backend` folder on how to start Kafka and the backend and what topics to create.
