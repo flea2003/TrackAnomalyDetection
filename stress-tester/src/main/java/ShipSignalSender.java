@@ -39,7 +39,7 @@ public class ShipSignalSender {
     /**
      * Initializes the current ship position/signal with random values.
      */
-    void initializeSignal() {
+    private void initializeSignal() {
         float longitude = (float) (Math.random() * 360 - 180);
         float latitude = (float) (Math.random() * 180 - 90);
         float speed = (float) (Math.random() * 30);
@@ -63,7 +63,7 @@ public class ShipSignalSender {
     /**
      * Slightly updates the last signal with random values.
      */
-    void randomlyUpdateSignal() {
+    private void randomlyUpdateSignal() {
         float longitude = currentSignal.getLongitude() + (float) (Math.random() * 0.1 - 0.05);
         float latitude = currentSignal.getLatitude() + (float) (Math.random() * 0.1 - 0.05);
         float speed = currentSignal.getSpeed() + (float) (Math.random() * 2 - 1);

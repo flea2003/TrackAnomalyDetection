@@ -58,9 +58,7 @@ public class AnomalyDetectionPipeline {
         config.setString("taskmanager.memory.fraction", "0.3");
         config.setString("taskmanager.memory.network.max", "300 mb");
 
-        this.flinkEnv = StreamExecutionEnvironment.createLocalEnvironment(
-                config
-        );
+        this.flinkEnv = StreamExecutionEnvironment.createLocalEnvironment(config);
 
         buildPipeline();
     }

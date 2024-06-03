@@ -21,7 +21,7 @@ public class FlinkSerialization {
             try {
                 collector.collect(SerializationMapper.toSerializedString(x));
             } catch (Exception e) {
-                logger.error("Failed to serialize object to binary, outgoing from Flink. Skipping this object. Object: " + x);
+                logger.error("Failed to serialize object to binary, outgoing from Flink. Skipping this object. Object: {}", x);
             }
         }).returns(String.class);
 
