@@ -2,16 +2,7 @@
     width: 100%;
     height: 45px;
     font-weight: bold;
-/*
-    margin-top: 1px;
-    margin-bottom: 1px;
-*/
     border-bottom: 1px solid black;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-
-    padding: 2px;
-
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -26,7 +17,8 @@
 
 .notification-list-entry-read:hover, .notification-list-entry-not-read:hover {
     background: white;
-    transform: scale(1.01);
+    /* I have commented out next line since it creates issues with scroll bars. To be solved later */
+    /* transform: scale(1.01); */
 }
 
 .notification-list-ship-entry-icon-id-container {

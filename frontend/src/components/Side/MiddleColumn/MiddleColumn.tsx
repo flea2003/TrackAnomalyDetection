@@ -15,14 +15,30 @@ interface MiddleColumnProps {
   notifications: ShipNotification[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
+  setFilterThreshold: (value: number) => void;
+  anomalyThreshold: number;
 }
 
+/**
+ * Function which returns the middle column component
+ *
+ * @param currentPage function for setting the current page
+ * @param ships list of all ships that are currently displayed
+ * @param notifications list of all notifications
+ * @param pageChanger page changer functions
+ * @param mapCenteringFun map centering function
+ * @param setFilterThreshold function that sets the filtering threshold
+ * @param anomalyThreshold the anomaly threshold that is used for filtering
+ * @constructor
+ */
 function MiddleColumn({
   currentPage,
   ships,
   notifications,
   pageChanger,
   mapCenteringFun,
+  setFilterThreshold,
+  anomalyThreshold,
 }: MiddleColumnProps): JSX.Element {
   switch (currentPage.currentPage) {
     case "anomalyList":
@@ -31,6 +47,8 @@ function MiddleColumn({
           ships={ships}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}
+          setFilterThreshold={setFilterThreshold}
+          anomalyThreshold={anomalyThreshold}
         />
       );
     case "objectDetails":
