@@ -74,7 +74,7 @@ public class ShipsDataController {
      *      500 error code in case the sql query fails.
      */
     @GetMapping("/ships/history/{id}")
-    public ResponseEntity<List<CurrentShipDetails>> getHistoryShip(
+    public ResponseEntity<List<CurrentShipDetails>> getHistoryOfShip(
         @PathVariable Long id
     ) {
         try {

@@ -1,8 +1,5 @@
 package sp.services;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -15,17 +12,12 @@ import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
 import java.util.HashMap;
 import java.util.List;
-import sp.utils.DruidConfig;
-import sp.utils.sql.FileReader;
-import sp.utils.sql.ResultSetReader;
-
+import sp.utils.sql.QueryExecutor;
 
 @Service
 public class ShipsDataService {
     private final AnomalyDetectionPipeline anomalyDetectionPipeline;
-    private final DruidConfig druidConfig;
     private final Integer activeTime = 30;
-    private final ResultSetReader<CurrentShipDetails> resultSetReader;
 
 
     /**
@@ -33,16 +25,10 @@ public class ShipsDataService {
      *
      * @param anomalyDetectionPipeline object that is responsible for managing and handling the stream of data and
      *     anomaly information computation
-     * @param resultSetReader - the object which retrieves the ShipDetails from the SQL queries
-     * @param druidConfig the database object of Apache Druid
      */
     @Autowired
-    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline,
-                            ResultSetReader<CurrentShipDetails> resultSetReader,
-                            DruidConfig druidConfig) {
+    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline) {
         this.anomalyDetectionPipeline = anomalyDetectionPipeline;
-        this.druidConfig = druidConfig;
-        this.resultSetReader = resultSetReader;
         anomalyDetectionPipeline.runPipeline();
     }
 
@@ -84,24 +70,10 @@ public class ShipsDataService {
      * @throws PipelineException in case the query doesn't succeed
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
-        String query;
         try {
-            query = FileReader.readQueryFromFile("src/main/resources/history.sql");
+            return QueryExecutor.executeQueryOneLong(id, "src/main/resources/history.sql", CurrentShipDetails.class);
         } catch (SQLException e) {
-            throw new PipelineException("Error reading SQL query from file");
-        }
-
-        try (Connection connection = druidConfig.connection();
-            PreparedStatement statement = connection.prepareStatement(query)) {
-            // in the sql query, the parameter 1 is the id that we query on
-            statement.setLong(1, id);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                return resultSetReader.extractQueryResults(resultSet, CurrentShipDetails.class);
-            }
-
-        } catch (SQLException e) {
-            throw new PipelineException("Error executing SQL query");
+            throw new PipelineException("Error while executing query.");
         }
     }
 }

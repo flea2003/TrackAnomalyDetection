@@ -13,17 +13,18 @@ import org.springframework.stereotype.Service;
 import sp.pipeline.utils.json.JsonMapper;
 
 @Service
-public class ResultSetReader<T> {
+public class ResultSetReader {
 
     /**
      * Methods extracts the rows from a ResultSet after a SQL query is performed.
      *
      * @param resultSet the resultSet of the query
      * @param classType the class that we have to extract
+     * @param <T> generics of the object which defines the class tclass
      * @return the retrieved list of the classType
      * @throws SQLException Exception if something went wrong
      */
-    public List<T> extractQueryResults(ResultSet resultSet, Class<T> classType) throws SQLException {
+    public static <T> List<T> extractQueryResults(ResultSet resultSet, Class<T> classType) throws SQLException {
         List<T> extractedResults = new ArrayList<>();
         while (resultSet.next()) {
             extractedResults.add(extractRow(resultSet, classType));
@@ -36,10 +37,11 @@ public class ResultSetReader<T> {
      *
      * @param resultSet the resultSet of the query
      * @param classType the class that we have to extract
+     * @param <T> generics of the object which defines the class tclass
      * @return the retrieved list of the classType
      * @throws SQLException Exception if something went wrong
      */
-    private T extractRow(ResultSet resultSet, Class<T> classType) throws SQLException {
+    private static <T> T extractRow(ResultSet resultSet, Class<T> classType) throws SQLException {
         JsonObject jsonObject = new JsonObject();
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();

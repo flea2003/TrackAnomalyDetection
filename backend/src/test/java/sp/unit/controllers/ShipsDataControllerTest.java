@@ -140,7 +140,7 @@ class ShipsDataControllerTest {
         when(shipsDataService.getHistoryOfShip(5))
             .thenReturn(List.of(details1, details2));
 
-        ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getHistoryShip(5L);
+        ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getHistoryOfShip(5L);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactlyInAnyOrder(details1, details2);
     }
@@ -148,7 +148,7 @@ class ShipsDataControllerTest {
     @Test
     void getShipDetailsServerError() throws PipelineException{
         when(shipsDataService.getHistoryOfShip(5L)).thenThrow(new PipelineException());
-        ResponseEntity<List<CurrentShipDetails>>response = shipsDataController.getHistoryShip(5L);
+        ResponseEntity<List<CurrentShipDetails>>response = shipsDataController.getHistoryOfShip(5L);
         assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
