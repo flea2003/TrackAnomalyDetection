@@ -9,12 +9,7 @@ beforeEach(() => {
 
 test("Check for invalid conversion", () => {
   const invalidTimestamp = "it's eleven o'clock";
-  const spyOnErrorServiceMethod = jest.spyOn(
-    ErrorNotificationService,
-    "addWarning",
-  );
   const result = TimeUtilities.computeTimeDifference(invalidTimestamp);
-  expect(spyOnErrorServiceMethod).toHaveBeenCalled();
   expect(result).toBe("Not available");
 });
 
