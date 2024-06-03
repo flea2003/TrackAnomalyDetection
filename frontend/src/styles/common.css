@@ -1,6 +1,7 @@
 /* This css file is meant for managing the root layout and the color schemes. */
 
 :root {
+    --middle-column-width: 20%;
 
     --anomaly-list-closing-icon-size: 20px;
     --anomaly-list-closing-icon-margin: 10px;
@@ -17,7 +18,7 @@
     --object-details-return-icon-margin: 10px;
 
     --object-details-entry-padding: 10px;
-    --object-details-title-font-size: 1.2em;
+    --object-details-title-font-size: 1em;
     --object-details-title-height: 50px;
     --object-details-entry-font-size: 0.8em;
 
@@ -28,6 +29,14 @@
     --error-list-entry-height: 36px;
     --error-list-entry-icon-size: 20px;
     --error-list-entry-icon-container-width: 25px;
+
+    --notification-list-entry-height: 72px;
+    --notification-list-entry-id-font-size: 0.8em;
+    --notification-list-entry-font-size: 0.6em;
+    --notification-list-date-entry-font-size: 0.8em;
+    --notification-list-entry-icon-container-width: 15px;
+    --notifcation-list-entry-icon-size: 25px;
+    --notification-list-mark-all-button-length: 50px;
 
 }
 

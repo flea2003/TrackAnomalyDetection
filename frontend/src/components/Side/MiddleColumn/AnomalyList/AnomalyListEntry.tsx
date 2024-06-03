@@ -4,10 +4,10 @@ import Stack from "@mui/material/Stack";
 import ShipDetails from "../../../../model/ShipDetails";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import shipIcon from "../../../../assets/icons/ship.png";
+import { CurrentPage } from "../../../../App";
 
 import "../../../../styles/common.css";
 import "../../../../styles/anomalyListEntry.css";
-import { CurrentPage } from "../../../../App";
 
 interface AnomalyListEntryProps {
   shipDetails: ShipDetails;
@@ -35,7 +35,7 @@ function AnomalyListEntry({
   const color = calculateAnomalyColor(shipAnomalyScore);
 
   const onClick = () => {
-    pageChanger({ currentPage: "objectDetails", shownShipId: shipDetails.id });
+    pageChanger({ currentPage: "objectDetails", shownItemId: shipDetails.id });
     mapCenteringFun(shipDetails);
   };
 

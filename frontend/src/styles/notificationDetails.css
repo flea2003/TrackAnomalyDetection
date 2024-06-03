@@ -1,0 +1,17 @@
+.notification-details-properties-list {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 3px;
+    height: 85%;
+}
+
+.notification-details-notifier {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2vh;
+    margin: 5px;
+}

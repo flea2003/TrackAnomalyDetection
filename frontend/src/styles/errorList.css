@@ -1,5 +1,5 @@
 #error-list-container {
-    width: 20%;
+    width: var(--middle-column-width);
     text-align: center;
     display: flex;
     height: 100vh;
@@ -33,11 +33,12 @@
 #error-list-mark-all-button {
     margin-right: 5px;
     background-color: white;
-    box-shadow: 0 3px #999;
     border: 1px solid black;
-    border-radius: 10px;
+    border-radius: 5px;
     padding-left: 7px;
     padding-right: 7px;
+    cursor: pointer;
+    font-size: 0.8em;
 }
 
 #error-list-mark-all-button:hover {
@@ -48,4 +49,8 @@
     transform: translateY(2px);
     box-shadow: 0 1px #666;
     background-color: lightgray;
+}
+
+#error-list-name-text {
+    font-weight: bold;
 }
