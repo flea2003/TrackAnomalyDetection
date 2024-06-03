@@ -7,8 +7,8 @@ public class FileReader {
     /**
      * Helper method to parse developer defined SQL queries.
      *
-     * @param filePath - the path where the corresponding query is located
-     * @return - the SQL processed query
+     * @param filePath the path where the corresponding query is located
+     * @return the SQL processed query
      */
     public static String readQueryFromFile(String filePath) throws SQLException {
         StringBuilder queryBuilder = new StringBuilder();

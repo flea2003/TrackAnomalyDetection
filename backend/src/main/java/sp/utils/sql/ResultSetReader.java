@@ -18,10 +18,10 @@ public class ResultSetReader<T> {
     /**
      * Methods extracts the rows from a ResultSet after a SQL query is performed.
      *
-     * @param resultSet - the resultSet of the query
-     * @param classType - the class that we have to extract
-     * @return - the retrieved list of the classType
-     * @throws SQLException - Exception if something went wrong
+     * @param resultSet the resultSet of the query
+     * @param classType the class that we have to extract
+     * @return the retrieved list of the classType
+     * @throws SQLException Exception if something went wrong
      */
     public List<T> extractQueryResults(ResultSet resultSet, Class<T> classType) throws SQLException {
         List<T> extractedResults = new ArrayList<>();
@@ -34,10 +34,10 @@ public class ResultSetReader<T> {
     /**
      * Extracts a particular row of the ResultSet.
      *
-     * @param resultSet - the resultSet of the query
-     * @param classType - the class that we have to extract
-     * @return - the retrieved list of the classType
-     * @throws SQLException - Exception if something went wrong
+     * @param resultSet the resultSet of the query
+     * @param classType the class that we have to extract
+     * @return the retrieved list of the classType
+     * @throws SQLException Exception if something went wrong
      */
     private T extractRow(ResultSet resultSet, Class<T> classType) throws SQLException {
         JsonObject jsonObject = new JsonObject();
@@ -55,7 +55,6 @@ public class ResultSetReader<T> {
             String json = gson.toJson(jsonObject);
             return JsonMapper.fromJson(json, classType);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new SQLException();
         }
     }

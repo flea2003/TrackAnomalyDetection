@@ -22,7 +22,6 @@ public class DruidConfig {
             String url = "jdbc:avatica:remote:url=http://localhost:8888/druid/v2/sql/avatica/;transparent_reconnection=true";
             return DriverManager.getConnection(url, connectionProperties);
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }

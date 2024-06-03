@@ -44,13 +44,14 @@ After finishing the execution of the system, one might want to delete the config
 
 In order to see the id of the active supervisors you can run 
 ```bash
-curl "http://localhost:8888/druid/indexer/v1/supervisor?full=null"
+curl "http://localhost:8888/druid/indexer/v1/supervisor"
 ```
 After identifying the id of the supervisor that you want to terminate, you can run the following command:
 ```bash
 curl --request POST "http://localhost:8888/druid/indexer/v1/supervisor/id/terminate"
 ```
 Where `id` is the identifier of the supervisor that you want to terminate. Note that the terminated supervisors still exist in the metadata store and their history can be retrieved.
+The data is persistently stored on disk in the structure of so-called segments. You can delete them through the [console](http://localhost:8888/unified-console.html#segments).
 
 You can find a more extensive list of supervisors' API at on the official [website](https://druid.apache.org/docs/latest/api-reference/supervisor-api/).
 

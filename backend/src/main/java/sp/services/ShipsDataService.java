@@ -79,9 +79,9 @@ public class ShipsDataService {
     /**
      * Queries the Druid database in order to retrieve the list of CurrentShipDetails of the corresponding ship.
      *
-     * @param id - the id of the ship on which we will query our data
-     * @return - the list of the retrieved details
-     * @throws PipelineException - in case the query doesn't succeed
+     * @param id the id of the ship on which we will query our data
+     * @return the list of the retrieved details
+     * @throws PipelineException in case the query doesn't succeed
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
         String query;

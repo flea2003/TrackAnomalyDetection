@@ -132,7 +132,7 @@ public class ScoreAggregationBuilder {
 
         // Kafka topic from which Apache Druid will ingest Ship Information data
         KStream<Long, CurrentShipDetails> detailsStream = table.toStream();
-        detailsStream.to("ship-details");
+        detailsStream.to(configuration.getShipsHistoryTopicName());
 
         return table;
     }
