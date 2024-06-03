@@ -1,4 +1,4 @@
-package sp.services.sql.utils;
+package sp.unit.utils.sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

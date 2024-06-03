@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.Mockito.mock;
-import static org.powermock.api.mockito.PowerMockito.spy;
+import static org.mockito.Mockito.spy;
 
 /**
  * The following class contains methods for running an integration test.
@@ -154,7 +154,7 @@ class GenericPipelineTest {
         );
 
         // Instantiate Service classes for querying
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, null, null);
     }
 
     /**

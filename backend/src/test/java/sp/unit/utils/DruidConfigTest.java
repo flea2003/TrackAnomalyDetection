@@ -1,6 +1,5 @@
 package sp.unit.utils;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -12,6 +11,7 @@ import java.sql.DriverManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import sp.utils.DruidConfig;
 
 class DruidConfigTest {
 
