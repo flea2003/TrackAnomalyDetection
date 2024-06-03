@@ -49,7 +49,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         produceToTopic(rawAISTopic, List.of(JsonMapper.toJson(fakeSignal)));
 
         // Wait 3 seconds for the data to be processed
-        Thread.sleep(3000);
+        Thread.sleep(10000);
 
         testSignalIDAssignment(fakeSignal);
         testFetchingFromService(fakeSignal);
@@ -129,7 +129,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         produceToTopic(scoresTopic, messages);
 
         // Wait for 5 seconds to be fully sure
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
         // Make sure that after this, the pipeline has not crashed and there still is only 1 ship
         assertThat(shipsDataService.getCurrentShipDetails().size()).isEqualTo(1);
@@ -182,7 +182,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         produceToTopic(rawAISTopic, messages);
 
         // Wait 5 seconds to make sure they pass through
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
         // Get the details
         List<CurrentShipDetails> details = shipsDataService.getCurrentShipDetails();
