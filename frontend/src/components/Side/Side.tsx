@@ -15,14 +15,30 @@ interface SideProps {
   notifications: ShipNotification[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
+  setFilterThreshold: (value: number) => void;
+  anomalyThreshold: number;
 }
 
+/**
+ * Function for side component
+ *
+ * @param currentPage function for setting the current page
+ * @param ships list of all ships that are currently displayed
+ * @param notifications list of all notifications
+ * @param pageChanger page changer functions
+ * @param mapCenteringFun map centering function
+ * @param setFilterThreshold function that sets the filtering threshold
+ * @param anomalyThreshold the anomaly threshold that is used for filtering
+ * @constructor
+ */
 function Side({
   currentPage,
   ships,
   notifications,
   pageChanger,
   mapCenteringFun,
+  setFilterThreshold,
+  anomalyThreshold,
 }: SideProps): JSX.Element {
   // Set up the ErrorNotificationService
   const [, setErrorNotificationState] = React.useState(
@@ -38,10 +54,11 @@ function Side({
         notifications={notifications}
         pageChanger={pageChanger}
         mapCenteringFun={mapCenteringFun}
+        setFilterThreshold={setFilterThreshold}
+        anomalyThreshold={anomalyThreshold}
       />
       <Sidebar pageChanger={pageChanger} />
     </>
-    // </Stack>
   );
 }
 

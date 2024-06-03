@@ -5,17 +5,30 @@ import closeIcon from "../../../../assets/icons/close.svg";
 import extendIcon from "../../../../assets/icons/extend_info.svg";
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../../App";
-import ShipService from "../../../../services/ShipService";
 
 interface ObjectDetailsProps {
   pageChanger: (currentPage: CurrentPage) => void;
+  setFilterThreshold: (value: number) => void;
+  anomalyThreshold: number;
 }
 
-const AnomalyTitleWithSlider = (props: ObjectDetailsProps) => {
+/**
+ * Function that returns the visual component of the title of the anomaly list,
+ * which can be extended to set the threshold of the anomaly score which is used
+ * for filtering ships
+ *
+ * @param pageChanger page changer function
+ * @param setFilterThreshold function that sets the anomaly threshold
+ * @param anomalyThreshold the anomaly threshold that is used for filtering
+ * @constructor
+ */
+const AnomalyTitleWithSlider = ({
+  pageChanger,
+  setFilterThreshold,
+  anomalyThreshold,
+}: ObjectDetailsProps) => {
   // State to manage the visibility of the extended container
   const [isExtended, setIsExtended] = useState(false);
-  // State to manage the slider value
-  const [threshold, setThreshold] = useState(ShipService.filterThreshold);
 
   // Function used to alter the state of whether the slider is shown or not
   const toggleExtended = () => {
@@ -24,8 +37,8 @@ const AnomalyTitleWithSlider = (props: ObjectDetailsProps) => {
 
   // Function to handle the change in slider
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setThreshold(Number(event.target.value));
-    ShipService.filterThreshold = Number(event.target.value);
+    const value = Number(event.target.value);
+    setFilterThreshold(value);
   };
 
   return (
@@ -36,9 +49,7 @@ const AnomalyTitleWithSlider = (props: ObjectDetailsProps) => {
           alt="Close"
           id="anomaly-list-close-icon"
           data-testid="anomaly-list-close-icon"
-          onClick={() =>
-            props.pageChanger({ currentPage: "none", shownItemId: -1 })
-          }
+          onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
         <div className="modify-button-container" onClick={toggleExtended}>
           Threshold
@@ -52,10 +63,10 @@ const AnomalyTitleWithSlider = (props: ObjectDetailsProps) => {
             min="0"
             max="100"
             className="modify-threshold-slide"
-            value={threshold}
+            value={anomalyThreshold}
             onChange={handleSliderChange}
           />
-          {threshold}%
+          {anomalyThreshold}%
         </span>
       )}
     </Stack>

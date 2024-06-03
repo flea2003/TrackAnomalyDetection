@@ -9,7 +9,7 @@ class ShipService {
    * the latest ship details for each ship, encapsulating: the AIS information and current/max anomaly information
    */
   static shipsCurrentDetailsEndpoint = "/ships/details";
-  static filterThreshold = 0;
+
   /**
    * This method queries the backend for the CurrentShipDetails array
    * The resulting array of type ShipDetails is the result of transforming the
@@ -19,7 +19,6 @@ class ShipService {
    * @returns a promise that resolves to an array of ShipDetails.
    */
   static queryBackendForShipsArray: () => Promise<ShipDetails[]> = async () => {
-    console.log(ShipService.filterThreshold);
     const response = await HttpSender.get(
       ShipService.shipsCurrentDetailsEndpoint,
     );
@@ -39,13 +38,12 @@ class ShipService {
       ErrorNotificationService.addError("Ship array contained null items");
     }
 
-    const filteredShipsOnThreshold = responseWithoutNulls
-      .map((item: APIResponseItem) =>
+    return ShipService.sortList(
+      responseWithoutNulls.map((item: APIResponseItem) =>
         ShipService.extractCurrentShipDetails(item),
-      )
-      .filter((ship) => ship.anomalyScore >= ShipService.filterThreshold);
-
-    return ShipService.sortList(filteredShipsOnThreshold, "desc");
+      ),
+      "desc",
+    );
   };
 
   /**

@@ -57,6 +57,7 @@ public class NotificationsDetectionBuilder {
                         Materialized
                                 .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("dummy")
                                 .withValueSerde(Notification.getSerde())
+                                .withCachingDisabled()
             );
     }
 }

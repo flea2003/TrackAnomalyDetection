@@ -53,11 +53,19 @@ function App() {
     }
   };
 
-  // Put the ships as state
-  const [ships, setShips] = useState<ShipDetails[]>([]);
+  // Put currently displayed ships as state
+  const [allShips, setAllShips] = useState<ShipDetails[]>([]);
 
   // Put notifications as state
   const [notifications, setNotifications] = useState<ShipNotification[]>([]);
+
+  // Put filter threshold as a state
+  const [filterThreshold, setFilterThreshold] = useState<number>(0);
+
+  // Create a separate array for displayed ships
+  const displayedShips = allShips.filter(
+    (x) => x.anomalyScore >= filterThreshold,
+  );
 
   // Every 1s update the anomaly score of all ships by querying the server
   useEffect(() => {
@@ -65,7 +73,7 @@ function App() {
       // Query for ships. When the results arrive, update the state
       ShipService.queryBackendForShipsArray().then(
         (shipsArray: ShipDetails[]) => {
-          setShips(shipsArray);
+          setAllShips(shipsArray);
         },
       );
     }, 1000);
@@ -87,13 +95,15 @@ function App() {
   return (
     <div className="App" id="root-div">
       <Stack direction="row">
-        <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
+        <Map ships={displayedShips} pageChanger={pageChanger} ref={mapRef} />
         <Side
           currentPage={currentPage}
-          ships={ships}
+          ships={displayedShips}
           notifications={notifications}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}
+          setFilterThreshold={setFilterThreshold}
+          anomalyThreshold={filterThreshold}
         />
       </Stack>
     </div>
