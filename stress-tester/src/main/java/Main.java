@@ -35,7 +35,6 @@ public class Main {
     public static void main(String[] args) {
         // Calculate the number of ships needed to achieve the required signals-per-second
         int shipCount = signalsPerSecond * (maxIntervalBetweenMessages + minIntervalBetweenMessages) / 2;
-        System.out.println("Ship count is " + shipCount);
 
         // Create a sender object for each ship. In order to send signals, the step() methods for these
         // sender objects should be called as often as possible. I.e., each call of step() checks if it is
@@ -81,15 +80,15 @@ public class Main {
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
 
         for (int i = 0; i < threadCount; i++) {
-            // Each thread is responsible for a subset of ships with indices from l to r
-            final int l = senders.length / threadCount * i;
-            final int r = Math.min(l + senders.length / threadCount, senders.length);
+            // Each thread is responsible for a subset of ships with indices from lowerIndex to upperIndex
+            final int lowerIndex = senders.length / threadCount * i;
+            final int upperIndex = Math.min(lowerIndex + senders.length / threadCount, senders.length);
 
             // Start the thread that will send signals for the subset of ships
             executor.submit(() -> {
                 while (true) {
                     Thread.sleep(500);
-                    for (int j = l; j < r; j++)
+                    for (int j = lowerIndex; j < upperIndex; j++)
                         senders[j].step();
                 }
             });
