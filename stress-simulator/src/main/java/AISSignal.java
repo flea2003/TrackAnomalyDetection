@@ -1,5 +1,3 @@
-package helperobjects;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,18 +41,5 @@ public class AISSignal implements Serializable {
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return mapper.writeValueAsString(this);
-    }
-
-    /**
-     * Creates the AIS object from a given string.
-     *
-     * @param val string value (in JSON format) that is being converted to an AIS object
-     * @return AIS object from a given string
-     */
-    public static AISSignal fromJson(String val) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return mapper.readValue(val, AISSignal.class);
     }
 }
