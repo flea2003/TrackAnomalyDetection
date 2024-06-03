@@ -4,7 +4,7 @@ import AnomalyListEntry from "./AnomalyListEntry";
 import List from "@mui/material/List";
 import { CurrentPage } from "../../../../App";
 import ShipDetails from "../../../../model/ShipDetails";
-import closeIcon from "../../../../assets/icons/close.svg";
+import ShipThresholdModifier from "./AnomalyTitleWithSlider";
 
 import "../../../../styles/common.css";
 import "../../../../styles/anomalyList.css";
@@ -13,6 +13,8 @@ interface AnomalyListProps {
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
+  setFilterThreshold: (value: number) => void;
+  anomalyThreshold: number;
 }
 
 /**
@@ -22,11 +24,15 @@ interface AnomalyListProps {
  * @param ships a list of ships to display in the list
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  * @param mapCenteringFun function that, when called, centers the map on a specific ship
+ * @param setFilterThreshold function that sets the filtering threshold
+ * @param anomalyThreshold the anomaly threshold that is used for filtering
  */
 function AnomalyList({
   ships,
   pageChanger,
   mapCenteringFun,
+  setFilterThreshold,
+  anomalyThreshold,
 }: AnomalyListProps) {
   const listEntries = [];
   for (let i = 0; i < ships.length; i++) {
@@ -42,15 +48,11 @@ function AnomalyList({
 
   return (
     <Stack id="anomaly-list-container" data-testid="anomaly-list-container">
-      <Stack id="anomaly-list-title-container" direction="row">
-        <img
-          src={closeIcon}
-          alt="Close"
-          id="anomaly-list-close-icon"
-          data-testid="anomaly-list-close-icon"
-          onClick={() => pageChanger({ currentPage: "none", shownShipId: -1 })}
-        />
-      </Stack>
+      <ShipThresholdModifier
+        pageChanger={pageChanger}
+        setFilterThreshold={setFilterThreshold}
+        anomalyThreshold={anomalyThreshold}
+      />
       <List
         id="anomaly-list-internal-container"
         style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}

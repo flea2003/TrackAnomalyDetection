@@ -12,6 +12,7 @@ import sp.model.AISSignal;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.utils.StreamUtils;
 import sp.pipeline.utils.json.FlinkJson;
+import sp.pipeline.utils.binarization.FlinkSerialization;
 import java.util.Objects;
 
 @Component
@@ -64,6 +65,7 @@ public class IdAssignmentBuilder {
      * @param kafkaSource the source of raw AIS signals
      * @param signalsSink the sink for the AISSignal objects with assigned internal IDs
      * @param flinkEnv the Flink execution environment
+     * @return the constructed stream
      */
     public DataStream<AISSignal> buildIdAssignmentPart(KafkaSource<String> kafkaSource,
                                                        KafkaSink<String> signalsSink,
@@ -82,7 +84,7 @@ public class IdAssignmentBuilder {
         });
 
         // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
-        FlinkJson.serialize(sourceWithIDs).sinkTo(signalsSink);
+        FlinkSerialization.serialize(sourceWithIDs).sinkTo(signalsSink);
 
         return sourceWithIDs;
     }

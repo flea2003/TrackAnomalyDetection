@@ -80,6 +80,10 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
           );
           return;
         }
+
+        // Check if requested ship still exists
+        if (ships.find((x) => x.id === ship.id) === undefined) return;
+
         map.flyTo(
           [ship.lat, ship.lng],
           mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
@@ -117,7 +121,11 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
       ships.forEach((ship) => {
         try {
           L.marker([ship.lat, ship.lng], {
-            icon: createShipIcon(ship.anomalyScore / 100, ship.heading),
+            icon: createShipIcon(
+              ship.anomalyScore / 100,
+              ship.heading,
+              ship.speed > 0,
+            ),
           })
             .addTo(map)
             .bindPopup("ID: " + ship.id)
@@ -126,7 +134,7 @@ const Map = forwardRef<MapExportedMethodsType, MapProps>(
               handleMouseOutShipIcon(e, setHoverInfo);
               pageChanger({
                 currentPage: "objectDetails",
-                shownShipId: ship.id,
+                shownItemId: ship.id,
               });
             })
             .on("mouseover", (e) => {

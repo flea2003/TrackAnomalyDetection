@@ -8,7 +8,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
-import sp.pipeline.utils.json.KafkaJson;
+import sp.pipeline.utils.binarization.KafkaSerialization;
 
 @Component
 public class NotificationsDetectionBuilder {
@@ -35,27 +35,21 @@ public class NotificationsDetectionBuilder {
      * is enough to have the information of the most recent notification for that ship, and a new AnomalyInformation
      * signal (which in our case is wrapped in CurrentShipDetails for optimization purposes for retrieving AIS signal).
      *
+     * @param state the Kafka table representing the state
      */
     public void buildNotifications(KTable<Long, CurrentShipDetails> state) {
         // Construct a stream for computed AnomalyInformation objects
         KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
-        /*
-        // Use the following code for easier testing (and also comment out the first line in the method)
 
-        KStream<Long, String> firstStream = builder.stream(calculatedScoresTopicName);
-        KStream<Long, AnomalyInformation> second = firstStream.mapValues(x -> {try { return AnomalyInformation
-        .fromJson(x); } catch (JsonProcessingException e) {  throw new RuntimeException(e); }  });
-        KStream<Long, AnomalyInformation> third = second.selectKey((key, value) -> value.getId());
-        KStream<Long, CurrentShipDetails> streamOfUpdates = third.mapValues(x -> new CurrentShipDetails(x, null));
-        */
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KafkaJson.serialize(streamOfUpdates)
+        KafkaSerialization.serialize(streamOfUpdates)
                 .groupByKey()
                 .aggregate(Notification::new,
-                        KafkaJson.aggregator(notificationsAggregator::aggregateSignals, CurrentShipDetails.class),
+                        KafkaSerialization.aggregator(notificationsAggregator::aggregateSignals, CurrentShipDetails.class),
                         Materialized
                                 .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("dummy")
                                 .withValueSerde(Notification.getSerde())
+                                .withCachingDisabled()
             );
     }
 }

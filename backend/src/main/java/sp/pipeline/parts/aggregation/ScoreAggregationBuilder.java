@@ -1,11 +1,10 @@
 package sp.pipeline.parts.aggregation;
 
-import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.Stores;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
@@ -14,7 +13,7 @@ import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
-import sp.pipeline.utils.json.KafkaJson;
+import sp.pipeline.utils.binarization.KafkaSerialization;
 
 @Component
 public class ScoreAggregationBuilder {
@@ -46,7 +45,7 @@ public class ScoreAggregationBuilder {
     private KStream<Long, ShipInformation> streamAnomalyInformation(StreamsBuilder builder) {
 
         // Take JSON strings from score topic, deserialize them into AnomalyInformation
-        KStream<Long, AnomalyInformation> streamAnomalyInformation = KafkaJson.deserialize(
+        KStream<Long, AnomalyInformation> streamAnomalyInformation = KafkaSerialization.deserialize(
                 builder.stream(configuration.getCalculatedScoresTopicName()),
                 AnomalyInformation.class
         );
@@ -67,7 +66,7 @@ public class ScoreAggregationBuilder {
 
         // Take the initial AISSignal and wrap them into ShipInformation objects, so we could later merge the stream
         // with already wrapped AnomalyInformation objects
-        KStream<Long, AISSignal> signalsStream = KafkaJson.deserialize(
+        KStream<Long, AISSignal> signalsStream = KafkaSerialization.deserialize(
                 builder.stream(configuration.getIncomingAisTopicName()),
                 AISSignal.class
         );
@@ -108,6 +107,9 @@ public class ScoreAggregationBuilder {
      * 4. The AIS-score-update type ShipInformation objects  get to the KTable after those and just update the missing
      * anomaly score field in the corresponding places.
      * </p>
+     *
+     * @param builder incoming stream
+     * @return Kafka table hashed by key
      */
     public KTable<Long, CurrentShipDetails> buildScoreAggregationPart(StreamsBuilder builder) {
         // Construct and merge two streams and select the ship hash as a key for the new stream.
@@ -115,15 +117,18 @@ public class ScoreAggregationBuilder {
 
         // Construct the KTable (state that is stored) by aggregating the merged stream
         KTable<Long, CurrentShipDetails> table =
-                KafkaJson.serialize(mergedStream)
+                KafkaSerialization.serialize(mergedStream)
                 .groupByKey()
                 .aggregate(
                         CurrentShipDetails::new,
-                        // Use the KafkaJson.aggregator helper function to avoid cluttering the lambda
-                        KafkaJson.aggregator(currentStateAggregator::aggregateSignals, ShipInformation.class),
+                        // Use the KafkaKryo.aggregator helper function to avoid cluttering the lambda
+                        KafkaSerialization.aggregator(currentStateAggregator::aggregateSignals, ShipInformation.class),
                         Materialized
-                                .<Long, CurrentShipDetails, KeyValueStore<Bytes, byte[]>>as(configuration.getKafkaStoreName())
+                                .<Long, CurrentShipDetails>as(
+                                        Stores.inMemoryKeyValueStore(configuration.getKafkaStoreName())
+                                )
                                 .withValueSerde(CurrentShipDetails.getSerde())
+                                .withCachingDisabled()
                 );
         return table;
     }

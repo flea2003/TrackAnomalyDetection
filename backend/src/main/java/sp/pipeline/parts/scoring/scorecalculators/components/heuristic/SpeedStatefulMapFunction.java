@@ -1,120 +1,113 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
-import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.harvesineDistance;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.getDistanceTravelled;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
 
 import sp.model.AISSignal;
-import sp.model.AnomalyInformation;
-import java.time.Duration;
+import java.text.DecimalFormat;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
 
-    private static final String goodMsg = "The ship's speed is ok.";
-    private static final String badMsg = "The ship's speed is anomalous.";
+    private static final double SPEED_THRESHOLD = 55.5;
+    private static final double ACCELERATION_THRESHOLD = 50;
+    private static final double REPORTED_SPEED_ACCURACY_MARGIN = 10;
 
     /**
-     * Performs a stateful map operation that receives an AIS signal and produces an
-     * AnomalyInformation based on the predefined heuristics for the speed of the ship.
+     * Checks if the current signal is an anomaly.
+     * The current signal is considered an anomaly if at least one of the following is true:
+     * - ship is going too fast
+     * - the reported speed is too different from the calculated one
+     * - ship is accelerating too fast
      *
-     * @param value The input value.
-     * @return the computed Anomaly Information object
-     * @throws Exception exception from value state descriptors
+     * @param currentSignal current AIS signal
+     * @param pastSignal past AIS signal (non-null object)
+     * @return AnomalyScoreWithExplanation object which indicates whether the current
+     *     signal is an anomaly. If it is an anomaly, an explanation string and anomaly score
+     *     are also included in the same return object.
      */
-    @Override
-    public AnomalyInformation map(AISSignal value) throws Exception {
-        AISSignal pastAISSignal = getAisSignalValueState().value();
-
-        // In the case that our stateful map has encountered signals in the past
-        if (pastAISSignal != null && isAnomaly(value, pastAISSignal)) {
-            this.getLastDetectedAnomalyTime().update(value.getTimestamp());
+    protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        // only check if there was a signal in the past
+        if (pastSignal == null) {
+            return new AnomalyScoreWithExplanation(false, 0f, "");
         }
 
-        return super.setAnomalyInformationResult(value, 33f, badMsg, goodMsg);
+        String explanation = "";
+        boolean isAnomaly = false;
+
+        DecimalFormat df = getDecimalFormatter();
+
+        // Compute and check speed between the signals
+        if (currentSignal.getSpeed() > SPEED_THRESHOLD) {
+            isAnomaly = true;
+            explanation += "Speed is too big: " + df.format(currentSignal.getSpeed())
+                    + " km/min is faster than threshold of " + df.format(SPEED_THRESHOLD)
+                    + " km/min" + explanationEnding();
+        }
+
+        // Check the difference between the computed speed and the reported speed
+        if (reportedSpeedDifference(currentSignal, pastSignal) > REPORTED_SPEED_ACCURACY_MARGIN) {
+            isAnomaly = true;
+            explanation += "Speed is inaccurate: the approximated speed of " + df.format(computeSpeed(currentSignal, pastSignal))
+                    + " km/min is different from reported speed of " + df.format(currentSignal.getSpeed())
+                    + " km/min by more than allowed margin of " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
+                    + " km/min" + explanationEnding();
+        }
+
+        // Compute and check acceleration between two signals
+        if (computedAcceleration(currentSignal, pastSignal) > ACCELERATION_THRESHOLD) {
+            isAnomaly = true;
+            explanation += "Acceleration is too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
+                    + " km/min^2 is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
+                    + " km/min^2" + explanationEnding();
+        }
+
+        return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
     }
 
     /**
-     * Checks if the current value is anomaly based on heuristics (current speed, reported
-     * speed difference and the acceleration).
+     * Compute speed based on the data of this and the past signals.
      *
-     * @param value current AIS signal
-     * @param pastAISSignal past AIS signal
-     * @return true if the current AIS signal is considered an anomaly based on speed
-     *     heuristics, and false otherwise.
+     * @param currentSignal the current AIS signal
+     * @param pastSignal the past AIS signal
+     * @return the computed speed
      */
-    public boolean isAnomaly(AISSignal value, AISSignal pastAISSignal) {
-        return isAnomaly(
-                computeSpeed(value, pastAISSignal),
-                getReportedSpeedDifference(value, pastAISSignal),
-                calculateAcceleration(value, pastAISSignal)
-        );
+    private double computeSpeed(AISSignal currentSignal, AISSignal pastSignal) {
+        double time = (double) timeDiffInMinutes(currentSignal, pastSignal);
+        return getDistanceTravelled(currentSignal, pastSignal) / (time + 0.00001);
     }
 
     /**
-     * Checks if the current value is anomaly based on heuristics (current speed, reported
-     * speed difference and the acceleration).
+     * Calculate the difference between the reported speed in the distance and the calculated
+     * distance based on the two signals (the current one and the past one).
      *
-     * @param computedSpeed computed speed based on the past AIS signal
-     * @param reportedSpeedDifference the difference between computed speed and reported speed
-     * @param computedAcceleration computed acceleration based on the past AIS signal
-     * @return true if the current AIS signal is considered an anomaly based on speed
-     *     heuristics, and false otherwise.
+     * @param currentSignal the current AIS signal
+     * @param pastSignal the past AIS signal
+     * @return the calculated difference
      */
-    public boolean isAnomaly(double computedSpeed, double reportedSpeedDifference, double computedAcceleration) {
-        boolean speedIsLow = (computedSpeed <= 55.5);
-        boolean reportedSpeedIsAccurate = (reportedSpeedDifference <= 10);
-        boolean accelerationIsLow = (computedAcceleration < 50);
-
-        return !speedIsLow || !reportedSpeedIsAccurate || !accelerationIsLow;
+    private double reportedSpeedDifference(AISSignal currentSignal, AISSignal pastSignal) {
+        return Math.abs(currentSignal.getSpeed() - computeSpeed(currentSignal, pastSignal));
     }
 
     /**
-     * Computes speed by taking the distance travelled between two AIS signals.
+     * Compute the acceleration based on the current and the past signals.
      *
-     * @param value the current AIS signal
-     * @param pastAISSignal the past AIS signal
-     * @return the speed computed based on these two signals
-     */
-    public double computeSpeed(AISSignal value, AISSignal pastAISSignal) {
-        double globeDistance = harvesineDistance(
-                value.getLatitude(), value.getLongitude(),
-                pastAISSignal.getLatitude(), pastAISSignal.getLongitude()
-        );
-        double time = getTimeDifference(value, pastAISSignal);
-
-        return globeDistance / (time + 0.00001);
-    }
-
-    /**
-     * Calculates the absolute difference between the reported speed in the AIS signal and the
-     * calculated speed (using the previous signal).
-     *
-     * @param value the current AIS signal
-     * @param pastValue the previous AIS signal
-     * @return the difference between reported speed and the calculated speed
-     */
-    public double getReportedSpeedDifference(AISSignal value, AISSignal pastValue) {
-        return Math.abs(value.getSpeed() - computeSpeed(pastValue, value));
-    }
-
-    /**
-     * Calculate the time difference between two AIS signals.
-     *
-     * @param value the current AIS signal
-     * @param pastAISSignal the previous AIS signal
-     * @return the difference between two signals
-     */
-    public double getTimeDifference(AISSignal value, AISSignal pastAISSignal) {
-        return Duration.between(pastAISSignal.getTimestamp(), value.getTimestamp()).toMinutes();
-    }
-
-    /**
-     * Calculates acceleration based on the data in two consecutive AIS signals.
-     *
-     * @param value the current AIS signal
-     * @param pastAISSignal the previous AIS signal
+     * @param currentSignal the current AIS signal
+     * @param pastSignal the past AIS signal
      * @return the computed acceleration
      */
-    public double calculateAcceleration(AISSignal value, AISSignal pastAISSignal) {
-        double time = getTimeDifference(value, pastAISSignal);
-        return (value.getSpeed() - pastAISSignal.getSpeed()) / (time + 0.00001);
+    private double computedAcceleration(AISSignal currentSignal, AISSignal pastSignal) {
+        double speedDiff = currentSignal.getSpeed() - pastSignal.getSpeed();
+        return speedDiff / (timeDiffInMinutes(currentSignal, pastSignal) + 0.00001);
+    }
+
+    /**
+     * Gets the anomaly score of the heuristic. This score is given to the ship that
+     * is considered an anomaly based on the heuristic.
+     *
+     * @return the anomaly score of the heuristic
+     */
+    @Override
+    protected float getAnomalyScore() {
+        return 25f;
     }
 }

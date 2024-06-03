@@ -6,16 +6,17 @@ import ShipDetails from "./model/ShipDetails";
 import ShipService from "./services/ShipService";
 import { MapExportedMethodsType } from "./components/Map/Map";
 import ErrorNotificationService from "./services/ErrorNotificationService";
-
 import "./styles/common.css";
 import Side from "./components/Side/Side";
+import ShipNotification from "./model/ShipNotification";
+import { NotificationService } from "./services/NotificationService";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
  */
 export interface CurrentPage {
   currentPage: string;
-  shownShipId: number;
+  shownItemId: number;
 }
 
 function App() {
@@ -34,7 +35,7 @@ function App() {
   // Create state for current page
   const [currentPage, setCurrentPage] = useState({
     currentPage: "none",
-    shownShipId: -1,
+    shownItemId: -1,
   } as CurrentPage);
 
   // Create function that is called when the current page needs to be changed
@@ -45,15 +46,26 @@ function App() {
       !areShipDetailsOpened(currentPage)
     ) {
       // If we clicked the same icon for the second time
-      setCurrentPage({ currentPage: "none", shownShipId: -1 });
+      setCurrentPage({ currentPage: "none", shownItemId: -1 });
     } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);
     }
   };
 
-  // Put the ships as state
-  const [ships, setShips] = useState<ShipDetails[]>([]);
+  // Put currently displayed ships as state
+  const [allShips, setAllShips] = useState<ShipDetails[]>([]);
+
+  // Put notifications as state
+  const [notifications, setNotifications] = useState<ShipNotification[]>([]);
+
+  // Put filter threshold as a state
+  const [filterThreshold, setFilterThreshold] = useState<number>(0);
+
+  // Create a separate array for displayed ships
+  const displayedShips = allShips.filter(
+    (x) => x.anomalyScore >= filterThreshold,
+  );
 
   // Every 1s update the anomaly score of all ships by querying the server
   useEffect(() => {
@@ -61,22 +73,37 @@ function App() {
       // Query for ships. When the results arrive, update the state
       ShipService.queryBackendForShipsArray().then(
         (shipsArray: ShipDetails[]) => {
-          setShips(shipsArray);
+          setAllShips(shipsArray);
         },
       );
     }, 1000);
+  }, []);
+
+  // Every 1s update the notifications by querying the server
+  useEffect(() => {
+    setInterval(() => {
+      // Query for notifications. When the results arrive, update the state
+      NotificationService.queryBackendForAllNotifications().then(
+        (notificationsArray: ShipNotification[]) => {
+          setNotifications(notificationsArray);
+        },
+      );
+    }, 500);
   }, []);
 
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
       <Stack direction="row">
-        <Map ships={ships} pageChanger={pageChanger} ref={mapRef} />
+        <Map ships={displayedShips} pageChanger={pageChanger} ref={mapRef} />
         <Side
           currentPage={currentPage}
-          ships={ships}
+          ships={displayedShips}
+          notifications={notifications}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}
+          setFilterThreshold={setFilterThreshold}
+          anomalyThreshold={filterThreshold}
         />
       </Stack>
     </div>
@@ -86,7 +113,7 @@ function App() {
 function areShipDetailsOpened(currentPage: CurrentPage) {
   return (
     currentPage.currentPage === "objectDetails" &&
-    currentPage.shownShipId !== -1
+    currentPage.shownItemId !== -1
   );
 }
 
