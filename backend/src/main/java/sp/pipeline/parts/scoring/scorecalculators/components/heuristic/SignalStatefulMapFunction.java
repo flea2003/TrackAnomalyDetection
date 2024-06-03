@@ -27,6 +27,11 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     protected AnomalyScoreWithExplanation checkForAnomaly(AISSignal currentSignal, AISSignal pastSignal) {
+        // only check if there was a signal in the past
+        if (pastSignal == null) {
+            return new AnomalyScoreWithExplanation(false, 0f, "");
+        }
+
         boolean isAnomaly = false;
         String explanation = "";
 
@@ -58,7 +63,7 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     @Override
     protected float getAnomalyScore() {
-        return 33f;
+        return 25f;
     }
 
     /**

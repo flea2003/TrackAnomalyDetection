@@ -91,7 +91,7 @@ public class SignalStatefulMapFunctionTest {
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
         assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
-        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
                         Time between two consecutive signals is too large: 11 minutes is more than threshold of 10 minutes, and ship's speed (between two signals) is too large: 37448.13 km/h is more than threshold of 6.0 km/h.
@@ -119,7 +119,7 @@ public class SignalStatefulMapFunctionTest {
         assertThat(anomalies.size()).isEqualTo(3);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
         assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
-        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
                         Time between two consecutive signals is too large: 11 minutes is more than threshold of 10 minutes, and ship's speed (between two signals) is too large: 597.3 km/h is more than threshold of 6.0 km/h.

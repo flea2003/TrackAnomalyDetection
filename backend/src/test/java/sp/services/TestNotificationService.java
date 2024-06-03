@@ -3,6 +3,8 @@ package sp.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import sp.model.*;
 import sp.exceptions.NotificationNotFoundException;
 import sp.repositories.NotificationRepository;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -123,8 +126,6 @@ public class TestNotificationService {
         assertThat(notification).isEqualTo(notification4);
     }
 
-
-
     @Test
     void testGetNewestNotificationForShipException() throws NotificationNotFoundException {
         assertThrows(NotificationNotFoundException.class, () -> notificationService.getNewestNotificationForShip(3L));
@@ -133,5 +134,18 @@ public class TestNotificationService {
     @Test
     void getAllNotifications() throws NotificationNotFoundException {
         assertThat(notificationService.getAllNotifications()).isEqualTo(List.of(notification1, notification2, notification3));
+    }
+
+    @Test
+    void testMarkNotificationAsRead() throws NotificationNotFoundException {
+        assertDoesNotThrow(() -> notificationService.markNotificationAsRead(0L));
+        notification1.setRead(true);
+        verify(notificationRepository, times(1)).save(notification1);
+    }
+
+    @Test
+    void testMarkNotificationAsReadFail() throws NotificationNotFoundException {
+        assertThrows(NotificationNotFoundException.class, () -> notificationService.markNotificationAsRead(4L));
+        verify(notificationRepository, times(0)).save(notification3);
     }
 }

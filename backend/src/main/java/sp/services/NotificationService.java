@@ -91,4 +91,19 @@ public class NotificationService {
 
         return result;
     }
+
+    /**
+     * Marks a certain notification as read (updates its object in the database).
+     *
+     * @param id id of the notification
+     * @throws NotificationNotFoundException throw in case the notification does not exist
+     */
+    public void markNotificationAsRead(Long id) throws NotificationNotFoundException {
+        Optional<Notification> notification = notificationRepository.findById(id);
+        if (notification.isEmpty()) throw new NotificationNotFoundException();
+
+        Notification notificationValue = notification.get();
+        notificationValue.setRead(true);
+        notificationRepository.save(notificationValue);
+    }
 }

@@ -12,8 +12,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class TestNotificationController {
 
@@ -58,6 +57,8 @@ public class TestNotificationController {
         when(notificationService.getAllNotifications()).thenReturn(List.of(notification1, notification2, notification3));
         when(notificationService.getAllNotificationForShip(2L)).thenReturn(List.of(notification2, notification3));
         when(notificationService.getNotificationById(4L)).thenThrow(NotificationNotFoundException.class);
+        doNothing().when(notificationService).markNotificationAsRead(2L);
+        doThrow(new NotificationNotFoundException()).when(notificationService).markNotificationAsRead(3L);
         notificationController = new NotificationController(notificationService);
     }
 
@@ -84,5 +85,15 @@ public class TestNotificationController {
     @Test
     void testGetNotificationForAShip() throws NotificationNotFoundException {
         assertThat(notificationController.getAllNotificationsForShip(2L)).isEqualTo(ResponseEntity.ok(List.of(notification2, notification3)));
+    }
+
+    @Test
+    void testMarkNotificationAsRead() throws NotificationNotFoundException {
+        assertThat(notificationController.markNotificationAsRead(2L)).isEqualTo(ResponseEntity.status(HttpStatus.OK).build());
+    }
+
+    @Test
+    void testMarkNotificationAsReadFail() throws NotificationNotFoundException {
+        assertThat(notificationController.markNotificationAsRead(3L)).isEqualTo(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 }

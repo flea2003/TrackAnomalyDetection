@@ -68,7 +68,7 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.size()).isEqualTo(2);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
         assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
-        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
                         Speed is too big: 840.06 km/min is faster than threshold of 55.5 km/min.
@@ -100,7 +100,7 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.size()).isEqualTo(3);
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
         assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
-        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
                         Speed is inaccurate: the approximated speed of 2.74 km/min is different from reported speed of 12.8 km/min by more than allowed margin of 10 km/min.
@@ -129,7 +129,7 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(0).getValue().getScore()).isEqualTo(0.0f);
         assertThat(anomalies.get(0).getValue().getExplanation()).isEqualTo("");
 
-        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
                         Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 60 km/min by more than allowed margin of 10 km/min.
@@ -137,7 +137,7 @@ public class SpeedStatefulMapFunctionTest {
                         """
         );
 
-        assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(33.0f);
+        assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo(
                 """
                         Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 110 km/min by more than allowed margin of 10 km/min.

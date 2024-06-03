@@ -5,10 +5,14 @@ import React, { JSX } from "react";
 import ShipDetails from "../../../model/ShipDetails";
 import ErrorList from "./ErrorNotifications/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
+import NotificationList from "./NotificationsList/NotificationList";
+import ShipNotification from "../../../model/ShipNotification";
+import NotificationDetails from "./NotificationsList/NotificationDetails";
 
 interface MiddleColumnProps {
   currentPage: CurrentPage;
   ships: ShipDetails[];
+  notifications: ShipNotification[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
 }
@@ -16,6 +20,7 @@ interface MiddleColumnProps {
 function MiddleColumn({
   currentPage,
   ships,
+  notifications,
   pageChanger,
   mapCenteringFun,
 }: MiddleColumnProps): JSX.Element {
@@ -32,12 +37,29 @@ function MiddleColumn({
       return (
         <ObjectDetails
           ships={ships}
-          shipId={currentPage.shownShipId}
+          notifications={notifications}
+          mapCenteringFun={mapCenteringFun}
+          shipId={currentPage.shownItemId}
           pageChanger={pageChanger}
         />
       );
-    case "notifications":
-      return <div>Notifications</div>;
+    case "notificationList":
+      return (
+        <NotificationList
+          notifications={notifications}
+          ships={ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+        />
+      );
+    case "notificationDetails":
+      return (
+        <NotificationDetails
+          allNotifications={notifications}
+          notificationID={currentPage.shownItemId}
+          pageChanger={pageChanger}
+        />
+      );
     case "settings":
       return <div>Settings</div>;
     case "errors":
