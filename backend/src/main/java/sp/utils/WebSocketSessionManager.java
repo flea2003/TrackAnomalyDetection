@@ -1,14 +1,17 @@
 package sp.utils;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@NoArgsConstructor
+@Getter
 public class WebSocketSessionManager {
     private Set<String> activeSessions = Collections.synchronizedSet(new HashSet<>());
-
 
     public void addSession(String sessionId) {
         this.activeSessions.add(sessionId);
