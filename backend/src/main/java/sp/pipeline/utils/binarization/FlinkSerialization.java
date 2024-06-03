@@ -10,7 +10,7 @@ public class FlinkSerialization {
     private static final Logger logger = LoggerFactory.getLogger(FlinkSerialization.class);
 
     /**
-     * Static method that takes a Flink data stream of objects and serializes them to serialized strings.
+     * Static method that takes a Flink data stream of objects and serializes them to base64 binary strings.
      *
      * @param source a Flink data stream of objects
      * @param <T> the type of incoming stream

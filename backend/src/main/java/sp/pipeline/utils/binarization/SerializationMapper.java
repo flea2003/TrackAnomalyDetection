@@ -6,7 +6,7 @@ import java.util.Base64;
 public class SerializationMapper {
 
     /**
-     * Converts a particular AnomalyInformation object to a binary-encoded string.
+     * Converts a particular object to a binary-encoded string.
      *
      * @param object the object to be converted to binary-encoded string
      * @param <T> the type of the object
@@ -22,7 +22,7 @@ public class SerializationMapper {
     }
 
     /**
-     * Converts a binary-encoded string to an AnomalyInformation object.
+     * Converts a binary-encoded string to a Java object.
      *
      * @param val the binary-encoded string to convert
      * @param classType the java class representing the class for the resulting object
