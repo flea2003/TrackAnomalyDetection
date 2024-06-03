@@ -11,6 +11,12 @@ public class WebSocketShipsDataService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final WebSocketSessionManager webSocketSessionManager;
 
+    /**
+     * Constructor for the WebSocketShipsDataService class.
+     *
+     * @param simpMessagingTemplate SimpMessagingTemplate instance
+     * @param webSocketSessionManager WebSocketSessionManager instance
+     */
     @Autowired
     public WebSocketShipsDataService(SimpMessagingTemplate simpMessagingTemplate,
                                      WebSocketSessionManager webSocketSessionManager) {

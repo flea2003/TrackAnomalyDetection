@@ -40,6 +40,7 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationBuilder builder for the score calculation part of the pipeline
      * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
      * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
+     * @param webSocketBroadcasterBuilder builder for the WebSockets message broadcasting part
      */
     @Autowired
     public AnomalyDetectionPipeline(StreamUtils streamUtils,
@@ -68,6 +69,7 @@ public class AnomalyDetectionPipeline {
      * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
      * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
      * @param flinkEnv injected Flink environment
+     * @param webSocketBroadcasterBuilder  builder for the WebSockets message broadcasting part
      */
     public AnomalyDetectionPipeline(
             StreamUtils streamUtils,

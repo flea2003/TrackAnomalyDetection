@@ -15,11 +15,21 @@ public class WebSocketEventListener implements ApplicationListener<ApplicationEv
 
     private final WebSocketSessionManager sessionManager;
 
+    /**
+     * Constructor of the WebSocketEventListener class.
+     *
+     * @param sessionManager - WebSocketSessionManager instance
+     */
     @Autowired
     public WebSocketEventListener(WebSocketSessionManager sessionManager) {
         this.sessionManager = sessionManager;
     }
 
+    /**
+     * Handle the application events triggered by Client actions.
+     *
+     * @param event the event to respond to
+     */
     @Override
     public void onApplicationEvent(@NonNull ApplicationEvent event) {
         if (event instanceof SessionSubscribeEvent) {
