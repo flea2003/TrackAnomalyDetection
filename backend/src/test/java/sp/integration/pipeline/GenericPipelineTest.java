@@ -154,7 +154,7 @@ class GenericPipelineTest {
         );
 
         // Instantiate Service classes for querying
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, null, null);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
     }
 
     /**

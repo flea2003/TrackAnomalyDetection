@@ -90,9 +90,9 @@ public class TestShipsDataService {
             put(4L, currentShipDetails4);
         }};
 
-        ResultSetReader<CurrentShipDetails> resultSetReader = Mockito.mock(ResultSetReader.class);
-        when(resultSetReader.extractQueryResults(any(), any())).thenReturn(List.of(currentShipDetails1,
-            currentShipDetails2, currentShipDetails3, currentShipDetails4));
+        MockedStatic<ResultSetReader>mockedResultSetReader = mockStatic(ResultSetReader.class);
+        mockedResultSetReader.when(() -> ResultSetReader.extractQueryResults(any(), any()))
+            .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
 
         druidConfig = Mockito.mock(DruidConfig.class);
         Connection connection = Mockito.mock(Connection.class);
@@ -100,7 +100,7 @@ public class TestShipsDataService {
         when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
 
         anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, resultSetReader, druidConfig);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
 
         ShipInformationExtractor shipInformationExtractor = Mockito.mock(ShipInformationExtractor.class);
 
@@ -115,6 +115,9 @@ public class TestShipsDataService {
         shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
+
+        MockedStatic<ResultSetReader>mockedResultSetReaderBroken = mockStatic(ResultSetReader.class);
+        mockedResultSetReaderBroken.when(() -> ResultSetReader.)
 
         ResultSetReader<CurrentShipDetails>resultSetReaderBroken = Mockito.mock(ResultSetReader.class);
         doThrow(SQLException.class).when(resultSetReaderBroken)
