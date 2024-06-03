@@ -14,4 +14,5 @@ include:
   - local: frontend/.gitlab-ci.yml
   - local: simulator/.gitlab-ci.yml
   - local: backend/.gitlab-ci.yml
+  - local: stress-tester/.gitlab-ci.yml
 
