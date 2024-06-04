@@ -17,6 +17,7 @@ import sp.utils.sql.QueryExecutor;
 @Service
 public class ShipsDataService {
     private final AnomalyDetectionPipeline anomalyDetectionPipeline;
+    private final QueryExecutor queryExecutor;
     private final Integer activeTime = 30;
 
 
@@ -27,8 +28,9 @@ public class ShipsDataService {
      *     anomaly information computation
      */
     @Autowired
-    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline) {
+    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline, QueryExecutor queryExecutor) {
         this.anomalyDetectionPipeline = anomalyDetectionPipeline;
+        this.queryExecutor = queryExecutor;
         anomalyDetectionPipeline.runPipeline();
     }
 
@@ -71,7 +73,7 @@ public class ShipsDataService {
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
         try {
-            return QueryExecutor.executeQueryOneLong(id, "src/main/resources/history.sql", CurrentShipDetails.class);
+            return queryExecutor.executeQueryOneLong(id, "src/main/resources/history.sql", CurrentShipDetails.class);
         } catch (SQLException e) {
             throw new PipelineException("Error while executing query.");
         }

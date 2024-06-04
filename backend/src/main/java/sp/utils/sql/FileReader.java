@@ -2,7 +2,9 @@ package sp.utils.sql;
 
 import java.io.BufferedReader;
 import java.sql.SQLException;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FileReader {
     /**
      * Helper method to parse developer defined SQL queries.

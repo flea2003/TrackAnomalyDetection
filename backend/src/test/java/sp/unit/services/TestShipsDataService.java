@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import sp.exceptions.PipelineStartingException;
@@ -25,6 +26,7 @@ import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.services.ShipsDataService;
 import sp.utils.DruidConfig;
 import sp.utils.sql.FileReader;
+import sp.utils.sql.QueryExecutor;
 import sp.utils.sql.ResultSetReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +46,6 @@ public class TestShipsDataService {
     CurrentShipDetails currentShipDetails4;
     ShipInformationExtractor shipInformationExtractorBroken;
     AnomalyDetectionPipeline anomalyDetectionPipeline;
-
     DruidConfig druidConfig;
     @BeforeEach
     public void setUp() throws Exception {
@@ -90,14 +91,12 @@ public class TestShipsDataService {
             put(4L, currentShipDetails4);
         }};
 
-        MockedStatic<ResultSetReader>mockedResultSetReader = mockStatic(ResultSetReader.class);
-        mockedResultSetReader.when(() -> ResultSetReader.extractQueryResults(any(), any()))
-            .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
-
         druidConfig = Mockito.mock(DruidConfig.class);
         Connection connection = Mockito.mock(Connection.class);
         when(druidConfig.connection()).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
+
+        QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
 
         anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
@@ -116,14 +115,7 @@ public class TestShipsDataService {
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
 
-        MockedStatic<ResultSetReader>mockedResultSetReaderBroken = mockStatic(ResultSetReader.class);
-        mockedResultSetReaderBroken.when(() -> ResultSetReader.)
-
-        ResultSetReader<CurrentShipDetails>resultSetReaderBroken = Mockito.mock(ResultSetReader.class);
-        doThrow(SQLException.class).when(resultSetReaderBroken)
-            .extractQueryResults(any(), any());
-
-        shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, resultSetReaderBroken, druidConfig);
+        shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
 
         doReturn(shipInformationExtractorBroken).when(anomalyDetectionPipelineBroken).getShipInformationExtractor();
 
@@ -213,14 +205,23 @@ public class TestShipsDataService {
 
     @Test
     void getHistoryOfShip() throws PipelineException{
-        List<CurrentShipDetails> result = shipsDataService.getHistoryOfShip(5L);
-        assertThat(result).containsExactlyElementsOf(List.of(currentShipDetails1, currentShipDetails2,
-            currentShipDetails3, currentShipDetails4));
+        try(MockedStatic<ResultSetReader>mockedResultSetReader = mockStatic(ResultSetReader.class)) {
+            mockedResultSetReader.when(() -> ResultSetReader.extractQueryResults(any(), any()))
+                .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
+
+            List<CurrentShipDetails> result = shipsDataService.getHistoryOfShip(5L);
+            assertThat(result).containsExactlyElementsOf(List.of(currentShipDetails1, currentShipDetails2,
+                currentShipDetails3, currentShipDetails4));
+        }
     }
 
     @Test
     void getHistoryOfShipException(){
-        assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
+        try(MockedStatic<ResultSetReader>mockedResultSetReader = mockStatic(ResultSetReader.class)){
+            mockedResultSetReader.when(() -> ResultSetReader.extractQueryResults(any(), any()))
+                .thenThrow(SQLException.class);
+            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
+        }
     }
 
     @Test

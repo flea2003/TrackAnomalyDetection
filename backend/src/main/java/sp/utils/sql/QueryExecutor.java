@@ -5,10 +5,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
+import org.springframework.stereotype.Service;
 import sp.utils.DruidConfig;
 
+@Service
 public class QueryExecutor {
-    private static DruidConfig druidConfig;
+    private final DruidConfig druidConfig;
+
+    @Autowired
+    public QueryExecutor(DruidConfig druidConfig){
+        this.druidConfig = druidConfig;
+    }
 
     /**
      * Executes a SQL query which takes as input a parameter of type long.
@@ -16,11 +25,10 @@ public class QueryExecutor {
      * @param id the parameter of type long
      * @param path the path of where the sql query is located
      * @param tclass the class of the answer of this query
-     * @param <T> generics of the object which defines the class tclass
      * @return a list of tclass objects
      * @throws SQLException throws if the SQL query fails
      */
-    public static <T> List<T> executeQueryOneLong(long id, String path, Class<T> tclass) throws SQLException {
+    public <T> List<T> executeQueryOneLong(long id, String path, Class<T> tclass) throws SQLException {
         String query;
 
         query = FileReader.readQueryFromFile(path);
