@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import sp.model.CurrentShipDetails;
 import sp.services.WebSocketShipsDataService;
-import sp.utils.WebSocketSessionManager;
+import sp.utils.websockets.WebSocketSessionManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;

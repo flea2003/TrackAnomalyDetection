@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import sp.model.CurrentShipDetails;
-import sp.utils.WebSocketSessionManager;
+import sp.utils.websockets.WebSocketSessionManager;
 
 @Service
 public class WebSocketShipsDataService {

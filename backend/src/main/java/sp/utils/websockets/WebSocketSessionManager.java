@@ -1,4 +1,4 @@
-package sp.utils;
+package sp.utils.websockets;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

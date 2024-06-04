@@ -1,8 +1,8 @@
-package sp.unit.utils;
+package sp.unit.utils.websockets;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sp.utils.WebSocketSessionManager;
+import sp.utils.websockets.WebSocketSessionManager;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -13,7 +13,6 @@ public class WebSocketSessionManagerTest {
     @BeforeEach
     public void setUp() {
         this.manager = new WebSocketSessionManager();
-        System.out.println(this.manager);
         this.manager.addSession("s1");
     }
 
