@@ -12,8 +12,10 @@ class ShipService {
 
   /**
    * This method queries the backend for the CurrentShipDetails array
-   * The resulting array of type ShipDetails is the result of transforming the retrieved arrays.
-   * The method returns a promise that resolves to an array of ShipDetails.
+   * The resulting array of type ShipDetails is the result of transforming the
+   * retrieved array. The method returns a promise that resolves to an array of
+   * ShipDetails, which is filtered based on the anomaly threshold, and also sorted
+   *
    * @returns a promise that resolves to an array of ShipDetails.
    */
   static queryBackendForShipsArray: () => Promise<ShipDetails[]> = async () => {
@@ -35,10 +37,10 @@ class ShipService {
     if (responseWithoutNulls.length !== response.length) {
       ErrorNotificationService.addError("Ship array contained null items");
     }
+
     return ShipService.sortList(
-      responseWithoutNulls.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (item: any) => ShipService.extractCurrentShipDetails(item),
+      responseWithoutNulls.map((item: APIResponseItem) =>
+        ShipService.extractCurrentShipDetails(item),
       ),
       "desc",
     );

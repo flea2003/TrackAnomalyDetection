@@ -126,7 +126,7 @@ but for not-yet-seen values it will contain previously calculated data.
 
 For full reset of the back-end state you can run the following commands (make sure the application is not runnning):
 ```bash
-bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeline
+bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeline --force
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092

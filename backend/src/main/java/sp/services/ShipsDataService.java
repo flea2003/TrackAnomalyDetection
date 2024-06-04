@@ -59,8 +59,13 @@ public class ShipsDataService {
     public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException, PipelineStartingException {
         OffsetDateTime currentTime = OffsetDateTime.now();
         HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getShipInformationExtractor()
-            .getFilteredShipDetails(x -> Duration.between(x.getCurrentAISSignal().getReceivedTime(),
-                currentTime).toMinutes() <= activeTime);
+            .getFilteredShipDetails(x -> {
+                if (x.getCurrentAISSignal() == null) {
+                    return false;
+                } else {
+                    return Duration.between(x.getCurrentAISSignal().getReceivedTime(), currentTime).toMinutes() <= activeTime;
+                }
+            });
         return shipsInfo.values().stream().toList();
     }
 

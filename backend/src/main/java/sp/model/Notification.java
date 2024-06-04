@@ -5,20 +5,20 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.apache.kafka.common.serialization.Serde;
 import sp.utils.UtilsObjectMapper;
+import java.io.Serializable;
 
 @Entity
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-@ToString
 @Getter
 @Setter
-public class Notification {
+public class Notification implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long shipID;
+    private boolean isRead;
 
     @Column(length = 2048)
     private final CurrentShipDetails currentShipDetails;
@@ -31,6 +31,7 @@ public class Notification {
      */
     public Notification(CurrentShipDetails currentShipDetails) {
         this.currentShipDetails = currentShipDetails;
+        this.isRead = false;
         this.shipID = currentShipDetails.getCurrentAnomalyInformation().getId();
     }
 
