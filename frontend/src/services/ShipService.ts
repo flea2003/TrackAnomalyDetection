@@ -1,7 +1,7 @@
 // Create a class to get ship information from the server
 import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";
-import HttpSender from "../utils/HttpSender";
+import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
 
 class ShipService {

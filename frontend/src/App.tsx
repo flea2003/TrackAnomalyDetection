@@ -9,7 +9,7 @@ import ErrorNotificationService from "./services/ErrorNotificationService";
 
 import "./styles/common.css";
 import Side from "./components/Side/Side";
-import useWebSocketClient from "./utils/WebSocketClient";
+import useWebSocketClient from "./utils/communication/WebSocketClient";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.

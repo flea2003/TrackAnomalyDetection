@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import ShipDetails from "../model/ShipDetails";
+import ShipDetails from "../../model/ShipDetails";
 import { Client } from "@stomp/stompjs";
-import APIResponseItem from "../templates/APIResponseItem";
-import ShipService from "../services/ShipService";
-import ErrorNotificationService from "../services/ErrorNotificationService";
+import APIResponseItem from "../../templates/APIResponseItem";
+import ShipService from "../../services/ShipService";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
 
 const useWebSocketClient = () => {
   const [ships, setShips] = useState<Map<number, ShipDetails>>(new Map());

@@ -3,6 +3,21 @@ import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import App from "../App";
 import userEvent from "@testing-library/user-event";
+import useWebSocketClient from "../utils/communication/WebSocketClient";
+import ShipDetails from "../model/ShipDetails";
+
+jest.mock("../utils/communication/WebSocketClient", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+const mockedUseWebSocketClient = useWebSocketClient as jest.MockedFunction<
+  typeof useWebSocketClient
+>;
+
+beforeEach(() => {
+  mockedUseWebSocketClient.mockReturnValue(new Map<number, ShipDetails>());
+});
 
 test("By default only the map is loaded when the page opens", async () => {
   render(<App />);

@@ -4,6 +4,21 @@ import App, { CurrentPage } from "../../../../App";
 import React from "react";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
 import ErrorList from "../../../../components/Side/MiddleColumn/ErrorNotifications/ErrorList";
+import useWebSocketClient from "../../../../utils/communication/WebSocketClient";
+import ShipDetails from "../../../../model/ShipDetails";
+
+jest.mock("../../../../utils/communication/WebSocketClient", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+const mockedUseWebSocketClient = useWebSocketClient as jest.MockedFunction<
+  typeof useWebSocketClient
+>;
+
+beforeEach(() => {
+  mockedUseWebSocketClient.mockReturnValue(new Map<number, ShipDetails>());
+});
 
 afterEach(() => {
   ErrorNotificationService.clearAllNotifications();
