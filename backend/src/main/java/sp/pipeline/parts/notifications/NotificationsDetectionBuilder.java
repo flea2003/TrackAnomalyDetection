@@ -8,7 +8,7 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.stereotype.Component;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
-import sp.pipeline.utils.json.KafkaJson;
+import sp.pipeline.utils.binarization.KafkaSerialization;
 
 @Component
 public class NotificationsDetectionBuilder {
@@ -42,13 +42,14 @@ public class NotificationsDetectionBuilder {
         KStream<Long, CurrentShipDetails> streamOfUpdates = state.toStream();
 
         // Construct the KTable (state that is stored) by aggregating the merged stream
-        KafkaJson.serialize(streamOfUpdates)
+        KafkaSerialization.serialize(streamOfUpdates)
                 .groupByKey()
                 .aggregate(Notification::new,
-                        KafkaJson.aggregator(notificationsAggregator::aggregateSignals, CurrentShipDetails.class),
+                        KafkaSerialization.aggregator(notificationsAggregator::aggregateSignals, CurrentShipDetails.class),
                         Materialized
                                 .<Long, Notification, KeyValueStore<Bytes, byte[]>>as("dummy")
                                 .withValueSerde(Notification.getSerde())
+                                .withCachingDisabled()
             );
     }
 }

@@ -190,7 +190,7 @@ test("backend-fetching-null-anomaly-info", async () => {
       90,
       350.0,
     ),
-  ]);
+  ]); // Now if anomaly score is not computed, we don't show it!
 });
 
 test("sorting-valid-list-descending-ascending", async () => {

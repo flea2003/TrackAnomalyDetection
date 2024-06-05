@@ -119,7 +119,7 @@ test("Closing Error list calls pageChanger correctly", () => {
   const pageChanger = (curPage: CurrentPage) => {
     expect(curPage).not.toBeNull();
     expect(curPage.currentPage).toBe("none");
-    expect(curPage.shownShipId).toBe(-1);
+    expect(curPage.shownItemId).toBe(-1);
     wasPageChangerCalled = true;
   };
 
