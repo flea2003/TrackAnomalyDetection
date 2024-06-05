@@ -21,6 +21,7 @@ import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
+import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
 import sp.repositories.NotificationRepository;
 import sp.services.NotificationService;
@@ -57,6 +58,7 @@ class GenericPipelineTest {
     protected String scoresTopic;
     protected AnomalyDetectionPipeline anomalyDetectionPipeline;
     protected ShipsDataService shipsDataService;
+    protected WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
 
     /**
@@ -135,6 +137,9 @@ class GenericPipelineTest {
         notificationRepository = mock(NotificationRepository.class);
         notificationService = spy(new NotificationService(notificationRepository));
 
+        // Mock the WebSocket broadcaster builder class
+        webSocketBroadcasterBuilder = mock(WebSocketBroadcasterBuilder.class);
+
         // Create the core objects
         scoreCalculationStrategy = new SimpleScoreCalculator();
         currentStateAggregator = new CurrentStateAggregator();
@@ -150,7 +155,7 @@ class GenericPipelineTest {
         // Create the pipeline itself
         anomalyDetectionPipeline = new AnomalyDetectionPipeline(
                 streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder,
-                env
+                env, webSocketBroadcasterBuilder
         );
 
         // Instantiate Service classes for querying
