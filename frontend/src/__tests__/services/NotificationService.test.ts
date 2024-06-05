@@ -1,4 +1,4 @@
-import HttpSender from "../../utils/HttpSender";
+import HttpSender from "../../utils/communication/HttpSender";
 import ShipDetails from "../../model/ShipDetails";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import NotificationResponseItem from "../../templates/NotificationResponseItem";
@@ -99,7 +99,7 @@ const resultItem2 = new ShipNotification(
   ),
 );
 
-jest.mock("../../utils/HttpSender");
+jest.mock("../../utils/communication/HttpSender");
 
 beforeEach(() => {
   // Make refreshState do nothing, so that it does not print to console.

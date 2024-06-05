@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import { useState } from "react";
 import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
-import ShipService from "./services/ShipService";
 import { MapExportedMethodsType } from "./components/Map/LMap";
 import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
@@ -11,6 +10,7 @@ import Side from "./components/Side/Side";
 import useWebSocketClient from "./utils/communication/WebSocketClient";
 import ShipNotification from "./model/ShipNotification";
 import { NotificationService } from "./services/NotificationService";
+import ShipService from "./services/ShipService";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -57,9 +57,10 @@ function App() {
   /**
    * Configure the state and the WebSocket connection with the backend server.
    */
-  const ships = useWebSocketClient();
-  // Put currently displayed ships as state
-  const [allShips, setAllShips] = useState<ShipDetails[]>([]);
+  const allShips = ShipService.sortList(
+    Array.from(useWebSocketClient().values()),
+    "desc",
+  );
 
   // Put notifications as state
   const [notifications, setNotifications] = useState<ShipNotification[]>([]);
@@ -71,18 +72,6 @@ function App() {
   const displayedShips = allShips.filter(
     (x) => x.anomalyScore >= filterThreshold,
   );
-
-  // Every 1s update the anomaly score of all ships by querying the server
-  useEffect(() => {
-    setInterval(() => {
-      // Query for ships. When the results arrive, update the state
-      ShipService.queryBackendForShipsArray().then(
-        (shipsArray: ShipDetails[]) => {
-          setAllShips(shipsArray);
-        },
-      );
-    }, 1000);
-  }, []);
 
   // Every 1s update the notifications by querying the server
   useEffect(() => {
@@ -101,16 +90,10 @@ function App() {
     <div className="App" id="root-div">
       <Stack direction="row">
         <LMap ships={displayedShips} pageChanger={pageChanger} ref={mapRef} />
-        <LMap
-          ships={ShipService.sortList(Array.from(ships.values()), "desc")}
-          pageChanger={pageChanger}
-          ref={mapRef}
-        />
         <Side
           currentPage={currentPage}
           ships={displayedShips}
           notifications={notifications}
-          ships={ShipService.sortList(Array.from(ships.values()), "desc")}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}
           setFilterThreshold={setFilterThreshold}

@@ -1,5 +1,5 @@
 import ShipNotification from "../model/ShipNotification";
-import HttpSender from "../utils/HttpSender";
+import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
 import NotificationResponseItem from "../templates/NotificationResponseItem";
 import ShipDetails from "../model/ShipDetails";
