@@ -127,7 +127,7 @@ public class AnomalyDetectionPipeline {
         this.state = scoreAggregationBuilder.buildScoreAggregationPart(builder);
 
         // Build the pipeline part that broadcasts ship details via websockets
-        this.webSocketBroadcasterBuilder.enableBroadcasting(this.state);
+        this.webSocketBroadcasterBuilder.buildWebSocketBroadcastingPart(this.state);
 
         // Build the pipeline part that produces notifications (Kafka Streams)
         notificationsDetectionBuilder.buildNotifications(this.state);

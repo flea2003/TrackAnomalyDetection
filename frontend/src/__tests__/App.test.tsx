@@ -19,6 +19,10 @@ beforeEach(() => {
   mockedUseWebSocketClient.mockReturnValue(new Map<number, ShipDetails>());
 });
 
+afterAll(() => {
+  jest.resetAllMocks();
+});
+
 test("By default only the map is loaded when the page opens", async () => {
   render(<App />);
 

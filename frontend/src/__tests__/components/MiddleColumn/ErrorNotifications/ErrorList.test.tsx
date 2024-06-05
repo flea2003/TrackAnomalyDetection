@@ -24,6 +24,10 @@ afterEach(() => {
   ErrorNotificationService.clearAllNotifications();
 });
 
+afterAll(() => {
+  jest.resetAllMocks();
+});
+
 test("When bug icon is clicked, the error list is shown with the current errors", async () => {
   render(<App />);
 

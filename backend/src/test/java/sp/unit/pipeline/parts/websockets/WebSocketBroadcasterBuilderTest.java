@@ -45,7 +45,7 @@ public class WebSocketBroadcasterBuilderTest {
 
         Mockito.when(currentState.toStream()).thenReturn(currentStream);
 
-        webSocketBroadcasterBuilder.enableBroadcasting(currentState);
+        webSocketBroadcasterBuilder.buildWebSocketBroadcastingPart(currentState);
 
         verify(webSocketShipsDataService, never()).sendCurrentShipDetails(any(CurrentShipDetails.class));
 
@@ -69,7 +69,7 @@ public class WebSocketBroadcasterBuilderTest {
 
         Mockito.when(currentState.toStream()).thenReturn(currentStream);
 
-        webSocketBroadcasterBuilder.enableBroadcasting(currentState);
+        webSocketBroadcasterBuilder.buildWebSocketBroadcastingPart(currentState);
 
         verify(webSocketShipsDataService).sendCurrentShipDetails(any(CurrentShipDetails.class));
     }

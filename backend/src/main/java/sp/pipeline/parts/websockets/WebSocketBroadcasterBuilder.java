@@ -27,7 +27,7 @@ public class WebSocketBroadcasterBuilder {
      *
      * @param currentShipDetails current view of the aggregated ship data
      */
-    public void enableBroadcasting(KTable<Long, CurrentShipDetails> currentShipDetails) {
+    public void buildWebSocketBroadcastingPart(KTable<Long, CurrentShipDetails> currentShipDetails) {
         KStream<Long, CurrentShipDetails> aggregatedStream = currentShipDetails.toStream();
         aggregatedStream.foreach((key, value) -> {
             if (this.webSocketShipsDataService.checkForOpenConnections()) {

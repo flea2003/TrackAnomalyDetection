@@ -1,0 +1,4 @@
+{
+  "brokerUrl": "ws://localhost:8081/details",
+  "topic": "/topic/details"
+}
