@@ -41,7 +41,7 @@ const useWebSocketClient = () => {
             return new Map(prevShips).set(shipDetails.id, shipDetails);
           });
         } catch (error) {
-          ErrorNotificationService.addError("Data fetching error");
+          ErrorNotificationService.addWarning("Data fetching error");
           setShips((prevMap) => {
             return new Map();
           });
@@ -54,7 +54,7 @@ const useWebSocketClient = () => {
      * @param closeEvent the caught event
      */
     stompClient.onWebSocketClose = function (closeEvent) {
-      ErrorNotificationService.addError("Websocket connection error");
+      ErrorNotificationService.addWarning("Websocket connection error");
       setShips((prevMap) => {
         return new Map();
       });

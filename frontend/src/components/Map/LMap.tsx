@@ -157,11 +157,20 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
       return () => {
         if (map) {
-          map.eachLayer(function (layer: L.Layer) {
-            if (layer instanceof L.Marker) {
-              map.removeLayer(layer);
-            }
-          });
+          map
+            .eachLayer(function (layer: L.Layer) {
+              if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+              }
+            })
+            .on("zoom", () => {
+              setHoverInfo({
+                show: false,
+                x: 0,
+                y: 0,
+                shipDetails: null,
+              } as ShipIconDetailsType);
+            });
         }
       };
     }, [map, pageChanger, ships]);
