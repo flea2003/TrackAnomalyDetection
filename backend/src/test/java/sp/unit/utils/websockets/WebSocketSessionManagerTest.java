@@ -57,4 +57,10 @@ public class WebSocketSessionManagerTest {
         assertThat(this.manager.checkForOpenConnections()).isFalse();
     }
 
+    @Test
+    public void testForNoInitialConnections() {
+        WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
+        assertThat(webSocketSessionManager.checkForOpenConnections()).isFalse();
+    }
+
 }
