@@ -4,6 +4,7 @@ import { Client } from "@stomp/stompjs";
 import APIResponseItem from "../../templates/APIResponseItem";
 import ShipService from "../../services/ShipService";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
+import websocketConfig from "../../configs/websocketConfig.json";
 
 const useWebSocketClient = () => {
   const [ships, setShips] = useState<Map<number, ShipDetails>>(new Map());
@@ -13,7 +14,7 @@ const useWebSocketClient = () => {
    */
   useEffect(() => {
     const stompClient = new Client({
-      brokerURL: "ws://localhost:8081/details",
+      brokerURL: websocketConfig.brokerUrl,
       debug: function (str) {
         console.log(str);
       },
@@ -29,11 +30,9 @@ const useWebSocketClient = () => {
      * @param frame
      */
     stompClient.onConnect = function (frame) {
-      stompClient.subscribe("/topic/details", function (message) {
+      stompClient.subscribe(websocketConfig.topic, function (message) {
         try {
-          /**
-           * Given a new received message, convert it to a ShipDetails instance and update the state.
-           */
+          // Given a new received message, convert it to a ShipDetails instance and update the state
           const apiResponse = JSON.parse(message.body) as APIResponseItem;
           const shipDetails =
             ShipService.extractCurrentShipDetails(apiResponse);
@@ -74,7 +73,7 @@ const useWebSocketClient = () => {
     };
 
     stompClient.onStompError = function (frame) {
-      ErrorNotificationService.addError(
+      ErrorNotificationService.addWarning(
         "Websocket broker error: " + frame.headers["message"],
       );
     };

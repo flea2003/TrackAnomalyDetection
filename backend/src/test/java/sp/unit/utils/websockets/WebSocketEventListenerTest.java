@@ -3,11 +3,13 @@ package sp.unit.utils.websockets;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import sp.utils.websockets.WebSocketEventListener;
@@ -80,9 +82,8 @@ public class WebSocketEventListenerTest {
         webSocketSessionManager.addSession("s1");
         assertThat(webSocketSessionManager.isActive("s1")).isTrue();
 
-        /*
-        Create the mock headers of the subscription message
-         */
+
+        // Create the mock headers of the subscription message
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
         stompHeaderAccessor.setSessionId("s1");
         Map<String, Object> headers = new HashMap<>(stompHeaderAccessor.toMap());
@@ -101,9 +102,7 @@ public class WebSocketEventListenerTest {
     public void sessionDisconnectEventUnknownClientTest() {
         assertThat(webSocketSessionManager.isActive("s1")).isFalse();
 
-        /*
-        Create the mock headers of the subscription message
-         */
+        // Create the mock headers of the subscription message
         StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.create(StompCommand.DISCONNECT);
         stompHeaderAccessor.setSessionId("s1");
         Map<String, Object> headers = new HashMap<>(stompHeaderAccessor.toMap());
@@ -115,6 +114,23 @@ public class WebSocketEventListenerTest {
 
         webSocketEventListener.onApplicationEvent(sessionDisconnectEvent);
 
+    }
+
+    @Test
+    public void otherSessionEventTest() {
+        assertThat(webSocketSessionManager.isActive("s1")).isFalse();
+
+        // Create the mock headers of the subscription message
+        StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.create(StompCommand.CONNECT);
+        stompHeaderAccessor.setSessionId("s1");
+        Map<String, Object> headers = new HashMap<>(stompHeaderAccessor.toMap());
+
+        Message<byte[]> message = new GenericMessage<>(new byte[0], headers);
+
+        ApplicationEvent sessionDisconnectEvent
+                = new SessionConnectEvent(this, message);
+
+        webSocketEventListener.onApplicationEvent(sessionDisconnectEvent);
     }
 
 }

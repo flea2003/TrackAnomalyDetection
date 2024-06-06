@@ -51,4 +51,16 @@ public class WebSocketSessionManagerTest {
         assertThat(this.manager.checkForOpenConnections()).isTrue();
     }
 
+    @Test
+    public void testForClosedConnections() {
+        this.manager.removeSession("s1");
+        assertThat(this.manager.checkForOpenConnections()).isFalse();
+    }
+
+    @Test
+    public void testForNoInitialConnections() {
+        WebSocketSessionManager webSocketSessionManager = new WebSocketSessionManager();
+        assertThat(webSocketSessionManager.checkForOpenConnections()).isFalse();
+    }
+
 }

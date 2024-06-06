@@ -54,9 +54,7 @@ function App() {
     }
   };
 
-  /**
-   * Configure the state and the WebSocket connection with the backend server.
-   */
+  // Configure the state and the WebSocket connection with the backend server
   const allShips = ShipService.sortList(
     Array.from(useWebSocketClient().values()),
     "desc",
