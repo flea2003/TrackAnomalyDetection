@@ -5,9 +5,26 @@ import APIResponseItem from "../../templates/APIResponseItem";
 import ShipService from "../../services/ShipService";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import websocketConfig from "../../configs/websocketConfig.json";
+import ShipUpdateBuffer from "../../services/ShipUpdateBuffer";
 
 const useWebSocketClient = () => {
   const [ships, setShips] = useState<Map<number, ShipDetails>>(new Map());
+
+  // Update the ships based on buffer
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const newShips = new Map(ships);
+      ShipUpdateBuffer.getBufferedShipsAndReset().forEach(shipToUpdate => {
+        newShips.set(shipToUpdate.id, shipToUpdate);
+      });
+      console.log("updating ships basedd on buffer")
+      setShips(newShips);
+    }, 10000);
+
+    return () => {
+      clearInterval(intervalId);
+    }
+  }, [ships]);
 
   /**
    * Configure the WebSocket connection.
@@ -15,9 +32,7 @@ const useWebSocketClient = () => {
   useEffect(() => {
     const stompClient = new Client({
       brokerURL: websocketConfig.brokerUrl,
-      debug: function (str) {
-        console.log(str);
-      },
+
       // Try to reconnect to the backend broker after 60 seconds.
       reconnectDelay: 60000,
       heartbeatIncoming: 4000,
@@ -36,14 +51,9 @@ const useWebSocketClient = () => {
           const apiResponse = JSON.parse(message.body) as APIResponseItem;
           const shipDetails =
             ShipService.extractCurrentShipDetails(apiResponse);
-          setShips((prevShips) => {
-            return new Map(prevShips).set(shipDetails.id, shipDetails);
-          });
+          ShipUpdateBuffer.addToBuffer(shipDetails);
         } catch (error) {
           ErrorNotificationService.addWarning("Data fetching error");
-          setShips((prevMap) => {
-            return new Map();
-          });
         }
       });
     };
@@ -54,9 +64,8 @@ const useWebSocketClient = () => {
      */
     stompClient.onWebSocketClose = function (closeEvent) {
       ErrorNotificationService.addWarning("Websocket connection error");
-      setShips((prevMap) => {
-        return new Map();
-      });
+      ShipUpdateBuffer.resetBuffer();
+      setShips(new Map());
     };
 
     /**
@@ -65,6 +74,9 @@ const useWebSocketClient = () => {
      * with the backend STOMP broker
      */
     stompClient.beforeConnect = async () => {
+      console.log("stomp before connect");
+      ShipUpdateBuffer.resetBuffer();
+
       ShipService.queryBackendForShipsArray().then(
         (shipsArray: ShipDetails[]) => {
           setShips(ShipService.constructMap(shipsArray));
@@ -77,6 +89,7 @@ const useWebSocketClient = () => {
         "Websocket broker error: " + frame.headers["message"],
       );
     };
+
     // Initiate the connection with the backend-hosted STOMP broker
     stompClient.activate();
 

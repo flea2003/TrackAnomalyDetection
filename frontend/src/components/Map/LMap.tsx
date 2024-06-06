@@ -20,6 +20,7 @@ import "../../styles/common.css";
 import mapStyleConfig from "../../configs/mapConfig.json";
 import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
 import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
+import { PageChangerRef } from "../Side/Side";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -29,6 +30,7 @@ function getInitialMap() {
   const initialMap = L.map("map", {
     minZoom: 2,
     maxZoom: 17,
+    preferCanvas: true
   }).setView([47.0105, 28.8638], 8);
 
   const southWest = L.latLng(-90, -180);
@@ -51,7 +53,7 @@ function getInitialMap() {
 
 interface MapProps {
   ships: ShipDetails[];
-  pageChanger: (currentPage: CurrentPage) => void;
+  pageChangerRef: React.RefObject<PageChangerRef>;
 }
 
 // Define the type of the ref object
@@ -67,9 +69,11 @@ interface MapExportedMethodsType {
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 const LMap = forwardRef<MapExportedMethodsType, MapProps>(
-  ({ ships, pageChanger }, ref) => {
+  ({ ships, pageChangerRef }, ref) => {
     // Initialize the map as state, since we want to have a single instance
     const [map, setMap] = useState<L.Map | null>(null);
+
+    console.log("cia kazka print -Augustinas 2024")
 
     // Define the methods that will be reachable from the parent
     useImperativeHandle(ref, () => ({
@@ -82,6 +86,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         }
 
         // Check if requested ship still exists
+        if (ship === undefined) return;
         if (ships.find((x) => x.id === ship.id) === undefined) return;
 
         map.flyTo(
@@ -130,12 +135,14 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
             .addTo(map)
             .bindPopup("ID: " + ship.id)
             .on("click", (e) => {
-              map.flyTo(e.latlng, map.getZoom());
+              map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
               handleMouseOutShipIcon(e, setHoverInfo);
-              pageChanger({
-                currentPage: "objectDetails",
-                shownItemId: ship.id,
-              });
+              if (pageChangerRef.current !== null) {
+                pageChangerRef.current.pageChanger({
+                  currentPage: "objectDetails",
+                  shownItemId: ship.id,
+                });
+              }
             })
             .on("mouseover", (e) => {
               handleMouseOverShipIcon(e, ship, map, setHoverInfo);
@@ -164,7 +171,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           });
         }
       };
-    }, [map, pageChanger, ships]);
+    }, [map, ships]);
 
     return (
       <div id="map-container">

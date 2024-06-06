@@ -20,7 +20,7 @@ public class Main {
 
 
     // Main value to customize - defines how many signals are sent per second
-    private static final int signalsPerSecond = 2000;
+    private static final int signalsPerSecond = 500;
 
 
     // Number of threads that will perform the sending of signals
@@ -35,6 +35,8 @@ public class Main {
     public static void main(String[] args) {
         // Calculate the number of ships needed to achieve the required signals-per-second
         int shipCount = signalsPerSecond * (maxIntervalBetweenMessages + minIntervalBetweenMessages) / 2;
+
+        System.out.println("ship count: " + shipCount);
 
         // Create a sender object for each ship. In order to send signals, the step() methods for these
         // sender objects should be called as often as possible. I.e., each call of step() checks if it is
