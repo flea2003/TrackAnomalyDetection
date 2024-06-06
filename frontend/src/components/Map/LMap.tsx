@@ -59,6 +59,12 @@ interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
 }
 
+interface ShipIconTrackingType {
+  x: number;
+  y: number;
+  shipId: number;
+}
+
 /**
  * This component is the first column of the main view of the application. It displays the map with all the ships.
  * A list of ships is passed as a prop.
@@ -84,14 +90,11 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         // Check if requested ship still exists
         if (ships.find((x) => x.id === ship.id) === undefined) return;
 
-        map.flyTo(
-          [ship.lat, ship.lng],
-          mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
-          {
-            animate: true,
-            duration: mapStyleConfig["transition-time"],
-          },
-        );
+        setTrackingInfo({
+          x: ship.lng,
+          y: ship.lat,
+          shipId: ship.id,
+        } as ShipIconTrackingType);
       },
     }));
 
@@ -104,6 +107,20 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       shipDetails: null,
     } as ShipIconDetailsType);
 
+    const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>({
+      x: 0,
+      y: 0,
+      shipId: -1,
+    } as ShipIconTrackingType);
+
+    const trackShipIcon = (ship: ShipDetails) => {
+      setTrackingInfo({
+        x: ship.lng,
+        y: ship.lat,
+        shipId: ship.id,
+      });
+    };
+
     // Everything to do with the map updates should be done inside useEffect
     useEffect(() => {
       // If the map is null, we need to create it. We do it once, with state
@@ -115,6 +132,20 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       // If not yet created, do not do anything, just wait
       if (map == null) {
         return;
+      }
+
+      if (trackingInfo.shipId !== -1) {
+        const trackedShip = ships.find((x) => x.id === trackingInfo.shipId);
+        if (trackedShip !== undefined) {
+          map.flyTo(
+            [trackedShip.lat, trackedShip.lng],
+            mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
+            {
+              animate: true,
+              duration: mapStyleConfig["transition-time"],
+            },
+          );
+        }
       }
 
       // Add all ship icons to the map
@@ -130,7 +161,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
             .addTo(map)
             .bindPopup("ID: " + ship.id)
             .on("click", (e) => {
-              map.flyTo(e.latlng, map.getZoom());
+              trackShipIcon(ship);
               handleMouseOutShipIcon(e, setHoverInfo);
               pageChanger({
                 currentPage: "objectDetails",
@@ -155,25 +186,33 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         }
       });
 
+      map
+        .on("drag", () => {
+          setTrackingInfo({
+            x: 0,
+            y: 0,
+            shipId: -1,
+          } as ShipIconTrackingType);
+        })
+        .on("zoom", () => {
+          setHoverInfo({
+            show: false,
+            x: 0,
+            y: 0,
+            shipDetails: null,
+          } as ShipIconDetailsType);
+        });
+
       return () => {
         if (map) {
-          map
-            .eachLayer(function (layer: L.Layer) {
-              if (layer instanceof L.Marker) {
-                map.removeLayer(layer);
-              }
-            })
-            .on("zoom", () => {
-              setHoverInfo({
-                show: false,
-                x: 0,
-                y: 0,
-                shipDetails: null,
-              } as ShipIconDetailsType);
-            });
+          map.eachLayer(function (layer: L.Layer) {
+            if (layer instanceof L.Marker) {
+              map.removeLayer(layer);
+            }
+          });
         }
       };
-    }, [map, pageChanger, ships]);
+    }, [map, pageChanger, ships, trackingInfo]);
 
     return (
       <div id="map-container">
