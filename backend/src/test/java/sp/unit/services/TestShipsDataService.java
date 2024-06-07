@@ -225,14 +225,14 @@ public class TestShipsDataService {
 
     @Test
     void getHistoryOfShipException(){
-        assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
+        assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
     }
 
     @Test
     void getHistoryOfShipSQLNotFound(){
         try(MockedStatic<FileReader> fileReader = mockStatic(FileReader.class)) {
             fileReader.when(() -> FileReader.readQueryFromFile(anyString())).thenThrow(SQLException.class);
-            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
+            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
         }
     }
 
