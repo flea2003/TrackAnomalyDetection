@@ -2,7 +2,7 @@ import React, {
   useEffect,
   useState,
   forwardRef,
-  useImperativeHandle,
+  useImperativeHandle, useRef
 } from "react";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import L, { LatLngBounds } from "leaflet";
@@ -24,41 +24,42 @@ import { PageChangerRef } from "../Side/Side";
 import useSupercluster from "use-supercluster";
 import Supercluster, { ClusterProperties } from "supercluster";
 import { Feature, GeoJsonProperties, Point } from "geojson";
+import { MapContainer, TileLayer } from "react-leaflet";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
  * @returns the created map
  */
-function getInitialMap(updateMarkersFunc: () => void) {
-  const initialMap = L.map("map", {
-    minZoom: 2,
-    maxZoom: 17,
-    preferCanvas: true
-  }).setView([47.0105, 28.8638], 8);
-
-  const southWest = L.latLng(-90, -180);
-  const northEast = L.latLng(90, 180);
-  const bounds = L.latLngBounds(southWest, northEast);
-
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution:
-      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  }).addTo(initialMap);
-
-  initialMap.setMaxBounds(bounds);
-  initialMap.on("drag", function () {
-    initialMap.panInsideBounds(bounds, { animate: false });
-  });
-
-  initialMap.on("zoomend", () => {
-    console.log("zoomend");
-    updateMarkersFunc();
-  });
-  initialMap.on("moveend", updateMarkersFunc);
-
-  return initialMap;
-}
+// function getInitialMap(updateMarkersFunc: () => void) {
+//   const initialMap = L.map("map", {
+//     minZoom: 2,
+//     maxZoom: 17,
+//     preferCanvas: true
+//   }).setView([47.0105, 28.8638], 8);
+//
+//   const southWest = L.latLng(-90, -180);
+//   const northEast = L.latLng(90, 180);
+//   const bounds = L.latLngBounds(southWest, northEast);
+//
+//   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+//     maxZoom: 19,
+//     attribution:
+//       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+//   }).addTo(initialMap);
+//
+//   initialMap.setMaxBounds(bounds);
+//   initialMap.on("drag", function () {
+//     initialMap.panInsideBounds(bounds, { animate: false });
+//   });
+//
+//   initialMap.on("zoomend", () => {
+//     console.log("zoomend");
+//     updateMarkersFunc();
+//   });
+//   initialMap.on("moveend", updateMarkersFunc);
+//
+//   return initialMap;
+// }
 
 interface MapProps {
   ships: ShipDetails[];
@@ -81,6 +82,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
   ({ ships, pageChangerRef }, ref) => {
     // Initialize the map as state, since we want to have a single instance
     const [map, setMap] = useState<L.Map | null>(null);
+    const mapRef = useRef(null);
 
     console.log("cia kazka print -Augustinas 2024")
 
@@ -154,8 +156,8 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       // If the map is null, we need to create it. We do it once, with state
       if (map == null) {
         console.log("creating initial map");
-        const initialMap = getInitialMap(updateMapMarkers);
-        setMap(initialMap);
+        // const initialMap = getInitialMap(updateMapMarkers);
+        // setMap(initialMap);
       }
 
       // If not yet created, do not do anything, just wait
@@ -177,15 +179,46 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     }, [map, pageChangerRef, ships, showOld]);
 
 
+  const southWest = L.latLng(-90, -180);
+  const northEast = L.latLng(90, 180);
+  const bounds = L.latLngBounds(southWest, northEast);
+  
+//   initialMap.on("drag", function () {
+//     initialMap.panInsideBounds(bounds, { animate: false });
+//   });
+//
+//   initialMap.on("zoomend", () => {
+//     console.log("zoomend");
+//     updateMarkersFunc();
+//   });
+//   initialMap.on("moveend", updateMarkersFunc);
+//
+//   return initialMap;
     return (
-      <div id="map-container">
-        <div id="map" data-testid="map"></div>
+      <MapContainer id={"map-container"} zoom={8} center={[47.0105, 28.8638]} ref={mapRef}
+      minZoom={2} maxZoom={17} preferCanvas={true}
+      maxBounds={bounds}
+      >
+
+        <TileLayer url={"https://tile.openstreetmap.org/{z}/{x}/{y}.png"}
+        maxZoom={19}
+                   attribution={'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
+        />
+
         {hoverInfo.show && hoverInfo.shipDetails !== null && (
-          <div>
-            <ShipIconDetails {...hoverInfo}></ShipIconDetails>
-          </div>
-        )}
-      </div>
+              <div>
+                <ShipIconDetails {...hoverInfo}></ShipIconDetails>
+              </div>
+            )}
+      </MapContainer>
+      // <div id="map-container">
+      //   <div id="map" data-testid="map"></div>
+      //   {hoverInfo.show && hoverInfo.shipDetails !== null && (
+      //     <div>
+      //       <ShipIconDetails {...hoverInfo}></ShipIconDetails>
+      //     </div>
+      //   )}
+      // </div>
     );
   },
 );
