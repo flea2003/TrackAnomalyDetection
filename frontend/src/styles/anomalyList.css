@@ -1,7 +1,10 @@
 #anomaly-list-container {
-    width: 8%;
+    width: 50%;
+    height: 60%;
     text-align: center;
+    border: 1px solid orange;
     display: flex;
+    pointer-events: all;
 }
 
 #anomaly-list-title-container-with-slider {

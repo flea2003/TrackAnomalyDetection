@@ -86,18 +86,16 @@ function App() {
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
-      <Stack direction="row">
         <LMap ships={displayedShips} pageChanger={pageChanger} ref={mapRef} />
-        <Side
-          currentPage={currentPage}
-          ships={displayedShips}
-          notifications={notifications}
-          pageChanger={pageChanger}
-          mapCenteringFun={mapCenteringFun}
-          setFilterThreshold={setFilterThreshold}
-          anomalyThreshold={filterThreshold}
-        />
-      </Stack>
+          <Side
+            currentPage={currentPage}
+            ships={displayedShips}
+            notifications={notifications}
+            pageChanger={pageChanger}
+            mapCenteringFun={mapCenteringFun}
+            setFilterThreshold={setFilterThreshold}
+            anomalyThreshold={filterThreshold}
+          />
     </div>
   );
 }

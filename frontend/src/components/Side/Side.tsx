@@ -8,6 +8,7 @@ import ShipNotification from "../../model/ShipNotification";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
+import { Stack } from "@mui/material";
 
 interface SideProps {
   currentPage: CurrentPage;
@@ -48,16 +49,19 @@ function Side({
 
   return (
     <>
-      <MiddleColumn
-        currentPage={currentPage}
-        ships={ships}
-        notifications={notifications}
-        pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-        setFilterThreshold={setFilterThreshold}
-        anomalyThreshold={anomalyThreshold}
-      />
-      <Sidebar pageChanger={pageChanger} />
+      <Stack direction="row" id="side-container">
+        <MiddleColumn
+          currentPage={currentPage}
+          ships={ships}
+          notifications={notifications}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+          setFilterThreshold={setFilterThreshold}
+          anomalyThreshold={anomalyThreshold}
+        />
+        <Sidebar pageChanger={pageChanger} />
+      </Stack>
+
     </>
   );
 }

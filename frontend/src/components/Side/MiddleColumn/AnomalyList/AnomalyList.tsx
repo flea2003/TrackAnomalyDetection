@@ -47,7 +47,7 @@ function AnomalyList({
   }
 
   return (
-    <Stack id="anomaly-list-container" data-testid="anomaly-list-container">
+    <Stack id="anomaly-list-container" data-testid="anomaly-list-container" direction="column">
       <ShipThresholdModifier
         pageChanger={pageChanger}
         setFilterThreshold={setFilterThreshold}

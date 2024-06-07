@@ -1,3 +1,11 @@
+#sidebar {
+    width: 3%;
+    height: 24%;
+    border: 1px solid black;
+    background: #DAD5CF66;
+    pointer-events: all;
+}
+
 .sidebar-entry, .sidebar-bug-icon-all-read,
 .sidebar-bug-icon-not-all-read, .sidebar-bell-icon
 {

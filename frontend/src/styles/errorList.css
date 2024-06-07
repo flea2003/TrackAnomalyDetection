@@ -1,9 +1,10 @@
 #error-list-container {
-    width: var(--middle-column-width);
+    width: 70%;
     text-align: center;
     display: flex;
     height: 100vh;
     border-left: 1px solid black;
+    pointer-events: all;
 }
 
 #error-list-internal-container {

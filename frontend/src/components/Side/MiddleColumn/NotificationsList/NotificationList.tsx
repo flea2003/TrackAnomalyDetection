@@ -49,6 +49,7 @@ function NotificationList({
     <Stack
       id="notification-list-container"
       data-testid="notification-list-container"
+      direction="column"
     >
       <Stack id="notification-list-title-container" direction="row">
         {image}
