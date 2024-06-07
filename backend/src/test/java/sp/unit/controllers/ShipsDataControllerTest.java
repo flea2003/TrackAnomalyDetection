@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import sp.controllers.ShipsDataController;
-import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -42,7 +41,7 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getCurrentShipDetailsSuccessful() throws PipelineException, NotExistingShipException, PipelineStartingException {
+    void getCurrentShipDetailsSuccessful() throws PipelineException, NotExistingShipException {
         long shipId = 123L;
         when(shipsDataService.getIndividualCurrentShipDetails(shipId)).thenReturn(
                 new CurrentShipDetails(new AnomalyInformation(1.0f, "explanation1", time1, shipId),
@@ -59,7 +58,7 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getCurrentAnomalyInformationShipDoesNotExist() throws PipelineException, NotExistingShipException, PipelineStartingException {
+    void getCurrentAnomalyInformationShipDoesNotExist() throws PipelineException, NotExistingShipException {
         long shipId = 123L;
         when(shipsDataService.getIndividualCurrentShipDetails(shipId))
                 .thenThrow(new NotExistingShipException());
@@ -70,7 +69,7 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getCurrentAnomalyInformationPipelineException() throws PipelineException, NotExistingShipException, PipelineStartingException {
+    void getCurrentAnomalyInformationPipelineException() throws PipelineException, NotExistingShipException {
         long shipId = 123L;
         when(shipsDataService.getIndividualCurrentShipDetails(shipId))
                 .thenThrow(new PipelineException());
@@ -81,20 +80,7 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getCurrentAnomalyInformationPipelineStartingException() throws PipelineException, NotExistingShipException, PipelineStartingException {
-        long shipId = 123L;
-        when(shipsDataService.getIndividualCurrentShipDetails(shipId))
-                .thenThrow(new PipelineStartingException());
-
-        ResponseEntity<CurrentShipDetails> response = shipsDataController.getIndividualCurrentShipDetails(shipId);
-
-        assertEquals(HttpStatus.TOO_EARLY, response.getStatusCode());
-    }
-
-
-
-    @Test
-    void getCurrentAnomalyInformationOfAllShipsSuccessful() throws PipelineException, PipelineStartingException {
+    void getCurrentAnomalyInformationOfAllShipsSuccessful() {
         AnomalyInformation info1 = new AnomalyInformation(1, "explanation1", time1, 1L);
         AnomalyInformation info2 = new AnomalyInformation(2, "explanation2", time1, 2L);
         AnomalyInformation info3 = new AnomalyInformation(3, "explanation3", time1, 3L);
@@ -109,25 +95,4 @@ class ShipsDataControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(List.of(details1, details2, details3), response.getBody());
     }
-
-    @Test
-    void getCurrentShipDetailsOfAllShipsPipelineException() throws PipelineException, PipelineStartingException {
-        when(shipsDataService.getCurrentShipDetails())
-                .thenThrow(new PipelineException());
-
-        ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getCurrentShipDetails();
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
-
-    @Test
-    void getCurrentShipDetailsOfAllShipsPipelineStartingException() throws PipelineException, PipelineStartingException {
-        when(shipsDataService.getCurrentShipDetails())
-                .thenThrow(new PipelineStartingException());
-
-        ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getCurrentShipDetails();
-
-        assertEquals(HttpStatus.TOO_EARLY, response.getStatusCode());
-    }
-
 }
