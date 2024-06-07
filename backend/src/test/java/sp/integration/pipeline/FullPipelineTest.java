@@ -43,9 +43,6 @@ public class FullPipelineTest extends GenericPipelineTest {
     void testSimpleFlow() throws Exception {
         setupPipelineComponentsAndRun();
 
-        // Make sure the notification DB says that no such notification exists
-        when(notificationRepository.findNotificationByShipID(any())).thenReturn(List.of());
-
         // Send a message to the raw ships topic
         ExternalAISSignal fakeSignal = new ExternalAISSignal("producer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
         produceToTopic(rawAISTopic, List.of(JsonMapper.toJson(fakeSignal)));
@@ -67,17 +64,16 @@ public class FullPipelineTest extends GenericPipelineTest {
      */
     void testSignalIDAssignment(ExternalAISSignal sentSignal) throws Exception {
         // Get the strings produced to the identified ships topic
-        List<String> list = getItemsFromTopic(identifiedAISTopic, 1, 5);
+        List<String> list = getItemsFromTopic(currentShipDetailsTopic, 2, 5);
 
         // Calculate the expected AIS signal
         long expectedID = 1098835837;
-        AISSignal expectedAISSignal = new AISSignal(sentSignal, expectedID);
 
         // Deserialize the received AIS signal
-        AISSignal aisSignal = SerializationMapper.fromSerializedString(list.get(0), AISSignal.class);
+        CurrentShipDetails receivedDetails = JsonMapper.fromJson(list.get(1), CurrentShipDetails.class);
 
         // Make sure they are equal (ignoring received time)
-        assertEquals(expectedAISSignal, aisSignal);
+        assertEquals(receivedDetails.extractId(), expectedID);
     }
 
     /**
@@ -127,14 +123,25 @@ public class FullPipelineTest extends GenericPipelineTest {
         );
 
         produceToTopic(rawAISTopic, messages);
-        produceToTopic(identifiedAISTopic, messages);
-        produceToTopic(scoresTopic, messages);
+        produceToTopic(notificationsTopic, messages);
+        produceToTopic(currentShipDetailsTopic, messages);
 
         // Wait for 5 seconds to be fully sure
         Thread.sleep(5000);
 
-        // Make sure that after this, the pipeline has not crashed and there still is only 1 ship
+        // Make sure that after this, the there still is only 1 ship
         assertThat(shipsDataService.getCurrentShipDetails().size()).isEqualTo(1);
+
+        // Send some new proper signals to the raw ships topic (to make sure the pipeline is still working)
+        ExternalAISSignal fakeSignal = new ExternalAISSignal("newProducer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
+        produceToTopic(rawAISTopic, List.of(JsonMapper.toJson(fakeSignal)));
+
+        // Wait 10 seconds for the data to be processed
+        Thread.sleep(10000);
+
+        // Make sure that after this, the there still are now 2 ships (i.e., the pipeline has not crashed)
+        assertThat(shipsDataService.getCurrentShipDetails().size()).isEqualTo(2);
+
     }
 
     /**
@@ -159,12 +166,6 @@ public class FullPipelineTest extends GenericPipelineTest {
      */
     void testForOneVeryAnomalousShipAndOneNot() throws Exception {
 
-        // Make sure that notificationRepository does nothing when something is added (Mockito)
-        // And that it says that no saved notification is present in the DB
-        Notification fakeNotification = new Notification();
-        when(notificationRepository.save(any())).thenReturn(fakeNotification);
-        when(notificationRepository.findNotificationByShipID(any())).thenReturn(List.of());
-
         // Create 2 different ships with anomalous speeds. The first and third signals are from the same ship and the second
         // is from another. Additionally, the first 2 ships have the same shipHash (but different producer ID),
         // so we are also testing if ID assignment works.
@@ -184,7 +185,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         produceToTopic(rawAISTopic, messages);
 
         // Wait 5 seconds to make sure they pass through
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
         // Get the details
         List<CurrentShipDetails> details = shipsDataService.getCurrentShipDetails();
@@ -225,9 +226,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         assertThat(details.get(1).getCurrentAnomalyInformation().getScore()).isEqualTo(details.get(1).getMaxAnomalyScoreInfo().getMaxAnomalyScore());
 
         // Make sure that a single notification was added to the notification repository
-        verify(notificationRepository, times(1)).save(any());
-
-        // Reset the mock (would not be needed if we did not cramp multiple tests into one)
-        reset(notificationRepository);
+        assertThat(notificationService.getAllNotifications().size()).isEqualTo(1);
+        assertThat(notificationService.getAllNotificationForShip(expectedIDShip1).size()).isEqualTo(1);
     }
 }
