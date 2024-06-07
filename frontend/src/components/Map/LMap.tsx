@@ -5,7 +5,7 @@ import React, {
   useImperativeHandle,
 } from "react";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
-import L from "leaflet";
+import L, { LatLngBounds } from "leaflet";
 import {
   createShipIcon,
   handleMouseOutShipIcon,
@@ -21,12 +21,15 @@ import mapStyleConfig from "../../configs/mapConfig.json";
 import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
 import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
 import { PageChangerRef } from "../Side/Side";
+import useSupercluster from "use-supercluster";
+import Supercluster, { ClusterProperties } from "supercluster";
+import { Feature, GeoJsonProperties, Point } from "geojson";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
  * @returns the created map
  */
-function getInitialMap() {
+function getInitialMap(updateMarkersFunc: () => void) {
   const initialMap = L.map("map", {
     minZoom: 2,
     maxZoom: 17,
@@ -47,6 +50,12 @@ function getInitialMap() {
   initialMap.on("drag", function () {
     initialMap.panInsideBounds(bounds, { animate: false });
   });
+
+  initialMap.on("zoomend", () => {
+    console.log("zoomend");
+    updateMarkersFunc();
+  });
+  initialMap.on("moveend", updateMarkersFunc);
 
   return initialMap;
 }
@@ -109,11 +118,43 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       shipDetails: null,
     } as ShipIconDetailsType);
 
+    // which one to show
+    const [showOld, setShowOld] = useState(false);
+
+    useEffect(() => {
+      function handleKeyDown(e: KeyboardEvent) {
+        if (e.key.toLowerCase() === 'a') {
+          setShowOld((o) => !o);
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyDown);
+
+      return function cleanup() {
+        document.removeEventListener('keydown', handleKeyDown);
+      }
+    }, []);
+
     // Everything to do with the map updates should be done inside useEffect
     useEffect(() => {
+      const updateMapMarkers = () => {
+        console.log("update map markers called");
+        if (map == null) return;
+        console.log("herererer");
+
+        if (showOld) {
+          console.log("showing old map");
+          oldWayToaddIconsToMap(ships, map, setHoverInfo, pageChangerRef);
+        } else {
+          console.log("showing new map");
+          addIconsToMap(ships, map, setHoverInfo, pageChangerRef);
+        }
+      }
+
       // If the map is null, we need to create it. We do it once, with state
       if (map == null) {
-        const initialMap = getInitialMap();
+        console.log("creating initial map");
+        const initialMap = getInitialMap(updateMapMarkers);
         setMap(initialMap);
       }
 
@@ -122,56 +163,19 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         return;
       }
 
-      // Add all ship icons to the map
-      ships.forEach((ship) => {
-        try {
-          L.marker([ship.lat, ship.lng], {
-            icon: createShipIcon(
-              ship.anomalyScore / 100,
-              ship.heading,
-              ship.speed > 0,
-            ),
-          })
-            .addTo(map)
-            .bindPopup("ID: " + ship.id)
-            .on("click", (e) => {
-              map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
-              handleMouseOutShipIcon(e, setHoverInfo);
-              if (pageChangerRef.current !== null) {
-                pageChangerRef.current.pageChanger({
-                  currentPage: "objectDetails",
-                  shownItemId: ship.id,
-                });
-              }
-            })
-            .on("mouseover", (e) => {
-              handleMouseOverShipIcon(e, ship, map, setHoverInfo);
-            })
-            .on("mouseout", (e) => {
-              handleMouseOutShipIcon(e, setHoverInfo);
-            });
-        } catch (error) {
-          if (error instanceof Error) {
-            ErrorNotificationService.addWarning(
-              "Error while adding an icon for ship with id " +
-                ship.id +
-                ": " +
-                error.message,
-            );
-          }
-        }
-      });
+      updateMapMarkers();
 
       return () => {
         if (map) {
           map.eachLayer(function (layer: L.Layer) {
-            if (layer instanceof L.Marker) {
+            if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
               map.removeLayer(layer);
             }
           });
         }
       };
-    }, [map, ships]);
+    }, [map, pageChangerRef, ships, showOld]);
+
 
     return (
       <div id="map-container">
@@ -185,6 +189,140 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     );
   },
 );
+//
+// interface ShipProperties extends GeoJsonProperties {
+//   shipId: number;
+// }
+
+function addIconsToMap(ships: ShipDetails[], map: L.Map,
+                       setHoverInfo: (value: (((prevState: ShipIconDetailsType) => ShipIconDetailsType) | ShipIconDetailsType)) => void,
+                       pageChangerRef: React.RefObject<PageChangerRef>) {
+
+
+
+  // convert ships to GeoJSON points (format that is required by Supercluster library)
+  const points: Feature<Point, {ship: ShipDetails}>[] = ships.map(ship => ({
+    type: "Feature",
+    properties: { ship: ship },
+    geometry: {
+      type: "Point",
+      coordinates: [ship.lng, ship.lat]
+    }
+  }));
+
+  // const bounds = map.getBounds();
+  // const zoom = map.getZoom();
+
+  // get clusters
+  const cluster = new Supercluster({radius: 100, maxZoom: 16});
+  cluster.load(points);
+//   const {clusters, supercluster}  = useSupercluster(
+//     {
+//       points,
+//       [
+//         bounds.getSouthWest().lng,
+//       bounds.getSouthWest().lat,
+//       bounds.getNorthEast().lng,
+//       bounds.getNorthEast().lat
+// ],
+//      // [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
+//       zoom,
+//       options: {},
+//       disableRefresh: true
+//     }
+//   )
+
+  const bounds = map.getBounds();
+  const clusters = cluster.getClusters(
+    [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
+    map.getZoom()
+  )
+
+  clusters.forEach(cluster => {
+    const [longitude, latitude] = cluster.geometry.coordinates;
+    const { cluster: isCluster, point_count: pointCount } = cluster.properties;
+
+    if (isCluster) {
+      L.circleMarker([latitude, longitude]).addTo(map);
+      return;
+    }
+
+    // not a cluster, just a single ship
+    const ship = cluster.properties.ship;
+
+    L.marker([ship.lat, ship.lng], {
+      icon: createShipIcon(
+        ship.anomalyScore / 100,
+        ship.heading,
+        ship.speed > 0
+      )
+    })
+      .addTo(map)
+      .bindPopup("ID: " + ship.id)
+      .on("click", (e) => {
+        map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
+        handleMouseOutShipIcon(e, setHoverInfo);
+        if (pageChangerRef.current !== null) {
+          pageChangerRef.current.pageChanger({
+            currentPage: "objectDetails",
+            shownItemId: ship.id
+          });
+        }
+      })
+      .on("mouseover", (e) => {
+        handleMouseOverShipIcon(e, ship, map, setHoverInfo);
+      })
+      .on("mouseout", (e) => {
+        handleMouseOutShipIcon(e, setHoverInfo);
+      });
+  })
+}
+
+
+function oldWayToaddIconsToMap(ships: ShipDetails[], map: L.Map,
+                       setHoverInfo: (value: (((prevState: ShipIconDetailsType) => ShipIconDetailsType) | ShipIconDetailsType)) => void,
+                       pageChangerRef: React.RefObject<PageChangerRef>) {
+
+  // Add all ship icons to the map
+  ships.forEach((ship) => {
+    try {
+      L.marker([ship.lat, ship.lng], {
+        icon: createShipIcon(
+          ship.anomalyScore / 100,
+          ship.heading,
+          ship.speed > 0
+        )
+      })
+        .addTo(map)
+        .bindPopup("ID: " + ship.id)
+        .on("click", (e) => {
+          map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
+          handleMouseOutShipIcon(e, setHoverInfo);
+          if (pageChangerRef.current !== null) {
+            pageChangerRef.current.pageChanger({
+              currentPage: "objectDetails",
+              shownItemId: ship.id
+            });
+          }
+        })
+        .on("mouseover", (e) => {
+          handleMouseOverShipIcon(e, ship, map, setHoverInfo);
+        })
+        .on("mouseout", (e) => {
+          handleMouseOutShipIcon(e, setHoverInfo);
+        });
+    } catch (error) {
+      if (error instanceof Error) {
+        ErrorNotificationService.addWarning(
+          "Error while adding an icon for ship with id " +
+          ship.id +
+          ": " +
+          error.message
+        );
+      }
+    }
+  });
+}
 
 // Needed for Lint to work (React itself does not require this)
 LMap.displayName = "Map";
