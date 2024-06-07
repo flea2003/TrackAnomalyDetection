@@ -182,7 +182,15 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
   const southWest = L.latLng(-90, -180);
   const northEast = L.latLng(90, 180);
   const bounds = L.latLngBounds(southWest, northEast);
-  
+
+  if (mapRef.current != null) {
+    const map = mapRef.current as L.Map;
+
+    map.on("drag", () => {
+      map.panInsideBounds(bounds, {animate: false});
+    })
+  }
+
 //   initialMap.on("drag", function () {
 //     initialMap.panInsideBounds(bounds, { animate: false });
 //   });
