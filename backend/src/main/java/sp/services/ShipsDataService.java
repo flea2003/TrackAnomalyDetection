@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
-import sp.exceptions.PipelineStartingException;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
 import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
@@ -41,7 +40,7 @@ public class ShipsDataService {
      * @return CurrentShipDetails instance encapsulating the current extensive information of a ship
      */
     public CurrentShipDetails getIndividualCurrentShipDetails(Long shipId)
-            throws NotExistingShipException, PipelineException, PipelineStartingException {
+            throws NotExistingShipException, PipelineException {
         CurrentShipDetails anomalyInfo = shipInformationExtractor.getCurrentShipDetails().get(shipId);
         if (anomalyInfo == null) {
             throw new NotExistingShipException("Couldn't find such ship.");
@@ -55,15 +54,12 @@ public class ShipsDataService {
      *
      * @return the CurrentShipDetails instances corresponding to all ships
      */
-    public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException, PipelineStartingException {
+    public List<CurrentShipDetails> getCurrentShipDetails() {
         OffsetDateTime currentTime = OffsetDateTime.now();
-        HashMap<Long, CurrentShipDetails> shipsInfo = shipInformationExtractor.getFilteredShipDetails(x -> {
-            if (x.getCurrentAISSignal() == null) {
-                return false;
-            } else {
-                return Duration.between(x.getCurrentAISSignal().getReceivedTime(), currentTime).toMinutes() <= activeTime;
-            }
-        });
+        HashMap<Long, CurrentShipDetails> shipsInfo = shipInformationExtractor.getFilteredShipDetails(
+                x -> x.getCurrentAISSignal() != null
+                        && Duration.between(x.getCurrentAISSignal().getReceivedTime(), currentTime).toMinutes() <= activeTime
+        );
         return shipsInfo.values().stream().toList();
     }
 

@@ -12,6 +12,7 @@ import java.util.Objects;
 @Entity
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 @NoArgsConstructor(force = true)
 @Getter
 @Setter

@@ -21,7 +21,6 @@ public class CurrentStateAggregator extends RichMapFunction<ShipInformation, Cur
      */
     @Override
     public CurrentShipDetails map(ShipInformation shipInformation) throws IOException {
-
         // Handle initializing the state
         if (aggregatedShipDetailsState.value() == null) {
             aggregatedShipDetailsState.update(new CurrentShipDetails());

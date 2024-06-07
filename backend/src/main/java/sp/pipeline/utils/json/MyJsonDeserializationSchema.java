@@ -8,7 +8,7 @@ import org.apache.flink.util.jackson.JacksonMapperFactory;
 import java.io.IOException;
 
 /**
- * This class is a very slightly modified version of the JsonDeserializationSchema class from the
+ * This class is a slightly modified version of the JsonDeserializationSchema class from the
  * Flink library. It is used to deserialize JSON strings into Java objects. The only modification is
  * that it ignores all exceptions that occur during deserialization and returns null instead of
  * throwing an exception.
@@ -33,16 +33,6 @@ public class MyJsonDeserializationSchema<T> extends JsonDeserializationSchema<T>
     /**
      * Creates a JSON deserialization schema for the given class.
      *
-     * @param typeInformation Type information describing the result type. The type information is
-     *     used to create a Jackson {@link ObjectMapper} to parse the JSON.
-     */
-    public MyJsonDeserializationSchema(TypeInformation<T> typeInformation) {
-        this(typeInformation, JacksonMapperFactory::createObjectMapper);
-    }
-
-    /**
-     * Creates a JSON deserialization schema for the given class.
-     *
      * @param clazz The class to which the JSON string is deserialized.
      * @param mapperFactory A factory for creating ObjectMapper instances
      */
@@ -50,20 +40,6 @@ public class MyJsonDeserializationSchema<T> extends JsonDeserializationSchema<T>
             Class<T> clazz, SerializableSupplier<ObjectMapper> mapperFactory) {
         super(clazz);
         this.clazz = clazz;
-        this.mapperFactory = mapperFactory;
-    }
-
-    /**
-     * Creates a JSON deserialization schema for the given class.
-     *
-     * @param typeInformation Type information describing the result type. The type information is
-     *     used to create a Jackson {@link ObjectMapper} to parse the JSON.
-     * @param mapperFactory A factory for creating {@link ObjectMapper} instances
-     */
-    public MyJsonDeserializationSchema(
-            TypeInformation<T> typeInformation, SerializableSupplier<ObjectMapper> mapperFactory) {
-        super(typeInformation);
-        this.clazz = typeInformation.getTypeClass();
         this.mapperFactory = mapperFactory;
     }
 

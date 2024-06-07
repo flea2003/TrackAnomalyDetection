@@ -12,6 +12,7 @@ import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
+import sp.pipeline.utils.OffsetDateTimeSerializer;
 
 @Service
 public class AnomalyDetectionPipeline {
@@ -44,6 +45,8 @@ public class AnomalyDetectionPipeline {
         Configuration config = new Configuration();
         config.setString("taskmanager.memory.fraction", "0.3");
         config.setString("taskmanager.memory.network.max", "300 mb");
+        config.setString("pipeline.default-kryo-serializers",
+                "class:java.time.OffsetDateTime,serializer:" + OffsetDateTimeSerializer.class.getName());
 
         this.flinkEnv = StreamExecutionEnvironment.createLocalEnvironment(config);
 
