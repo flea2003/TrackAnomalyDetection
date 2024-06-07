@@ -5,6 +5,8 @@ import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.junit.ClassRule;
 import org.junit.jupiter.api.Test;
 import sp.dtos.ExternalAISSignal;
+import sp.exceptions.NotExistingShipException;
+import sp.exceptions.NotificationNotFoundException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
@@ -17,6 +19,7 @@ import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -213,6 +216,10 @@ public class FullPipelineTest extends GenericPipelineTest {
         assertThat(individualDetailsShip1).isEqualTo(details.get(0));
         assertThat(individualDetailsShip2).isEqualTo(details.get(1));
 
+        // Make sure that getting some random ID that does not exist throws an exception
+        long badID = expectedIDShip1 + expectedIDShip2 + 1;
+        assertThrows(NotExistingShipException.class, () -> shipsDataService.getIndividualCurrentShipDetails(badID));
+
         float score1 = details.get(0).getCurrentAnomalyInformation().getScore();
         float score2 = details.get(1).getCurrentAnomalyInformation().getScore();
 
@@ -228,5 +235,13 @@ public class FullPipelineTest extends GenericPipelineTest {
         // Make sure that a single notification was added to the notification repository
         assertThat(notificationService.getAllNotifications().size()).isEqualTo(1);
         assertThat(notificationService.getAllNotificationForShip(expectedIDShip1).size()).isEqualTo(1);
+
+        // Test getting that notification by ID
+        Notification expected = notificationService.getAllNotificationForShip(expectedIDShip1).get(0);
+        Notification received = notificationService.getNotificationById(expected.getId());
+        assertThat(expected).isEqualTo(received);
+
+        // Get some random notification with random ID that does not exist and make sure that exception is thrown
+        assertThrows(NotificationNotFoundException.class, () -> notificationService.getNotificationById(expected.getId()-1));
     }
 }
