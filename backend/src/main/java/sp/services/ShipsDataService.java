@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sp.exceptions.DatabaseException;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.exceptions.PipelineStartingException;
@@ -77,11 +78,11 @@ public class ShipsDataService {
      * @return the list of the retrieved details
      * @throws PipelineException in case the query doesn't succeed
      */
-    public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
+    public List<CurrentShipDetails> getHistoryOfShip(long id) throws DatabaseException {
         try {
             return queryExecutor.executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
         } catch (SQLException e) {
-            throw new PipelineException("Error while executing query.");
+            throw new DatabaseException("The database query failed.");
         }
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import sp.exceptions.DatabaseException;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
 import sp.exceptions.PipelineStartingException;
@@ -79,7 +80,7 @@ public class ShipsDataController {
     ) {
         try {
             return ResponseEntity.ok(this.shipsDataService.getHistoryOfShip(id));
-        } catch (PipelineException e) {
+        } catch (DatabaseException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

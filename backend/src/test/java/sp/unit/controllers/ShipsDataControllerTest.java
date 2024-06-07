@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import sp.controllers.ShipsDataController;
+import sp.exceptions.DatabaseException;
 import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
@@ -132,7 +133,7 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getShipDetailsHistory() throws PipelineException{
+    void getShipDetailsHistory() throws DatabaseException {
         AnomalyInformation info1 = new AnomalyInformation(1, "explanation1", time1, 1L);
         AnomalyInformation info2 = new AnomalyInformation(2, "explanation2", time1, 2L);
         CurrentShipDetails details1 = new CurrentShipDetails(info1, null, null);
@@ -146,8 +147,8 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getShipDetailsServerError() throws PipelineException{
-        when(shipsDataService.getHistoryOfShip(5L)).thenThrow(new PipelineException());
+    void getShipDetailsServerError() throws DatabaseException{
+        when(shipsDataService.getHistoryOfShip(5L)).thenThrow(new DatabaseException());
         ResponseEntity<List<CurrentShipDetails>>response = shipsDataController.getHistoryOfShip(5L);
         assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }

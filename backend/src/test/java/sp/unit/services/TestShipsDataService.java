@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import sp.exceptions.DatabaseException;
 import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
@@ -211,7 +212,7 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getHistoryOfShip() throws PipelineException{
+    void getHistoryOfShip() throws DatabaseException {
         try(MockedStatic<ResultSetReader>mockedResultSetReader = mockStatic(ResultSetReader.class)) {
             mockedResultSetReader.when(() -> ResultSetReader.extractQueryResults(any(), any()))
                 .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
