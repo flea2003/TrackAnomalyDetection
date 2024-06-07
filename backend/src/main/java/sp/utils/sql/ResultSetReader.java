@@ -48,6 +48,9 @@ public class ResultSetReader {
         for (int i = 1; i <= columnCount; i++) {
             String columnName = metaData.getColumnLabel(i);
             String columnValue = resultSet.getString(i);
+            if(columnValue == null){
+                columnValue = "null";
+            }
             JsonElement jsonElement = JsonParser.parseString(columnValue);
             jsonObject.add(columnName, jsonElement);
         }

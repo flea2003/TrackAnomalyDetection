@@ -79,7 +79,7 @@ public class ShipsDataService {
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws PipelineException {
         try {
-            return queryExecutor.executeQueryOneLong(id, "src/main/resources/history.sql", CurrentShipDetails.class);
+            return queryExecutor.executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
         } catch (SQLException e) {
             throw new PipelineException("Error while executing query.");
         }
