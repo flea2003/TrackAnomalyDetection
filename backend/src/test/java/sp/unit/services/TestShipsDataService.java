@@ -99,7 +99,7 @@ public class TestShipsDataService {
         QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
 
         anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor);
 
         ShipInformationExtractor shipInformationExtractor = Mockito.mock(ShipInformationExtractor.class);
 
@@ -114,8 +114,9 @@ public class TestShipsDataService {
         shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
+        QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
 
-        shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
+        shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken);
 
         doReturn(shipInformationExtractorBroken).when(anomalyDetectionPipelineBroken).getShipInformationExtractor();
 

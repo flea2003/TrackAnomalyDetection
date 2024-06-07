@@ -9,6 +9,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import sp.pipeline.AnomalyDetectionPipeline;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import sp.utils.sql.QueryExecutor;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -159,7 +161,10 @@ class GenericPipelineTest {
         );
 
         // Instantiate Service classes for querying
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
+
+        QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
+
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor);
     }
 
     /**

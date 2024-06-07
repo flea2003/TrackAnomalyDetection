@@ -14,7 +14,6 @@ import sp.pipeline.utils.json.JsonMapper;
 
 @Service
 public class ResultSetReader {
-
     /**
      * Methods extracts the rows from a ResultSet after a SQL query is performed.
      *

@@ -29,9 +29,7 @@ public class QueryExecutor {
      * @throws SQLException throws if the SQL query fails
      */
     public <T> List<T> executeQueryOneLong(long id, String path, Class<T> tclass) throws SQLException {
-        String query;
-
-        query = FileReader.readQueryFromFile(path);
+        String query = FileReader.readQueryFromFile(path);
 
         try (Connection connection = druidConfig.connection();
              PreparedStatement statement = connection.prepareStatement(query)) {
