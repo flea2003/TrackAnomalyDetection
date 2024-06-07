@@ -7,8 +7,8 @@ import ErrorNotificationService from "../../../../services/ErrorNotificationServ
 import ShipNotification from "../../../../model/ShipNotification";
 
 import "../../../../styles/common.css";
-import "../../../../styles/objectDetails.css";
-import "../../../../styles/notificationDetails.css";
+import "../../../../styles/ship-details/shipDetails.css";
+import "../../../../styles/notifications/notificationDetails.css";
 import ObjectDetailsEntry from "../ObjectDetails/ObjectDetailsEntry";
 
 interface NotificationDetailsProps {

@@ -1,12 +1,14 @@
 import React from "react";
 import { useState } from "react";
 import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
-import extendIcon from "../../../../assets/icons/helper-icons/extend_info.svg";
-import filterIcon from "../../../../assets/icons/anomaly-list/filter_blue.png";
+import filterIconBlue from "../../../../assets/icons/anomaly-list/filter-blue.png";
+import filterIcon from "../../../../assets/icons/anomaly-list/filter.svg";
+
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../../App";
 
-import "../../../../styles/anomalyList.css";
+import "../../../../styles/anomaly-list/anomalyList.css";
+import "../../../../styles/anomaly-list/slider.css";
 
 interface ObjectDetailsProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -53,14 +55,21 @@ const AnomalyTitleWithSlider = ({
           data-testid="anomaly-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
-        <div>Anomaly List</div>
+        <div className="list-title">Anomaly List</div>
         <div className="modify-button-container" onClick={toggleExtended}>
-          <img
+          {!isExtended && <img
             src={filterIcon}
             alt="Open"
-            id="anomaly-list-close-icon"
             data-testid="anomaly-list-close-icon"
-          />
+            className="filter-icon"
+          />}
+
+          {isExtended && <img
+            src={filterIconBlue}
+            alt="Open"
+            data-testid="anomaly-list-close-icon"
+            className="filter-icon"
+          />}
         </div>
       </Stack>
       {isExtended && (
@@ -69,11 +78,10 @@ const AnomalyTitleWithSlider = ({
             type="range"
             min="0"
             max="100"
-            className="modify-threshold-slide"
             value={anomalyThreshold}
             onChange={handleSliderChange}
           />
-          {anomalyThreshold}%
+         {anomalyThreshold}%
         </span>
       )}
     </Stack>

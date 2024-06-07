@@ -6,7 +6,7 @@ import ErrorNotificationService, {
 import trashIcon from "../../../../assets/icons/error-notifications/trash.svg";
 
 import "../../../../styles/common.css";
-import "../../../../styles/errorListEntry.css";
+import "../../../../styles/error-notifications/errorListEntry.css";
 
 interface ErrorListEntryProps {
   notification: ErrorNotification;

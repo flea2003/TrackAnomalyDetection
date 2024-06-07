@@ -1,22 +1,21 @@
 #error-list-container {
-    width: 70%;
+    width: 20%;
+    background: #DAD5CFCC;
     text-align: center;
     display: flex;
-    height: 100vh;
-    border-left: 1px solid black;
+    height: 60%;
+    border: var(--border);
     pointer-events: all;
 }
 
 #error-list-internal-container {
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow: hidden;
     height: 100%;
 }
 
 #error-list-close-icon {
     height: var(--error-list-closing-icon-size);
     width: var(--error-list-closing-icon-size);
-    padding: var(--error-list-closing-icon-margin);
 }
 
 #error-list-close-icon:hover {
@@ -27,23 +26,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid black;
-
+    padding: 3px 8px;
+    font-size: var(--title-size);
+    font-weight: bold;
 }
 
 #error-list-mark-all-button {
-    margin-right: 5px;
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 5px;
-    padding-left: 7px;
-    padding-right: 7px;
+    width: var(--anomaly-list-closing-icon-size);
+    height: var(--anomaly-list-closing-icon-size);
     cursor: pointer;
-    font-size: 0.8em;
 }
 
 #error-list-mark-all-button:hover {
-    background-color: lightgray;
+    width: var(--anomaly-list-closing-icon-size);
+    height: var(--anomaly-list-closing-icon-size);
+    content: url("../../assets/icons/helper-icons/mark-all-green.png");
 }
 
 #error-list-mark-all-button:active {

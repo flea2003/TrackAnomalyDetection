@@ -7,9 +7,10 @@ import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
 import ErrorNotificationService, {
   ErrorNotification,
 } from "../../../../services/ErrorNotificationService";
+import markAll from "../../../../assets/icons/helper-icons/mark-all.svg";
 
 import "../../../../styles/common.css";
-import "../../../../styles/errorList.css";
+import "../../../../styles/error-notifications/errorList.css";
 
 interface ErrorListProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -34,13 +35,15 @@ function ErrorList({ pageChanger }: ErrorListProps) {
           onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
         <div id="error-list-name-text">Error list</div>
-        <button
+
+        <img
+          src={markAll}
           id="error-list-mark-all-button"
           data-testid="error-list-mark-all-button"
           onClick={() => ErrorNotificationService.markAllAsRead()}
-        >
-          Mark all as read
-        </button>
+          alt="Mark All">
+
+        </img>
       </Stack>
       <List
         id="error-list-internal-container"

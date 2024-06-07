@@ -10,8 +10,8 @@ import { NotificationService } from "../../../../services/NotificationService";
 import TimeUtilities from "../../../../utils/TimeUtilities";
 
 import "../../../../styles/common.css";
-import "../../../../styles/notificationList.css";
-import "../../../../styles/notificationEntry.css";
+import "../../../../styles/notifications/notificationList.css";
+import "../../../../styles/notifications/notificationEntry.css";
 
 interface NotificationEntryProps {
   notification: ShipNotification;

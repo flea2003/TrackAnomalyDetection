@@ -1,8 +1,6 @@
 /* This css file is meant for managing the root layout and the color schemes. */
 
 :root {
-    --middle-column-width: 20%;
-
     --anomaly-list-closing-icon-size: 20px;
     --anomaly-list-closing-icon-margin: 10px;
 
@@ -38,14 +36,12 @@
     --notifcation-list-entry-icon-size: 25px;
     --notification-list-mark-all-button-length: 50px;
 
+    --border: 2px solid black;
+    --title-size: 1.2em;
 }
 
 #root-div {
     height: 100vh;
-}
-
-#menu {
-
 }
 
 #anomaly-list-container, #object-details-container {

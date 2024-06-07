@@ -7,7 +7,7 @@ import ShipDetails from "../../../../model/ShipDetails";
 import ShipThresholdModifier from "./AnomalyTitleWithSlider";
 
 import "../../../../styles/common.css";
-import "../../../../styles/anomalyList.css";
+import "../../../../styles/anomaly-list/anomalyList.css";
 
 interface AnomalyListProps {
   ships: ShipDetails[];

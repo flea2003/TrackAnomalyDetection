@@ -5,7 +5,7 @@ import { CurrentPage } from "../../../../App";
 import ShipsNotificationEntry from "./NotificationListEntry";
 import List from "@mui/material/List";
 
-import "../../../../styles/notificationList.css";
+import "../../../../styles/notifications/notificationList.css";
 
 interface NotificationListProps {
   notifications: ShipNotification[];

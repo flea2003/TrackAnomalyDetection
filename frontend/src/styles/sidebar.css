@@ -1,7 +1,7 @@
 #sidebar {
     width: 3%;
     height: 24%;
-    border: 1px solid black;
+    border: var(--border);
     background: #DAD5CF66;
     pointer-events: all;
 
@@ -13,7 +13,7 @@
 {
     width: 100%;
     height: 50px;
-    border-bottom: 1px solid black;
+    border-bottom: var(--border);
     display: flex;
     justify-content: center;
     align-items: center;

@@ -6,10 +6,11 @@ import ShipNotification from "../../../../model/ShipNotification";
 import ShipDetails from "../../../../model/ShipDetails";
 import { NotificationService } from "../../../../services/NotificationService";
 import NotificationListWithoutTitle from "./NotificationListWithoutTitle";
+import markAll from "../../../../assets/icons/helper-icons/mark-all.svg";
 
 import "../../../../styles/common.css";
-import "../../../../styles/notificationList.css";
-import "../../../../styles/notificationEntry.css";
+import "../../../../styles/notifications/notificationList.css";
+import "../../../../styles/notifications/notificationEntry.css";
 
 interface NotificationListProps {
   notifications: ShipNotification[];
@@ -54,18 +55,16 @@ function NotificationList({
       <Stack id="notification-list-title-container" direction="row">
         {image}
         <div id="notification-list-name-text">Notifications</div>
-        <div id="notification-list-button-button-div">
-          <button
+          <img
+            src={markAll}
             id="notification-list-mark-all-button"
             onClick={() => {
               NotificationService.queryBackendToMarkAllNotificationsAsRead(
                 notifications,
               );
             }}
-          >
-            Mark all as read
-          </button>
-        </div>
+           alt="Close">
+          </img>
       </Stack>
       <NotificationListWithoutTitle
         notifications={notifications}

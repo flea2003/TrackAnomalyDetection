@@ -3,10 +3,11 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    border: 1px solid black;
-    height: 80%;
+    border: var(--border);
+    height: 60%;
     width: 20%;
     pointer-events: all;
+    background: #DAD5CFCC;
 }
 
 #notification-list-close-icon {
@@ -22,27 +23,20 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid black;
+    padding: 3px 8px;
 }
 
 #notification-list-mark-all-button {
-    margin-right: 5px;
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 5px;
-    padding-left: 7px;
-    padding-right: 7px;
+    margin: 0;
     cursor: pointer;
-    font-size: 0.8em;
+    width: var(--anomaly-list-closing-icon-size);
+    height: var(--anomaly-list-closing-icon-size);
 }
 
 #notification-list-mark-all-button:hover {
-    background: darkgray;
-}
-
-#notification-list-button-button-div {
-    padding: 1px;
-    margin-right: 1px;
+    content: url("../../assets/icons/helper-icons/mark-all-green.png");
+    width: var(--anomaly-list-closing-icon-size);
+    height: var(--anomaly-list-closing-icon-size);
 }
 
 #notification-list-internal-container {
@@ -58,5 +52,6 @@
 }
 
 #notification-list-name-text {
+    font-size: var(--title-size);
     font-weight: bold;
 }

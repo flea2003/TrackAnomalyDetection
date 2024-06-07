@@ -7,7 +7,7 @@ import shipIcon from "../../../../assets/icons/anomaly-list/ship.png";
 import { CurrentPage } from "../../../../App";
 
 import "../../../../styles/common.css";
-import "../../../../styles/anomalyListEntry.css";
+import "../../../../styles/anomaly-list/anomalyListEntry.css";
 
 interface AnomalyListEntryProps {
   shipDetails: ShipDetails;
