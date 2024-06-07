@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9bd95ea6-6dbc-4c96-a67a-fa51559a6e21" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../backend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/kafka-connection.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/kafka-connection.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/controllers/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/controllers/NotificationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/model/CurrentShipDetails.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/model/CurrentShipDetails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/AnomalyDetectionPipeline.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/AnomalyDetectionPipeline.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/PipelineConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/PipelineConfiguration.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/aggregation/ScoreAggregationBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/aggregation/ScoreAggregationBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/aggregation/aggregators/CurrentStateAggregator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/aggregation/aggregators/CurrentStateAggregator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/aggregation/extractors/ShipInformationExtractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/aggregation/extractors/ShipInformationExtractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/identification/IdAssignmentBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/identification/IdAssignmentBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/notifications/NotificationsAggregator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/notifications/NotificationsAggregator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/notifications/NotificationsDetectionBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/notifications/NotificationsDetectionBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/scoring/ScoreCalculationBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/parts/scoring/ScoreCalculationBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/utils/StreamUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/utils/StreamUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/utils/json/JsonMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/pipeline/utils/json/JsonMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/repositories/NotificationRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/services/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/services/NotificationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/services/ShipsDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/services/ShipsDataService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2hV8Fek12SXDImWsmp3UtVgMbEx" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/augus/Desktop/codebase/stress-tester&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9bd95ea6-6dbc-4c96-a67a-fa51559a6e21" name="Changes" comment="" />
+      <created>1717667782360</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1717667782360</updated>
+      <workItem from="1717667783430" duration="13872000" />
+      <workItem from="1717749907913" duration="2370000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
