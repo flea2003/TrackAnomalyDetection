@@ -97,7 +97,7 @@ public class TestShipsDataService {
         when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
 
         QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
-        when(queryExecutor.executeQueryOneLong(5, "src/main/resources/history.sql", CurrentShipDetails.class))
+        when(queryExecutor.executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class))
             .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
 
         anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
@@ -120,7 +120,7 @@ public class TestShipsDataService {
         QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
 
         doThrow(SQLException.class).when(queryExecutorBroken)
-                .executeQueryOneLong(5, "src/main/resources/history.sql", CurrentShipDetails.class);
+                .executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class);
 
         shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken);
 
