@@ -24,6 +24,7 @@ public class ShipsDataService {
     /**
      * Constructor for service class.
      *
+     * @param queryExecutor object which will execute the queries
      * @param anomalyDetectionPipeline object that is responsible for managing and handling the stream of data and
      *     anomaly information computation
      */
