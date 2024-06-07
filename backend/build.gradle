@@ -114,6 +114,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 	testCompileOnly 'org.projectlombok:lombok:1.18.32'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+	implementation "org.apache.flink:flink-json:${flinkVersion}"
 
 	// Flink test utils
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
