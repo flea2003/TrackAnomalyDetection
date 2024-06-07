@@ -1,6 +1,6 @@
 #error-list-container {
     width: 20%;
-    background: #DAD5CFCC;
+    background: var(--background);
     text-align: center;
     display: flex;
     height: 60%;

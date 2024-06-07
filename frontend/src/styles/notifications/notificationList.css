@@ -7,7 +7,7 @@
     height: 60%;
     width: 20%;
     pointer-events: all;
-    background: #DAD5CFCC;
+    background: var(--background);
 }
 
 #notification-list-close-icon {

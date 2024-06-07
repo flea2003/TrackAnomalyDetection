@@ -38,38 +38,9 @@
 
     --border: 2px solid black;
     --title-size: 1.2em;
-}
+    --background: #DAD5CFCC;
 
-#root-div {
-    height: 100vh;
-}
-
-#anomaly-list-container, #object-details-container {
-    height: 40%;
-    border-left: 1px solid black;
-}
-
-#map-container {
-    width: 100%;
-    height: 100vh;
-    flex-grow: 1;
-    position: relative;
-    display: block;
-}
-
-#side-container {
-    position: absolute;
-
-    width: 100%;
-    height: 98%;
-    top: 1%;
-    right: 0.5%;
-
-
-    border: 1px solid black;
-    z-index: 999;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
-    pointer-events: none;
+    *::-webkit-scrollbar{
+        display: none;
+    }
 }

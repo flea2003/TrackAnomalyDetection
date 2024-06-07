@@ -1,20 +1,21 @@
 #object-details-container {
-    width: var(--middle-column-width);
-    height: 100vh;
+    width: 20%;
+    height: 60%;
+    background: var(--background);
+    border: var(--border);
+    pointer-events: all;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: flex-start;
-    pointer-events: all;
 }
 
 .object-details-title-container {
     display: flex;
-    justify-content: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    width: 100%;
     height: var(--object-details-title-height);
-    flex-shrink: 0;
+    padding: 3px 8px;
 }
 
 .object-details-title {
@@ -24,14 +25,12 @@
     align-items: center;
     font-size: var(--object-details-title-font-size);
     font-weight: bold;
-    padding-left: 30px;
 }
 
 .object-details-return-icon {
     cursor: pointer;
     width: var(--object-details-return-icon-size);
     height: var(--object-details-return-icon-size);
-    margin-left: var(--object-details-return-icon-margin);
 }
 
 .object-details-properties-list{
@@ -43,7 +42,6 @@
     overflow-y: auto;
     height: 70%;
     width: 100%;
-    padding: 3px;
 }
 
 .object-details-notification-list {
@@ -59,4 +57,10 @@
 
 .object-details-notification-title {
     text-align: center;
+}
+
+.object-anomaly-score {
+    font-weight: bold;
+    margin: 0;
+    /*-webkit-text-stroke: 0.2px black;*/
 }

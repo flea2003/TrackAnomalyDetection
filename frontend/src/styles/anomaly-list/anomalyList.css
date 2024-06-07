@@ -1,12 +1,9 @@
 #anomaly-list-container {
     width: 20%;
     height: 60%;
-    background: #DAD5CFCC;
+    background: var(--background);
     border: var(--border);
     pointer-events: all;
-}
-
-#anomaly-list-title-container-with-slider {
 }
 
 #anomaly-list-internal-container {

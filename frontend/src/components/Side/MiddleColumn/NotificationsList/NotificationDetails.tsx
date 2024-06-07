@@ -9,7 +9,7 @@ import ShipNotification from "../../../../model/ShipNotification";
 import "../../../../styles/common.css";
 import "../../../../styles/ship-details/shipDetails.css";
 import "../../../../styles/notifications/notificationDetails.css";
-import ObjectDetailsEntry from "../ObjectDetails/ObjectDetailsEntry";
+import ObjectDetailsEntry from "../ShipDetails/ObjectDetailsEntry";
 
 interface NotificationDetailsProps {
   allNotifications: ShipNotification[];

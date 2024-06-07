@@ -7,9 +7,13 @@ import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
 import { CurrentPage } from "../../../../App";
 import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 import ShipNotification from "../../../../model/ShipNotification";
+import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
+
 
 import "../../../../styles/common.css";
 import "../../../../styles/ship-details/shipDetails.css";
+import MenuObjectDetails from "./DisplayedInformation";
+import DisplayedInformation from "./DisplayedInformation";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
@@ -43,22 +47,27 @@ function ObjectDetails(props: ObjectDetailsProps) {
 
   return (
     <Stack id="object-details-container">
-      <div className="object-details-title-container">
+      <span className="object-details-title-container">
         {getReturnIcon(pageChanger)}
         <span className="object-details-title">Ship #{ship.id}</span>
-      </div>
-      <List className="object-details-properties-list">
-        {getPropertyElements(ship)}
-      </List>
-      <Stack className="object-details-notification-list">
-        <div className="object-details-notification-title">Notifications</div>
-        <NotificationListWithoutTitle
-          notifications={shipNotifications}
-          ships={props.ships}
-          pageChanger={pageChanger}
-          mapCenteringFun={props.mapCenteringFun}
-        />
-      </Stack>
+        <p className="object-anomaly-score" style={{ color: calculateAnomalyColor(ship.anomalyScore) }}> {ship.anomalyScore}%</p>
+      </span>
+
+      <DisplayedInformation/>
+
+      {/*<List className="object-details-properties-list">*/}
+      {/*  {getPropertyElements(ship)}*/}
+      {/*</List>*/}
+      {/*<Stack className="object-details-notification-list">*/}
+      {/*  <div className="object-details-notification-title">Notifications</div>*/}
+      {/*  <NotificationListWithoutTitle*/}
+      {/*    notifications={shipNotifications}*/}
+      {/*    ships={props.ships}*/}
+      {/*    pageChanger={pageChanger}*/}
+      {/*    mapCenteringFun={props.mapCenteringFun}*/}
+      {/*  />*/}
+      {/*</Stack>*/}
+
     </Stack>
   );
 }
