@@ -1,7 +1,7 @@
 // Create a class to get ship information from the server
 import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";
-import HttpSender from "../utils/HttpSender";
+import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
 
 class ShipService {
@@ -140,6 +140,21 @@ class ShipService {
       return sortedList.reverse();
     }
     return sortedList;
+  };
+
+  /**
+   * Utility method for constructing a map representation of the ShipDetails array.
+   * @param shipDetailsArray - ShipDetails array encapsulating the information fetched from the backend
+   */
+  static constructMap: (
+    shipDetailsArray: ShipDetails[],
+  ) => Map<number, ShipDetails> = (shipDetailsArray) => {
+    const initialMap = new Map<number, ShipDetails>();
+    for (let i = 0; i < shipDetailsArray.length; i++) {
+      const shipDetailsInstance = shipDetailsArray[i];
+      initialMap.set(shipDetailsInstance.id, shipDetailsInstance);
+    }
+    return initialMap;
   };
 }
 

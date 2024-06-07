@@ -27,6 +27,7 @@ import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
+import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
 import sp.services.NotificationService;
 
@@ -63,9 +64,13 @@ class ShipInformationExtractorTest {
         CurrentStateAggregator currentStateAggregator;
         PipelineConfiguration config;
         NotificationsAggregator notificationsAggregator;
+        WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
         // Mock the notification service class (to mock the DB)
         notificationService = mock(NotificationService.class);
+
+        // Mock the WebSocket broadcaster builder class
+        webSocketBroadcasterBuilder = mock(WebSocketBroadcasterBuilder.class);
 
         // Create the configuration
         config = new PipelineConfiguration("kafka-connection.properties");
@@ -88,7 +93,7 @@ class ShipInformationExtractorTest {
 
         // Create the pipeline itself
         anomalyDetectionPipeline = new AnomalyDetectionPipeline(
-            streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder
+            streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder, webSocketBroadcasterBuilder
         );
     }
 
