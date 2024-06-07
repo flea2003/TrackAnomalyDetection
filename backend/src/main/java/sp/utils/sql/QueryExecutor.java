@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.stereotype.Service;
 import sp.utils.DruidConfig;
 
@@ -14,8 +13,13 @@ import sp.utils.DruidConfig;
 public class QueryExecutor {
     private final DruidConfig druidConfig;
 
+    /**
+     * Constructor for the QueryExecutor class.
+     *
+     * @param druidConfig the class containing the druid database
+     */
     @Autowired
-    public QueryExecutor(DruidConfig druidConfig){
+    public QueryExecutor(DruidConfig druidConfig) {
         this.druidConfig = druidConfig;
     }
 
@@ -25,6 +29,7 @@ public class QueryExecutor {
      * @param id the parameter of type long
      * @param path the path of where the sql query is located
      * @param tclass the class of the answer of this query
+     * @param <T> the type of class that will be the answer of this query
      * @return a list of tclass objects
      * @throws SQLException throws if the SQL query fails
      */

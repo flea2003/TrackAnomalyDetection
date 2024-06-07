@@ -11,8 +11,14 @@ import sp.pipeline.PipelineConfiguration;
 
 @Configuration
 public class DruidConfig {
+
     private final PipelineConfiguration pipelineConfiguration;
 
+    /**
+     * Constructor for the DruidConfig class.
+     *
+     * @param pipelineConfiguration the object containing the hardcoded configurations
+     */
     @Autowired
     public DruidConfig(PipelineConfiguration pipelineConfiguration) {
         this.pipelineConfiguration = pipelineConfiguration;

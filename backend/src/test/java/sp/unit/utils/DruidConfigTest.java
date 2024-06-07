@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import sp.pipeline.PipelineConfiguration;
+import sp.unit.pipeline.PipelineConfigurationTest;
 import sp.utils.DruidConfig;
 
 class DruidConfigTest {
@@ -19,12 +21,14 @@ class DruidConfigTest {
     void testConfiguration(){
         try (MockedStatic<DriverManager> dummyDriver = mockStatic(DriverManager.class)) {
             dummyDriver.when(() -> DriverManager.getConnection(anyString(), any())).thenReturn(mock(Connection.class));
-            AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DruidConfig.class);
 
-            Connection connection1 = context.getBean(Connection.class);
-            Connection connection2 = context.getBean(Connection.class);
+            AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+            context.registerBean(PipelineConfiguration.class, () -> mock(PipelineConfiguration.class));
+            context.register(DruidConfig.class);
+            context.refresh();
 
-            dummyDriver.verify(() -> DriverManager.getConnection(anyString(), any()), times(1));
+
+            dummyDriver.verify(() -> DriverManager.getConnection(any(), any()), times(1));
         }
     }
 

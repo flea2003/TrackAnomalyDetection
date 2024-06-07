@@ -97,6 +97,8 @@ public class TestShipsDataService {
         when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
 
         QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
+        when(queryExecutor.executeQueryOneLong(5, "src/main/resources/history.sql", CurrentShipDetails.class))
+            .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
 
         anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor);
@@ -114,7 +116,11 @@ public class TestShipsDataService {
         shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
 
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
+
         QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
+
+        doThrow(SQLException.class).when(queryExecutorBroken)
+                .executeQueryOneLong(5, "src/main/resources/history.sql", CurrentShipDetails.class);
 
         shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken);
 
@@ -218,11 +224,7 @@ public class TestShipsDataService {
 
     @Test
     void getHistoryOfShipException(){
-        try(MockedStatic<ResultSetReader>mockedResultSetReader = mockStatic(ResultSetReader.class)){
-            mockedResultSetReader.when(() -> ResultSetReader.extractQueryResults(any(), any()))
-                .thenThrow(SQLException.class);
-            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
-        }
+        assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(PipelineException.class);
     }
 
     @Test
