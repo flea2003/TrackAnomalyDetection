@@ -45,7 +45,7 @@ class ResultSetReaderTest {
         anomalyInformation1 = new AnomalyInformation(0.5F, "explanation", offsetDateTime1, 123L);
         anomalyInformation2 = new AnomalyInformation(0.5F, "explanation", offsetDateTime2, 123L);
         maxAnomalyScoreDetails1 = new MaxAnomalyScoreDetails(33F, offsetDateTime1);
-        maxAnomalyScoreDetails2 = new MaxAnomalyScoreDetails(50F, offsetDateTime2);
+        maxAnomalyScoreDetails2 = null;
         currentShipDetails1 = new CurrentShipDetails(anomalyInformation1, aisSignal1, maxAnomalyScoreDetails1);
         currentShipDetails2 = new CurrentShipDetails(anomalyInformation2, aisSignal2, maxAnomalyScoreDetails2);
     }
@@ -63,7 +63,7 @@ class ResultSetReaderTest {
         when(resultSetMetaData.getColumnLabel(2)).thenReturn("currentAnomalyInformation");
         when(resultSetMetaData.getColumnLabel(3)).thenReturn("currentAISSignal");
 
-        when(resultSet.getString(1)).thenReturn(JsonMapper.toJson(maxAnomalyScoreDetails1), JsonMapper.toJson(maxAnomalyScoreDetails2));
+        when(resultSet.getString(1)).thenReturn(JsonMapper.toJson(maxAnomalyScoreDetails1), null);
         when(resultSet.getString(2)).thenReturn(JsonMapper.toJson(anomalyInformation1), JsonMapper.toJson(anomalyInformation2));
         when(resultSet.getString(3)).thenReturn(JsonMapper.toJson(aisSignal1), JsonMapper.toJson(aisSignal2));
 
