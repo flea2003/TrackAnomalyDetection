@@ -14,21 +14,16 @@ import java.util.Properties;
 @Component
 public class PipelineConfiguration {
     private static final String RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais-raw.topic.name";
-    private static final String INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais.topic.name";
-    private static final String CALCULATED_SCORES_TOPIC_NAME_PROPERTY = "calculated.scores.topic.name";
+    private static final String CURRENT_SHIP_DETAILS_TOPIC_NAME_PROPERTY = "current.ship.details.topic.name";
+    private static final String NOTIFICATIONS_TOPIC_NAME_PROPERTY = "notifications.topic.name";
     private static final String KAFKA_SERVER_ADDRESS_PROPERTY = "kafka.server.address";
     private static final String KAFKA_STORE_NAME_PROPERTY = "kafka.store.name";
 
     private String rawIncomingAisTopicName;
-
-    private String incomingAisTopicName;
-
-    private String calculatedScoresTopicName;
-
+    private String currentShipDetailsTopicName;
+    private String notificationsTopicName;
     private String kafkaServerAddress;
-
     private String kafkaStoreName;
-
     private Properties savedConfiguration;
 
     /**
@@ -50,10 +45,10 @@ public class PipelineConfiguration {
      */
     private void updateLocalFields() {
         rawIncomingAisTopicName = savedConfiguration.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
-        incomingAisTopicName = savedConfiguration.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
-        calculatedScoresTopicName = savedConfiguration.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
         kafkaServerAddress = savedConfiguration.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
         kafkaStoreName = savedConfiguration.getProperty(KAFKA_STORE_NAME_PROPERTY);
+        currentShipDetailsTopicName = savedConfiguration.getProperty(CURRENT_SHIP_DETAILS_TOPIC_NAME_PROPERTY);
+        notificationsTopicName = savedConfiguration.getProperty(NOTIFICATIONS_TOPIC_NAME_PROPERTY);
     }
 
     /**

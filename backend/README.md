@@ -20,15 +20,15 @@ bin/kafka-server-start.sh config/server.properties
 Finally, create the topics required for the project. In the third terminal, run the following commands:
 ```bash
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic current-ship-details --bootstrap-server localhost:9092
 ```
 
 If needed to remove the topics, run the following command:
 ```bash
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic current-ship-details --bootstrap-server localhost:9092
 ```
 
 Additionally, the following JVM arguments need to be added (in IntelliJ: Edit configurations -> Modify options -> (Java) Add VM options):
@@ -61,11 +61,12 @@ For full reset of the back-end state you can run the following commands (make su
 ```bash
 bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeline --force
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic current-ship-details --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic current-ship-details --bootstrap-server localhost:9092
+
 ```
 
 Sometimes Kafka might not start if the logs of Zookeeper and the Kafka server are not cleared. Assuming that `/tmp/kafka-logs` and `/tmp/zoekeeper` are the locations of the logs, run the following commands to delete them:
