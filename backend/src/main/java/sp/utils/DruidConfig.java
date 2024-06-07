@@ -4,11 +4,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import sp.pipeline.PipelineConfiguration;
 
 @Configuration
 public class DruidConfig {
+    private final PipelineConfiguration pipelineConfiguration;
+
+    @Autowired
+    public DruidConfig(PipelineConfiguration pipelineConfiguration) {
+        this.pipelineConfiguration = pipelineConfiguration;
+    }
 
     /**
      * Spring bean which initialized a database connection.
@@ -19,7 +27,7 @@ public class DruidConfig {
     public Connection connection() {
         Properties connectionProperties = new Properties();
         try {
-            String url = "jdbc:avatica:remote:url=http://localhost:8888/druid/v2/sql/avatica/;transparent_reconnection=true";
+            String url = pipelineConfiguration.getDruidUrl();
             return DriverManager.getConnection(url, connectionProperties);
         } catch (SQLException e) {
             return null;
