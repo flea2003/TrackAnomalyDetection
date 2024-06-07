@@ -107,12 +107,14 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       shipDetails: null,
     } as ShipIconDetailsType);
 
+    // Initialize the trackingInfo variable that will track the selected ship icon
     const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>({
       x: 0,
       y: 0,
       shipId: -1,
     } as ShipIconTrackingType);
 
+    // Event-handling method which enables the tracking of a particular ship
     const trackShipIcon = (ship: ShipDetails) => {
       setTrackingInfo({
         x: ship.lng,
@@ -134,17 +136,14 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         return;
       }
 
+      // When re-rendering the Map component, check if a ship icon is currently tracked
       if (trackingInfo.shipId !== -1) {
         const trackedShip = ships.find((x) => x.id === trackingInfo.shipId);
         if (trackedShip !== undefined) {
-          map.flyTo(
-            [trackedShip.lat, trackedShip.lng],
-            mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
-            {
-              animate: true,
-              duration: mapStyleConfig["transition-time"],
-            },
-          );
+          map.flyTo([trackedShip.lat, trackedShip.lng], map.getZoom(), {
+            animate: true,
+            duration: mapStyleConfig["transition-time"],
+          });
         }
       }
 
