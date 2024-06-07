@@ -41,7 +41,7 @@ public abstract class GenericKafkaExtractor {
      * This method runs in a thread, separate from the main application. It handles polling the Kafka topic
      * and distributing the processing of the incoming messages to separate threads.
      */
-    private void stateUpdatingThread() {
+    public void stateUpdatingThread() {
         // Create a consumer for the current ship details topic
         try(KafkaConsumer<Long, String> consumer = streamUtils.getConsumer()) {
 
