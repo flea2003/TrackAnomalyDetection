@@ -3,9 +3,9 @@ import React from "react";
 import ShipDetails from "../../../../model/ShipDetails";
 import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
-import shipIcon from "../../../../assets/icons/ship.png";
-import bellIconNotRead from "../../../../assets/icons/regular-notifications/bell-notification-not-read.svg";
-import bellIconRead from "../../../../assets/icons/regular-notifications/bell-notification-read.svg";
+import shipIcon from "../../../../assets/icons/anomaly-list/ship.png";
+import bellIconNotRead from "../../../../assets/icons/regular-notifications/notificaation_bell_orange.png";
+import bellIconRead from "../../../../assets/icons/regular-notifications/notification_bell.svg";
 import { NotificationService } from "../../../../services/NotificationService";
 import TimeUtilities from "../../../../utils/TimeUtilities";
 

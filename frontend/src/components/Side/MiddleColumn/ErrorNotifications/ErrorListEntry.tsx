@@ -3,7 +3,7 @@ import Stack from "@mui/material/Stack";
 import ErrorNotificationService, {
   ErrorNotification,
 } from "../../../../services/ErrorNotificationService";
-import trashIcon from "../../../../assets/icons/trash.svg";
+import trashIcon from "../../../../assets/icons/error-notifications/trash.svg";
 
 import "../../../../styles/common.css";
 import "../../../../styles/errorListEntry.css";

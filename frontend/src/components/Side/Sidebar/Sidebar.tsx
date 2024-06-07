@@ -2,11 +2,11 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../App";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
-import shipIcon from "../../../assets/icons/ship.png";
-import bellIconNotRead from "../../../assets/icons/regular-notifications/bell-notification-not-read.svg";
-import bellIconRead from "../../../assets/icons/regular-notifications/bell-notification-read.svg";
-import settingsIcon from "../../../assets/icons/settings.svg";
-import bugIcon from "../../../assets/icons/bug.svg";
+import shipIcon from "../../../assets/icons/anomaly-list/ship.png";
+import bellIconNotRead from "../../../assets/icons/regular-notifications/notificaation_bell_orange.png";
+import bellIconRead from "../../../assets/icons/regular-notifications/notification_bell.svg";
+import settingsIcon from "../../../assets/icons/helper-icons/settings.svg";
+import bugIcon from "../../../assets/icons/error-notifications/bug.svg";
 import { NotificationService } from "../../../services/NotificationService";
 
 import "../../../styles/common.css";

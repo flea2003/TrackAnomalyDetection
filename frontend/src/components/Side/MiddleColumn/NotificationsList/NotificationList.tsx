@@ -1,6 +1,6 @@
 import { CurrentPage } from "../../../../App";
 import Stack from "@mui/material/Stack";
-import closeIcon from "../../../../assets/icons/close.svg";
+import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
 import React from "react";
 import ShipNotification from "../../../../model/ShipNotification";
 import ShipDetails from "../../../../model/ShipDetails";

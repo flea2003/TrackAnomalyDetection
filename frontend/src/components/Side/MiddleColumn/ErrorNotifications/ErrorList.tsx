@@ -3,7 +3,7 @@ import Stack from "@mui/material/Stack";
 import ErrorListEntry from "./ErrorListEntry";
 import List from "@mui/material/List";
 import { CurrentPage } from "../../../../App";
-import closeIcon from "../../../../assets/icons/close.svg";
+import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
 import ErrorNotificationService, {
   ErrorNotification,
 } from "../../../../services/ErrorNotificationService";

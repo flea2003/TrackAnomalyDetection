@@ -1,10 +1,12 @@
 import React from "react";
 import { useState } from "react";
-import "../../../../styles/anomalyList.css";
-import closeIcon from "../../../../assets/icons/close.svg";
-import extendIcon from "../../../../assets/icons/extend_info.svg";
+import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
+import extendIcon from "../../../../assets/icons/helper-icons/extend_info.svg";
+import filterIcon from "../../../../assets/icons/anomaly-list/filter_blue.png";
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../../App";
+
+import "../../../../styles/anomalyList.css";
 
 interface ObjectDetailsProps {
   pageChanger: (currentPage: CurrentPage) => void;
@@ -51,9 +53,14 @@ const AnomalyTitleWithSlider = ({
           data-testid="anomaly-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
+        <div>Anomaly List</div>
         <div className="modify-button-container" onClick={toggleExtended}>
-          Threshold
-          <img src={extendIcon} alt="close" />
+          <img
+            src={filterIcon}
+            alt="Open"
+            id="anomaly-list-close-icon"
+            data-testid="anomaly-list-close-icon"
+          />
         </div>
       </Stack>
       {isExtended && (

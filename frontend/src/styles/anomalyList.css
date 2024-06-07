@@ -1,6 +1,7 @@
 #anomaly-list-container {
-    width: 50%;
+    width: 20%;
     height: 60%;
+    padding: 1px;
     text-align: center;
     border: 1px solid orange;
     display: flex;
@@ -25,6 +26,7 @@
     transform: scale(1.1);
 }
 
+
 #anomaly-list-title-container {
     display: flex;
     justify-content: space-between;
@@ -37,7 +39,6 @@
 }
 
 .modify-button-container {
-    width: 80%;
     display: flex;
     flex-direction: row;
     font-size: 0.6em;

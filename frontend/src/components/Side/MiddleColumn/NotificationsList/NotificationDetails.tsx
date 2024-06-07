@@ -1,7 +1,7 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
-import returnIcon from "../../../../assets/icons/back.svg";
+import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
 import { CurrentPage } from "../../../../App";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
 import ShipNotification from "../../../../model/ShipNotification";

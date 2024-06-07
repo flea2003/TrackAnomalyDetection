@@ -4,6 +4,8 @@
     border: 1px solid black;
     background: #DAD5CF66;
     pointer-events: all;
+
+    margin-left: 0.5%;
 }
 
 .sidebar-entry, .sidebar-bug-icon-all-read,
