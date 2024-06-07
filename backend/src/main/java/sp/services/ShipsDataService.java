@@ -9,6 +9,7 @@ import sp.exceptions.PipelineException;
 import sp.exceptions.PipelineStartingException;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
+import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,18 +17,20 @@ import java.util.List;
 @Service
 public class ShipsDataService {
 
-    private final AnomalyDetectionPipeline anomalyDetectionPipeline;
+    private final ShipInformationExtractor shipInformationExtractor;
     private final Integer activeTime = 30;
 
     /**
      * Constructor for service class.
      *
      * @param anomalyDetectionPipeline object that is responsible for managing and handling the stream of data and
-     *     anomaly information computation
+     *     anomaly information computation. Injecting it here makes sure that it is started when the service is created.
+     * @param shipInformationExtractor object that is responsible for extracting ship information from a Kafka topic
      */
     @Autowired
-    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline) {
-        this.anomalyDetectionPipeline = anomalyDetectionPipeline;
+    public ShipsDataService(AnomalyDetectionPipeline anomalyDetectionPipeline,
+                            ShipInformationExtractor shipInformationExtractor) {
+        this.shipInformationExtractor = shipInformationExtractor;
         anomalyDetectionPipeline.runPipeline();
     }
 
@@ -39,8 +42,7 @@ public class ShipsDataService {
      */
     public CurrentShipDetails getIndividualCurrentShipDetails(Long shipId)
             throws NotExistingShipException, PipelineException, PipelineStartingException {
-        CurrentShipDetails anomalyInfo = anomalyDetectionPipeline.getShipInformationExtractor()
-            .getCurrentShipDetails().get(shipId);
+        CurrentShipDetails anomalyInfo = shipInformationExtractor.getCurrentShipDetails().get(shipId);
         if (anomalyInfo == null) {
             throw new NotExistingShipException("Couldn't find such ship.");
         }
@@ -55,14 +57,13 @@ public class ShipsDataService {
      */
     public List<CurrentShipDetails> getCurrentShipDetails() throws PipelineException, PipelineStartingException {
         OffsetDateTime currentTime = OffsetDateTime.now();
-        HashMap<Long, CurrentShipDetails> shipsInfo = anomalyDetectionPipeline.getShipInformationExtractor()
-            .getFilteredShipDetails(x -> {
-                if (x.getCurrentAISSignal() == null) {
-                    return false;
-                } else {
-                    return Duration.between(x.getCurrentAISSignal().getReceivedTime(), currentTime).toMinutes() <= activeTime;
-                }
-            });
+        HashMap<Long, CurrentShipDetails> shipsInfo = shipInformationExtractor.getFilteredShipDetails(x -> {
+            if (x.getCurrentAISSignal() == null) {
+                return false;
+            } else {
+                return Duration.between(x.getCurrentAISSignal().getReceivedTime(), currentTime).toMinutes() <= activeTime;
+            }
+        });
         return shipsInfo.values().stream().toList();
     }
 

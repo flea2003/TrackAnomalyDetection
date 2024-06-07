@@ -1,33 +1,55 @@
 package sp.pipeline.parts.aggregation.extractors;
 
-import java.util.HashMap;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StoreQueryParameters;
-import org.apache.kafka.streams.errors.InvalidStateStoreException;
-import org.apache.kafka.streams.errors.StreamsNotStartedException;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.state.KeyValueIterator;
-import org.apache.kafka.streams.state.QueryableStoreTypes;
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
-import sp.exceptions.PipelineException;
-import sp.exceptions.PipelineStartingException;
+import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import sp.model.CurrentShipDetails;
+import sp.pipeline.PipelineConfiguration;
+import sp.pipeline.utils.StreamUtils;
+import sp.pipeline.utils.json.JsonMapper;
 
-public class ShipInformationExtractor {
+@Service
+public class ShipInformationExtractor extends GenericKafkaExtractor {
 
-    private final KTable<Long, CurrentShipDetails> state;
-    private final KafkaStreams kafkaStreams;
+    private final Logger logger = LoggerFactory.getLogger(ShipInformationExtractor.class);
+    private final ConcurrentHashMap<Long, CurrentShipDetails> state = new ConcurrentHashMap<>();
 
     /**
      * Constructor for ShipInformationExtractor.
      *
-     * @param state Kafka table representing the current state
-     * @param kafkaStreams KafkaStreams object
+     * @param streamUtils an object that holds utility methods for dealing with streams
+     * @param configuration an object that holds configuration properties
      */
-    public ShipInformationExtractor(KTable<Long, CurrentShipDetails> state, KafkaStreams kafkaStreams) {
-        this.state = state;
-        this.kafkaStreams = kafkaStreams;
+    @Autowired
+    public ShipInformationExtractor(StreamUtils streamUtils,
+                                    PipelineConfiguration configuration) {
+        super(streamUtils, configuration, 10000); // poll every 0.01ms
+    }
+
+    /**
+     * Processes an incoming record from the Kafka topic. Deserializes it into a CurrentShipDetails
+     * object and updates the state concurrent hashmap.
+     *
+     * @param record the record incoming from Kafka topic
+     */
+    @Override
+    protected void processNewRecord(ConsumerRecord<Long, String> record) {
+        CurrentShipDetails newCurrentShipDetails;
+        try {
+            newCurrentShipDetails = JsonMapper.fromJson(record.value(), CurrentShipDetails.class);
+        } catch (JsonProcessingException e) {
+            logger.error("JSON error while processing internal record, so skipping it. Error: ", e);
+            return;
+        }
+
+        state.put(newCurrentShipDetails.extractId(), newCurrentShipDetails);
     }
 
     /**
@@ -36,8 +58,7 @@ public class ShipInformationExtractor {
      *
      * @return the current and max scores of the ships in the system.
      */
-    public HashMap<Long, CurrentShipDetails> getCurrentShipDetails() throws
-            PipelineException, PipelineStartingException {
+    public HashMap<Long, CurrentShipDetails> getCurrentShipDetails() {
         return getFilteredShipDetails(x -> true);
     }
 
@@ -45,47 +66,14 @@ public class ShipInformationExtractor {
     /**
      * Returns the current (last updated) anomaly scores of the ships in the system after applying a filter operation.
      *
-     * @param filter - the filter operation that we will apply on the CurrentShipDetails
+     * @param filter the filter operation that we will apply on the CurrentShipDetails
      * @return the current scores of the ships in the systems after filtering them on our criteria.
-     * @throws PipelineException exception thrown in case that our pipeline fails.
      */
-    public HashMap<Long, CurrentShipDetails> getFilteredShipDetails(Predicate<CurrentShipDetails> filter)
-            throws PipelineException, PipelineStartingException {
-        try {
-            // Get the current state of the KTable
-            final String storeName = this.state.queryableStoreName();
-            ReadOnlyKeyValueStore<Long, CurrentShipDetails> view = this.kafkaStreams.store(
-                StoreQueryParameters.fromNameAndType(storeName, QueryableStoreTypes.keyValueStore())
-            );
-
-            // Create a copy of the state considering only the current AnomalyInformation values for each ship
-            return extractLatestCurrentShipDetails(view, filter);
-
-        } catch (StreamsNotStartedException e) {
-            throw new PipelineStartingException("The pipeline has not yet started");
-        } catch (InvalidStateStoreException e) {
-            throw new PipelineException("Error while querying the state store");
-        }
+    public HashMap<Long, CurrentShipDetails> getFilteredShipDetails(Predicate<CurrentShipDetails> filter) {
+        return state
+                .entrySet()
+                .stream()
+                .filter(x -> filter.test(x.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, HashMap::new));
     }
-
-    /**
-     * Method which extracts the latest anomalies from a given ReadOnlyKeyValueStore.
-     *
-     * @param view - the ReadOnlyKeyValueStore
-     * @param filter - the filter that we will apply to the CurrentShipDetails
-     * @return - the extracted HashMap with the required information.
-     */
-    public HashMap<Long, CurrentShipDetails> extractLatestCurrentShipDetails(ReadOnlyKeyValueStore<Long, CurrentShipDetails> view,
-                                                                             Predicate<CurrentShipDetails> filter) {
-        HashMap<Long, CurrentShipDetails> stateCopy = new HashMap<>();
-        try (KeyValueIterator<Long, CurrentShipDetails> iter = view.all()) {
-            iter.forEachRemaining(kv -> {
-                if (filter.test(kv.value)) {
-                    stateCopy.put(kv.key, kv.value);
-                }
-            });
-        }
-        return stateCopy;
-    }
-
 }
