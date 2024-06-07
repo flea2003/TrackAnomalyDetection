@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.PipelineException;
@@ -30,14 +29,12 @@ import static org.mockito.Mockito.*;
 public class TestShipsDataService {
 
     private ShipsDataService shipsDataService;
-    private ShipsDataService shipsDataServiceBroken;
     private AISSignal signal3;
     CurrentShipDetails currentShipDetails1;
     CurrentShipDetails currentShipDetails2;
     CurrentShipDetails currentShipDetails3;
     CurrentShipDetails currentShipDetails4;
-    ShipInformationExtractor shipInformationExtractorBroken;
-    AnomalyDetectionPipeline anomalyDetectionPipeline;
+    ShipInformationExtractor shipInformationExtractor;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -83,32 +80,15 @@ public class TestShipsDataService {
             put(4L, currentShipDetails4);
         }};
 
-
-
-        anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline);
-
-        ShipInformationExtractor shipInformationExtractor = Mockito.mock(ShipInformationExtractor.class);
-
-        doReturn(shipInformationExtractor).when(anomalyDetectionPipeline).getShipInformationExtractor();
+        AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
+        shipInformationExtractor = mock(ShipInformationExtractor.class);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, shipInformationExtractor);
 
         doReturn(currentShipDetailsMap).when(shipInformationExtractor)
             .getFilteredShipDetails(any(Predicate.class));
 
         doReturn(currentShipDetailsMap).when(shipInformationExtractor)
             .getCurrentShipDetails();
-
-        shipInformationExtractorBroken = Mockito.mock(ShipInformationExtractor.class);
-
-        AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
-        shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken);
-
-        doReturn(shipInformationExtractorBroken).when(anomalyDetectionPipelineBroken).getShipInformationExtractor();
-
-        doThrow(PipelineException.class).when(shipInformationExtractorBroken)
-            .getCurrentShipDetails();
-        doThrow(PipelineException.class).when(shipInformationExtractorBroken)
-            .getFilteredShipDetails(any(Predicate.class));
     }
 
     @Test
@@ -121,33 +101,9 @@ public class TestShipsDataService {
     }
 
     @Test
-    void testGetIndividualAISPipelineStartingException() throws PipelineException, PipelineStartingException {
-        ShipInformationExtractor fakeExtractor = Mockito.mock(ShipInformationExtractor.class);
-        when(anomalyDetectionPipeline.getShipInformationExtractor()).thenReturn(fakeExtractor);
-        when(fakeExtractor.getCurrentShipDetails()).thenThrow(new PipelineStartingException("Something wroong"));
-        assertThrows(PipelineStartingException.class, () -> {
-           shipsDataService.getIndividualCurrentShipDetails(1L);
-        });
-    }
-
-    @Test
     void getIndividualDetailsNoShipException(){
         assertThatThrownBy(() -> shipsDataService.getIndividualCurrentShipDetails(6L))
                 .isInstanceOf(NotExistingShipException.class).hasMessage("Couldn't find such ship.");
-    }
-
-    @Test
-    void getIndividualDetailsTestPipelineException(){
-        assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
-                .isInstanceOf(PipelineException.class);
-    }
-
-    @Test
-    void getIndividualDetailsTestPipelineNotStartedException() throws PipelineException, PipelineStartingException {
-        doThrow(PipelineStartingException.class).when(shipInformationExtractorBroken)
-                .getCurrentShipDetails();
-        assertThatThrownBy(() -> shipsDataServiceBroken.getIndividualCurrentShipDetails(6L))
-                .isInstanceOf(PipelineStartingException.class);
     }
 
     @Test
@@ -167,11 +123,6 @@ public class TestShipsDataService {
                 .isInstanceOf(NotExistingShipException.class).hasMessage("Couldn't find such ship.");
     }
 
-    @Test
-    void ShipDetailsOfAllShipsPipelineExceptionTest(){
-        assertThatThrownBy(() -> shipsDataServiceBroken.getCurrentShipDetails())
-                .isInstanceOf(PipelineException.class);
-    }
 
     @Test
     void getAllCurrentShipDetils(){
@@ -184,10 +135,9 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getCurrentShipDetailsTest() throws PipelineException, PipelineStartingException {
+    void getCurrentShipDetailsTest() {
         List<CurrentShipDetails> result = shipsDataService.getCurrentShipDetails();
         assertThat(result).containsExactly(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
     }
-
 }
 
