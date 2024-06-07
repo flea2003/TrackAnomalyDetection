@@ -52,9 +52,6 @@ public class NotificationsAggregator extends RichFlatMapFunction<CurrentShipDeta
         boolean previousScoreWasHigh = previousScore >= notificationThreshold;
         boolean newScoreIsHigh = newScore >= notificationThreshold;
 
-        // Information that will be returned as the updated result for the state
-        CurrentShipDetails resultingInformation;
-
         // In case the score has changed to be below the threshold, we should update the state
         if (previousScoreWasHigh && !newScoreIsHigh) {
             previousNotificationState.update(new Notification(newShipDetails));
