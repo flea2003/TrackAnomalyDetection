@@ -10,6 +10,13 @@ import java.time.format.DateTimeFormatter;
 public class OffsetDateTimeSerializer extends Serializer<OffsetDateTime> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
+    /**
+     * Writes the bytes for the object to the output.
+     *
+     * @param kryo the Kryo serializer object
+     * @param output the output object
+     * @param offsetDateTime the object to serialize
+     */
     @Override
     public void write(Kryo kryo, Output output, OffsetDateTime offsetDateTime) {
         output.writeString(offsetDateTime.format(FORMATTER));
@@ -17,18 +24,11 @@ public class OffsetDateTimeSerializer extends Serializer<OffsetDateTime> {
 
     /**
      * Reads bytes and returns a new object of the specified concrete type.
-     * <p>
-     * Before Kryo can be used to read child objects, {@link Kryo#reference(Object)} must be called with the parent object to
-     * ensure it can be referenced by the child objects. Any serializer that uses {@link Kryo} to read a child object may need to
-     * be reentrant.
-     * <p>
-     * This method should not be called directly, instead this serializer can be passed to {@link Kryo} read methods that accept a
-     * serialier.
      *
-     * @param kryo
-     * @param input
-     * @param type
-     * @return May be null if {@link #getAcceptsNull()} is true.
+     * @param kryo the Kryo serializer object
+     * @param input the input object
+     * @param type the class of the object to create
+     * @return the deserialized object
      */
     @Override
     public OffsetDateTime read(Kryo kryo, Input input, Class<OffsetDateTime> type) {

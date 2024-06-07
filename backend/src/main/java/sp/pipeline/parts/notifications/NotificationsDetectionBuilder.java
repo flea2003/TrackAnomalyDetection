@@ -40,9 +40,8 @@ public class NotificationsDetectionBuilder {
      * All notifications are forwarded to a Kafka topic for storage and also querying by the web part of the backend.
      *
      * @param streamOfUpdates a stream that contains the state updates, i.e., the aggregated CurrentShipDetails
-     * @return a data stream of produced notifications
      */
-    public DataStream<Notification> buildNotifications(DataStream<CurrentShipDetails> streamOfUpdates) {
+    public void buildNotifications(DataStream<CurrentShipDetails> streamOfUpdates) {
         // Construct the KTable (state that is stored) by aggregating the merged stream
         DataStream<Notification> notificationStream = streamOfUpdates
                 .keyBy(CurrentShipDetails::extractId)
@@ -53,7 +52,5 @@ public class NotificationsDetectionBuilder {
                 configuration.getNotificationsTopicName()
         );
         notificationStream.sinkTo(kafkaSink);
-
-        return notificationStream;
     }
 }

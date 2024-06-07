@@ -148,8 +148,6 @@ public class CurrentStateAggregator extends RichMapFunction<ShipInformation, Cur
      */
     @Override
     public void open(OpenContext openContext) throws Exception {
-        super.open(openContext);
-
         // Get the state
         aggregatedShipDetailsState = getRuntimeContext().getState(
                 new ValueStateDescriptor<>("aggregatedShipDetailsState", CurrentShipDetails.class));

@@ -1,6 +1,5 @@
 package sp.pipeline.utils.json;
 
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.formats.json.JsonDeserializationSchema;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.util.function.SerializableSupplier;

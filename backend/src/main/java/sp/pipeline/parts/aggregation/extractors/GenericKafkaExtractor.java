@@ -43,7 +43,7 @@ public abstract class GenericKafkaExtractor {
      */
     public void stateUpdatingThread() {
         // Create a consumer for the current ship details topic
-        try(KafkaConsumer<Long, String> consumer = streamUtils.getConsumer()) {
+        try (KafkaConsumer<Long, String> consumer = streamUtils.getConsumer()) {
 
             consumer.subscribe(List.of(topic));
 
