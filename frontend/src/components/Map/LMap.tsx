@@ -65,6 +65,19 @@ interface ShipIconTrackingType {
   shipId: number;
 }
 
+const defaulIconTrackingInfo = {
+  x: 0,
+  y: 0,
+  shipId: -1,
+} as ShipIconTrackingType;
+
+const defaultHoverInfo = {
+  show: false,
+  x: 0,
+  y: 0,
+  shipDetails: null,
+} as ShipIconDetailsType;
+
 /**
  * This component is the first column of the main view of the application. It displays the map with all the ships.
  * A list of ships is passed as a prop.
@@ -100,19 +113,13 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship
-    const [hoverInfo, setHoverInfo] = useState<ShipIconDetailsType>({
-      show: false,
-      x: 0,
-      y: 0,
-      shipDetails: null,
-    } as ShipIconDetailsType);
+    const [hoverInfo, setHoverInfo] =
+      useState<ShipIconDetailsType>(defaultHoverInfo);
 
     // Initialize the trackingInfo variable that will track the selected ship icon
-    const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>({
-      x: 0,
-      y: 0,
-      shipId: -1,
-    } as ShipIconTrackingType);
+    const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>(
+      defaulIconTrackingInfo,
+    );
 
     // Event-handling method which enables the tracking of a particular ship
     const trackShipIcon = (ship: ShipDetails) => {
@@ -187,19 +194,10 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
       map
         .on("drag", () => {
-          setTrackingInfo({
-            x: 0,
-            y: 0,
-            shipId: -1,
-          } as ShipIconTrackingType);
+          setTrackingInfo(defaulIconTrackingInfo);
         })
         .on("zoom", () => {
-          setHoverInfo({
-            show: false,
-            x: 0,
-            y: 0,
-            shipDetails: null,
-          } as ShipIconDetailsType);
+          setHoverInfo(defaultHoverInfo);
         });
 
       return () => {
