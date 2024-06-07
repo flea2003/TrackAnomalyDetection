@@ -1,6 +1,8 @@
 package sp.pipeline.parts.notifications;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sp.model.Notification;
@@ -16,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NotificationExtractor extends GenericKafkaExtractor {
 
     private ConcurrentHashMap<Long, Notification> state = new ConcurrentHashMap<>();
+    private final Logger logger = LoggerFactory.getLogger(NotificationExtractor.class);
 
     /**
      * A constructor for notifications extractor. Calls the constructor of the parent class, which
@@ -26,7 +29,7 @@ public class NotificationExtractor extends GenericKafkaExtractor {
      */
     @Autowired
     public NotificationExtractor(StreamUtils streamUtils, PipelineConfiguration configuration) {
-        super(streamUtils, configuration, 1000000 - 1); // poll every ~1ms
+        super(streamUtils, configuration, 1000000 - 1, configuration.getNotificationsTopicName()); // poll every ~1ms
     }
 
     /**
@@ -40,9 +43,9 @@ public class NotificationExtractor extends GenericKafkaExtractor {
         try {
             newNotification = JsonMapper.fromJson(record.value(), Notification.class);
         } catch (Exception e) {
-            throw new RuntimeException("Could not deserialize the incoming record into a Notification object.", e);
+            logger.error("JSON error while processing internal record, so skipping it. Error: ", e);
+            return;
         }
-
         state.put(newNotification.getId(), newNotification);
     }
 

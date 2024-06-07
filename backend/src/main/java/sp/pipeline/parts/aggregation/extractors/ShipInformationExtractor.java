@@ -30,7 +30,7 @@ public class ShipInformationExtractor extends GenericKafkaExtractor {
     @Autowired
     public ShipInformationExtractor(StreamUtils streamUtils,
                                     PipelineConfiguration configuration) {
-        super(streamUtils, configuration, 10000); // poll every 0.01ms
+        super(streamUtils, configuration, 10000, configuration.getCurrentShipDetailsTopicName()); // poll every 0.01ms
     }
 
     /**

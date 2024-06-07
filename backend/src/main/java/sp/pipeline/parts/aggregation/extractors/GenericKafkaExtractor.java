@@ -13,6 +13,7 @@ public abstract class GenericKafkaExtractor {
     protected final StreamUtils streamUtils;
     protected final PipelineConfiguration configuration;
     private final int pollingFrequency;
+    private final String topic;
 
     /**
      * Constructor for a class that handles polling (and extracting) from a Kafka topic.
@@ -20,13 +21,16 @@ public abstract class GenericKafkaExtractor {
      * @param streamUtils an object that holds utility methods for dealing with streams
      * @param configuration an object that holds configuration properties
      * @param pollingFrequency the frequency at which we poll the Kafka topic (in nanoseconds)
+     * @param topic the Kafka topic to poll
      */
     public GenericKafkaExtractor(StreamUtils streamUtils,
                                  PipelineConfiguration configuration,
-                                 int pollingFrequency) {
+                                 int pollingFrequency,
+                                 String topic) {
         this.streamUtils = streamUtils;
         this.configuration = configuration;
         this.pollingFrequency = pollingFrequency;
+        this.topic = topic;
 
         // Spawn a thread to constantly consume from the Kafka topic and update the state
         new Thread(this::stateUpdatingThread).start();
@@ -41,7 +45,7 @@ public abstract class GenericKafkaExtractor {
         // Create a consumer for the current ship details topic
         try(KafkaConsumer<Long, String> consumer = streamUtils.getConsumer()) {
 
-            consumer.subscribe(List.of(configuration.getCurrentShipDetailsTopicName()));
+            consumer.subscribe(List.of(topic));
 
             // Create a thread pool to handle the incoming messages
             final ExecutorService executor = Executors.newFixedThreadPool(20);
