@@ -27,7 +27,6 @@ import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
-import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
 import sp.services.NotificationService;
 

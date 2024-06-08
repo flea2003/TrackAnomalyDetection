@@ -10,7 +10,6 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import sp.model.CurrentShipDetails;
-import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.services.WebSocketShipsDataService;
 
 import static org.mockito.ArgumentMatchers.any;

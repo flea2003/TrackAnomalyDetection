@@ -31,4 +31,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
 
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.setMessageSizeLimit(2 * 1024 * 1024); // 2MB
+        registration.setSendBufferSizeLimit(2 * 1024 * 1024); // 2MB
+        registration.setSendTimeLimit(20 * 10000); // 20 seconds
+    }
 }
