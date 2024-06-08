@@ -30,7 +30,7 @@ function NotificationListWithoutTitle({
   pageChanger,
   mapCenteringFun,
 }: NotificationListProps) {
-  const listEntries = notifications.map((notification, i) => {
+  const listEntries = notifications.slice(0, 250).map((notification, i) => {
     const shipDetails = ships
       .filter((x) => x.id === notifications[i].shipDetails.id)
       .slice()[0];
