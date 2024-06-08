@@ -59,8 +59,7 @@ Note: It is enough to run this configuration command only once. Even after closi
 
 Also, the consumed data is deeply stored(stored on the disk) every hour with the current configuration, so if a crash happens, at most one hour of ship data will be lost from the database.
 
-One issue which will be fixed before merging is that Druid reads the data from the topic by considering its offset. 
-In other words, if the topic is deleted and the details are re-written from the offset `0`, Druid will simply overwrite the processed ship details.
+It is worth noting that Druid reads the data from the topic by considering its offset. In other words, if the topic is deleted and the details are re-written from the offset `0`, Druid will simply overwrite the processed ship details.
 
 ### Kafka
 
