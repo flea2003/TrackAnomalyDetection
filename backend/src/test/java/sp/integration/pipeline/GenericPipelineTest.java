@@ -9,6 +9,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import sp.pipeline.AnomalyDetectionPipeline;
@@ -30,8 +31,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-
-import static org.powermock.api.mockito.PowerMockito.mock;
+import sp.utils.sql.QueryExecutor;
 
 /**
  * The following class contains methods for running an integration test.
@@ -78,12 +78,12 @@ class GenericPipelineTest {
 
         // Set the topic names to something a bit random as well so that tests do not clash
         config.updateConfiguration("incoming.ais-raw.topic.name", "ships-raw-AIS" + "-" + randomUUID);
-        config.updateConfiguration("current.ship.details.topic.name", "current-ship-details" + "-" + randomUUID);
+        config.updateConfiguration("current.ship.details.topic.name", "ships-history" + "-" + randomUUID);
         config.updateConfiguration("notifications.topic.name", "notifications-" + "-" + randomUUID);
 
         rawAISTopic = config.getRawIncomingAisTopicName();
         notificationsTopic = config.getNotificationsTopicName();
-        currentShipDetailsTopic = config.getCurrentShipDetailsTopicName();
+        currentShipDetailsTopic = config.getShipsHistoryTopicName();
     }
 
     /**
@@ -130,6 +130,7 @@ class GenericPipelineTest {
         NotificationsAggregator notificationsAggregator;
         NotificationExtractor notificationExtractor;
         ShipInformationExtractor shipInformationExtractor;
+        QueryExecutor queryExecutor;
         StreamUtils streamUtils;
 
         // Create the core objects
@@ -157,9 +158,11 @@ class GenericPipelineTest {
         notificationExtractor = new NotificationExtractor(streamUtils, config);
         notificationService = new NotificationService(notificationExtractor);
 
-        // Instantiate Service classes for querying
+        queryExecutor = Mockito.mock(QueryExecutor.class);
         shipInformationExtractor = new ShipInformationExtractor(streamUtils, config);
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, shipInformationExtractor);
+
+        // Instantiate Service classes for querying
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor, shipInformationExtractor);
     }
 
     /**

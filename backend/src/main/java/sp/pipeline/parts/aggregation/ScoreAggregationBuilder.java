@@ -86,7 +86,7 @@ public class ScoreAggregationBuilder {
 
         // Sink the aggregated stream to a Kafka topic
         KafkaSink<CurrentShipDetails> kafkaSink = streamUtils.createSinkFlinkToKafka(
-                configuration.getCurrentShipDetailsTopicName()
+                configuration.getShipsHistoryTopicName()
         );
         aggregatedStream.sinkTo(kafkaSink);
         return aggregatedStream;

@@ -29,7 +29,7 @@ public class WebSocketExtractor extends GenericKafkaExtractor {
     public WebSocketExtractor(StreamUtils streamUtils,
                               PipelineConfiguration configuration,
                               WebSocketShipsDataService webSocketShipsDataService) {
-        super(streamUtils, configuration, 10000, configuration.getCurrentShipDetailsTopicName());
+        super(streamUtils, configuration, 10000, configuration.getShipsHistoryTopicName());
         this.webSocketShipsDataService = webSocketShipsDataService;
     }
 

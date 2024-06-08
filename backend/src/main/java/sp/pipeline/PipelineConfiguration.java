@@ -14,16 +14,20 @@ import java.util.Properties;
 @Component
 public class PipelineConfiguration {
     private static final String RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais-raw.topic.name";
-    private static final String CURRENT_SHIP_DETAILS_TOPIC_NAME_PROPERTY = "current.ship.details.topic.name";
     private static final String NOTIFICATIONS_TOPIC_NAME_PROPERTY = "notifications.topic.name";
     private static final String KAFKA_SERVER_ADDRESS_PROPERTY = "kafka.server.address";
+    private static final String KAFKA_SHIPS_HISTORY_STORE_NAME_PROPERTY = "kafka.ships-history.name";
     private static final String KAFKA_STORE_NAME_PROPERTY = "kafka.store.name";
+    private static final String DRUID_URL_PROPERTY = "druid.connection.url";
 
     private String rawIncomingAisTopicName;
-    private String currentShipDetailsTopicName;
+    private String shipsHistoryTopicName;
     private String notificationsTopicName;
     private String kafkaServerAddress;
     private String kafkaStoreName;
+
+    private String druidUrl;
+
     private Properties savedConfiguration;
 
     /**
@@ -46,8 +50,9 @@ public class PipelineConfiguration {
     private void updateLocalFields() {
         rawIncomingAisTopicName = savedConfiguration.getProperty(RAW_INCOMING_AIS_TOPIC_NAME_PROPERTY);
         kafkaServerAddress = savedConfiguration.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
+        shipsHistoryTopicName = savedConfiguration.getProperty(KAFKA_SHIPS_HISTORY_STORE_NAME_PROPERTY);
         kafkaStoreName = savedConfiguration.getProperty(KAFKA_STORE_NAME_PROPERTY);
-        currentShipDetailsTopicName = savedConfiguration.getProperty(CURRENT_SHIP_DETAILS_TOPIC_NAME_PROPERTY);
+        druidUrl = savedConfiguration.getProperty(DRUID_URL_PROPERTY);
         notificationsTopicName = savedConfiguration.getProperty(NOTIFICATIONS_TOPIC_NAME_PROPERTY);
     }
 

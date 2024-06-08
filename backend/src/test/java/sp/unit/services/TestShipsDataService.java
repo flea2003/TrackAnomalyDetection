@@ -1,39 +1,44 @@
 package sp.unit.services;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import sp.exceptions.DatabaseException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
-import sp.exceptions.PipelineException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.services.ShipsDataService;
-
+import sp.utils.DruidConfig;
+import sp.utils.sql.FileReader;
+import sp.utils.sql.QueryExecutor;
+import sp.utils.sql.ResultSetReader;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
-import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 // TODO include MaxAnomalyScoreDetails objects
 public class TestShipsDataService {
-
     private ShipsDataService shipsDataService;
     private AISSignal signal3;
     CurrentShipDetails currentShipDetails1;
     CurrentShipDetails currentShipDetails2;
     CurrentShipDetails currentShipDetails3;
     CurrentShipDetails currentShipDetails4;
+    DruidConfig druidConfig;
     ShipInformationExtractor shipInformationExtractor;
 
     @BeforeEach
@@ -80,9 +85,20 @@ public class TestShipsDataService {
             put(4L, currentShipDetails4);
         }};
 
+        // Mock Druid where needed
+        druidConfig = Mockito.mock(DruidConfig.class);
+        Connection connection = Mockito.mock(Connection.class);
+        when(druidConfig.connection()).thenReturn(connection);
+        when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
+
+        QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
+        when(queryExecutor.executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class))
+                .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
+
+
         AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
         shipInformationExtractor = mock(ShipInformationExtractor.class);
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, shipInformationExtractor);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor, shipInformationExtractor);
 
         doReturn(currentShipDetailsMap).when(shipInformationExtractor)
             .getFilteredShipDetails(any(Predicate.class));
@@ -125,7 +141,7 @@ public class TestShipsDataService {
 
 
     @Test
-    void getAllCurrentShipDetils(){
+    void getAllCurrentShipDetails(){
         try {
             assertThat(shipsDataService.getCurrentShipDetails()).containsExactlyElementsOf(List.of(currentShipDetails1,
                 currentShipDetails2, currentShipDetails3, currentShipDetails4));
@@ -138,6 +154,43 @@ public class TestShipsDataService {
     void getCurrentShipDetailsTest() {
         List<CurrentShipDetails> result = shipsDataService.getCurrentShipDetails();
         assertThat(result).containsExactly(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
+    }
+
+    @Test
+    void getHistoryOfShip() throws DatabaseException {
+        try(MockedStatic<ResultSetReader>mockedResultSetReader = mockStatic(ResultSetReader.class)) {
+            mockedResultSetReader.when(() -> ResultSetReader.extractQueryResults(any(), any()))
+                .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
+
+            List<CurrentShipDetails> result = shipsDataService.getHistoryOfShip(5L);
+            assertThat(result).containsExactlyElementsOf(List.of(currentShipDetails1, currentShipDetails2,
+                currentShipDetails3, currentShipDetails4));
+        }
+    }
+
+    @Test
+    void getHistoryOfShipException() throws SQLException {
+        // Setup the broken
+        AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
+        QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
+        ShipsDataService shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken, shipInformationExtractor);
+        doThrow(SQLException.class).when(queryExecutorBroken)
+                .executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class);
+        assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
+    }
+
+    @Test
+    void getHistoryOfShipSQLNotFound() throws SQLException {
+        // Setup the broken
+        AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
+        QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
+        ShipsDataService shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken, shipInformationExtractor);
+        doThrow(SQLException.class).when(queryExecutorBroken)
+                .executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class);
+        try(MockedStatic<FileReader> fileReader = mockStatic(FileReader.class)) {
+            fileReader.when(() -> FileReader.readQueryFromFile(anyString())).thenThrow(SQLException.class);
+            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
+        }
     }
 }
 

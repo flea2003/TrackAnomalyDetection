@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 public class FullPipelineTest extends GenericPipelineTest {
 
@@ -51,7 +50,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         produceToTopic(rawAISTopic, List.of(JsonMapper.toJson(fakeSignal)));
 
         // Wait 3 seconds for the data to be processed
-        Thread.sleep(3000);
+        Thread.sleep(10000);
 
         testSignalIDAssignment(fakeSignal);
         testFetchingFromService(fakeSignal);
@@ -130,7 +129,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         produceToTopic(currentShipDetailsTopic, messages);
 
         // Wait for 5 seconds to be fully sure
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
         // Make sure that after this, the there still is only 1 ship
         assertThat(shipsDataService.getCurrentShipDetails().size()).isEqualTo(1);

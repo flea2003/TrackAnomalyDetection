@@ -4,11 +4,9 @@ import org.junit.jupiter.api.Test;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.pipeline.utils.StreamUtils;
-
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GenericKafkaExtractorTest {
     private final StreamUtils streamUtils = mock(StreamUtils.class);
