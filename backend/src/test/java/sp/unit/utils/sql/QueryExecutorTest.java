@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,6 +36,10 @@ public class QueryExecutorTest {
     CurrentShipDetails currentShipDetails2;
     CurrentShipDetails currentShipDetails3;
     CurrentShipDetails currentShipDetails4;
+    DruidConfig druidConfig;
+    Connection connection;
+    PreparedStatement preparedStatement;
+    ResultSet resultSet;
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -62,10 +68,10 @@ public class QueryExecutorTest {
         currentShipDetails4 = new CurrentShipDetails();
         currentShipDetails4.setCurrentAISSignal(signal4);
 
-        DruidConfig druidConfig = Mockito.mock(DruidConfig.class);
-        Connection connection = Mockito.mock(Connection.class);
-        PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
-        ResultSet resultSet = Mockito.mock(ResultSet.class);
+        druidConfig = Mockito.mock(DruidConfig.class);
+        connection = Mockito.mock(Connection.class);
+        preparedStatement = Mockito.mock(PreparedStatement.class);
+        resultSet = Mockito.mock(ResultSet.class);
 
         when(connection.prepareStatement("SELECT *")).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
@@ -88,6 +94,7 @@ public class QueryExecutorTest {
                 assertThat(queryExecutor.executeQueryOneLong(5, "path", CurrentShipDetails.class))
                     .containsExactlyInAnyOrder(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
 
+                verify(preparedStatement, times(1)).setLong(1, 5);
             }
         }
     }

@@ -11,6 +11,12 @@ import sp.utils.sql.FileReader;
 class FileReaderTest {
 
     @Test
+    void testConstructor(){
+        FileReader fileReader = new FileReader();
+        assertThat(fileReader).isNotNull();
+    }
+
+    @Test
     void readQueryFromFileTest() throws SQLException {
         assertThat(FileReader.readQueryFromFile("src/test/resources/test.sql"))
             .isEqualTo("TEST 123");

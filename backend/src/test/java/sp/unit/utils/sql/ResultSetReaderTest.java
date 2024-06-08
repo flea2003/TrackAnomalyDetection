@@ -23,6 +23,7 @@ import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.model.MaxAnomalyScoreDetails;
 import sp.pipeline.utils.json.JsonMapper;
+import sp.utils.sql.ResultSetReader;
 
 class ResultSetReaderTest {
     AnomalyInformation anomalyInformation1;
@@ -49,6 +50,13 @@ class ResultSetReaderTest {
         currentShipDetails1 = new CurrentShipDetails(anomalyInformation1, aisSignal1, maxAnomalyScoreDetails1);
         currentShipDetails2 = new CurrentShipDetails(anomalyInformation2, aisSignal2, maxAnomalyScoreDetails2);
     }
+
+    @Test
+    void testConstructor(){
+        ResultSetReader resultSetReader = new ResultSetReader();
+        assertThat(resultSetReader).isNotNull();
+    }
+
     @Test
     void extractQueryResultsTest() throws SQLException, JsonProcessingException {
         ResultSet resultSet = Mockito.mock(ResultSet.class);
