@@ -26,13 +26,13 @@ public class Main {
         String topicName = "ships-raw-AIS";
         String serverName  = "localhost:9092";
         String dataSetName = "DEBS_DATASET_PUBLIC_second.csv";
-        Timestamp startTime = new Timestamp(2015, 4, 25, 20, 25);
-        Timestamp endTimestamp = new Timestamp(2015, 4, 26, 20, 30);
+        Timestamp startTime = new Timestamp(2015, 4, 1, 20, 25);
+        Timestamp endTimestamp = new Timestamp(2015, 4, 2, 20, 30);
 
         Parser parser = new DEBSParser(getReader(dataSetName));
         try (KafkaProducer<String, String> producer = createProducer(serverName)) {
             Simulator simulator = new Simulator(parser, startTime, endTimestamp, topicName, producer);
-            simulator.setSpeed(10);
+            simulator.setSpeed(60);
 
             simulator.startStream();
         }
