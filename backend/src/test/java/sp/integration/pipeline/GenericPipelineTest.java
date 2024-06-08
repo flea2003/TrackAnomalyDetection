@@ -56,7 +56,6 @@ class GenericPipelineTest {
     protected String notificationsTopic;
     protected AnomalyDetectionPipeline anomalyDetectionPipeline;
     protected ShipsDataService shipsDataService;
-    protected WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
 
     /**
@@ -133,9 +132,6 @@ class GenericPipelineTest {
         ShipInformationExtractor shipInformationExtractor;
         StreamUtils streamUtils;
 
-        // Mock the WebSocket broadcaster builder class
-        webSocketBroadcasterBuilder = mock(WebSocketBroadcasterBuilder.class);
-
         // Create the core objects
         scoreCalculationStrategy = new SimpleScoreCalculator();
         currentStateAggregator = new CurrentStateAggregator();
@@ -154,8 +150,7 @@ class GenericPipelineTest {
                 scoreCalculationBuilder,
                 scoreAggregationBuilder,
                 notificationsDetectionBuilder,
-                env,
-                webSocketBroadcasterBuilder
+                env
         );
 
         // Set up the notification servicce

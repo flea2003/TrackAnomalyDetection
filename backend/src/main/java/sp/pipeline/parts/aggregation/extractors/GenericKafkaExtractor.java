@@ -38,6 +38,16 @@ public abstract class GenericKafkaExtractor {
     }
 
     /**
+     * Default constructor (used for testing purposes).
+     */
+    public GenericKafkaExtractor() {
+        streamUtils = null;
+        configuration = null;
+        pollingFrequency = 0;
+        topic = null;
+    }
+
+    /**
      * This method runs in a thread, separate from the main application. It handles polling the Kafka topic
      * and distributing the processing of the incoming messages to separate threads.
      */

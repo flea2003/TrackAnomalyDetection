@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Getter;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import sp.pipeline.utils.StreamUtils;
 import sp.pipeline.utils.json.JsonMapper;
 
 @Service
+@Getter
 public class ShipInformationExtractor extends GenericKafkaExtractor {
 
     private final Logger logger = LoggerFactory.getLogger(ShipInformationExtractor.class);
@@ -31,6 +33,13 @@ public class ShipInformationExtractor extends GenericKafkaExtractor {
     public ShipInformationExtractor(StreamUtils streamUtils,
                                     PipelineConfiguration configuration) {
         super(streamUtils, configuration, 10000, configuration.getCurrentShipDetailsTopicName()); // poll every 0.01ms
+    }
+
+    /**
+     * Default constructor, used for testing purposes.
+     */
+    public ShipInformationExtractor() {
+        super();
     }
 
     /**

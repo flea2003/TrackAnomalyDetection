@@ -30,7 +30,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*");
     }
 
-
+    /**
+     * Updates the WebSocket transport configuration.
+     *
+     * @param registration WebSocket transport registration
+     */
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
         registration.setMessageSizeLimit(2 * 1024 * 1024); // 2MB
