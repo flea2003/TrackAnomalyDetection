@@ -73,7 +73,10 @@ const DisplayedInformation = ({ship, notifications, ships, pageChanger, mapCente
       </Stack>
       <Stack className="info-container">
         {displayedAnomalyInfo && (
-          <AnomalyDetails ship={ship}/>
+          <AnomalyDetails
+            ship={ship}
+            addAnomalyScore={false}
+          />
         )}
         {displayedAIS && (
         <AISDetails ship={ship}/>

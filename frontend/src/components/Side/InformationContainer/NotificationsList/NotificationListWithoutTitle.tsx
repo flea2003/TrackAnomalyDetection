@@ -30,6 +30,8 @@ function NotificationListWithoutTitle({
   pageChanger,
   mapCenteringFun,
 }: NotificationListProps) {
+  if (notifications.length === 0) return <div className="no-notifications">Currently there are no notifications</div>
+
   const listEntries = notifications.map((notification, i) => {
     const shipDetails = ships
       .filter((x) => x.id === notifications[i].shipDetails.id)

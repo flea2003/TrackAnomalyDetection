@@ -14,7 +14,6 @@ interface ObjectDetailsProps {
   ship: ShipDetails;
 }
 
-
 function AISDetails({ship} : ObjectDetailsProps) {
   return (
     <Stack direction="row" className="ais-details-container">
@@ -51,39 +50,6 @@ function AISDetails({ship} : ObjectDetailsProps) {
         </div>
       </Stack>
     </Stack>
-  );
-}
-
-function getExplanationList(str: string) {
-  str = str.trim();
-
-  if (str === "") {
-    return <ul className="anomaly-details-entry-value">
-      <li key={0}>No anomalous behaviour registered</li>
-    </ul>;
-  }
-
-  return (
-    <ul className="anomaly-details-entry-value">
-      {str.split("\n").map((line, index) => (
-        <li key={index}>{line}</li>
-      ))}
-    </ul>
-  );
-}
-
-function getMaximumAnomalyInfoList(ship: ShipDetails) {
-  if (ship.explanation === "") {
-    return <ul className="anomaly-details-entry-value">
-      <li key={0}>No anomalous behaviour registered</li>
-    </ul>;
-  }
-
-  return (
-    <ul className="anomaly-details-entry-value">
-      <li key={0}>Score: {ship.anomalyScore}%</li>
-      <li key={1}>Obtained: {TimeUtilities.reformatTimestamp(ship.correspondingTimestamp)}</li>
-    </ul>
   );
 }
 

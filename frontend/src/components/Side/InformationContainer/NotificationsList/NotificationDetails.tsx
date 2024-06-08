@@ -79,7 +79,10 @@ function NotificationDetails({
       </Stack>
       <Stack className="info-container">
         {displayedAnomalyInfo && (
-          <AnomalyDetails ship={notification.shipDetails} />
+          <AnomalyDetails
+            ship={notification.shipDetails}
+            addAnomalyScore={true}
+          />
         )}
 
         {displayedAIS && (

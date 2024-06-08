@@ -49,6 +49,6 @@
     }
 
     *. {
-        border-collapse: collapse;
+        overflow: auto;
     }
 }
