@@ -10,7 +10,6 @@
     justify-content: flex-start;
     align-items: center;
 
-    /* Make sure when hovering it is like a link */
     cursor: pointer;
 }
 
@@ -28,7 +27,7 @@
 
 .error-list-entry-text {
     flex-grow: 6;
-    font-size: var(--error-list-entry-font-size);
+    font-size: 0.8em;
     width: 50px;
     text-align: left;
     padding-left: 5px;
@@ -36,23 +35,17 @@
 
 .error-list-entry-icon-container {
     flex-grow: 1;
-    font-size: var(--error-list-entry-font-size);
+    font-size: 0.8em;
     height: 100%;
-    width: var(--error-list-entry-icon-container-width);
+    width: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.error-list-entry-icon{
-    height: var(--error-list-entry-icon-size);
-    width: var(--error-list-entry-icon-size);
-}
-
-.error-list-entry-trash-icon{
-    height: var(--error-list-entry-icon-size);
-    width: var(--error-list-entry-icon-size);
-
+.error-list-entry-icon, .error-list-entry-trash-icon{
+    height: 20px;
+    width: 20px;
 }
 
 .error-list-entry-trash-icon:hover{

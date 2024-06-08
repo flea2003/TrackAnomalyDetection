@@ -52,13 +52,13 @@
 
 .modify-button-container:hover {
     content: url("../../assets/icons/selected-sidebar-icons/filter-blue.png");
-    height: var(--anomaly-list-closing-icon-size);
-    width: var(--anomaly-list-closing-icon-size);
+    height: 20px;
+    width: 20px;
 }
 
 .modify-button-container {
-    height: var(--anomaly-list-closing-icon-size);
-    width: var(--anomaly-list-closing-icon-size);
+    height: 20px;
+    width: 20px;
     display: flex;
     flex-direction: row;
     font-size: 0.6em;
@@ -69,8 +69,8 @@
 }
 
 .filter-icon {
-    height: var(--anomaly-list-closing-icon-size);
-    width: var(--anomaly-list-closing-icon-size);
+    height: 20px;
+    width: 20px;
 }
 
 .no-ships {

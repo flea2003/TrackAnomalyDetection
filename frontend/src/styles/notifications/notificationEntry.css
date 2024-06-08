@@ -46,7 +46,7 @@
 }
 
 .notification-list-ship-entry-icon-container {
-    font-size: var(--notification-list-entry-font-size);
+    font-size: 0.6em;
     display: flex;
     justify-content: center;
     align-items: center;

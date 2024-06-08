@@ -1,6 +1,5 @@
 .anomaly-list-entry {
-
-    height: var(--anomaly-list-entry-height);
+    height: 36px;
     border-bottom: var(--border);
 
     padding-top: 2px;
@@ -27,13 +26,13 @@
 }
 
 .anomaly-list-entry-score {
-    font-size: var(--anomaly-list-entry-font-size);
+    font-size: 0.8em;
     text-align: center;
     font-weight: bold;
 }
 
 .anomaly-list-entry-id {
-    font-size: var(--anomaly-list-entry-id-font-size);
+    font-size: 0.6em;
     width: 30px;
     text-align:center;
 }
@@ -43,9 +42,8 @@
 }
 
 .anomaly-list-entry-icon-container {
-    font-size: var(--anomaly-list-entry-font-size);
     height: 100%;
-    width: var(--anomaly-list-entry-icon-container-width);
+    width: 15px;
     display: flex;
     justify-content: center;
     align-items: center;

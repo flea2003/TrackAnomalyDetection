@@ -27,22 +27,6 @@
     padding-top: 1px;
 }
 
-
-.object-details-entry {
-    width: 90%;
-    padding-top: var(--object-details-entry-padding);
-    padding-bottom: var(--object-details-entry-padding);
-    text-align: left;
-    padding-left: var(--object-details-entry-padding);
-    border-bottom: 1px dotted gray;
-
-    font-size: var(--object-details-entry-font-size);
-}
-
-.object-details-entry-type {
-    font-weight: bold;
-}
-
 .anomaly-score-div {
     width: 100%;
     display: flex;

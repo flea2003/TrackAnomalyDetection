@@ -20,7 +20,7 @@
     justify-content: space-between;
     align-items: center;
 
-    height: var(--object-details-title-height);
+    height: 50px;
     padding: var(--title-padding);
     width: 95%;
 

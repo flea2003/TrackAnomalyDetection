@@ -19,7 +19,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    height: var(--object-details-title-height);
+    height: 50px;
     padding: var(--title-padding);
 
     width: 95%;
@@ -30,14 +30,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: var(--object-details-title-font-size);
+    font-size: var(--title-size);
     font-weight: bold;
 }
 
 .object-details-return-icon {
     cursor: pointer;
-    width: var(--object-details-return-icon-size);
-    height: var(--object-details-return-icon-size);
+    width: var(--close-icon-length);
+    height: var(--close-icon-length);
 }
 
 .object-details-properties-list{
