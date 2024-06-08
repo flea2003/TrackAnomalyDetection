@@ -68,8 +68,9 @@ public abstract class GenericKafkaExtractor {
                         executor.submit(() -> processNewRecord(record));
                     });
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    continue;
                 }
+
             }
         }
     }
