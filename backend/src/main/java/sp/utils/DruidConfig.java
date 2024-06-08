@@ -33,7 +33,7 @@ public class DruidConfig {
      * @return the established connection
      */
     @Bean
-    public Connection connection() {
+    public Connection openConnection() {
         Properties connectionProperties = new Properties();
         try {
             String url = pipelineConfiguration.getDruidUrl();
@@ -48,7 +48,7 @@ public class DruidConfig {
      * Method to close the database connection when the application stops.
      */
     @PreDestroy
-    public void closeConnection() throws DatabaseException{
+    public void closeConnection() throws DatabaseException {
         if (this.connection != null) {
             try {
                 this.connection.close();

@@ -39,8 +39,12 @@ class DruidConfigTest {
     void testDruidConnectionNull(){
         PipelineConfiguration pipelineConfiguration = mock(PipelineConfiguration.class);
         DruidConfig druidConfig = new DruidConfig(pipelineConfiguration);
-        doThrow(SQLException.class).when(pipelineConfiguration.getDruidUrl());
-        assertThat(druidConfig.connection()).isNull();
+
+        try(MockedStatic<DriverManager>mocked = mockStatic(DriverManager.class)) {
+            mocked.when(() -> DriverManager.getConnection(any(), any()))
+                .thenThrow(SQLException.class);
+            assertThat(druidConfig.openConnection()).isNull();
+        }
     }
 
     @Test
@@ -51,7 +55,7 @@ class DruidConfigTest {
         try(MockedStatic<DriverManager>mocked = mockStatic(DriverManager.class)) {
             mocked.when(() -> DriverManager.getConnection(any(), any()))
                 .thenReturn(mock(Connection.class));
-            assertThat(druidConfig.connection()).isNotNull();
+            assertThat(druidConfig.openConnection()).isNotNull();
         }
     }
 

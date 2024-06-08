@@ -76,7 +76,7 @@ public class QueryExecutorTest {
         when(connection.prepareStatement("SELECT *")).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
-        when(druidConfig.connection()).thenReturn(connection);
+        when(druidConfig.openConnection()).thenReturn(connection);
 
         queryExecutor = new QueryExecutor(druidConfig);
     }

@@ -35,7 +35,7 @@ public class QueryExecutor {
     public <T> List<T> executeQueryOneLong(long id, String path, Class<T> tclass) throws SQLException {
         String query = FileReader.readQueryFromFile(path);
 
-        try (PreparedStatement statement = druidConfig.connection().prepareStatement(query)) {
+        try (PreparedStatement statement = druidConfig.openConnection().prepareStatement(query)) {
             // in the sql query, the parameter 1 is the id that we query on
             statement.setLong(1, id);
 

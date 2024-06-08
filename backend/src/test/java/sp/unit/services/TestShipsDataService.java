@@ -94,7 +94,7 @@ public class TestShipsDataService {
 
         druidConfig = Mockito.mock(DruidConfig.class);
         Connection connection = Mockito.mock(Connection.class);
-        when(druidConfig.connection()).thenReturn(connection);
+        when(druidConfig.openConnection()).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
 
         QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
