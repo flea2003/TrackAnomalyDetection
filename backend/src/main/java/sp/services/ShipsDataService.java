@@ -82,6 +82,7 @@ public class ShipsDataService {
         try {
             return queryExecutor.executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DatabaseException("The database query failed.");
         }
     }

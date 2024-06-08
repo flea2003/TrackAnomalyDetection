@@ -40,6 +40,10 @@ This will create a configuration where ship data is retrieved from a Kafka topic
 
 When successful, the message `{"id" : "ship-details"}` will be printed in the terminal. In addition, there will be a supervisor named `ship-details` added to the [console](http://localhost:8888/unified-console.html#supervisors).
 
+#### Resetting Druid
+
+After the termination of the backend, one has to kill the connection between the database and the backend process. This can be done throught the console in the Tasks tab.
+
 After finishing the execution of the system, one might want to delete the configuration file from the database.
 
 In order to see the id of the active supervisors you can run 
@@ -95,6 +99,7 @@ If needed to remove the topics, run the following command:
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
 ```
 
 Additionally, the following JVM argument needs to be added (Edit configurations -> Modify options -> (Java) Add VM options):
@@ -129,10 +134,12 @@ bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeli
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
 ```
+In addition, you have to reset the database by following the steps mentioned above in the Resetting Druid section.
 
 Sometimes Kafka might not start if the logs of Zookeeper and the Kafka server are not cleared. Assuming that `/tmp/kafka-logs` and `/tmp/zoekeeper` are the locations of the logs, run the following commands to delete them:
 ```bash
