@@ -61,7 +61,6 @@ function Side({
         />
         <Sidebar pageChanger={pageChanger} />
       </Stack>
-
     </>
   );
 }

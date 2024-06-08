@@ -59,7 +59,9 @@ function AnomalyListEntry({
         <span className="anomaly-list-entry-id">#{shipId}</span>
       </div>
       <span className="anomaly-list-entry-score">{shipAnomalyScore}%</span>
-      <span className="anomaly-list-entry-time">{TimeUtilities.computeTimeDifference(shipDetails.timestamp)} ago</span>
+      <span className="anomaly-list-entry-time">
+        {TimeUtilities.computeTimeDifference(shipDetails.timestamp)} ago
+      </span>
     </Stack>
   );
 }

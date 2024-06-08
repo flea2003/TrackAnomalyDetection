@@ -10,7 +10,6 @@ import ShipNotification from "../../../model/ShipNotification";
 import NotificationDetails from "./NotificationsList/NotificationDetails";
 import "../../../styles/settings.css";
 
-
 interface ObjectProps {
   currentPage: CurrentPage;
   ships: ShipDetails[];
@@ -88,7 +87,8 @@ function InformationContainer({
       return <div></div>;
     default: {
       ErrorNotificationService.addWarning(
-        "InformationContainer required page not found: " + currentPage.currentPage,
+        "InformationContainer required page not found: " +
+          currentPage.currentPage,
       );
       return <div></div>;
     }

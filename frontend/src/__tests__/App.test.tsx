@@ -127,7 +127,7 @@ test("When the close icon is clicked, the anomaly list is not present", async ()
 
   // Wait for the list to disappear
   await waitFor(() => {
-    const anomalyListTitle = screen.queryByText("Anomaly list");
+    const anomalyListTitle = screen.queryByText("Anomaly List");
     expect(anomalyListTitle).toBeNull();
   });
 });

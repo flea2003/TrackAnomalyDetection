@@ -1,17 +1,13 @@
 import React from "react";
 import Stack from "@mui/material/Stack";
-import List from "@mui/material/List";
 import ShipDetails from "../../../../model/ShipDetails";
-import ObjectDetailsEntry from "./ObjectDetailsEntry";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
 import { CurrentPage } from "../../../../App";
-import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 
-
 import "../../../../styles/common.css";
-import "../../../../styles/ship-details/shipDetails.css";
+import "../../../../styles/object-details/objectDetails.css";
 import DisplayedInformation from "./DisplayedInformation";
 
 interface ObjectDetailsProps {
@@ -33,7 +29,13 @@ interface ObjectDetailsProps {
  * @param shipId
  * @constructor
  */
-function ObjectDetails({ships, notifications, mapCenteringFun, pageChanger, shipId}: ObjectDetailsProps) {
+function ObjectDetails({
+  ships,
+  notifications,
+  mapCenteringFun,
+  pageChanger,
+  shipId,
+}: ObjectDetailsProps) {
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = ships.find((ship) => ship.id === shipId);
   const shipNotifications = notifications.filter(
@@ -49,7 +51,13 @@ function ObjectDetails({ships, notifications, mapCenteringFun, pageChanger, ship
       <Stack className="object-details-title-container" direction="row">
         {getReturnIcon(pageChanger)}
         <Stack className="object-details-title">Ship #{ship.id}</Stack>
-        <p className="object-anomaly-score" style={{ color: calculateAnomalyColor(ship.anomalyScore) }}> {ship.anomalyScore}%</p>
+        <p
+          className="object-anomaly-score"
+          style={{ color: calculateAnomalyColor(ship.anomalyScore) }}
+        >
+          {" "}
+          {ship.anomalyScore}%
+        </p>
       </Stack>
 
       <DisplayedInformation

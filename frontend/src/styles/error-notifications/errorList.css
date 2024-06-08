@@ -1,17 +1,27 @@
 #error-list-container {
     width: 20%;
-    background: var(--background);
-    text-align: center;
-    display: flex;
     height: 60%;
+
+    background: var(--background);
     border: var(--border);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
     pointer-events: all;
 }
 
 #error-list-internal-container {
     max-height: 100%;
+    width: 95%;
     overflow: auto;
     padding: 0;
+
+    border: 1px solid black;
+    border-bottom: none;
+    margin-bottom: 1%;
 }
 
 #error-list-close-icon {
@@ -20,10 +30,17 @@
     cursor: pointer;
 }
 
+#error-list-close-icon:hover {
+    transform: scale(1.1);
+}
+
 #error-list-title-container {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    width: 95%;
+
     padding: var(--title-padding);
     font-size: var(--title-size);
     font-weight: bold;

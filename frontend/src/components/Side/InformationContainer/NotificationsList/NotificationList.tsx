@@ -63,8 +63,8 @@ function NotificationList({
               notifications,
             );
           }}
-         alt="Close">
-        </img>
+          alt="Close"
+        ></img>
       </Stack>
       <NotificationListWithoutTitle
         notifications={notifications}

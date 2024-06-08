@@ -1,12 +1,9 @@
 import React from "react";
 
 import "../../../../styles/common.css";
-import "../../../../styles/ship-details/shipDetailsEntry.css";
+import "../../../../styles/object-details/objectDetailsEntry.css";
 import ShipDetails from "../../../../model/ShipDetails";
-import ShipNotification from "../../../../model/ShipNotification";
-import { CurrentPage } from "../../../../App";
-
-import "../../../../styles/ship-details/aisDetails.css";
+import "../../../../styles/object-details/aisDetails.css";
 import TimeUtilities from "../../../../utils/TimeUtilities";
 import Stack from "@mui/material/Stack";
 
@@ -14,13 +11,15 @@ interface ObjectDetailsProps {
   ship: ShipDetails;
 }
 
-function AISDetails({ship} : ObjectDetailsProps) {
+function AISDetails({ ship }: ObjectDetailsProps) {
   return (
     <Stack direction="row" className="ais-details-container">
       <Stack direction="column" className="ais-details-column">
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Last signal</div>
-          <div className="ais-details-info">{TimeUtilities.getHoursAndMinutes(ship.timestamp)}</div>
+          <div className="ais-details-info">
+            {TimeUtilities.getHoursAndMinutes(ship.timestamp)}
+          </div>
         </div>
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Course</div>

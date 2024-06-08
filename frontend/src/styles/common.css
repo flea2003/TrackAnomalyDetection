@@ -23,7 +23,7 @@
     --error-list-closing-icon-size: 20px;
     --error-list-closing-icon-margin: 10px;
 
-    --error-list-entry-font-size: 0.8em;
+    --error-list-entry-font-size: 0.7em;
     --error-list-entry-height: 36px;
     --error-list-entry-icon-size: 20px;
     --error-list-entry-icon-container-width: 25px;
@@ -42,7 +42,7 @@
     --background-blue: #AAD3DFFF;
     --title-padding: 7px 8px;
     --close-icon-length: 20px;
-    --check-icon-length: 20px;
+    --check-icon-length: 25px;
 
     *::-webkit-scrollbar{
         display: none;

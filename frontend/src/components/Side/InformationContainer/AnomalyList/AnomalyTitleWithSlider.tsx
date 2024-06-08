@@ -57,19 +57,18 @@ const AnomalyTitleWithSlider = ({
         />
         <div className="list-title">Anomaly List</div>
         <div className="modify-button-container" onClick={toggleExtended}>
-          {!isExtended && <img
-            src={filterIcon}
-            alt="Open"
-            data-testid="anomaly-list-close-icon"
-            className="filter-icon"
-          />}
+          {!isExtended && (
+            <img src={filterIcon} alt="Open" className="filter-icon" />
+          )}
 
-          {isExtended && <img
-            src={filterIconBlue}
-            alt="Open"
-            data-testid="anomaly-list-close-icon"
-            className="filter-icon"
-          />}
+          {isExtended && (
+            <img
+              src={filterIconBlue}
+              alt="Open"
+              data-testid="anomaly-list-close-icon"
+              className="filter-icon"
+            />
+          )}
         </div>
       </Stack>
       {isExtended && (
@@ -81,7 +80,7 @@ const AnomalyTitleWithSlider = ({
             value={anomalyThreshold}
             onChange={handleSliderChange}
           />
-         {anomalyThreshold}%
+          {anomalyThreshold}%
         </span>
       )}
     </Stack>

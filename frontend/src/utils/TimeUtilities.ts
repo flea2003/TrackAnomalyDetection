@@ -25,8 +25,8 @@ class TimeUtilities {
       (timeDifference % (1000 * 60 * 60)) / (1000 * 60),
     );
 
-    if (days === 0) return `${hours}h ${minutes}m`;
     if (days === 0 && hours === 0) return `${minutes}m`;
+    if (days === 0) return `${hours}h ${minutes}m`;
     else return `${days}d ${hours}h ${minutes}m`;
   }
 
@@ -46,7 +46,11 @@ class TimeUtilities {
     return year + "-" + month + "-" + day + " " + hour + ":" + minute;
   }
 
-
+  /**
+   * Returns the hours and minutes part from the timestamp string
+   *
+   * @param timestamp string representation of the timestamp
+   */
   static getHoursAndMinutes(timestamp: string) {
     const signalTime = new Date(timestamp);
     if (!this.isDateValid(signalTime)) return "Not available";
@@ -60,7 +64,7 @@ class TimeUtilities {
   /**
    * Method that prepends zero to digits when reformatting
    *
-   * @param value integer that is considered for prependind
+   * @param value integer that is considered for prepending
    */
   static prependZero(value: number) {
     if (value >= 0 && value < 10) return "0" + value;

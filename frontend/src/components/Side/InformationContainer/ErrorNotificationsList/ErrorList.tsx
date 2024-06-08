@@ -40,12 +40,12 @@ function ErrorList({ pageChanger }: ErrorListProps) {
           id="error-list-mark-all-button"
           data-testid="error-list-mark-all-button"
           onClick={() => ErrorNotificationService.markAllAsRead()}
-          alt="Mark All">
-        </img>
+          alt="Mark All"
+        ></img>
       </Stack>
-      <List id="error-list-internal-container">
-        {getErrorListEntries()}
-      </List>
+      {ErrorNotificationService.getAllNotifications().length !== 0 && (
+        <List id="error-list-internal-container">{getErrorListEntries()}</List>
+      )}
     </Stack>
   );
 }
@@ -59,7 +59,7 @@ function getErrorListEntries() {
     .slice()
     .reverse()
     .map((notification: ErrorNotification, i: number) => (
-      <ErrorListEntry key={i} notification={notification}/>
+      <ErrorListEntry key={i} notification={notification} />
     ));
 }
 
