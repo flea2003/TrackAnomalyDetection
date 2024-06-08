@@ -24,7 +24,7 @@ class ShipDetails {
     anomalyScore: number,
     description: string,
     maxAnomalyScore: number,
-    correspondingTimestamp: string,
+    maxAnomalyScoreTimestamp: string,
     departurePort: string,
     course: number,
     speed: number,
@@ -37,10 +37,18 @@ class ShipDetails {
     this.anomalyScore = anomalyScore;
     this.explanation = description;
     this.maxAnomalyScore = maxAnomalyScore;
-    this.correspondingTimestamp = correspondingTimestamp;
+    this.correspondingTimestamp = maxAnomalyScoreTimestamp;
     this.departurePort = departurePort;
     this.course = course;
     this.speed = speed;
+  }
+
+  getRoundedLatitude() {
+    return roundShipDetail(this.lat);
+  }
+
+  getRoundedLongitude() {
+    return roundShipDetail(this.lng);
   }
 
   /**

@@ -12,7 +12,6 @@ import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator"
 
 import "../../../../styles/common.css";
 import "../../../../styles/ship-details/shipDetails.css";
-import MenuObjectDetails from "./DisplayedInformation";
 import DisplayedInformation from "./DisplayedInformation";
 
 interface ObjectDetailsProps {
@@ -47,13 +46,13 @@ function ObjectDetails(props: ObjectDetailsProps) {
 
   return (
     <Stack id="object-details-container">
-      <span className="object-details-title-container">
+      <Stack className="object-details-title-container" direction="row">
         {getReturnIcon(pageChanger)}
-        <span className="object-details-title">Ship #{ship.id}</span>
+        <Stack className="object-details-title">Ship #{ship.id}</Stack>
         <p className="object-anomaly-score" style={{ color: calculateAnomalyColor(ship.anomalyScore) }}> {ship.anomalyScore}%</p>
-      </span>
+      </Stack>
 
-      <DisplayedInformation/>
+      <DisplayedInformation ship={ship}/>
 
       {/*<List className="object-details-properties-list">*/}
       {/*  {getPropertyElements(ship)}*/}

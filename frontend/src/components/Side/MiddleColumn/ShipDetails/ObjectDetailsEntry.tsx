@@ -1,7 +1,6 @@
 import React from "react";
 
 import "../../../../styles/common.css";
-import "../../../../styles/ship-details/shipDetailsEntry.css";
 
 /**
  * This component is a single entry in the Object Details. It displays a single key-value pair of the object.

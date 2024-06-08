@@ -1,0 +1,46 @@
+.anomaly-details-container {
+    width: 94%;
+    padding: 5px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.anomaly-details-subtitle {
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.anomaly-details-bulletlist {
+    font-size: 0.9em;
+    margin-top: -4%;
+    margin-left: -5%;
+    text-align: justify;
+}
+
+.anomaly-details-entry-value {
+    overflow-wrap: break-word;
+}
+
+.anomaly-details-entry-value li {
+    padding-top: 1px;
+}
+
+
+.object-details-entry {
+    width: 90%;
+    padding-top: var(--object-details-entry-padding);
+    padding-bottom: var(--object-details-entry-padding);
+    text-align: left;
+    padding-left: var(--object-details-entry-padding);
+    border-bottom: 1px dotted gray;
+
+    font-size: var(--object-details-entry-font-size);
+}
+
+.object-details-entry-type {
+    font-weight: bold;
+}
+
+

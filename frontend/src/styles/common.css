@@ -39,8 +39,13 @@
     --border: 2px solid black;
     --title-size: 1.2em;
     --background: #DAD5CFCC;
+    --background-blue: #AAD3DFFF;
 
     *::-webkit-scrollbar{
         display: none;
+    }
+
+    *. {
+        border-collapse: collapse;
     }
 }

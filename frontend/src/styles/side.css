@@ -6,7 +6,6 @@
     top: 1%;
     right: 0.5%;
 
-    border: 1px solid black;
     z-index: 999;
     display: flex;
     justify-content: flex-end;

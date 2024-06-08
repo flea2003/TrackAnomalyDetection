@@ -44,6 +44,17 @@ class TimeUtilities {
     return year + "-" + month + "-" + day + " " + hour + ":" + minute;
   }
 
+
+  static getHoursAndMinutes(timestamp: string) {
+    const signalTime = new Date(timestamp);
+    if (!this.isDateValid(signalTime)) return "Not available";
+
+    const hour = this.prependZero(signalTime.getUTCHours());
+    const minute = this.prependZero(signalTime.getUTCMinutes());
+
+    return hour + ":" + minute;
+  }
+
   /**
    * Method that prepends zero to digits when reformatting
    *

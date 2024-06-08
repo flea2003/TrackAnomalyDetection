@@ -3,10 +3,18 @@ import { useState } from "react";
 
 import Stack from "@mui/material/Stack";
 
-import "../../../../styles/anomaly-list/anomalyList.css";
-import "../../../../styles/anomaly-list/slider.css";
+import "../../../../styles/ship-details/shipDetails.css";
+import ShipDetails from "../../../../model/ShipDetails";
+import AnomalyDetails from "./AnomalyDetails";
+import AISDetails from "./AISDetails";
+import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 
-const DisplayedInformation = () => {
+interface ObjectDetailsProps {
+  ship: ShipDetails;
+}
+
+
+const DisplayedInformation = ({ship}: ObjectDetailsProps) => {
 
   const [displayedAnomalyInfo, setDisplayedAnomalyInfo] = useState(true);
   const [displayedAIS, setDisplayedAIS] = useState(false);
@@ -15,26 +23,38 @@ const DisplayedInformation = () => {
 
 
   const changeAnomalyInfo = () => {
-    setDisplayedAnomalyInfo((prevState) => true);
+    setDisplayedAnomalyInfo((x) => true);
+    setDisplayedAIS((x) => false)
+    setDisplayedNotifications((x) => false)
+    setDisplayedPlot((x) => false)
   };
 
   const changeAIS = () => {
-    setDisplayedAIS((prevState) => true);
+    setDisplayedAnomalyInfo((x) => false);
+    setDisplayedAIS((x) => true)
+    setDisplayedNotifications((x) => false)
+    setDisplayedPlot((x) => false)
   };
 
   const changeNotifications = () => {
-    setDisplayedNotifications((prevState) => true);
+    setDisplayedAnomalyInfo((x) => false);
+    setDisplayedAIS((x) => false)
+    setDisplayedNotifications((x) => true)
+    setDisplayedPlot((x) => false)
   };
 
   const changePlot = () => {
-    setDisplayedPlot((prevState) => true);
+    setDisplayedAnomalyInfo((x) => false);
+    setDisplayedAIS((x) => false)
+    setDisplayedNotifications((x) => false)
+    setDisplayedPlot((x) => true)
   };
 
   return (
-    <Stack direction="column">
-      <Stack direction="row">
+    <Stack direction="column" className="menu-info-container">
+      <Stack direction="row" className="menu-container">
         <div onClick={changeAnomalyInfo} className={displayedAnomalyInfo ? "displayed" : "not-displayed"}>
-          Anomaly Info
+          Information
         </div>
         <div onClick={changeAIS} className={displayedAIS ? "displayed" : "not-displayed"}>
           AIS
@@ -46,21 +66,18 @@ const DisplayedInformation = () => {
           Plot
         </div>
       </Stack>
+      <Stack className="info-container">
       {displayedAnomalyInfo && (
-        <span>
-         Anomaly info data
-        </span>
+        <AnomalyDetails ship={ship}/>
       )}
 
-      {displayedAIS && (
-        <span>
-         AIS data
-        </span>
+        {displayedAIS && (
+        <AISDetails ship={ship}/>
       )}
 
       {displayedNotifications && (
         <span>
-         Notifications data
+         {/*<NotificationListWithoutTitle />*/}
         </span>
       )}
 
@@ -69,6 +86,7 @@ const DisplayedInformation = () => {
          Plot
         </span>
       )}
+      </Stack>
 
     </Stack>
   );
