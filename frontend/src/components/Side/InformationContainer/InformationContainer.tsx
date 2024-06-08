@@ -8,6 +8,8 @@ import ErrorNotificationService from "../../../services/ErrorNotificationService
 import NotificationList from "./NotificationsList/NotificationList";
 import ShipNotification from "../../../model/ShipNotification";
 import NotificationDetails from "./NotificationsList/NotificationDetails";
+import "../../../styles/settings.css";
+
 
 interface ObjectProps {
   currentPage: CurrentPage;
@@ -79,7 +81,7 @@ function InformationContainer({
         />
       );
     case "settings":
-      return <div>Settings</div>;
+      return <div className="settings-div">Settings</div>;
     case "errors":
       return <ErrorList pageChanger={pageChanger} />;
     case "none":

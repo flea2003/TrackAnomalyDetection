@@ -34,21 +34,16 @@ function ErrorList({ pageChanger }: ErrorListProps) {
           data-testid="error-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
-        <div id="error-list-name-text">Error list</div>
-
+        Error list
         <img
           src={markAll}
           id="error-list-mark-all-button"
           data-testid="error-list-mark-all-button"
           onClick={() => ErrorNotificationService.markAllAsRead()}
           alt="Mark All">
-
         </img>
       </Stack>
-      <List
-        id="error-list-internal-container"
-        style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}
-      >
+      <List id="error-list-internal-container">
         {getErrorListEntries()}
       </List>
     </Stack>
@@ -64,7 +59,7 @@ function getErrorListEntries() {
     .slice()
     .reverse()
     .map((notification: ErrorNotification, i: number) => (
-      <ErrorListEntry key={i} notification={notification} />
+      <ErrorListEntry key={i} notification={notification}/>
     ));
 }
 

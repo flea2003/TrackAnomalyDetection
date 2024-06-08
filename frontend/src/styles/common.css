@@ -40,6 +40,9 @@
     --title-size: 1em;
     --background: #DAD5CFCC;
     --background-blue: #AAD3DFFF;
+    --title-padding: 7px 8px;
+    --close-icon-length: 20px;
+    --check-icon-length: 20px;
 
     *::-webkit-scrollbar{
         display: none;

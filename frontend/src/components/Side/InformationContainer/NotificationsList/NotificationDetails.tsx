@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import List from "@mui/material/List";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
@@ -6,10 +6,14 @@ import { CurrentPage } from "../../../../App";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
 import ShipNotification from "../../../../model/ShipNotification";
 
+import ObjectDetailsEntry from "../ObjectDetails/ObjectDetailsEntry";
+import AnomalyDetails from "../ObjectDetails/AnomalyDetails";
+import AISDetails from "../ObjectDetails/AISDetails";
+import NotificationListWithoutTitle from "./NotificationListWithoutTitle";
+
 import "../../../../styles/common.css";
 import "../../../../styles/ship-details/shipDetails.css";
 import "../../../../styles/notifications/notificationDetails.css";
-import ObjectDetailsEntry from "../ObjectDetails/ObjectDetailsEntry";
 
 interface NotificationDetailsProps {
   allNotifications: ShipNotification[];
@@ -32,6 +36,20 @@ function NotificationDetails({
   notificationID,
   pageChanger,
 }: NotificationDetailsProps) {
+
+  const [displayedAnomalyInfo, setDisplayedAnomalyInfo] = useState(true);
+  const [displayedAIS, setDisplayedAIS] = useState(false);
+
+  const changeAnomalyInfo = () => {
+    setDisplayedAnomalyInfo((x) => true);
+    setDisplayedAIS((x) => false)
+  };
+
+  const changeAIS = () => {
+    setDisplayedAnomalyInfo((x) => false);
+    setDisplayedAIS((x) => true)
+  };
+
   // Find the notification with the given ID.
   const notification = allNotifications.find((x) => x.id === notificationID);
 
@@ -44,19 +62,30 @@ function NotificationDetails({
   }
 
   return (
-    <Stack id="object-details-container">
-      <div className="object-details-title-container">
+    <Stack className="notification-details-container">
+      <div className="notification-details-title-container">
         {getReturnIcon(pageChanger)}
-        <span className="object-details-title">
-          Notification #{notification.id}
-        </span>
+        <div className="notification-title-div">Notification #{notification.id}</div>
       </div>
-      <div className="notification-details-notifier">
-        Ship details at the time of the anomaly:
-      </div>
-      <List className="notification-details-properties-list">
-        {getPropertyElements(notification)}
-      </List>
+      <div className="ship-id-div">Ship #{notification.shipDetails.id}</div>
+      <Stack direction="row" className="menu-container">
+        <div onClick={changeAnomalyInfo}
+             className={displayedAnomalyInfo ? "notification-displayed" : "notification-not-displayed"}>
+          Information
+        </div>
+        <div onClick={changeAIS} className={displayedAIS ? "notification-displayed" : "notification-not-displayed"}>
+          AIS
+        </div>
+      </Stack>
+      <Stack className="info-container">
+        {displayedAnomalyInfo && (
+          <AnomalyDetails ship={notification.shipDetails} />
+        )}
+
+        {displayedAIS && (
+          <AISDetails ship={notification.shipDetails} />
+        )}
+      </Stack>
     </Stack>
   );
 }
@@ -73,25 +102,6 @@ function notificationNotFoundElement() {
       </span>
     </Stack>
   );
-}
-
-/**
- * Creates the UX component for notification details
- *
- * @param notification notification whose details are being displayed
- */
-function getPropertyElements(notification: ShipNotification) {
-  const properties = notification.getPropertyList();
-
-  return properties.map((property) => {
-    return (
-      <ObjectDetailsEntry
-        key={property.type}
-        type={property.type}
-        value={property.value.toString()}
-      />
-    );
-  });
 }
 
 /**

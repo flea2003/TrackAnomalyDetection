@@ -1,5 +1,3 @@
-import TimeUtilities from "../utils/TimeUtilities";
-
 class ShipDetails {
   static rounding = 1000;
   id: number;
@@ -49,55 +47,6 @@ class ShipDetails {
 
   getRoundedLongitude() {
     return roundShipDetail(this.lng);
-  }
-
-  /**
-   * This method returns a list of properties of the ship. This is used to present the properties in a human-readable format,
-   * when the ship details page is opened. This should not include the name of the ship.
-   *
-   * @returns a list of properties of the ship
-   */
-  getPropertyList() {
-    return [
-      { type: "Anomaly Score", value: this.anomalyScore + "%" },
-      { type: "Explanation", value: this.explanation },
-      {
-        type: "Last AIS signal",
-        value:
-          TimeUtilities.computeTimeDifference(this.correspondingTimestamp) +
-          " ago",
-      },
-      {
-        type: "Highest Recorded Anomaly Score",
-        value: this.maxAnomalyScore.toString() + "%",
-      },
-      {
-        type: "Timestamp of the Highest Anomaly Score",
-        value: TimeUtilities.reformatTimestamp(this.correspondingTimestamp),
-      },
-      { type: "Heading", value: this.heading.toString() },
-      { type: "Departure Port", value: this.departurePort },
-      { type: "Course", value: this.course.toString() },
-      {
-        type: "Position",
-        value: this.getPositionString(),
-      },
-      { type: "Speed", value: this.speed.toString() },
-    ];
-  }
-
-  /**
-   * Utility method for concatenating the latitude and longitude values.
-   */
-  getPositionString() {
-    return roundShipDetail(this.lat) + ", " + roundShipDetail(this.lng);
-  }
-
-  /**
-   * Getter for the anomalyScore field.
-   */
-  getAnomalyScore() {
-    return this.anomalyScore;
   }
 }
 

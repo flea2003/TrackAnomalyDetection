@@ -54,17 +54,17 @@ function NotificationList({
     >
       <Stack id="notification-list-title-container" direction="row">
         {image}
-        <div id="notification-list-name-text">Notifications</div>
-          <img
-            src={markAll}
-            id="notification-list-mark-all-button"
-            onClick={() => {
-              NotificationService.queryBackendToMarkAllNotificationsAsRead(
-                notifications,
-              );
-            }}
-           alt="Close">
-          </img>
+        Notifications
+        <img
+          src={markAll}
+          id="notification-list-mark-all-button"
+          onClick={() => {
+            NotificationService.queryBackendToMarkAllNotificationsAsRead(
+              notifications,
+            );
+          }}
+         alt="Close">
+        </img>
       </Stack>
       <NotificationListWithoutTitle
         notifications={notifications}

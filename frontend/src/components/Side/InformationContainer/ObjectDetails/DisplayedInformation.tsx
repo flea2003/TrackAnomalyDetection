@@ -19,7 +19,6 @@ interface ObjectDetailsProps {
   mapCenteringFun: (details: ShipDetails) => void;
 }
 
-
 const DisplayedInformation = ({ship, notifications, ships, pageChanger, mapCenteringFun}: ObjectDetailsProps) => {
 
   const [displayedAnomalyInfo, setDisplayedAnomalyInfo] = useState(true);
@@ -29,31 +28,31 @@ const DisplayedInformation = ({ship, notifications, ships, pageChanger, mapCente
 
 
   const changeAnomalyInfo = () => {
-    setDisplayedAnomalyInfo((x) => true);
-    setDisplayedAIS((x) => false)
-    setDisplayedNotifications((x) => false)
-    setDisplayedPlot((x) => false)
+    setDisplayedAnomalyInfo(true);
+    setDisplayedAIS(false)
+    setDisplayedNotifications(false)
+    setDisplayedPlot(false)
   };
 
   const changeAIS = () => {
-    setDisplayedAnomalyInfo((x) => false);
-    setDisplayedAIS((x) => true)
-    setDisplayedNotifications((x) => false)
-    setDisplayedPlot((x) => false)
+    setDisplayedAnomalyInfo( false);
+    setDisplayedAIS( true)
+    setDisplayedNotifications( false)
+    setDisplayedPlot(false)
   };
 
   const changeNotifications = () => {
-    setDisplayedAnomalyInfo((x) => false);
-    setDisplayedAIS((x) => false)
-    setDisplayedNotifications((x) => true)
-    setDisplayedPlot((x) => false)
+    setDisplayedAnomalyInfo(false);
+    setDisplayedAIS(false)
+    setDisplayedNotifications(true)
+    setDisplayedPlot(false)
   };
 
   const changePlot = () => {
-    setDisplayedAnomalyInfo((x) => false);
-    setDisplayedAIS((x) => false)
-    setDisplayedNotifications((x) => false)
-    setDisplayedPlot((x) => true)
+    setDisplayedAnomalyInfo(false);
+    setDisplayedAIS(false)
+    setDisplayedNotifications(false)
+    setDisplayedPlot(true)
   };
 
   return (
@@ -73,10 +72,9 @@ const DisplayedInformation = ({ship, notifications, ships, pageChanger, mapCente
         </div>
       </Stack>
       <Stack className="info-container">
-      {displayedAnomalyInfo && (
-        <AnomalyDetails ship={ship}/>
-      )}
-
+        {displayedAnomalyInfo && (
+          <AnomalyDetails ship={ship}/>
+        )}
         {displayedAIS && (
         <AISDetails ship={ship}/>
       )}
@@ -91,14 +89,12 @@ const DisplayedInformation = ({ship, notifications, ships, pageChanger, mapCente
           />
         </div>
       )}
-
       {displayedPlot && (
         <div>
          Plot
         </div>
       )}
       </Stack>
-
     </Stack>
   );
 };

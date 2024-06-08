@@ -2,7 +2,7 @@
     width: 3%;
     height: 24%;
     border: var(--border);
-    background: #DAD5CF66;
+    background: var(--background);
     pointer-events: all;
 
     margin-left: 0.5%;

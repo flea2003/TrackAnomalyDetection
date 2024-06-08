@@ -81,6 +81,10 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           return;
         }
 
+        // Check if the passed ship is even defined
+        if (ship === undefined) return;
+        if (ship.id === undefined) return;
+
         // Check if requested ship still exists
         if (ships.find((x) => x.id === ship.id) === undefined) return;
 
