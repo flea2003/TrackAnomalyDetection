@@ -87,14 +87,14 @@ Finally, create the topics required for the project. In the third terminal, run 
 ```bash
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic current-ship-details --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic ships-history --bootstrap-server localhost:9092
 ```
 
 If needed to remove the topics, run the following command:
 ```bash
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic current-ship-details --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
 ```
 
 Additionally, the following JVM argument needs to be added (Edit configurations -> Modify options -> (Java) Add VM options):
@@ -128,10 +128,10 @@ For full reset of the back-end state you can run the following commands (make su
 bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeline --force
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic current-ship-details --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic current-ship-details --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic ships-history --bootstrap-server localhost:9092
 
 ```
 

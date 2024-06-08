@@ -78,7 +78,7 @@ class GenericPipelineTest {
 
         // Set the topic names to something a bit random as well so that tests do not clash
         config.updateConfiguration("incoming.ais-raw.topic.name", "ships-raw-AIS" + "-" + randomUUID);
-        config.updateConfiguration("current.ship.details.topic.name", "ships-history" + "-" + randomUUID);
+        config.updateConfiguration("kafka.ships-history.name", "ships-history" + "-" + randomUUID);
         config.updateConfiguration("notifications.topic.name", "notifications-" + "-" + randomUUID);
 
         rawAISTopic = config.getRawIncomingAisTopicName();
