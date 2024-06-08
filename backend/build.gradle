@@ -200,6 +200,8 @@ pitest {
 	outputFormats = ['XML', 'HTML']
 
 	jvmArgs = additionalJvmArgs
+
+	enableDefaultIncrementalAnalysis = true
 }
 
 

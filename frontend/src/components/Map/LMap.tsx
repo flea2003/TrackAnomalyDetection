@@ -1,30 +1,21 @@
-import React, {
-  useEffect,
-  useState,
-  forwardRef,
-  useImperativeHandle, useRef
-} from "react";
-import ErrorNotificationService from "../../services/ErrorNotificationService";
-import L, { LatLngBounds } from "leaflet";
-import {
-  createShipIcon,
-  handleMouseOutShipIcon,
-  handleMouseOverShipIcon,
-} from "../ShipIcon/ShipIcon";
-import { CurrentPage } from "../../App";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
+import L from "leaflet";
+import { createShipIcon, handleMouseOutShipIcon, handleMouseOverShipIcon } from "../ShipIcon/ShipIcon";
 import ShipDetails from "../../model/ShipDetails";
 
+// import MarkerClusterGroup from 'react-leaflet-markercluster';
 import "../../styles/map.css";
 import "../../styles/common.css";
-
-import mapStyleConfig from "../../configs/mapConfig.json";
-import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
-import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
+import ShipIconDetails, { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
 import { PageChangerRef } from "../Side/Side";
-import useSupercluster from "use-supercluster";
-import Supercluster, { ClusterProperties } from "supercluster";
-import { Feature, GeoJsonProperties, Point } from "geojson";
 import { MapContainer, TileLayer } from "react-leaflet";
+// import MarkerClusterGroup from "react-leaflet-markercluster";
+// require('~leaflet/dist/leaflet.css'); // inside .js file
+// require('react-leaflet-markercluster/dist/styles.min.css'); // inside .js
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster";
 
 interface MapProps {
   ships: ShipDetails[];
@@ -35,6 +26,9 @@ interface MapProps {
 interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
 }
+
+const previousShips = new Map<number, ShipDetails>();
+const markersOnMap = new Map<number, L.Marker>();
 
 /**
  * This component is the first column of the main view of the application. It displays the map with all the ships.
@@ -49,7 +43,11 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     // const [map, setMap] = useState<L.Map | null>(null);
     const mapRef = useRef(null);
 
-    console.log("cia kazka print -Augustinas 2024")
+    // const [clusterLayer, setClusterLayer] = useState<L.MarkerClusterGroup | null> (null);
+
+    const clusterLayer= useRef<L.MarkerClusterGroup | null>(null);
+
+    console.log("cia kazka print -Augustinas 2024");
 
     // TODO add below functions
     // // Define the methods that will be reachable from the parent
@@ -88,35 +86,65 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
     useEffect(() => {
       const map = mapRef.current as L.Map | null;
-
       if (map != null) {
-        map.on("drag", () => {
-          map.panInsideBounds(getMapGlobalBounds(), {animate: false});
-        })
+        if (clusterLayer.current == null) {
+          const markers = L.markerClusterGroup({
+            chunkedLoading: true,
+            chunkInterval: 1,
+            chunkDelay: 10
+          });
+          map.addLayer(markers);
+          clusterLayer.current = markers;
 
-        const cluster = loadPointsToSupercluster(ships);
-
-        const updateMapMarkers = () => {
-          console.log("update map markers called");
-          clearMarkersFromMap(map);
-          addIconsToMap(cluster, map, setHoverInfo, pageChangerRef);
+          console.log("set cluster");
         }
 
-        updateMapMarkers();
+        const mapPanInsideBoundsFunc = () => map.panInsideBounds(getMapGlobalBounds(), {animate: false});
+        map.on("drag",  mapPanInsideBoundsFunc);
 
-        map.on("moveend", updateMapMarkers);
+        // const cluster = loadPointsToSupercluster(ships);
+
+
+        // const updateMapMarkers = () => {
+          console.log("update map markers called");
+          // clearMarkersFromMap(map);
+          // L.markerClusterGroup()
+          // map.removeLayer(L.markerClusterGroup())
+        // const markersGroupLayer = addIconsToMap(ships, map, setHoverInfo, pageChangerRef);
+        // }
+
+        if (clusterLayer.current != null) {
+          addIconsToMap(clusterLayer.current, ships, map, setHoverInfo, pageChangerRef);
+        }
+        // const m = L.marker([0, 0, 0]);
+        // m.
+
+        // updateMapMarkers();
 
         return () => {
-          clearMarkersFromMap(map);
+          // TODO clear markers
 
           if (map != null) {
-            map.off("moveend", updateMapMarkers);
+            // markersGroupLayer.then(aaa => map.removeLayer(aaa));
+            // map.removeLayer(markersGroupLayer);
+            map.off("drag", mapPanInsideBoundsFunc);
           }
         }
+
+        // map.on("moveend", updateMapMarkers);
+        //
+        // return () => {
+        //   // clearMarkersFromMap(map);
+        //
+        //   if (map != null) {
+        //     map.off("moveend", updateMapMarkers);
+        //   }
+        // }
       }
 
-      return () => clearMarkersFromMap(map);
+      // return () => clearMarkersFromMap(map);
     }, [pageChangerRef, ships]);
+
 
     return (
       <MapContainer id={"map-container"} zoom={8} center={[47.0105, 28.8638]} ref={mapRef}
@@ -128,6 +156,8 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         maxZoom={19}
                    attribution={'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
         />
+
+        {/*<MarkerClusterGroup />*/}
 
         {hoverInfo.show && hoverInfo.shipDetails !== null
           && (
@@ -141,26 +171,116 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 );
 
 // TODO make this async
-function addIconsToMap(cluster: Supercluster, map: L.Map,
+function addIconsToMap(markers: L.MarkerClusterGroup, ships: ShipDetails[], map: L.Map,
                        setHoverInfo: (value: (((prevState: ShipIconDetailsType) => ShipIconDetailsType) | ShipIconDetailsType)) => void,
                        pageChangerRef: React.RefObject<PageChangerRef>) {
 
-  const bounds = map.getBounds();
-  const clusters = cluster.getClusters(
-    [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
-    map.getZoom()
-  )
+  // based on https://github.com/Leaflet/Leaflet.markercluster/tree/master?tab=readme-ov-file#usage
 
-  for (const cluster1 of clusters) {
-    addMarker(cluster1, map, setHoverInfo, pageChangerRef);
+  // const markers = L.markerClusterGroup();
 
-  }
+  // const markers = map.getL
+
+  // const layersToAdd: L.Marker[] = [];
+  // const layersToRem: L.Marker[] = [];
+
+  // ships.forEach(ship => {
+  //
+  //     if (isSameShip(ship)) {return;}
+  //     //
+  //     const previousMarker = markersOnMap.get(ship.id);
+  //     const newMarker = getMarker(ship, map, setHoverInfo, pageChangerRef)
+  //     if (previousMarker != null) {
+  //       layersToRem.push(previousMarker);
+  //     }
+  //     layersToAdd.push(newMarker);
+  //
+  //     markersOnMap.set(ship.id, newMarker);
+  //     previousShips.set(ship.id, ship);
+  //
+  //   })
+
+  const layersToAdd =  ships.map(ship => {
+
+    // if (isSameShip(ship)) {return;}
+    //
+    // const previousMarker = markersOnMap.get(ship.id);
+    return getMarker(ship, map, setHoverInfo, pageChangerRef)
+    // if (previousMarker != null) {
+    //   markers.removeLayer(previousMarker);
+    // }
+    //
+    // markersOnMap.set(ship.id, newMarker);
+    // previousShips.set(ship.id, ship);
+
+  })
+
+  markers.clearLayers();
+  // markers.removeLayers(layersToRem);
+  markers.addLayers(layersToAdd);
+
+    console.log("ship counte: " + ships.length);
+
+    // ships.forEach(ship => {
+    //
+    //   // if (isSameShip(ship)) {return;}
+    //   //
+    //   // const previousMarker = markersOnMap.get(ship.id);
+    //   const newMarker = getMarker(ship, map, setHoverInfo, pageChangerRef);
+    //
+    //   // if (previousMarker != null) {
+    //   //   markers.removeLayer(previousMarker);
+    //   // }
+    //   markers.addLayer(newMarker);
+    //   //
+    //   // markersOnMap.set(ship.id, newMarker);
+    //   // previousShips.set(ship.id, ship);
+    //
+    // })
+
+    // map.addLayer(markers);
+
+    // return markers;
 }
 
-function addMarker(cluster1:  Supercluster.ClusterFeature<Supercluster.AnyProps> | Supercluster.PointFeature<Supercluster.AnyProps>,
-                         map: L.Map,
+function isSameShip(ship: ShipDetails) {
+  const pastShip = previousShips.get(ship.id);
+  if (pastShip == null) return false;
+
+  return pastShip.lng === ship.lng && pastShip.lat === ship.lat
+  && pastShip.anomalyScore === ship.anomalyScore
+  && pastShip.speed === ship.speed
+  && pastShip.course === ship.course;
+}
+
+function getMarker(ship: ShipDetails, map: L.Map,
                          setHoverInfo: (value: (((prevState: ShipIconDetailsType) => ShipIconDetailsType) | ShipIconDetailsType)) => void,
                          pageChangerRef: React.RefObject<PageChangerRef>) {
+
+  return L.marker([ship.lat, ship.lng], {
+      icon: createShipIcon(
+        ship.anomalyScore / 100,
+        ship.heading,
+        ship.speed > 0
+      )
+    })
+      .bindPopup("ID: " + ship.id)
+      .on("click", (e) => {
+        map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
+        handleMouseOutShipIcon(e, setHoverInfo);
+        if (pageChangerRef.current !== null) {
+          pageChangerRef.current.pageChanger({
+            currentPage: "objectDetails",
+            shownItemId: ship.id
+          });
+        }
+      })
+      .on("mouseover", (e) => {
+        handleMouseOverShipIcon(e, ship, map, setHoverInfo);
+      })
+      .on("mouseout", (e) => {
+        handleMouseOutShipIcon(e, setHoverInfo);
+      });
 
   // const [longitude, latitude] = cluster1.geometry.coordinates;
   // const { cluster: isCluster, point_count: pointCount } = cluster1.properties;
@@ -227,17 +347,19 @@ function getMapGlobalBounds() {
   return L.latLngBounds(southWest, northEast);
 }
 
-function clearMarkersFromMap(map: L.Map | null) {
-  if (map == null) {
-    return;
-  }
-
-  map.eachLayer(function (layer: L.Layer) {
-    if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
-      map.removeLayer(layer);
-    }
-  });
-}
+// function clearMarkersFromMap(map: L.Map | null) {
+//   if (map == null) {
+//     return;
+//   }
+//
+//   map.removeLayer()
+//
+//   // map.eachLayer(function (layer: L.Layer) {
+//   //   if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+//   //     map.removeLayer(layer);
+//   //   }
+//   // });
+// }
 
 // Needed for Lint to work (React itself does not require this)
 LMap.displayName = "Map";

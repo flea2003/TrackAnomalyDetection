@@ -19,7 +19,7 @@ const useWebSocketClient = () => {
       });
       console.log("updating ships basedd on buffer")
       setShips(newShips);
-    }, 10000);
+    }, 1000);
 
     return () => {
       clearInterval(intervalId);
