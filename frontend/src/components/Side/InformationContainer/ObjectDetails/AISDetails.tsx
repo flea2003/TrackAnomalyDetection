@@ -10,9 +10,6 @@ import "../../../../styles/ship-details/aisDetails.css";
 import TimeUtilities from "../../../../utils/TimeUtilities";
 import Stack from "@mui/material/Stack";
 
-
-
-
 interface ObjectDetailsProps {
   ship: ShipDetails;
 }
@@ -40,20 +37,18 @@ function AISDetails({ship} : ObjectDetailsProps) {
         </div>
       </Stack>
       <Stack direction="column" className="ais-details-column">
-        <Stack direction="column">
-          <div className="ais-details-info-container">
-            <div className="ais-details-subtitle">Departure Port</div>
-            <div className="ais-details-info">{ship.departurePort}</div>
-          </div>
-          <div className="ais-details-info-container">
-            <div className="ais-details-subtitle">Heading</div>
-            <div className="ais-details-info">{ship.heading}°</div>
-          </div>
-          <div className="ais-details-info-container">
-            <div className="ais-details-subtitle">Longitude</div>
-            <div className="ais-details-info">{ship.getRoundedLongitude()}</div>
-          </div>
-        </Stack>
+        <div className="ais-details-info-container">
+          <div className="ais-details-subtitle">Departure Port</div>
+          <div className="ais-details-info">{ship.departurePort}</div>
+        </div>
+        <div className="ais-details-info-container">
+          <div className="ais-details-subtitle">Heading</div>
+          <div className="ais-details-info">{ship.heading}°</div>
+        </div>
+        <div className="ais-details-info-container">
+          <div className="ais-details-subtitle">Longitude</div>
+          <div className="ais-details-info">{ship.getRoundedLongitude()}</div>
+        </div>
       </Stack>
     </Stack>
   );

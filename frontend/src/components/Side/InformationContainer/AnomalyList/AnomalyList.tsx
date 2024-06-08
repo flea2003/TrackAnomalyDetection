@@ -46,6 +46,8 @@ function AnomalyList({
     );
   }
 
+  if (listEntries.length === 0) listEntries.push(<div className="no-ships">There are no ships</div>)
+
   return (
     <Stack id="anomaly-list-container" data-testid="anomaly-list-container" direction="column">
       <ShipThresholdModifier
@@ -53,10 +55,7 @@ function AnomalyList({
         setFilterThreshold={setFilterThreshold}
         anomalyThreshold={anomalyThreshold}
       />
-      <List
-        id="anomaly-list-internal-container"
-        style={{ maxHeight: "100%", overflow: "auto", padding: "0" }}
-      >
+      <List id="anomaly-list-internal-container">
         {listEntries}
       </List>
     </Stack>

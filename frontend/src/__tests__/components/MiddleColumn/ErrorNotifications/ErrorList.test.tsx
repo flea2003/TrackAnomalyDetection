@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import App, { CurrentPage } from "../../../../App";
 import React from "react";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
-import ErrorList from "../../../../components/Side/MiddleColumn/ErrorNotifications/ErrorList";
+import ErrorList from "../../../../components/Side/InformationContainer/ErrorNotificationsList/ErrorList";
 import useWebSocketClient from "../../../../utils/communication/WebSocketClient";
 import ShipDetails from "../../../../model/ShipDetails";
 

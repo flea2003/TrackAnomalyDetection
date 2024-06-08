@@ -1,15 +1,14 @@
 .anomaly-list-entry {
-    width: 100%;
+
     height: var(--anomaly-list-entry-height);
+    border-bottom: var(--border);
 
-    border: var(--border);
-
+    padding-top: 2px;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
 
-    /* Make sure when hovering it is like a link */
     cursor: pointer;
 }
 
@@ -24,18 +23,23 @@
 }
 
 .anomaly-list-entry:hover .anomaly-list-entry-icon-container{
-    transform: scale(1.25);
+    transform: scale(1.1);
 }
 
 .anomaly-list-entry-score {
     font-size: var(--anomaly-list-entry-font-size);
-    width: 30px;
     text-align: center;
+    font-weight: bold;
 }
+
 .anomaly-list-entry-id {
     font-size: var(--anomaly-list-entry-id-font-size);
     width: 30px;
     text-align:center;
+}
+
+.anomaly-list-entry-time {
+    font-size: 0.7em;
 }
 
 .anomaly-list-entry-icon-container {
@@ -48,6 +52,6 @@
 }
 
 .anomaly-list-entry-icon{
-    height: var(--anomaly-list-entry-icon-size);
-    width: var(--anomaly-list-entry-icon-size);
+    height: 20px;
+    width: 20px;
 }

@@ -8,13 +8,19 @@ import ShipDetails from "../../../../model/ShipDetails";
 import AnomalyDetails from "./AnomalyDetails";
 import AISDetails from "./AISDetails";
 import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
+import ShipNotification from "../../../../model/ShipNotification";
+import { CurrentPage } from "../../../../App";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
+  notifications: ShipNotification[];
+  ships: ShipDetails[];
+  pageChanger: (currentPage: CurrentPage) => void;
+  mapCenteringFun: (details: ShipDetails) => void;
 }
 
 
-const DisplayedInformation = ({ship}: ObjectDetailsProps) => {
+const DisplayedInformation = ({ship, notifications, ships, pageChanger, mapCenteringFun}: ObjectDetailsProps) => {
 
   const [displayedAnomalyInfo, setDisplayedAnomalyInfo] = useState(true);
   const [displayedAIS, setDisplayedAIS] = useState(false);
@@ -76,15 +82,20 @@ const DisplayedInformation = ({ship}: ObjectDetailsProps) => {
       )}
 
       {displayedNotifications && (
-        <span>
-         {/*<NotificationListWithoutTitle />*/}
-        </span>
+        <div className="notifications-container">
+          <NotificationListWithoutTitle
+            notifications={notifications}
+            pageChanger={pageChanger}
+            ships={ships}
+            mapCenteringFun={mapCenteringFun}
+          />
+        </div>
       )}
 
       {displayedPlot && (
-        <span>
+        <div>
          Plot
-        </span>
+        </div>
       )}
       </Stack>
 

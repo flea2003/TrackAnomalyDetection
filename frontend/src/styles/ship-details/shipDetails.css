@@ -1,5 +1,5 @@
 #object-details-container {
-    width: 27%;
+    width: 25%;
     height: 60%;
     background: var(--background);
     border: var(--border);
@@ -109,4 +109,16 @@
 
 .not-displayed:hover {
     background: var(--background-blue);
+}
+
+.notifications-container {
+    width: 100%;
+    height: 80%;
+
+    border: solid black 1px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    margin-top: 40px;
 }

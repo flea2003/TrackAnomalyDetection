@@ -40,7 +40,6 @@
 }
 
 #notification-list-internal-container {
-    height: 100%;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -48,7 +47,7 @@
     align-items: center;
     padding-top: 0;
     width: 100%;
-    align-self: center;
+    height: 100%;
 }
 
 #notification-list-name-text {

@@ -17,8 +17,8 @@
     font-weight: bold;
 }
 
-.ais-details-info {
-
+.ais-details-info, .ais-details-subtitle {
+    font-size: 0.9em;
 }
 
 .ais-details-info-container {

@@ -1,15 +1,15 @@
 import { CurrentPage } from "../../../App";
 import AnomalyList from "./AnomalyList/AnomalyList";
-import ObjectDetails from "./ShipDetails/ObjectDetails";
+import ObjectDetails from "./ObjectDetails/ObjectDetails";
 import React, { JSX } from "react";
 import ShipDetails from "../../../model/ShipDetails";
-import ErrorList from "./ErrorNotifications/ErrorList";
+import ErrorList from "./ErrorNotificationsList/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
 import NotificationList from "./NotificationsList/NotificationList";
 import ShipNotification from "../../../model/ShipNotification";
 import NotificationDetails from "./NotificationsList/NotificationDetails";
 
-interface MiddleColumnProps {
+interface ObjectProps {
   currentPage: CurrentPage;
   ships: ShipDetails[];
   notifications: ShipNotification[];
@@ -31,7 +31,7 @@ interface MiddleColumnProps {
  * @param anomalyThreshold the anomaly threshold that is used for filtering
  * @constructor
  */
-function MiddleColumn({
+function InformationContainer({
   currentPage,
   ships,
   notifications,
@@ -39,7 +39,7 @@ function MiddleColumn({
   mapCenteringFun,
   setFilterThreshold,
   anomalyThreshold,
-}: MiddleColumnProps): JSX.Element {
+}: ObjectProps): JSX.Element {
   switch (currentPage.currentPage) {
     case "anomalyList":
       return (
@@ -86,11 +86,11 @@ function MiddleColumn({
       return <div></div>;
     default: {
       ErrorNotificationService.addWarning(
-        "MiddleColumn required page not found: " + currentPage.currentPage,
+        "InformationContainer required page not found: " + currentPage.currentPage,
       );
       return <div></div>;
     }
   }
 }
 
-export default MiddleColumn;
+export default InformationContainer;

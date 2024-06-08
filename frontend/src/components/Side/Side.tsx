@@ -2,7 +2,7 @@ import { CurrentPage } from "../../App";
 import React, { JSX } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import Sidebar from "./Sidebar/Sidebar";
-import MiddleColumn from "./MiddleColumn/MiddleColumn";
+import InformationContainer from "./InformationContainer/InformationContainer";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import ShipNotification from "../../model/ShipNotification";
 
@@ -50,7 +50,7 @@ function Side({
   return (
     <>
       <Stack direction="row" id="side-container">
-        <MiddleColumn
+        <InformationContainer
           currentPage={currentPage}
           ships={ships}
           notifications={notifications}

@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
-import filterIconBlue from "../../../../assets/icons/anomaly-list/filter-blue.png";
+import filterIconBlue from "../../../../assets/icons/selected-sidebar-icons/filter-blue.png";
 import filterIcon from "../../../../assets/icons/anomaly-list/filter.svg";
 
 import Stack from "@mui/material/Stack";

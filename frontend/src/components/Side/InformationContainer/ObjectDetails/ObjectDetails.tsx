@@ -52,7 +52,13 @@ function ObjectDetails(props: ObjectDetailsProps) {
         <p className="object-anomaly-score" style={{ color: calculateAnomalyColor(ship.anomalyScore) }}> {ship.anomalyScore}%</p>
       </Stack>
 
-      <DisplayedInformation ship={ship}/>
+      <DisplayedInformation
+        ship={ship}
+        notifications={shipNotifications}
+        pageChanger={pageChanger}
+        mapCenteringFun={props.mapCenteringFun}
+        ships={allShips}
+      />
 
       {/*<List className="object-details-properties-list">*/}
       {/*  {getPropertyElements(ship)}*/}

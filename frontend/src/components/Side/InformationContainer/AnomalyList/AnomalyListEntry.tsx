@@ -8,6 +8,7 @@ import { CurrentPage } from "../../../../App";
 
 import "../../../../styles/common.css";
 import "../../../../styles/anomaly-list/anomalyListEntry.css";
+import TimeUtilities from "../../../../utils/TimeUtilities";
 
 interface AnomalyListEntryProps {
   shipDetails: ShipDetails;
@@ -58,6 +59,7 @@ function AnomalyListEntry({
         <span className="anomaly-list-entry-id">#{shipId}</span>
       </div>
       <span className="anomaly-list-entry-score">{shipAnomalyScore}%</span>
+      <span className="anomaly-list-entry-time">{TimeUtilities.computeTimeDifference(shipDetails.timestamp)} ago</span>
     </Stack>
   );
 }
