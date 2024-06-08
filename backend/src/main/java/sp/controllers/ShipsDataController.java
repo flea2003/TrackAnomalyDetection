@@ -14,7 +14,7 @@ import sp.services.ShipsDataService;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class ShipsDataController {
 
     private final ShipsDataService shipsDataService;

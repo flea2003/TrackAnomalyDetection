@@ -1,4 +1,4 @@
-import ErrorNotificationService from "../services/ErrorNotificationService";
+import ErrorNotificationService from "../../services/ErrorNotificationService";
 
 /**
  * Utility class that handles request sending to the backend

@@ -14,6 +14,7 @@ import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
+import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
 import java.io.IOException;
 import java.util.UUID;
@@ -38,7 +39,12 @@ class AnomalyDetectionPipelineTest {
         CurrentStateAggregator currentStateAggregator;
         PipelineConfiguration config;
         NotificationsAggregator notificationsAggregator;
+        WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
+
         flinkEnv = spy(StreamExecutionEnvironment.getExecutionEnvironment());
+
+        // Mock the WebSocket broadcaster builder
+        webSocketBroadcasterBuilder = mock(WebSocketBroadcasterBuilder.class);
 
         // Create the configuration
         config = new PipelineConfiguration("kafka-connection.properties");
@@ -65,7 +71,8 @@ class AnomalyDetectionPipelineTest {
                 scoreCalculationBuilder,
                 scoreAggregationBuilder,
                 notificationsDetectionBuilder,
-                flinkEnv
+                flinkEnv,
+                webSocketBroadcasterBuilder
         );
 
         // Create the pipeline with default flink env
@@ -74,7 +81,8 @@ class AnomalyDetectionPipelineTest {
                     idAssignmentBuilder,
                     scoreCalculationBuilder,
                     scoreAggregationBuilder,
-                    notificationsDetectionBuilder
+                    notificationsDetectionBuilder,
+                    webSocketBroadcasterBuilder
             );
         });
 

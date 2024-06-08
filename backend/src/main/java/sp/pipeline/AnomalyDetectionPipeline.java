@@ -13,6 +13,7 @@ import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.utils.OffsetDateTimeSerializer;
+import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 
 @Service
 public class AnomalyDetectionPipeline {
@@ -21,6 +22,7 @@ public class AnomalyDetectionPipeline {
     private final ScoreCalculationBuilder scoreCalculationBuilder;
     private final ScoreAggregationBuilder scoreAggregationBuilder;
     private final NotificationsDetectionBuilder notificationsDetectionBuilder;
+    private final WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
     /**
      * Constructor for the AnomalyDetectionPipeline class.
@@ -29,16 +31,19 @@ public class AnomalyDetectionPipeline {
      * @param scoreCalculationBuilder builder for the score calculation part of the pipeline
      * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
      * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
+     * @param webSocketBroadcasterBuilder builder for the WebSockets message broadcasting part
      */
     @Autowired
     public AnomalyDetectionPipeline(IdAssignmentBuilder idAssignmentBuilder,
                                     ScoreCalculationBuilder scoreCalculationBuilder,
                                     ScoreAggregationBuilder scoreAggregationBuilder,
-                                    NotificationsDetectionBuilder notificationsDetectionBuilder) {
+                                    NotificationsDetectionBuilder notificationsDetectionBuilder,
+                                    WebSocketBroadcasterBuilder webSocketBroadcasterBuilder) {
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
+        this.webSocketBroadcasterBuilder = webSocketBroadcasterBuilder;
 
         // For now, hardcode some flink properties. This will be completely redone in the next MR
         // (we will be connecting to a remote cluster)
@@ -62,19 +67,22 @@ public class AnomalyDetectionPipeline {
      * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
      * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
      * @param flinkEnv injected Flink environment
+     * @param webSocketBroadcasterBuilder  builder for the WebSockets message broadcasting part
      */
     public AnomalyDetectionPipeline(
             IdAssignmentBuilder idAssignmentBuilder,
             ScoreCalculationBuilder scoreCalculationBuilder,
             ScoreAggregationBuilder scoreAggregationBuilder,
             NotificationsDetectionBuilder notificationsDetectionBuilder,
-            StreamExecutionEnvironment flinkEnv
+            StreamExecutionEnvironment flinkEnv,
+            WebSocketBroadcasterBuilder webSocketBroadcasterBuilder
     ) {
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
         this.flinkEnv = flinkEnv;
+        this.webSocketBroadcasterBuilder = webSocketBroadcasterBuilder;
         buildPipeline();
     }
 
@@ -103,6 +111,9 @@ public class AnomalyDetectionPipeline {
         // by the next part of the pipeline - ship information extractor
         DataStream<CurrentShipDetails> aggregatedStream =
                 scoreAggregationBuilder.buildScoreAggregationPart(streamWithAssignedIds, streamOfAnomalyInfo);
+
+        // Build the pipeline part that broadcasts ship details via websockets
+        this.webSocketBroadcasterBuilder.buildWebSocketBroadcastingPart(this.state);
 
         // Build the pipeline part that produces notifications (Kafka Streams)
         notificationsDetectionBuilder.buildNotifications(aggregatedStream);

@@ -23,6 +23,7 @@ import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
+import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
 import sp.services.NotificationService;
 import sp.services.ShipsDataService;
@@ -30,6 +31,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 /**
  * The following class contains methods for running an integration test.
@@ -54,6 +57,7 @@ class GenericPipelineTest {
     protected String notificationsTopic;
     protected AnomalyDetectionPipeline anomalyDetectionPipeline;
     protected ShipsDataService shipsDataService;
+    protected WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
 
     /**
@@ -130,6 +134,9 @@ class GenericPipelineTest {
         ShipInformationExtractor shipInformationExtractor;
         StreamUtils streamUtils;
 
+        // Mock the WebSocket broadcaster builder class
+        webSocketBroadcasterBuilder = mock(WebSocketBroadcasterBuilder.class);
+
         // Create the core objects
         scoreCalculationStrategy = new SimpleScoreCalculator();
         currentStateAggregator = new CurrentStateAggregator();
@@ -148,7 +155,8 @@ class GenericPipelineTest {
                 scoreCalculationBuilder,
                 scoreAggregationBuilder,
                 notificationsDetectionBuilder,
-                env
+                env,
+                webSocketBroadcasterBuilder
         );
 
         // Set up the notification servicce
