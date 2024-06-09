@@ -19,7 +19,7 @@ export interface CurrentPage {
 }
 
 function App() {
-  // Create a reference to the map component
+  // References to the `map` and `pageChanger` objects. Will be assigned later.
   const mapRef = React.useRef<MapExportedMethodsType>(null);
   const pageChangerRef = React.useRef<PageChangerRef>(null);
 
@@ -44,13 +44,17 @@ function App() {
   // Create a separate array for displayed ships
   const displayedShips = allShips.filter(
     (x) => x.anomalyScore >= filterThreshold,
-  ).slice(0, 10000); // take only the first 100 ships
+  );
 
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
       <Stack direction="row">
-        <LMap ships={displayedShips} pageChangerRef={pageChangerRef} ref={mapRef} />
+        <LMap
+          ships={displayedShips}
+          pageChangerRef={pageChangerRef}
+          ref={mapRef}
+        />
         <Side
           ships={displayedShips}
           mapCenteringFun={mapCenteringFun}

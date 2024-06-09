@@ -10,19 +10,29 @@ import ShipUpdateBuffer from "../../services/ShipUpdateBuffer";
 const useWebSocketClient = () => {
   const [ships, setShips] = useState<Map<number, ShipDetails>>(new Map());
 
-  // Update the ships based on buffer
+  // Update the ships based on buffer frequently
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    const updateShips = () => {
+      // Copy the map of the current ships
       const newShips = new Map(ships);
-      ShipUpdateBuffer.getBufferedShipsAndReset().forEach(shipToUpdate => {
+
+      // Update the `newShips` map based on the buffered ships
+      ShipUpdateBuffer.getBufferedShipsAndReset().forEach((shipToUpdate) => {
         newShips.set(shipToUpdate.id, shipToUpdate);
       });
+
+      // Update the React state for ships
       setShips(newShips);
-    }, websocketConfig.websocketBufferRefreshMs);
+    };
+
+    const intervalId = setInterval(
+      updateShips,
+      websocketConfig.websocketBufferRefreshMs,
+    );
 
     return () => {
       clearInterval(intervalId);
-    }
+    };
   }, [ships]);
 
   /**
@@ -38,7 +48,6 @@ const useWebSocketClient = () => {
 
     /**
      * Given a successful connection to the backend broker, subscribe to the `details` topic
-     *
      */
     stompClient.onConnect = () => {
       stompClient.subscribe(websocketConfig.topic, function (message) {
@@ -89,7 +98,9 @@ const useWebSocketClient = () => {
 
     return () => {
       if (stompClient) {
-        stompClient.deactivate().then(() => console.log("Previous stomp client deactivated."));
+        stompClient
+          .deactivate()
+          .then(() => console.log("Previous stomp client deactivated."));
       }
     };
   }, []);

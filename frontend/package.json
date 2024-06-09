@@ -96,9 +96,6 @@
         "lines": 0,
         "statements": 0
       }
-    },
-    "moduleNameMapper": {
-      "react-leaflet": "<rootDir>/src/__mocks__/reactLeafletMock.ts"
     }
   }
 }

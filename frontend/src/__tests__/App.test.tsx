@@ -11,8 +11,6 @@ jest.mock("../utils/communication/WebSocketClient", () => ({
   default: jest.fn(),
 }));
 
-// jest.mock('react-leaflet', () => jest.fn());
-
 const mockedUseWebSocketClient = useWebSocketClient as jest.MockedFunction<
   typeof useWebSocketClient
 >;

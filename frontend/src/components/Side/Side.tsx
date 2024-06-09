@@ -1,5 +1,10 @@
 import { CurrentPage } from "../../App";
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import ShipDetails from "../../model/ShipDetails";
 import Sidebar from "./Sidebar/Sidebar";
 import MiddleColumn from "./MiddleColumn/MiddleColumn";
@@ -10,7 +15,7 @@ import { NotificationService } from "../../services/NotificationService";
 import "../../styles/common.css";
 import "../../styles/side.css";
 
-import config from '../../configs/generalConfig.json';
+import config from "../../configs/generalConfig.json";
 
 interface SideProps {
   ships: ShipDetails[];
@@ -33,12 +38,7 @@ interface PageChangerRef {
  * @constructor
  */
 const Side = forwardRef<PageChangerRef, SideProps>(
-  ({
-    ships,
-    mapCenteringFun,
-    setFilterThreshold,
-    anomalyThreshold,
-  }, ref) => {
+  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold }, ref) => {
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
@@ -54,7 +54,12 @@ const Side = forwardRef<PageChangerRef, SideProps>(
         // Query for notifications. When the results arrive, update the state
         NotificationService.queryBackendForAllNotifications().then(
           (newNotifications: ShipNotification[]) => {
-            if (!NotificationService.notificationArraysEqual(notifications, newNotifications)) {
+            if (
+              !NotificationService.notificationArraysEqual(
+                notifications,
+                newNotifications,
+              )
+            ) {
               setNotifications(newNotifications);
             }
           },
@@ -63,7 +68,7 @@ const Side = forwardRef<PageChangerRef, SideProps>(
 
       return () => {
         clearInterval(intervalId);
-      }
+      };
     }, [notifications]);
 
     // Create state for current page
@@ -87,7 +92,7 @@ const Side = forwardRef<PageChangerRef, SideProps>(
       }
     };
 
-    useImperativeHandle(ref, () => ({pageChanger}));
+    useImperativeHandle(ref, () => ({ pageChanger }));
 
     return (
       <>
@@ -103,9 +108,8 @@ const Side = forwardRef<PageChangerRef, SideProps>(
         <Sidebar pageChanger={pageChanger} />
       </>
     );
-  }
-)
-
+  },
+);
 
 function areShipDetailsOpened(currentPage: CurrentPage) {
   return (
@@ -117,4 +121,4 @@ function areShipDetailsOpened(currentPage: CurrentPage) {
 Side.displayName = "Side";
 
 export default Side;
-export type {PageChangerRef};
+export type { PageChangerRef };

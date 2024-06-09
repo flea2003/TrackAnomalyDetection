@@ -34,14 +34,16 @@ function AnomalyList({
   setFilterThreshold,
   anomalyThreshold,
 }: AnomalyListProps) {
-  const listEntries = ships.slice(0, 250).map((ship, id) =>
-    <AnomalyListEntry
-      key={id}
-      shipDetails={ship}
-      pageChanger={pageChanger}
-      mapCenteringFun={mapCenteringFun}
-    />
-  );
+  const listEntries = ships
+    .slice(0, 250)
+    .map((ship, id) => (
+      <AnomalyListEntry
+        key={id}
+        shipDetails={ship}
+        pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
+      />
+    ));
 
   return (
     <Stack id="anomaly-list-container" data-testid="anomaly-list-container">

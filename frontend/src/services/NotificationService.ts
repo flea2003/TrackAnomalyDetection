@@ -161,7 +161,10 @@ export class NotificationService {
   }
 
   // equality is based on array length and notification ids
-  static notificationArraysEqual(notifications1: ShipNotification[], notifications2: ShipNotification[]) {
+  static notificationArraysEqual(
+    notifications1: ShipNotification[],
+    notifications2: ShipNotification[],
+  ) {
     if (notifications1.length !== notifications2.length) {
       return false;
     }
