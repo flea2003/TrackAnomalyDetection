@@ -1,7 +1,7 @@
 package sp.utils.sql;
 
 import java.io.BufferedReader;
-import java.sql.SQLException;
+import java.io.IOException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,7 +12,7 @@ public class FileReader {
      * @param filePath the path where the corresponding query is located
      * @return the SQL processed query
      */
-    public static String readQueryFromFile(String filePath) throws SQLException {
+    public static String readQueryFromFile(String filePath) throws IOException {
         StringBuilder queryBuilder = new StringBuilder();
         try (java.io.FileReader fileReader = new java.io.FileReader(filePath);
             BufferedReader reader = new BufferedReader(fileReader)) {
@@ -22,8 +22,6 @@ public class FileReader {
                 line = reader.readLine();
             }
             return queryBuilder.toString().trim();
-        } catch (Exception e) {
-            throw new SQLException("Error reading query from file", e);
         }
     }
 

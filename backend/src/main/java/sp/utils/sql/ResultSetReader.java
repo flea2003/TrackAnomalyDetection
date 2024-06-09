@@ -1,5 +1,6 @@
 package sp.utils.sql;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -58,8 +59,8 @@ public class ResultSetReader {
             Gson gson = new Gson();
             String json = gson.toJson(jsonObject);
             return JsonMapper.fromJson(json, classType);
-        } catch (Exception e) {
-            throw new SQLException();
+        } catch (JsonProcessingException e) {
+            throw new SQLException("JSON conversion exception.");
         }
     }
 

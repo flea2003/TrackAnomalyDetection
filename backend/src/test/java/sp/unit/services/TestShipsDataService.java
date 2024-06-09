@@ -1,5 +1,6 @@
 package sp.unit.services;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -88,7 +89,7 @@ public class TestShipsDataService {
         // Mock Druid where needed
         druidConfig = Mockito.mock(DruidConfig.class);
         Connection connection = Mockito.mock(Connection.class);
-        when(druidConfig.connection()).thenReturn(connection);
+        when(druidConfig.openConnection()).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(mock(PreparedStatement.class));
 
         QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
@@ -169,26 +170,26 @@ public class TestShipsDataService {
     }
 
     @Test
-    void getHistoryOfShipException() throws SQLException {
+    void getHistoryOfShipException() throws SQLException, DatabaseException {
         // Setup the broken
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
         QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
         ShipsDataService shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken, shipInformationExtractor);
-        doThrow(SQLException.class).when(queryExecutorBroken)
+        doThrow(DatabaseException.class).when(queryExecutorBroken)
                 .executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class);
         assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
     }
 
     @Test
-    void getHistoryOfShipSQLNotFound() throws SQLException {
+    void getHistoryOfShipSQLNotFound() throws DatabaseException {
         // Setup the broken
         AnomalyDetectionPipeline anomalyDetectionPipelineBroken = mock(AnomalyDetectionPipeline.class);
         QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
         ShipsDataService shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken, shipInformationExtractor);
-        doThrow(SQLException.class).when(queryExecutorBroken)
+        doThrow(DatabaseException.class).when(queryExecutorBroken)
                 .executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class);
         try(MockedStatic<FileReader> fileReader = mockStatic(FileReader.class)) {
-            fileReader.when(() -> FileReader.readQueryFromFile(anyString())).thenThrow(SQLException.class);
+            fileReader.when(() -> FileReader.readQueryFromFile(anyString())).thenThrow(IOException.class);
             assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
         }
     }

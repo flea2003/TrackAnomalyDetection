@@ -5,9 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import sp.exceptions.DatabaseException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.utils.DruidConfig;
@@ -34,6 +38,10 @@ public class QueryExecutorTest {
     CurrentShipDetails currentShipDetails2;
     CurrentShipDetails currentShipDetails3;
     CurrentShipDetails currentShipDetails4;
+    DruidConfig druidConfig;
+    Connection connection;
+    PreparedStatement preparedStatement;
+    ResultSet resultSet;
 
     @BeforeEach
     public void setUp() throws SQLException {
@@ -62,21 +70,21 @@ public class QueryExecutorTest {
         currentShipDetails4 = new CurrentShipDetails();
         currentShipDetails4.setCurrentAISSignal(signal4);
 
-        DruidConfig druidConfig = Mockito.mock(DruidConfig.class);
-        Connection connection = Mockito.mock(Connection.class);
-        PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
-        ResultSet resultSet = Mockito.mock(ResultSet.class);
+        druidConfig = Mockito.mock(DruidConfig.class);
+        connection = Mockito.mock(Connection.class);
+        preparedStatement = Mockito.mock(PreparedStatement.class);
+        resultSet = Mockito.mock(ResultSet.class);
 
         when(connection.prepareStatement("SELECT *")).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);
 
-        when(druidConfig.connection()).thenReturn(connection);
+        when(druidConfig.openConnection()).thenReturn(connection);
 
         queryExecutor = new QueryExecutor(druidConfig);
     }
 
     @Test
-    void testQueryExtractor() throws SQLException{
+    void testQueryExtractor() throws SQLException, DatabaseException{
         try(MockedStatic<FileReader>mockedFileReader = mockStatic(FileReader.class)) {
             mockedFileReader.when(() -> FileReader.readQueryFromFile("path"))
                 .thenReturn("SELECT *");
@@ -86,9 +94,22 @@ public class QueryExecutorTest {
                     .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
 
                 assertThat(queryExecutor.executeQueryOneLong(5, "path", CurrentShipDetails.class))
-                    .containsExactlyInAnyOrder(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
+                    .containsExactlyInAnyOrder(currentShipDetails1, currentShipDetails2,
+                        currentShipDetails3, currentShipDetails4);
 
+                verify(preparedStatement, times(1)).setLong(1, 5);
             }
+        }
+    }
+
+    @Test
+    void testIOException(){
+        try(MockedStatic<FileReader>mockedFileReader = mockStatic(FileReader.class)) {
+            mockedFileReader.when(() -> FileReader.readQueryFromFile(any()))
+                .thenThrow(IOException.class);
+
+            assertThatThrownBy(() -> queryExecutor.executeQueryOneLong(5, "path", CurrentShipDetails.class))
+                .isInstanceOf(DatabaseException.class).hasMessage("Error reading the query from the file at path.");
         }
     }
 
@@ -103,8 +124,9 @@ public class QueryExecutorTest {
                     .thenThrow(SQLException.class);
 
                 assertThatThrownBy(() -> queryExecutor.executeQueryOneLong(5, "path", CurrentShipDetails.class))
-                    .isInstanceOf(SQLException.class);
+                    .isInstanceOf(DatabaseException.class).hasMessage("Error executing the query.");
             }
         }
     }
+
 }

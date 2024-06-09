@@ -1,6 +1,5 @@
 package sp.services;
 
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,10 +77,6 @@ public class ShipsDataService {
      * @throws DatabaseException in case the query doesn't succeed
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws DatabaseException {
-        try {
-            return queryExecutor.executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
-        } catch (SQLException e) {
-            throw new DatabaseException("The database query failed.");
-        }
+        return queryExecutor.executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
     }
 }
