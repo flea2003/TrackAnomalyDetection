@@ -95,7 +95,6 @@ function NotificationDetails({
               addAnomalyScore={true}
             />
           )}
-
           {displayedAIS && <AISDetails ship={notification.shipDetails} />}
         </Stack>
       </Stack>

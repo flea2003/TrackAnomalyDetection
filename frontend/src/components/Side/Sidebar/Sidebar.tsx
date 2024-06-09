@@ -44,29 +44,29 @@ function Sidebar({ pageChanger }: SidebarProps) {
 
   const changeAnomalyListIcon = () => {
     setDisplayedAnomalyList((x) => !x);
-    setDisplayedNotifications((x) => false);
-    setDisplayedSettings((x) => false);
-    setDisplayedBugs((x) => false);
+    setDisplayedNotifications(false);
+    setDisplayedSettings(false);
+    setDisplayedBugs(false);
   };
 
   const changeNotificationsIcon = () => {
-    setDisplayedAnomalyList((x) => false);
+    setDisplayedAnomalyList(false);
     setDisplayedNotifications((x) => !x);
-    setDisplayedSettings((x) => false);
-    setDisplayedBugs((x) => false);
+    setDisplayedSettings(false);
+    setDisplayedBugs(false);
   };
 
   const changeSettingsIcon = () => {
-    setDisplayedAnomalyList((x) => false);
-    setDisplayedNotifications((x) => false);
+    setDisplayedAnomalyList(false);
+    setDisplayedNotifications(false);
     setDisplayedSettings((x) => !x);
-    setDisplayedBugs((x) => false);
+    setDisplayedBugs(false);
   };
 
   const changeBugsIcon = () => {
-    setDisplayedAnomalyList((x) => false);
-    setDisplayedNotifications((x) => false);
-    setDisplayedSettings((x) => false);
+    setDisplayedAnomalyList(false);
+    setDisplayedNotifications(false);
+    setDisplayedSettings(false);
     setDisplayedBugs((x) => !x);
   };
 

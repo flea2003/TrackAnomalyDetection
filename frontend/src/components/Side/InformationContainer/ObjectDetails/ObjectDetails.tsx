@@ -5,10 +5,10 @@ import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
 import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
+import DisplayedInformation from "./DisplayedInformation";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
-import DisplayedInformation from "./DisplayedInformation";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
@@ -71,6 +71,9 @@ function ObjectDetails({
   );
 }
 
+/**
+ * Component that is displayed in case ship is not found
+ */
 function shipNotFoundElement() {
   return (
     <Stack id="object-details-container">
@@ -82,6 +85,11 @@ function shipNotFoundElement() {
   );
 }
 
+/**
+ * Function that returns an icon for going back to anomaly list
+ *
+ * @param pageChanger page changer function
+ */
 function getReturnIcon(pageChanger: (currentPage: CurrentPage) => void) {
   const onReturnClicked = () => {
     pageChanger({ currentPage: "anomalyList", shownItemId: -1 });

@@ -51,7 +51,6 @@ function NotificationListWithoutTitle({
       />
     );
   });
-
   return <List id="notification-list-internal-container">{listEntries}</List>;
 }
 

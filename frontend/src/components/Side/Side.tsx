@@ -5,10 +5,10 @@ import Sidebar from "./Sidebar/Sidebar";
 import InformationContainer from "./InformationContainer/InformationContainer";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import ShipNotification from "../../model/ShipNotification";
+import { Stack } from "@mui/material";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
-import { Stack } from "@mui/material";
 
 interface SideProps {
   currentPage: CurrentPage;

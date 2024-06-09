@@ -2,14 +2,14 @@ import React from "react";
 import { useState } from "react";
 
 import Stack from "@mui/material/Stack";
-
-import "../../../../styles/object-details/objectDetails.css";
 import ShipDetails from "../../../../model/ShipDetails";
 import AnomalyDetails from "./AnomalyDetails";
 import AISDetails from "./AISDetails";
 import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 import ShipNotification from "../../../../model/ShipNotification";
 import { CurrentPage } from "../../../../App";
+
+import "../../../../styles/object-details/objectDetails.css";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
@@ -19,6 +19,17 @@ interface ObjectDetailsProps {
   mapCenteringFun: (details: ShipDetails) => void;
 }
 
+/**
+ * Component that contains the menu and the data below the menu that is displayed
+ * in object details window
+ *
+ * @param ship ship whose data is being displayed
+ * @param notifications array of all notifications
+ * @param ships array of all ships
+ * @param pageChanger page changer function
+ * @param mapCenteringFun map centering function
+ * @constructor
+ */
 const DisplayedInformation = ({
   ship,
   notifications,

@@ -1,16 +1,22 @@
 import React from "react";
+import ShipDetails from "../../../../model/ShipDetails";
+import Stack from "@mui/material/Stack";
+import TimeUtilities from "../../../../utils/TimeUtilities";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetailsEntry.css";
-import ShipDetails from "../../../../model/ShipDetails";
 import "../../../../styles/object-details/aisDetails.css";
-import TimeUtilities from "../../../../utils/TimeUtilities";
-import Stack from "@mui/material/Stack";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
 }
 
+/**
+ * Function that returns the UI component that displays all AIS data for a ship
+ *
+ * @param ship ship whose data is being considered
+ * @constructor
+ */
 function AISDetails({ ship }: ObjectDetailsProps) {
   return (
     <Stack direction="row" className="ais-details-container">
