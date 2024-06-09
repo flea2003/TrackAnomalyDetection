@@ -59,6 +59,25 @@ interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
 }
 
+interface ShipIconTrackingType {
+  x: number;
+  y: number;
+  shipId: number;
+}
+
+const defaulIconTrackingInfo = {
+  x: 0,
+  y: 0,
+  shipId: -1,
+} as ShipIconTrackingType;
+
+const defaultHoverInfo = {
+  show: false,
+  x: 0,
+  y: 0,
+  shipDetails: null,
+} as ShipIconDetailsType;
+
 /**
  * This component is the first column of the main view of the application. It displays the map with all the ships.
  * A list of ships is passed as a prop.
@@ -88,25 +107,32 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         // Check if requested ship still exists
         if (ships.find((x) => x.id === ship.id) === undefined) return;
 
-        map.flyTo(
-          [ship.lat, ship.lng],
-          mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
-          {
-            animate: true,
-            duration: mapStyleConfig["transition-time"],
-          },
-        );
+        setTrackingInfo({
+          x: ship.lng,
+          y: ship.lat,
+          shipId: ship.id,
+        } as ShipIconTrackingType);
       },
     }));
 
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship
-    const [hoverInfo, setHoverInfo] = useState<ShipIconDetailsType>({
-      show: false,
-      x: 0,
-      y: 0,
-      shipDetails: null,
-    } as ShipIconDetailsType);
+    const [hoverInfo, setHoverInfo] =
+      useState<ShipIconDetailsType>(defaultHoverInfo);
+
+    // Initialize the trackingInfo variable that will track the selected ship icon
+    const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>(
+      defaulIconTrackingInfo,
+    );
+
+    // Event-handling method which enables the tracking of a particular ship
+    const trackShipIcon = (ship: ShipDetails) => {
+      setTrackingInfo({
+        x: ship.lng,
+        y: ship.lat,
+        shipId: ship.id,
+      });
+    };
 
     // Everything to do with the map updates should be done inside useEffect
     useEffect(() => {
@@ -119,6 +145,17 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       // If not yet created, do not do anything, just wait
       if (map == null) {
         return;
+      }
+
+      // When re-rendering the Map component, check if a ship icon is currently tracked
+      if (trackingInfo.shipId !== -1) {
+        const trackedShip = ships.find((x) => x.id === trackingInfo.shipId);
+        if (trackedShip !== undefined) {
+          map.flyTo([trackedShip.lat, trackedShip.lng], map.getZoom(), {
+            animate: true,
+            duration: mapStyleConfig["transition-time"],
+          });
+        }
       }
 
       // Add all ship icons to the map
@@ -134,7 +171,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
             .addTo(map)
             .bindPopup("ID: " + ship.id)
             .on("click", (e) => {
-              map.flyTo(e.latlng, map.getZoom());
+              trackShipIcon(ship);
               handleMouseOutShipIcon(e, setHoverInfo);
               pageChanger({
                 currentPage: "objectDetails",
@@ -159,6 +196,14 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         }
       });
 
+      map
+        .on("drag", () => {
+          setTrackingInfo(defaulIconTrackingInfo);
+        })
+        .on("zoom", () => {
+          setHoverInfo(defaultHoverInfo);
+        });
+
       return () => {
         if (map) {
           map.eachLayer(function (layer: L.Layer) {
@@ -168,7 +213,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           });
         }
       };
-    }, [map, pageChanger, ships]);
+    }, [map, pageChanger, ships, trackingInfo]);
 
     return (
       <div id="map-container">

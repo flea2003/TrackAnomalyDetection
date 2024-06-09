@@ -161,4 +161,9 @@ const handleMouseOutShipIcon = (
   } as ShipIconDetailsType);
 };
 
-export { createShipIcon, handleMouseOverShipIcon, handleMouseOutShipIcon };
+export {
+  createShipIcon,
+  handleMouseOverShipIcon,
+  handleMouseOutShipIcon,
+  extractIconCoordinates,
+};

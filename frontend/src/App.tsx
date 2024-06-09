@@ -4,12 +4,12 @@ import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
 import { MapExportedMethodsType } from "./components/Map/LMap";
 import ErrorNotificationService from "./services/ErrorNotificationService";
-import "./styles/common.css";
 import Side from "./components/Side/Side";
 import useWebSocketClient from "./utils/communication/WebSocketClient";
 import ShipNotification from "./model/ShipNotification";
 import { NotificationService } from "./services/NotificationService";
 import ShipService from "./services/ShipService";
+import "./styles/common.css";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
