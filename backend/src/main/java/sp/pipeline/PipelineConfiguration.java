@@ -17,7 +17,9 @@ public class PipelineConfiguration {
     private static final String INCOMING_AIS_TOPIC_NAME_PROPERTY = "incoming.ais.topic.name";
     private static final String CALCULATED_SCORES_TOPIC_NAME_PROPERTY = "calculated.scores.topic.name";
     private static final String KAFKA_SERVER_ADDRESS_PROPERTY = "kafka.server.address";
+    private static final String KAFKA_SHIPS_HISTORY_STORE_NAME_PROPERTY = "kafka.ships-history.name";
     private static final String KAFKA_STORE_NAME_PROPERTY = "kafka.store.name";
+    private static final String DRUID_URL_PROPERTY = "druid.connection.url";
 
     private String rawIncomingAisTopicName;
 
@@ -28,6 +30,10 @@ public class PipelineConfiguration {
     private String kafkaServerAddress;
 
     private String kafkaStoreName;
+
+    private String shipsHistoryTopicName;
+
+    private String druidUrl;
 
     private Properties savedConfiguration;
 
@@ -53,7 +59,9 @@ public class PipelineConfiguration {
         incomingAisTopicName = savedConfiguration.getProperty(INCOMING_AIS_TOPIC_NAME_PROPERTY);
         calculatedScoresTopicName = savedConfiguration.getProperty(CALCULATED_SCORES_TOPIC_NAME_PROPERTY);
         kafkaServerAddress = savedConfiguration.getProperty(KAFKA_SERVER_ADDRESS_PROPERTY);
+        shipsHistoryTopicName = savedConfiguration.getProperty(KAFKA_SHIPS_HISTORY_STORE_NAME_PROPERTY);
         kafkaStoreName = savedConfiguration.getProperty(KAFKA_STORE_NAME_PROPERTY);
+        druidUrl = savedConfiguration.getProperty(DRUID_URL_PROPERTY);
     }
 
     /**

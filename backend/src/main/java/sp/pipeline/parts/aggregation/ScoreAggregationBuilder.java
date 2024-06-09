@@ -130,6 +130,11 @@ public class ScoreAggregationBuilder {
                                 .withValueSerde(CurrentShipDetails.getSerde())
                                 .withCachingDisabled()
                 );
+
+        // Kafka topic from which Apache Druid will ingest Ship Information data
+        KStream<Long, CurrentShipDetails> detailsStream = table.toStream();
+        detailsStream.to(configuration.getShipsHistoryTopicName());
+
         return table;
     }
 }

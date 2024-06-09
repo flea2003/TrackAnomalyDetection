@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import sp.controllers.ShipsDataController;
+import sp.exceptions.DatabaseException;
 import sp.exceptions.PipelineStartingException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
@@ -19,6 +20,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -128,6 +130,27 @@ class ShipsDataControllerTest {
         ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getCurrentShipDetails();
 
         assertEquals(HttpStatus.TOO_EARLY, response.getStatusCode());
+    }
+
+    @Test
+    void getShipDetailsHistory() throws DatabaseException {
+        AnomalyInformation info1 = new AnomalyInformation(1, "explanation1", time1, 1L);
+        AnomalyInformation info2 = new AnomalyInformation(2, "explanation2", time1, 2L);
+        CurrentShipDetails details1 = new CurrentShipDetails(info1, null, null);
+        CurrentShipDetails details2 = new CurrentShipDetails(info2, null, null);
+        when(shipsDataService.getHistoryOfShip(5))
+            .thenReturn(List.of(details1, details2));
+
+        ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getHistoryOfShip(5L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactlyInAnyOrder(details1, details2);
+    }
+
+    @Test
+    void getShipDetailsServerError() throws DatabaseException{
+        when(shipsDataService.getHistoryOfShip(5L)).thenThrow(new DatabaseException());
+        ResponseEntity<List<CurrentShipDetails>>response = shipsDataController.getHistoryOfShip(5L);
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
