@@ -42,20 +42,20 @@ class ShipDetails {
   }
 
   getRoundedLatitude() {
-    return roundShipDetail(this.lat);
+    return this.roundShipDetail(this.lat);
   }
 
   getRoundedLongitude() {
-    return roundShipDetail(this.lng);
+    return this.roundShipDetail(this.lng);
   }
-}
 
-/**
- * Utility method for processing numerical values.
- * @param x - numerical value
- */
-function roundShipDetail(x: number) {
-  return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding;
+  /**
+   * Utility method for processing numerical values.
+   * @param x - numerical value
+   */
+  roundShipDetail(x: number) {
+    return Math.round(x * ShipDetails.rounding) / ShipDetails.rounding;
+  }
 }
 
 export default ShipDetails;

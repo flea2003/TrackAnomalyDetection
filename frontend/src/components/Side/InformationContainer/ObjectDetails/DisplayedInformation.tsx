@@ -115,9 +115,7 @@ const DisplayedInformation = ({
           </div>
         )}
         {displayedNotifications && notifications.length === 0 && (
-          <div className="no-notifications">
-            Currently there are no notifications
-          </div>
+          <div className="no-notifications">No notifications</div>
         )}
         {displayedPlot && <div>Plot</div>}
       </Stack>

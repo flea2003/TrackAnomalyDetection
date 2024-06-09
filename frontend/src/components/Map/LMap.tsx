@@ -13,13 +13,12 @@ import {
 } from "../ShipIcon/ShipIcon";
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
-
-import "../../styles/map.css";
-import "../../styles/common.css";
-
 import mapStyleConfig from "../../configs/mapConfig.json";
 import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
 import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
+
+import "../../styles/map.css";
+import "../../styles/common.css";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -164,7 +163,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           L.marker([ship.lat, ship.lng], {
             icon: createShipIcon(
               ship.anomalyScore / 100,
-              ship.course,
+              ship.heading === 511 ? ship.course : ship.heading,
               ship.speed > 0,
             ),
           })

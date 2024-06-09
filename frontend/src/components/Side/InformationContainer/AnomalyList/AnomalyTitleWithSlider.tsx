@@ -80,7 +80,7 @@ const AnomalyTitleWithSlider = ({
             value={anomalyThreshold}
             onChange={handleSliderChange}
           />
-          {anomalyThreshold}%
+          <div className="threshold-div">{anomalyThreshold}%</div>
         </span>
       )}
     </Stack>

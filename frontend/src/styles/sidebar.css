@@ -1,6 +1,5 @@
 #sidebar {
     width: 3%;
-    height: 24%;
     border: var(--border);
     border-bottom: none;
     background: var(--background);
@@ -48,26 +47,3 @@
 .bug-icon-not-selected:hover{
     content: url("../assets/icons/selected-sidebar-icons/bug_blue.png");
 }
-
-
-/*
-
-we may want that, or not.
-
-.anomaly-list-icon-selected:hover{
-    content: url("../assets/icons/anomaly-list/ship.png");
-}
-
-.bell-icon-selected:hover{
-    content: url("../assets/icons/regular-notifications/notification_bell.svg");
-}
-
-.settings-icon-selected:hover{
-    content: url("../assets/icons/helper-icons/settings.svg");
-}
-
-.bug-icon-selected:hover{
-    content: url("../assets/icons/error-notifications/bug.svg");
-}
-*/
-

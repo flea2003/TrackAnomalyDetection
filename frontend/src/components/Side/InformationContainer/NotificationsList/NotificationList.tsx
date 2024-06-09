@@ -49,10 +49,7 @@ function NotificationList({
   let noNotificactionsEntry = <div> </div>;
   if (notifications.length === 0) {
     noNotificactionsEntry = (
-      <div className="no-ships-entry">
-        {" "}
-        Currently there are no notifications{" "}
-      </div>
+      <div className="no-ships-entry"> No notifications </div>
     );
   }
 

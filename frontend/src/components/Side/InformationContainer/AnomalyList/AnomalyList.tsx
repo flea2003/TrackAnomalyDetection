@@ -48,9 +48,7 @@ function AnomalyList({
 
   let noShipsEntry = <div> </div>;
   if (listEntries.length === 0) {
-    noShipsEntry = (
-      <div className="no-ships-entry"> Currently there are no ships </div>
-    );
+    noShipsEntry = <div className="no-ships-entry"> No ships </div>;
   }
 
   return (

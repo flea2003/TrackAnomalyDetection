@@ -11,6 +11,8 @@
 
     cursor: pointer;
     background: var(--background);
+
+    overflow-x: hidden;
 }
 
 .notification-list-entry-read {

@@ -1,5 +1,5 @@
 #anomaly-list-container {
-    width: 17%;
+    width: 15%;
     height: 60%;
 
     display: flex;
@@ -75,13 +75,6 @@
     width: 20px;
 }
 
-.no-ships {
-    border-bottom: var(--border);
-    text-align: center;
-    font-weight: bold;
-    font-size: 0.7em;
-}
-
 .no-ships-entry {
     font-size: 0.8em;
     margin-top: 2.5px;
@@ -89,4 +82,9 @@
     border-top: 1px solid black;
     width: 95%;
     text-align: center;
+}
+
+.threshold-div {
+    width: 20px;
+    text-align: left;
 }
