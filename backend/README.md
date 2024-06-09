@@ -42,6 +42,12 @@ When successful, the message `{"id" : "ship-details"}` will be printed in the te
 
 After creating the supervisor, you can proceed to run the other parts of the systems. Be sure that Druid doesn't have any open past connections with the backend before starting it. You can check it by checking the `Tasks` tab in the [web console](http://localhost:8888/).
 
+Note: It is enough to run this configuration command only once. Even after closing the database and opening it again, it will continue to ingest data from the same topic.
+
+Also, the consumed data is deeply stored(stored on the disk) every hour with the current configuration, so if a crash happens, at most one hour of ship data will be lost from the database.
+
+It is worth noting that Druid reads the data from the topic by considering its offset. In other words, if the topic is deleted and the details are re-written from the offset `0`, Druid will simply overwrite the processed ship details.
+
 #### Resetting Druid
 
 After the termination of the backend, one has to kill the connection between the database and the backend process. This can be done as mentioned above, in the web console by checking out the `Tasks` tab.
@@ -60,12 +66,6 @@ Where `id` is the identifier of the supervisor that you want to terminate. Note 
 The data is persistently stored on disk in the structure of so-called segments. You can delete them through the [web console](http://localhost:8888/unified-console.html#segments).
 
 You can find a more extensive list of supervisors' API at on the official [website](https://druid.apache.org/docs/latest/api-reference/supervisor-api/).
-
-Note: It is enough to run this configuration command only once. Even after closing the database and opening it again, it will continue to ingest data from the same topic.
-
-Also, the consumed data is deeply stored(stored on the disk) every hour with the current configuration, so if a crash happens, at most one hour of ship data will be lost from the database.
-
-It is worth noting that Druid reads the data from the topic by considering its offset. In other words, if the topic is deleted and the details are re-written from the offset `0`, Druid will simply overwrite the processed ship details.
 
 ### Kafka
 
