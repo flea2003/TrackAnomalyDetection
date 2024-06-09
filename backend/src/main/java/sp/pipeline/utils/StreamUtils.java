@@ -11,8 +11,8 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.pipeline.PipelineConfiguration;
-import sp.pipeline.utils.json.MyJsonDeserializationSchema;
-import sp.pipeline.utils.json.MyJsonSerializationSchema;
+import sp.pipeline.utils.json.SoftJsonDeserializationSchema;
+import sp.pipeline.utils.json.SoftJsonSerializationSchema;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public class StreamUtils {
     public <T> KafkaSource<T> getFlinkStreamConsumingFromKafka(String topic, Class<T> classType) {
         // Load the properties of Kafka from the configuration file
         Properties props = configuration.getFullConfiguration();
-        JsonDeserializationSchema<T> jsonFormat = new MyJsonDeserializationSchema<>(classType);
+        JsonDeserializationSchema<T> jsonFormat = new SoftJsonDeserializationSchema<>(classType);
 
         return KafkaSource.<T>builder()
                 .setProperties(props)
@@ -61,7 +61,7 @@ public class StreamUtils {
      * @return the created KafkaSink object
      */
     public <T> KafkaSink<T> createSinkFlinkToKafka(String topicName) {
-        MyJsonSerializationSchema<T> jsonFormat = new MyJsonSerializationSchema<>();
+        SoftJsonSerializationSchema<T> jsonFormat = new SoftJsonSerializationSchema<>();
         return KafkaSink.<T>builder()
                 .setBootstrapServers(configuration.getKafkaServerAddress())
                 .setRecordSerializer(KafkaRecordSerializationSchema.builder()

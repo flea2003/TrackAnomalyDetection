@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class NotificationExtractor extends GenericKafkaExtractor {
 
-    private ConcurrentHashMap<Long, Notification> state = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Notification> state = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(NotificationExtractor.class);
 
     /**
@@ -29,7 +29,8 @@ public class NotificationExtractor extends GenericKafkaExtractor {
      */
     @Autowired
     public NotificationExtractor(StreamUtils streamUtils, PipelineConfiguration configuration) {
-        super(streamUtils, configuration, 1000000 - 1, configuration.getNotificationsTopicName()); // poll every ~1ms
+        super(streamUtils, configuration, configuration.getPollingFrequencyForNotifications(),
+                configuration.getNotificationsTopicName());
     }
 
     /**

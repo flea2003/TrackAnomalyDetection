@@ -7,10 +7,8 @@ import org.junit.jupiter.api.Test;
 import sp.dtos.ExternalAISSignal;
 import sp.exceptions.NotExistingShipException;
 import sp.exceptions.NotificationNotFoundException;
-import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.Notification;
-import sp.pipeline.utils.binarization.SerializationMapper;
 import sp.pipeline.utils.json.JsonMapper;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -21,7 +19,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 public class FullPipelineTest extends GenericPipelineTest {
 
@@ -89,7 +86,7 @@ public class FullPipelineTest extends GenericPipelineTest {
     void testFetchingFromService(ExternalAISSignal sentSignal) throws Exception {
 
         // Get the details of all ships
-        List<CurrentShipDetails> allDetails = shipsDataService.getCurrentShipDetails();
+        List<CurrentShipDetails> allDetails = shipsDataService.getCurrentShipDetailsOfAllShips();
         assertThat(allDetails.size()).isEqualTo(1);
 
         CurrentShipDetails details = allDetails.get(0);
@@ -132,7 +129,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         Thread.sleep(10000);
 
         // Make sure that after this, the there still is only 1 ship
-        assertThat(shipsDataService.getCurrentShipDetails().size()).isEqualTo(1);
+        assertThat(shipsDataService.getCurrentShipDetailsOfAllShips().size()).isEqualTo(1);
 
         // Send some new proper signals to the raw ships topic (to make sure the pipeline is still working)
         ExternalAISSignal fakeSignal = new ExternalAISSignal("newProducer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
@@ -142,7 +139,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         Thread.sleep(10000);
 
         // Make sure that after this, the there still are now 2 ships (i.e., the pipeline has not crashed)
-        assertThat(shipsDataService.getCurrentShipDetails().size()).isEqualTo(2);
+        assertThat(shipsDataService.getCurrentShipDetailsOfAllShips().size()).isEqualTo(2);
 
     }
 
@@ -190,7 +187,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         Thread.sleep(10000);
 
         // Get the details
-        List<CurrentShipDetails> details = shipsDataService.getCurrentShipDetails();
+        List<CurrentShipDetails> details = shipsDataService.getCurrentShipDetailsOfAllShips();
 
         // Extract the ships
         assertThat(details.size()).isEqualTo(2);

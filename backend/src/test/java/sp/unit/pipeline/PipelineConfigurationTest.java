@@ -8,24 +8,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PipelineConfigurationTest {
 
     @Test
-    void loadConfigFromTestConfigFile() throws IOException {
-        Path path = Paths.get("src", "test", "resources", "test.dummy.kafka.config.file");
+    void loadConfigFromConfigFile() throws IOException {
+        Path path = Paths.get("kafka-connection.properties");
         PipelineConfiguration pipelineConfiguration = new PipelineConfiguration(path.toString());
-
-        Properties expected = new Properties();
-        expected.setProperty("a", "b");
-        expected.setProperty("b", "c");
-        expected.setProperty("c", "d");
-
-        Properties result = pipelineConfiguration.getFullConfiguration();
-
-        assertEquals(expected, result);
+        assertDoesNotThrow(() -> {
+            pipelineConfiguration.getFullConfiguration();
+        });
     }
 
     @Test

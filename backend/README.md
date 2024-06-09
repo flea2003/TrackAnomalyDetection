@@ -132,7 +132,6 @@ bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-history --bootstrap-server localhost:9092
-
 ```
 
 Sometimes Kafka might not start if the logs of Zookeeper and the Kafka server are not cleared. Assuming that `/tmp/kafka-logs` and `/tmp/zoekeeper` are the locations of the logs, run the following commands to delete them:

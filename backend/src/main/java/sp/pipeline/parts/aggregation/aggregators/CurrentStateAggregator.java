@@ -14,7 +14,7 @@ public class CurrentStateAggregator extends RichMapFunction<ShipInformation, Cur
     private ValueState<CurrentShipDetails> aggregatedShipDetailsState;
 
     /**
-     * Aggregates data to a resulting map.
+     * Aggregates data to a single object that encapsulates the current state of a ship.
      *
      * @param shipInformation object that stores the latest received data for a ship
      * @return an updated current ship details for the ship

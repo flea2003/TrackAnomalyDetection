@@ -5,6 +5,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMap
 import org.apache.flink.util.function.SerializableSupplier;
 import org.apache.flink.util.jackson.JacksonMapperFactory;
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * This class is a slightly modified version of the JsonDeserializationSchema class from the
@@ -12,8 +13,9 @@ import java.io.IOException;
  * that it ignores all exceptions that occur during deserialization and returns null instead of
  * throwing an exception.
  */
-public class MyJsonDeserializationSchema<T> extends JsonDeserializationSchema<T> {
+public class SoftJsonDeserializationSchema<T> extends JsonDeserializationSchema<T> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Class<T> clazz;
@@ -25,7 +27,7 @@ public class MyJsonDeserializationSchema<T> extends JsonDeserializationSchema<T>
      *
      * @param clazz The class to which the JSON string is deserialized.
      */
-    public MyJsonDeserializationSchema(Class<T> clazz) {
+    public SoftJsonDeserializationSchema(Class<T> clazz) {
         this(clazz, JacksonMapperFactory::createObjectMapper);
     }
 
@@ -35,7 +37,7 @@ public class MyJsonDeserializationSchema<T> extends JsonDeserializationSchema<T>
      * @param clazz The class to which the JSON string is deserialized.
      * @param mapperFactory A factory for creating ObjectMapper instances
      */
-    public MyJsonDeserializationSchema(
+    public SoftJsonDeserializationSchema(
             Class<T> clazz, SerializableSupplier<ObjectMapper> mapperFactory) {
         super(clazz);
         this.clazz = clazz;

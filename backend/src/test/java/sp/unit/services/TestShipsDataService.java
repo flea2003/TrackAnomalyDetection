@@ -143,7 +143,7 @@ public class TestShipsDataService {
     @Test
     void getAllCurrentShipDetails(){
         try {
-            assertThat(shipsDataService.getCurrentShipDetails()).containsExactlyElementsOf(List.of(currentShipDetails1,
+            assertThat(shipsDataService.getCurrentShipDetailsOfAllShips()).containsExactlyElementsOf(List.of(currentShipDetails1,
                 currentShipDetails2, currentShipDetails3, currentShipDetails4));
         } catch (Exception e){
             fail("Exception thrown but not expected");
@@ -152,7 +152,7 @@ public class TestShipsDataService {
 
     @Test
     void getCurrentShipDetailsTest() {
-        List<CurrentShipDetails> result = shipsDataService.getCurrentShipDetails();
+        List<CurrentShipDetails> result = shipsDataService.getCurrentShipDetailsOfAllShips();
         assertThat(result).containsExactly(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
     }
 

@@ -61,7 +61,7 @@ public class ShipsDataService {
      *
      * @return the CurrentShipDetails instances corresponding to all ships
      */
-    public List<CurrentShipDetails> getCurrentShipDetails() {
+    public List<CurrentShipDetails> getCurrentShipDetailsOfAllShips() {
         OffsetDateTime currentTime = OffsetDateTime.now();
         HashMap<Long, CurrentShipDetails> shipsInfo = shipInformationExtractor.getFilteredShipDetails(
                 x -> x.getCurrentAISSignal() != null

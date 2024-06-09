@@ -52,7 +52,7 @@ public class ShipsDataController {
      */
     @GetMapping("/ships/details")
     public ResponseEntity<List<CurrentShipDetails>> getCurrentShipDetails() {
-        return ResponseEntity.ok(this.shipsDataService.getCurrentShipDetails());
+        return ResponseEntity.ok(this.shipsDataService.getCurrentShipDetailsOfAllShips());
     }
 
     /**

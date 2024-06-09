@@ -78,7 +78,7 @@ class ShipsDataControllerTest {
         CurrentShipDetails details1 = new CurrentShipDetails(info1, null, null);
         CurrentShipDetails details2 = new CurrentShipDetails(info2, null, null);
         CurrentShipDetails details3 = new CurrentShipDetails(info3, null, null);
-        when(shipsDataService.getCurrentShipDetails())
+        when(shipsDataService.getCurrentShipDetailsOfAllShips())
                 .thenReturn(List.of(details1, details2, details3));
 
         ResponseEntity<List<CurrentShipDetails>> response = shipsDataController.getCurrentShipDetails();

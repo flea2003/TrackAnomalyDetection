@@ -58,7 +58,9 @@ public abstract class GenericKafkaExtractor {
             consumer.subscribe(List.of(topic));
 
             // Create a thread pool to handle the incoming messages
-            final ExecutorService executor = Executors.newFixedThreadPool(20);
+            final ExecutorService executor = Executors.newFixedThreadPool(
+                    configuration.getExtractorThreadPoolSize()
+            );
 
             // Busy poll the Kafka topic. If new message has arrived, process it in a separate thread
             while (true) {

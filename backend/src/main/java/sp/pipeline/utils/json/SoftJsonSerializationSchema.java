@@ -6,6 +6,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.datatype.jsr310.Ja
 import org.apache.flink.util.function.SerializableSupplier;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.Serial;
 
 /**
  * This class is a very slightly modified version of the JsonSerializationSchema class from the
@@ -15,8 +16,9 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMap
  */
 
 @SuppressWarnings("PMD")
-public class MyJsonSerializationSchema<T> implements SerializationSchema<T> {
+public class SoftJsonSerializationSchema<T> implements SerializationSchema<T> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final SerializableSupplier<ObjectMapper> mapperFactory;
@@ -26,7 +28,7 @@ public class MyJsonSerializationSchema<T> implements SerializationSchema<T> {
     /**
      * Creates a JSON serialization schema for the given class.
      */
-    public MyJsonSerializationSchema() {
+    public SoftJsonSerializationSchema() {
         this(() -> new ObjectMapper().registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
     }
@@ -36,7 +38,7 @@ public class MyJsonSerializationSchema<T> implements SerializationSchema<T> {
      *
      * @param mapperFactory A factory for creating {@link ObjectMapper} instances
      */
-    public MyJsonSerializationSchema(SerializableSupplier<ObjectMapper> mapperFactory) {
+    public SoftJsonSerializationSchema(SerializableSupplier<ObjectMapper> mapperFactory) {
         this.mapperFactory = mapperFactory;
     }
 
