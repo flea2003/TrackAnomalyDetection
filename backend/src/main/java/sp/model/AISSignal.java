@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.*;
 import sp.dtos.ExternalAISSignal;
 import java.io.Serializable;
 import java.time.OffsetDateTime;

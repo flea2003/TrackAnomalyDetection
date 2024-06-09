@@ -79,11 +79,9 @@ configurations {
 }
 
 dependencies {
-	testImplementation group: 'org.apache.kafka', name: 'kafka-streams-test-utils', version: "${kafkaVersion}"
 
 	implementation 'io.r2dbc:r2dbc-spi:0.9.0.RELEASE' // Check for the latest version
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation "org.apache.kafka:kafka-streams:${kafkaVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -114,6 +112,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 	testCompileOnly 'org.projectlombok:lombok:1.18.32'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+	implementation "org.apache.flink:flink-json:${flinkVersion}"
 
 	// Flink test utils
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
@@ -127,6 +126,7 @@ dependencies {
 	implementation group: 'com.giladam', name: 'kafka-jackson-serde', version: '1.0.0'
 
 	// For JPA:
+	implementation group: 'org.apache.calcite.avatica', name: 'avatica-core', version: '1.25.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.h2database:h2'
 
@@ -136,10 +136,11 @@ dependencies {
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"
 	testImplementation "org.apache.flink:flink-runtime:${flinkVersion}:tests"
 
-	testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
-	testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
-
 	testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.12.0'
+	testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
+
+	// Some JSON Utils
+	implementation group: 'com.google.code.gson', name: 'gson', version: '2.11.0'
 }
 
 // For Flink
