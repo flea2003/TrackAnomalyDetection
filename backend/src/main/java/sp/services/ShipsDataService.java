@@ -76,14 +76,9 @@ public class ShipsDataService {
      *
      * @param id the id of the ship on which we will query our data
      * @return the list of the retrieved details
-     * @throws PipelineException in case the query doesn't succeed
+     * @throws DatabaseException in case the query doesn't succeed
      */
     public List<CurrentShipDetails> getHistoryOfShip(long id) throws DatabaseException {
-        try {
-            return queryExecutor.executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DatabaseException("The database query failed.");
-        }
+        return queryExecutor.executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
     }
 }

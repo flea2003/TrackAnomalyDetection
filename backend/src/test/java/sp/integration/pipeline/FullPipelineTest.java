@@ -49,7 +49,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         ExternalAISSignal fakeSignal = new ExternalAISSignal("producer", "hash", 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, java.time.OffsetDateTime.now(ZoneId.of("Z")), "port");
         produceToTopic(rawAISTopic, List.of(JsonMapper.toJson(fakeSignal)));
 
-        // Wait 3 seconds for the data to be processed
+        // Wait 10 seconds for the data to be processed
         Thread.sleep(10000);
 
         testSignalIDAssignment(fakeSignal);
@@ -129,7 +129,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         produceToTopic(identifiedAISTopic, messages);
         produceToTopic(scoresTopic, messages);
 
-        // Wait for 5 seconds to be fully sure
+        // Wait for 10 seconds to be fully sure
         Thread.sleep(10000);
 
         // Make sure that after this, the pipeline has not crashed and there still is only 1 ship
@@ -182,7 +182,7 @@ public class FullPipelineTest extends GenericPipelineTest {
         // Send the ship signals
         produceToTopic(rawAISTopic, messages);
 
-        // Wait 5 seconds to make sure they pass through
+        // Wait 10 seconds to make sure they pass through
         Thread.sleep(10000);
 
         // Get the details

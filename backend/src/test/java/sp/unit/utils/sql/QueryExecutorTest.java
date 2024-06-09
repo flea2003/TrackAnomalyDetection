@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import sp.exceptions.DatabaseException;
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.utils.DruidConfig;
@@ -82,7 +84,7 @@ public class QueryExecutorTest {
     }
 
     @Test
-    void testQueryExtractor() throws SQLException{
+    void testQueryExtractor() throws SQLException, DatabaseException{
         try(MockedStatic<FileReader>mockedFileReader = mockStatic(FileReader.class)) {
             mockedFileReader.when(() -> FileReader.readQueryFromFile("path"))
                 .thenReturn("SELECT *");
@@ -92,10 +94,22 @@ public class QueryExecutorTest {
                     .thenReturn(List.of(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4));
 
                 assertThat(queryExecutor.executeQueryOneLong(5, "path", CurrentShipDetails.class))
-                    .containsExactlyInAnyOrder(currentShipDetails1, currentShipDetails2, currentShipDetails3, currentShipDetails4);
+                    .containsExactlyInAnyOrder(currentShipDetails1, currentShipDetails2,
+                        currentShipDetails3, currentShipDetails4);
 
                 verify(preparedStatement, times(1)).setLong(1, 5);
             }
+        }
+    }
+
+    @Test
+    void testIOException(){
+        try(MockedStatic<FileReader>mockedFileReader = mockStatic(FileReader.class)) {
+            mockedFileReader.when(() -> FileReader.readQueryFromFile(any()))
+                .thenThrow(IOException.class);
+
+            assertThatThrownBy(() -> queryExecutor.executeQueryOneLong(5, "path", CurrentShipDetails.class))
+                .isInstanceOf(DatabaseException.class).hasMessage("Error reading the query from the file at path.");
         }
     }
 
@@ -110,8 +124,9 @@ public class QueryExecutorTest {
                     .thenThrow(SQLException.class);
 
                 assertThatThrownBy(() -> queryExecutor.executeQueryOneLong(5, "path", CurrentShipDetails.class))
-                    .isInstanceOf(SQLException.class);
+                    .isInstanceOf(DatabaseException.class).hasMessage("Error executing the query.");
             }
         }
     }
+
 }

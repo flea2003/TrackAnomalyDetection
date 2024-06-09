@@ -1,5 +1,6 @@
 package sp.unit.services;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -120,7 +121,7 @@ public class TestShipsDataService {
 
         QueryExecutor queryExecutorBroken = mock(QueryExecutor.class);
 
-        doThrow(SQLException.class).when(queryExecutorBroken)
+        doThrow(DatabaseException.class).when(queryExecutorBroken)
                 .executeQueryOneLong(5, "src/main/resources/db/history.sql", CurrentShipDetails.class);
 
         shipsDataServiceBroken = new ShipsDataService(anomalyDetectionPipelineBroken, queryExecutorBroken);
@@ -225,14 +226,16 @@ public class TestShipsDataService {
 
     @Test
     void getHistoryOfShipException(){
-        assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
+        assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L))
+            .isInstanceOf(DatabaseException.class);
     }
 
     @Test
     void getHistoryOfShipSQLNotFound(){
         try(MockedStatic<FileReader> fileReader = mockStatic(FileReader.class)) {
-            fileReader.when(() -> FileReader.readQueryFromFile(anyString())).thenThrow(SQLException.class);
-            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L)).isInstanceOf(DatabaseException.class);
+            fileReader.when(() -> FileReader.readQueryFromFile(anyString())).thenThrow(IOException.class);
+            assertThatThrownBy(() -> shipsDataServiceBroken.getHistoryOfShip(5L))
+                .isInstanceOf(DatabaseException.class);
         }
     }
 

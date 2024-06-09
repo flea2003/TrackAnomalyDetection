@@ -117,7 +117,7 @@ class ResultSetReaderTest {
         try(MockedStatic<JsonMapper>jsonMapper = mockStatic(JsonMapper.class)){
             jsonMapper.when(() -> JsonMapper.fromJson(any(), any())).thenThrow(JsonProcessingException.class);
             assertThatThrownBy(() -> extractQueryResults(resultSet, CurrentShipDetails.class))
-                .isInstanceOf(SQLException.class);
+                .isInstanceOf(SQLException.class).hasMessage("JSON conversion exception.");
         }
     }
 
