@@ -53,7 +53,7 @@ function ObjectDetails({
         <Stack className="object-details-title">Ship #{ship.id}</Stack>
         <p
           className="object-anomaly-score"
-          style={{ color: calculateAnomalyColor(ship.anomalyScore) }}
+          style={{ color: calculateAnomalyColor(ship.anomalyScore, true) }}
         >
           {" "}
           {ship.anomalyScore}%

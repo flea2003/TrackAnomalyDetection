@@ -38,6 +38,7 @@ function ErrorList({ pageChanger }: ErrorListProps) {
         <img
           src={markAll}
           id="error-list-mark-all-button"
+          title="Mark all as read"
           data-testid="error-list-mark-all-button"
           onClick={() => ErrorNotificationService.markAllAsRead()}
           alt="Mark All"

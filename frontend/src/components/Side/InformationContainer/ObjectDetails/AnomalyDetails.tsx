@@ -56,7 +56,7 @@ function getExplanationList(str: string) {
   if (str === "") {
     return (
       <ul className="anomaly-details-entry-value">
-        <li key={0}>No anomalous behaviour registered</li>
+        <li key={0}>No anomalous behaviour registered.</li>
       </ul>
     );
   }
@@ -79,7 +79,7 @@ function getMaximumAnomalyInfoList(ship: ShipDetails) {
   if (ship.explanation === "") {
     return (
       <ul className="anomaly-details-entry-value">
-        <li key={0}>No anomalous behaviour registered</li>
+        <li key={0}>No anomalous behaviour registered.</li>
       </ul>
     );
   }
@@ -103,7 +103,7 @@ function getAnomalyScore(ship: ShipDetails) {
   if (ship.anomalyScore === undefined || ship.anomalyScore === -1) {
     return (
       <ul className="anomaly-details-entry-value">
-        <li key={0}>No anomalous behaviour registered</li>
+        <li key={0}>No anomalous behaviour registered.</li>
       </ul>
     );
   }

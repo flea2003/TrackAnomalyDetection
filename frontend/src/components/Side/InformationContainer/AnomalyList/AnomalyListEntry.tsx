@@ -32,7 +32,7 @@ function AnomalyListEntry({
 
   const shipAnomalyScore = shipDetails.anomalyScore;
   const shipId = shipDetails.id % 1000;
-  const color = calculateAnomalyColor(shipAnomalyScore);
+  const color = calculateAnomalyColor(shipAnomalyScore, false);
 
   const onClick = () => {
     pageChanger({ currentPage: "objectDetails", shownItemId: shipDetails.id });

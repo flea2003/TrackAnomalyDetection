@@ -59,7 +59,7 @@ function Side({
           setFilterThreshold={setFilterThreshold}
           anomalyThreshold={anomalyThreshold}
         />
-        <Sidebar pageChanger={pageChanger} />
+        <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
       </Stack>
     </>
   );

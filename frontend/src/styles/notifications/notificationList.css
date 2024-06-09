@@ -6,7 +6,7 @@
 
     border: var(--border);
     height: 60%;
-    width: 13%;
+    width: 15%;
 
     pointer-events: all;
     background: var(--background);
@@ -59,13 +59,4 @@
 
 #notification-list-mark-all-button:hover {
     content: url("../../assets/icons/helper-icons/mark-all-green.png");
-}
-
-.no-notifications {
-    margin-top: 10px;
-    font-size: 0.7em;
-    font-weight: bold;
-    border: 1px black solid;
-    width: 95%;
-    text-align: center;
 }

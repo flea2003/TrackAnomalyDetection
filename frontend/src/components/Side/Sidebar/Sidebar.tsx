@@ -3,7 +3,7 @@ import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../App";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
 import shipIcon from "../../../assets/icons/anomaly-list/ship.png";
-import bellIconNotRead from "../../../assets/icons/regular-notifications/notificaation_bell_orange.png";
+import bellIconNotRead from "../../../assets/icons/regular-notifications/notification_bell_orange.png";
 import bellIconRead from "../../../assets/icons/regular-notifications/notification_bell.svg";
 import settingsIcon from "../../../assets/icons/helper-icons/settings.svg";
 import bugIcon from "../../../assets/icons/error-notifications/bug.svg";
@@ -21,6 +21,7 @@ import "../../../styles/sidebar.css";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
+  currentPage: CurrentPage;
 }
 
 /**
@@ -28,8 +29,9 @@ interface SidebarProps {
  * for future functionality.
  *
  * @param pageChanger function that, when called, changes the page displayed in the second column.
+ * @param currentPage current page that is being displayed
  */
-function Sidebar({ pageChanger }: SidebarProps) {
+function Sidebar({ pageChanger, currentPage }: SidebarProps) {
   // Load the icons
 
   const shipIconAlt = "Ship Icon";
@@ -69,7 +71,6 @@ function Sidebar({ pageChanger }: SidebarProps) {
     setDisplayedSettings(false);
     setDisplayedBugs((x) => !x);
   };
-
   // Define the click handlers for the icons
   const onShipIconClicked = () => {
     pageChanger({ currentPage: "anomalyList", shownItemId: -1 });
@@ -90,6 +91,20 @@ function Sidebar({ pageChanger }: SidebarProps) {
     pageChanger({ currentPage: "errors", shownItemId: -1 });
     changeBugsIcon();
   };
+
+  if (currentPage.currentPage === "none") {
+    if (
+      displayedBugs ||
+      displayedSettings ||
+      displayedNotifications ||
+      displayedAnomalyList
+    ) {
+      setDisplayedAnomalyList(false);
+      setDisplayedNotifications(false);
+      setDisplayedSettings(false);
+      setDisplayedBugs(false);
+    }
+  }
 
   return (
     <Stack id="sidebar" data-testid="sidebar">

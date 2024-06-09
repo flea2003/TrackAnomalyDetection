@@ -46,11 +46,13 @@ function NotificationList({
     />
   );
 
-
-  let noNotificactionsEntry = (<div> </div>);
+  let noNotificactionsEntry = <div> </div>;
   if (notifications.length === 0) {
     noNotificactionsEntry = (
-      <div className="no-ships-entry"> Currently there are no notifications </div>
+      <div className="no-ships-entry">
+        {" "}
+        Currently there are no notifications{" "}
+      </div>
     );
   }
 
@@ -66,6 +68,7 @@ function NotificationList({
         <img
           src={markAll}
           id="notification-list-mark-all-button"
+          title="Mark all as read"
           onClick={() => {
             NotificationService.queryBackendToMarkAllNotificationsAsRead(
               notifications,
@@ -76,13 +79,14 @@ function NotificationList({
       </Stack>
       {notifications.length !== 0 ? (
         <NotificationListWithoutTitle
-        notifications={notifications}
-        ships={ships}
-        pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-      />
-      ) : noNotificactionsEntry}
-
+          notifications={notifications}
+          ships={ships}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+        />
+      ) : (
+        noNotificactionsEntry
+      )}
     </Stack>
   );
 }
