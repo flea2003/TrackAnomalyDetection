@@ -26,7 +26,7 @@ One can start Druid by running the following command in the terminal:
 In WSL, when trying to run Druid you can get a ``CANNOT CREATE FIFO`` error. This is due to the fact that FIFO file can't be created over mounted drive
 (`/mnt/c`, for example). An easy solution to this is copying the entire Druid installation folder to any internal folder (`/usr/share`, for example).
 
-In order to further explore Druid you can access the application console available at [http://localhost:8888](http://localhost:8888).
+In order to further explore Druid you can access the application web console available at [http://localhost:8888](http://localhost:8888).
 
 The configuration file for the database is located in the folder `backend/src/main/resources/ship-scores-kafka-supervisor.json`.
 
@@ -38,11 +38,13 @@ curl -X POST -H 'Content-Type: application/json' -d @backend/src/main/resources/
 
 This will create a configuration where ship data is retrieved from a Kafka topic called `ship-details` located at `localhost:9092`. This configuration will create a so-called supervisor.
 
-When successful, the message `{"id" : "ship-details"}` will be printed in the terminal. In addition, there will be a supervisor named `ship-details` added to the [console](http://localhost:8888/unified-console.html#supervisors).
+When successful, the message `{"id" : "ship-details"}` will be printed in the terminal. In addition, there will be a supervisor named `ship-details` added to the [web console](http://localhost:8888/unified-console.html#supervisors).
+
+After creating the supervisor, you can proceed to run the other parts of the systems. Be sure that Druid doesn't have any open past connections with the backend before starting it. You can check it by checking the `Tasks` tab in the [web console](http://localhost:8888/).
 
 #### Resetting Druid
 
-After the termination of the backend, one has to kill the connection between the database and the backend process. This can be done throught the console in the Tasks tab.
+After the termination of the backend, one has to kill the connection between the database and the backend process. This can be done as mentioned above, in the web console by checking out the `Tasks` tab.
 
 After finishing the execution of the system, one might want to delete the configuration file from the database.
 
@@ -55,7 +57,7 @@ After identifying the id of the supervisor that you want to terminate, you can r
 curl --request POST "http://localhost:8888/druid/indexer/v1/supervisor/id/terminate"
 ```
 Where `id` is the identifier of the supervisor that you want to terminate. Note that the terminated supervisors still exist in the metadata store and their history can be retrieved.
-The data is persistently stored on disk in the structure of so-called segments. You can delete them through the [console](http://localhost:8888/unified-console.html#segments).
+The data is persistently stored on disk in the structure of so-called segments. You can delete them through the [web console](http://localhost:8888/unified-console.html#segments).
 
 You can find a more extensive list of supervisors' API at on the official [website](https://druid.apache.org/docs/latest/api-reference/supervisor-api/).
 
@@ -77,7 +79,8 @@ If you use Windows, then WSL will have to be used to run Kafka. There are instru
 
 Afterwards, start 3 bash terminals. Locate to the kafka folder in each of the terminals.
 
-Note: if you have managed to start the Druid database, you can omit this step.
+Note: if you have managed to start the Druid database, you might be able to omit the first step.
+
 In the first one, run the following command to start the Zookeeper server:
 ```bash
 bin/zookeeper-server-start.sh config/zookeeper.properties
@@ -139,7 +142,7 @@ bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:
 bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
 ```
-In addition, you have to reset the database by following the steps mentioned above in the Resetting Druid section.
+In addition, you have to reset the database by following the steps mentioned above in the `Resetting Druid` section.
 
 Sometimes Kafka might not start if the logs of Zookeeper and the Kafka server are not cleared. Assuming that `/tmp/kafka-logs` and `/tmp/zoekeeper` are the locations of the logs, run the following commands to delete them:
 ```bash
