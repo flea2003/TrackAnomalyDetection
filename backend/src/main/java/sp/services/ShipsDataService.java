@@ -1,6 +1,5 @@
 package sp.services;
 
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -42,11 +42,18 @@ public class QueryExecutor {
             try (ResultSet resultSet = statement.executeQuery()) {
                 return ResultSetReader.extractQueryResults(resultSet, tclass);
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             throw new DatabaseException("Error executing the query.");
         }
     }
 
+    /**
+     * Calls the FileReader and deals with the exception handling.
+     *
+     * @param path the path where the query is located
+     * @return the fetched String
+     * @throws DatabaseException in case something went wrong in the FileReader
+     */
     private String fetchQuery(String path) throws DatabaseException {
         try {
             return FileReader.readQueryFromFile(path);

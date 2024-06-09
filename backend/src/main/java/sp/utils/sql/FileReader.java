@@ -2,9 +2,7 @@ package sp.utils.sql;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.sql.SQLException;
 import org.springframework.stereotype.Service;
-import sp.exceptions.DatabaseException;
 
 @Service
 public class FileReader {
