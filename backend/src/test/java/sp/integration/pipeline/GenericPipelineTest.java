@@ -16,15 +16,15 @@ import sp.pipeline.AnomalyDetectionPipeline;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
+import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
+import sp.pipeline.parts.notifications.NotificationExtractor;
 import sp.pipeline.parts.notifications.NotificationsAggregator;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
-import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
-import sp.repositories.NotificationRepository;
 import sp.services.NotificationService;
 import sp.services.ShipsDataService;
 import java.io.IOException;
@@ -32,9 +32,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import sp.utils.sql.QueryExecutor;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 
 /**
  * The following class contains methods for running an integration test.
@@ -53,14 +50,12 @@ class GenericPipelineTest {
     private StreamExecutionEnvironment env;
 
     // Items to be inherited by children
-    protected NotificationRepository notificationRepository;
     protected NotificationService notificationService;
     protected String rawAISTopic;
-    protected String identifiedAISTopic;
-    protected String scoresTopic;
+    protected String currentShipDetailsTopic;
+    protected String notificationsTopic;
     protected AnomalyDetectionPipeline anomalyDetectionPipeline;
     protected ShipsDataService shipsDataService;
-    protected WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
 
     /**
@@ -83,12 +78,12 @@ class GenericPipelineTest {
 
         // Set the topic names to something a bit random as well so that tests do not clash
         config.updateConfiguration("incoming.ais-raw.topic.name", "ships-raw-AIS" + "-" + randomUUID);
-        config.updateConfiguration("incoming.ais.topic.name", "ships-AIS" + "-" + randomUUID);
-        config.updateConfiguration("calculated.scores.topic.name", "ships-scores" + "-" + randomUUID);
+        config.updateConfiguration("kafka.ships-history.name", "ships-history" + "-" + randomUUID);
+        config.updateConfiguration("notifications.topic.name", "notifications-" + "-" + randomUUID);
 
         rawAISTopic = config.getRawIncomingAisTopicName();
-        identifiedAISTopic = config.getIncomingAisTopicName();
-        scoresTopic = config.getCalculatedScoresTopicName();
+        notificationsTopic = config.getNotificationsTopicName();
+        currentShipDetailsTopic = config.getShipsHistoryTopicName();
     }
 
     /**
@@ -102,7 +97,7 @@ class GenericPipelineTest {
         loadConfigFile();
 
         // Setup embedded kafka
-        embeddedKafka = new EmbeddedKafkaZKBroker(1, true, 1, rawAISTopic, identifiedAISTopic, scoresTopic);
+        embeddedKafka = new EmbeddedKafkaZKBroker(1, true, 1, rawAISTopic, currentShipDetailsTopic, notificationsTopic);
         embeddedKafka.kafkaPorts(kafkaPort);
         embeddedKafka.zkPort(zkPort);
 
@@ -111,7 +106,7 @@ class GenericPipelineTest {
 
     @AfterEach
     void tearDown() throws Exception {
-        embeddedKafka.doWithAdmin(x -> x.deleteTopics(List.of(rawAISTopic, identifiedAISTopic, scoresTopic)));
+        embeddedKafka.doWithAdmin(x -> x.deleteTopics(List.of(rawAISTopic, rawAISTopic, currentShipDetailsTopic)));
         embeddedKafka.destroy();
         env.close();
     }
@@ -133,38 +128,41 @@ class GenericPipelineTest {
         ScoreCalculationStrategy scoreCalculationStrategy;
         CurrentStateAggregator currentStateAggregator;
         NotificationsAggregator notificationsAggregator;
+        NotificationExtractor notificationExtractor;
+        ShipInformationExtractor shipInformationExtractor;
+        QueryExecutor queryExecutor;
         StreamUtils streamUtils;
-
-        // Mock the notification service class (to mock the DB)
-        notificationRepository = mock(NotificationRepository.class);
-        notificationService = spy(new NotificationService(notificationRepository));
-
-        // Mock the WebSocket broadcaster builder class
-        webSocketBroadcasterBuilder = mock(WebSocketBroadcasterBuilder.class);
 
         // Create the core objects
         scoreCalculationStrategy = new SimpleScoreCalculator();
         currentStateAggregator = new CurrentStateAggregator();
-        notificationsAggregator = new NotificationsAggregator(notificationService);
+        notificationsAggregator = new NotificationsAggregator();
 
         // Create the pipeline builders
         streamUtils = new StreamUtils(config);
         idAssignmentBuilder = new IdAssignmentBuilder(streamUtils, config);
-        scoreCalculationBuilder = new ScoreCalculationBuilder(streamUtils, config, scoreCalculationStrategy);
-        scoreAggregationBuilder = new ScoreAggregationBuilder(config, currentStateAggregator);
-        notificationsDetectionBuilder = new NotificationsDetectionBuilder(notificationsAggregator);
+        scoreCalculationBuilder = new ScoreCalculationBuilder(scoreCalculationStrategy);
+        scoreAggregationBuilder = new ScoreAggregationBuilder(config, currentStateAggregator, streamUtils);
+        notificationsDetectionBuilder = new NotificationsDetectionBuilder(notificationsAggregator, streamUtils, config);
 
         // Create the pipeline itself
         anomalyDetectionPipeline = new AnomalyDetectionPipeline(
-                streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder,
-                env, webSocketBroadcasterBuilder
+                idAssignmentBuilder,
+                scoreCalculationBuilder,
+                scoreAggregationBuilder,
+                notificationsDetectionBuilder,
+                env
         );
 
+        // Set up the notification servicce
+        notificationExtractor = new NotificationExtractor(streamUtils, config);
+        notificationService = new NotificationService(notificationExtractor);
+
+        queryExecutor = Mockito.mock(QueryExecutor.class);
+        shipInformationExtractor = new ShipInformationExtractor(streamUtils, config);
+
         // Instantiate Service classes for querying
-
-        QueryExecutor queryExecutor = Mockito.mock(QueryExecutor.class);
-
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor, shipInformationExtractor);
     }
 
     /**

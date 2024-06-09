@@ -1,7 +1,6 @@
 package sp.pipeline.parts.identification;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -11,8 +10,6 @@ import sp.dtos.ExternalAISSignal;
 import sp.model.AISSignal;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.utils.StreamUtils;
-import sp.pipeline.utils.json.FlinkJson;
-import sp.pipeline.utils.binarization.FlinkSerialization;
 import java.util.Objects;
 
 @Component
@@ -46,46 +43,20 @@ public class IdAssignmentBuilder {
      */
     public DataStream<AISSignal> buildIdAssignmentPart(StreamExecutionEnvironment flinkEnv) {
         // Create a Kafka source for incoming id-less AIS signals
-        KafkaSource<String> kafkaSource = streamUtils.getFlinkStreamConsumingFromKafka(config.getRawIncomingAisTopicName());
-
-        // Create a Kafka sink to sink the id-assigned AISSignal objects
-        KafkaSink<String> signalsSink = streamUtils.createSinkFlinkToKafka(config.getKafkaServerAddress(),
-                config.getIncomingAisTopicName());
-
-        // Call the overloaded method that takes the Kafka source, Kafka sink and Flink environment as input
-        // and builds the ID-assigning part of the pipeline
-        return buildIdAssignmentPart(kafkaSource, signalsSink, flinkEnv);
-    }
-
-    /**
-     * Builds the first part of the pipeline. This part takes as input the raw AIS signals from Kafka,
-     * assigns an internal ID to each signal and sends them to another Kafka topic.
-     * The internal ID is calculated as a hash of the producer ID and the ship hash.
-     *
-     * @param kafkaSource the source of raw AIS signals
-     * @param signalsSink the sink for the AISSignal objects with assigned internal IDs
-     * @param flinkEnv the Flink execution environment
-     * @return the constructed stream
-     */
-    public DataStream<AISSignal> buildIdAssignmentPart(KafkaSource<String> kafkaSource,
-                                                       KafkaSink<String> signalsSink,
-                                                       StreamExecutionEnvironment flinkEnv) {
-
-        // Create a stream of id-less AIS Signals from the Kafka source
-        DataStream<ExternalAISSignal> sourceWithNoIDs = FlinkJson.deserialize(
-                flinkEnv.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source"),
+        KafkaSource<ExternalAISSignal> kafkaSource = streamUtils.getFlinkStreamConsumingFromKafka(
+                config.getRawIncomingAisTopicName(),
                 ExternalAISSignal.class
         );
 
+        // Create a stream of id-less AIS Signals from the Kafka source
+        DataStream<ExternalAISSignal> sourceWithNoIDs = flinkEnv.fromSource(
+                kafkaSource, WatermarkStrategy.noWatermarks(), "AIS Source"
+        );
+
         // Map ExternalAISSignal objects to AISSignal objects by assigning an internal ID
-        DataStream<AISSignal> sourceWithIDs = sourceWithNoIDs.map(x -> {
+        return sourceWithNoIDs.map(x -> {
             int calculatedID = Objects.hash(x.getProducerID(), x.getShipHash()) & 0x7FFFFFFF; // Ensure positive ID
             return new AISSignal(x, calculatedID);
         });
-
-        // Send the id-assigned AISSignal objects to a Kafka topic (to be used later when aggregating the scores)
-        FlinkSerialization.serialize(sourceWithIDs).sinkTo(signalsSink);
-
-        return sourceWithIDs;
     }
 }

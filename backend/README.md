@@ -1,7 +1,7 @@
 ## Building the project
 First, you need to install Java 17. 
 
-### APACHE DRUID
+### Apache Druid
 
 In order to utilize all the functionalities of the backend you need to install [Apache Druid Database](https://druid.apache.org/).
 
@@ -93,15 +93,14 @@ bin/kafka-server-start.sh config/server.properties
 Finally, create the topics required for the project. In the third terminal, run the following commands:
 ```bash
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic ships-history --bootstrap-server localhost:9092
 ```
 
 If needed to remove the topics, run the following command:
 ```bash
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
 ```
 
@@ -135,12 +134,11 @@ For full reset of the back-end state you can run the following commands (make su
 ```bash
 bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeline --force
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
 bin/kafka-topics.sh --create --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --create --topic ships-scores --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:9092
+bin/kafka-topics.sh --create --topic ships-history --bootstrap-server localhost:9092
 ```
 In addition, you have to reset the database by following the steps mentioned above in the `Resetting Druid` section.
 

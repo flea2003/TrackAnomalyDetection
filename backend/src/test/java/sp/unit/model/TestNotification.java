@@ -37,14 +37,15 @@ public class TestNotification {
     }
 
     @Test
-    void testConstructor1() throws JsonProcessingException {
+    void testConstructor1() {
         Notification notification2 = new Notification(new CurrentShipDetails(
                 new AnomalyInformation(1F, "explanation", dateTime, 1L),
                 new AISSignal(1L, 0F, 0F, 0F, 0F, 0F, dateTime, "KLAIPEDA"),
                 new MaxAnomalyScoreDetails()
         ));
 
-        assertThat(notification2).isEqualTo(notification);
+        // Since we cannot assert that IDs are equal (since we assign unique IDs for each one), assert by parts
+        assertThat(notification2.getCurrentShipDetails()).isEqualTo(notification.getCurrentShipDetails());
     }
 
     @Test

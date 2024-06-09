@@ -79,11 +79,9 @@ configurations {
 }
 
 dependencies {
-	testImplementation group: 'org.apache.kafka', name: 'kafka-streams-test-utils', version: "${kafkaVersion}"
 
 	implementation 'io.r2dbc:r2dbc-spi:0.9.0.RELEASE' // Check for the latest version
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation "org.apache.kafka:kafka-streams:${kafkaVersion}"
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -114,6 +112,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.32'
 	testCompileOnly 'org.projectlombok:lombok:1.18.32'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+	implementation "org.apache.flink:flink-json:${flinkVersion}"
 
 	// Flink test utils
 	testImplementation "org.apache.flink:flink-test-utils:${flinkVersion}"

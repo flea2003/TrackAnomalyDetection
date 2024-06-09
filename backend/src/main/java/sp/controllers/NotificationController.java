@@ -31,12 +31,8 @@ public class NotificationController {
      */
     @PutMapping("/notifications/read/{id}")
     public ResponseEntity<Void> markNotificationAsRead(@PathVariable Long id) {
-        try {
-            this.notificationService.markNotificationAsRead(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NotificationNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        // TODO: totally get rid of this, make notifications local!
+        return ResponseEntity.ok().build();
     }
 
     /**

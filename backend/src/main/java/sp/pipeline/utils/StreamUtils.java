@@ -1,17 +1,20 @@
 package sp.pipeline.utils;
 
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.formats.json.JsonDeserializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.pipeline.PipelineConfiguration;
+import sp.pipeline.utils.json.SoftJsonDeserializationSchema;
+import sp.pipeline.utils.json.SoftJsonSerializationSchema;
 import java.util.Properties;
+import java.util.UUID;
 
 @Service
 public class StreamUtils {
@@ -29,53 +32,58 @@ public class StreamUtils {
     }
 
     /**
-     * Creates a Flink stream that is consuming from a Kafka topic.
+     * Creates a Flink source that is consuming from a Kafka topic. Assumes that incoming data is in JSON format.
+     * The type of the data is specified by the classType parameter.
      *
      * @param topic the name of the topic from which to consume
+     * @param classType the type of the incoming data
+     * @param <T> the type of data that is expected to be in the topic
      * @return the created Flink stream
      */
-    public KafkaSource<String> getFlinkStreamConsumingFromKafka(String topic) {
+    public <T> KafkaSource<T> getFlinkStreamConsumingFromKafka(String topic, Class<T> classType) {
         // Load the properties of Kafka from the configuration file
         Properties props = configuration.getFullConfiguration();
+        JsonDeserializationSchema<T> jsonFormat = new SoftJsonDeserializationSchema<>(classType);
 
-        return KafkaSource.<String>builder()
+        return KafkaSource.<T>builder()
                 .setProperties(props)
                 .setTopics(topic)
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .setValueOnlyDeserializer(jsonFormat)
                 .build();
     }
 
     /**
-     * Creates a KafkaStreams object, according to the configuration file.
+     * Creates a sink from Flink to a Kafka topic. Also deals with serializing to JSON format.
      *
-     * @param builder streams builder
-     * @return created KafkaStreams object with the specified configuration
-     */
-    public KafkaStreams getKafkaStreamConsumingFromKafka(StreamsBuilder builder) {
-        // Load properties from the configuration file
-        Properties props = configuration.getFullConfiguration();
-
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        return new KafkaStreams(builder.build(), props);
-    }
-
-    /**
-     * Creates a sink from Flink to a Kafka topic.
-     *
-     * @param kafkaServerAddress Kafka server address
      * @param topicName Kafka topic name to send the data to
+     * @param <T> the type of data that will be sent to the topic
      * @return the created KafkaSink object
      */
-    public KafkaSink<String> createSinkFlinkToKafka(String kafkaServerAddress, String topicName) {
-        return KafkaSink.<String>builder()
-                .setBootstrapServers(kafkaServerAddress)
+    public <T> KafkaSink<T> createSinkFlinkToKafka(String topicName) {
+        SoftJsonSerializationSchema<T> jsonFormat = new SoftJsonSerializationSchema<>();
+        return KafkaSink.<T>builder()
+                .setBootstrapServers(configuration.getKafkaServerAddress())
                 .setRecordSerializer(KafkaRecordSerializationSchema.builder()
                         .setTopic(topicName)
-                        .setValueSerializationSchema(new SimpleStringSchema())
+                        .setValueSerializationSchema(jsonFormat)
                         .build()
                 )
                 .build();
+    }
+
+    /**
+     * Creates a Kafka consumer object, consuming from the Kafka server specified in the configuration file.
+     *
+     * @return the created KafkaConsumer object
+     */
+    public KafkaConsumer<Long, String> getConsumer() {
+        Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, configuration.getKafkaServerAddress());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
+        return new KafkaConsumer<>(props);
     }
 }
 

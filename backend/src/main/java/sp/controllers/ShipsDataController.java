@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import sp.exceptions.DatabaseException;
 import sp.exceptions.NotExistingShipException;
-import sp.exceptions.PipelineException;
-import sp.exceptions.PipelineStartingException;
 import sp.model.CurrentShipDetails;
 import sp.services.ShipsDataService;
 import java.util.List;
@@ -44,10 +42,6 @@ public class ShipsDataController {
             return ResponseEntity.ok(this.shipsDataService.getIndividualCurrentShipDetails(id));
         } catch (NotExistingShipException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (PipelineException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (PipelineStartingException e) {
-            return new ResponseEntity<>(HttpStatus.TOO_EARLY);
         }
     }
 
@@ -58,13 +52,7 @@ public class ShipsDataController {
      */
     @GetMapping("/ships/details")
     public ResponseEntity<List<CurrentShipDetails>> getCurrentShipDetails() {
-        try {
-            return ResponseEntity.ok(this.shipsDataService.getCurrentShipDetails());
-        } catch (PipelineException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (PipelineStartingException e) {
-            return new ResponseEntity<>(HttpStatus.TOO_EARLY);
-        }
+        return ResponseEntity.ok(this.shipsDataService.getCurrentShipDetailsOfAllShips());
     }
 
     /**
