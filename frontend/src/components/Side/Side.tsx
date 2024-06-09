@@ -1,14 +1,16 @@
 import { CurrentPage } from "../../App";
-import React, { forwardRef, JSX, useEffect, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import Sidebar from "./Sidebar/Sidebar";
 import MiddleColumn from "./MiddleColumn/MiddleColumn";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import ShipNotification from "../../model/ShipNotification";
+import { NotificationService } from "../../services/NotificationService";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
-import { NotificationService } from "../../services/NotificationService";
+
+import config from '../../configs/generalConfig.json';
 
 interface SideProps {
   ships: ShipDetails[];
@@ -46,7 +48,7 @@ const Side = forwardRef<PageChangerRef, SideProps>(
     // Set up the state for Notifications about ships
     const [notifications, setNotifications] = useState<ShipNotification[]>([]);
 
-    // Every 1s update the notifications by querying the server
+    // Update the notifications by querying the server frequently
     useEffect(() => {
       const intervalId = setInterval(() => {
         // Query for notifications. When the results arrive, update the state
@@ -57,7 +59,7 @@ const Side = forwardRef<PageChangerRef, SideProps>(
             }
           },
         );
-      }, 10000);
+      }, config.notificationsRefreshMs);
 
       return () => {
         clearInterval(intervalId);

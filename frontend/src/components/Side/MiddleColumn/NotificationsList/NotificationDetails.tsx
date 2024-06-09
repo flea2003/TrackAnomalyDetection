@@ -19,7 +19,7 @@ interface NotificationDetailsProps {
 
 /**
  * This component is in the second column of the main view of the application.
- * It displays the details of a selected notification in the middle column..
+ * It displays the details of a selected notification in the middle column.
  * The object to whose details are to be displayed is passed as a prop.
  *
  * @param allNotifications all notifications extracted from the database

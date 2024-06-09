@@ -103,7 +103,7 @@ export class NotificationService {
   ) => ShipNotification = (item) => {
     return new ShipNotification(
       item.id,
-      item.read,
+      item.isRead,
       new ShipDetails(
         item.shipID,
         item.currentShipDetails.currentAISSignal.heading,

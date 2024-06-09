@@ -17,9 +17,8 @@ const useWebSocketClient = () => {
       ShipUpdateBuffer.getBufferedShipsAndReset().forEach(shipToUpdate => {
         newShips.set(shipToUpdate.id, shipToUpdate);
       });
-      console.log("updating ships basedd on buffer")
       setShips(newShips);
-    }, 1000);
+    }, websocketConfig.websocketBufferRefreshMs);
 
     return () => {
       clearInterval(intervalId);
@@ -32,19 +31,16 @@ const useWebSocketClient = () => {
   useEffect(() => {
     const stompClient = new Client({
       brokerURL: websocketConfig.brokerUrl,
-
-      // Try to reconnect to the backend broker after 60 seconds.
-      reconnectDelay: 60000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
+      reconnectDelay: websocketConfig.reconnectDelayMs,
+      heartbeatIncoming: websocketConfig.heartbeatIncoming,
+      heartbeatOutgoing: websocketConfig.heartbeatOutgoing,
     });
 
     /**
      * Given a successful connection to the backend broker, subscribe to the `details` topic
      *
-     * @param frame
      */
-    stompClient.onConnect = function (frame) {
+    stompClient.onConnect = () => {
       stompClient.subscribe(websocketConfig.topic, function (message) {
         try {
           // Given a new received message, convert it to a ShipDetails instance and update the state
@@ -60,9 +56,8 @@ const useWebSocketClient = () => {
 
     /**
      * Given that the backend closes the Websocket connection, report it.
-     * @param closeEvent the caught event
      */
-    stompClient.onWebSocketClose = function (closeEvent) {
+    stompClient.onWebSocketClose = () => {
       ErrorNotificationService.addWarning("Websocket connection error");
       ShipUpdateBuffer.resetBuffer();
       setShips(new Map());
@@ -74,7 +69,6 @@ const useWebSocketClient = () => {
      * with the backend STOMP broker
      */
     stompClient.beforeConnect = async () => {
-      console.log("stomp before connect");
       ShipUpdateBuffer.resetBuffer();
 
       ShipService.queryBackendForShipsArray().then(
@@ -84,7 +78,7 @@ const useWebSocketClient = () => {
       );
     };
 
-    stompClient.onStompError = function (frame) {
+    stompClient.onStompError = (frame) => {
       ErrorNotificationService.addWarning(
         "Websocket broker error: " + frame.headers["message"],
       );
@@ -95,7 +89,7 @@ const useWebSocketClient = () => {
 
     return () => {
       if (stompClient) {
-        stompClient.deactivate();
+        stompClient.deactivate().then(() => console.log("Previous stomp client deactivated."));
       }
     };
   }, []);

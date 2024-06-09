@@ -47,7 +47,7 @@ class TimeUtilities {
   /**
    * Method that prepends zero to digits when reformatting
    *
-   * @param value integer that is considered for prependind
+   * @param value integer that is considered for prepending
    */
   static prependZero(value: number) {
     if (value >= 0 && value < 10) return "0" + value;

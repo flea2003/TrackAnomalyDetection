@@ -19,8 +19,6 @@ export interface CurrentPage {
 }
 
 function App() {
-  console.log("Start of App");
-
   // Create a reference to the map component
   const mapRef = React.useRef<MapExportedMethodsType>(null);
   const pageChangerRef = React.useRef<PageChangerRef>(null);
