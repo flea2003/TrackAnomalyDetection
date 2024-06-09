@@ -65,7 +65,7 @@ interface ShipIconTrackingType {
   shipId: number;
 }
 
-const defaulIconTrackingInfo = {
+const defaultIconTrackingInfo = {
   x: 0,
   y: 0,
   shipId: -1,
@@ -122,7 +122,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
     // Initialize the trackingInfo variable that will track the selected ship icon
     const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>(
-      defaulIconTrackingInfo,
+      defaultIconTrackingInfo,
     );
 
     // Event-handling method which enables the tracking of a particular ship
@@ -164,7 +164,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           L.marker([ship.lat, ship.lng], {
             icon: createShipIcon(
               ship.anomalyScore / 100,
-              ship.heading,
+              ship.course,
               ship.speed > 0,
             ),
           })
@@ -198,7 +198,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
       map
         .on("drag", () => {
-          setTrackingInfo(defaulIconTrackingInfo);
+          setTrackingInfo(defaultIconTrackingInfo);
         })
         .on("zoom", () => {
           setHoverInfo(defaultHoverInfo);

@@ -2,6 +2,7 @@
     width: 3%;
     height: 24%;
     border: var(--border);
+    border-bottom: none;
     background: var(--background);
     pointer-events: all;
 

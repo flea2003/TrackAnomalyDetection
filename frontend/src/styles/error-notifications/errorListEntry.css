@@ -11,6 +11,8 @@
     align-items: center;
 
     cursor: pointer;
+
+    font-size: 0.9em;
 }
 
 .error-list-entry:hover {
@@ -18,11 +20,11 @@
 }
 
 .error-list-entry .error-list-entry-not-read{
-    font-weight: 1000;
+    font-weight: 700;
 }
 
 .error-list-entry .error-list-entry-read{
-    color: dimgrey;
+    color: black;
 }
 
 .error-list-entry-text {
@@ -35,7 +37,6 @@
 
 .error-list-entry-icon-container {
     flex-grow: 1;
-    font-size: 0.8em;
     height: 100%;
     width: 25px;
     display: flex;

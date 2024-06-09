@@ -81,7 +81,7 @@
 
 .menu-container {
     width: 95%;
-    height: 6%;
+    height: 6.5%;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -99,7 +99,7 @@
     border: 1px solid black;
     border-left: none;
     width: 25%;
-    height: 75%;
+    height: 77%;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -65,37 +65,39 @@ function NotificationDetails({
         </div>
       </div>
       <div className="ship-id-div">Ship #{notification.shipDetails.id}</div>
-      <Stack direction="row" className="menu-container">
-        <div
-          onClick={changeAnomalyInfo}
-          className={
-            displayedAnomalyInfo
-              ? "notification-displayed"
-              : "notification-not-displayed"
-          }
-        >
-          Information
-        </div>
-        <div
-          onClick={changeAIS}
-          className={
-            displayedAIS
-              ? "notification-displayed"
-              : "notification-not-displayed"
-          }
-        >
-          AIS
-        </div>
-      </Stack>
-      <Stack className="info-container">
-        {displayedAnomalyInfo && (
-          <AnomalyDetails
-            ship={notification.shipDetails}
-            addAnomalyScore={true}
-          />
-        )}
+      <Stack direction="column" className="menu-info-container">
+        <Stack direction="row" className="menu-container">
+          <div
+            onClick={changeAnomalyInfo}
+            className={
+              displayedAnomalyInfo
+                ? "notification-displayed"
+                : "notification-not-displayed"
+            }
+          >
+            Information
+          </div>
+          <div
+            onClick={changeAIS}
+            className={
+              displayedAIS
+                ? "notification-displayed"
+                : "notification-not-displayed"
+            }
+          >
+            AIS
+          </div>
+        </Stack>
+        <Stack className="info-container">
+          {displayedAnomalyInfo && (
+            <AnomalyDetails
+              ship={notification.shipDetails}
+              addAnomalyScore={true}
+            />
+          )}
 
-        {displayedAIS && <AISDetails ship={notification.shipDetails} />}
+          {displayedAIS && <AISDetails ship={notification.shipDetails} />}
+        </Stack>
       </Stack>
     </Stack>
   );
