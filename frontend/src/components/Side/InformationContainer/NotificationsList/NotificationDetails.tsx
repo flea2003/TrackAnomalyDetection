@@ -107,7 +107,7 @@ function NotificationDetails({
  */
 function notificationNotFoundElement() {
   return (
-    <Stack id="object-details-container">
+    <Stack className="object-details-container">
       <span className="object-details-title">
         Object ID:&nbsp;&nbsp;
         <span className="object-details-title-id">Not found</span>

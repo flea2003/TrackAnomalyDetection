@@ -46,6 +46,14 @@ function NotificationList({
     />
   );
 
+
+  let noNotificactionsEntry = (<div> </div>);
+  if (notifications.length === 0) {
+    noNotificactionsEntry = (
+      <div className="no-ships-entry"> Currently there are no notifications </div>
+    );
+  }
+
   return (
     <Stack
       id="notification-list-container"
@@ -66,12 +74,15 @@ function NotificationList({
           alt="Close"
         ></img>
       </Stack>
-      <NotificationListWithoutTitle
+      {notifications.length !== 0 ? (
+        <NotificationListWithoutTitle
         notifications={notifications}
         ships={ships}
         pageChanger={pageChanger}
         mapCenteringFun={mapCenteringFun}
       />
+      ) : noNotificactionsEntry}
+
     </Stack>
   );
 }

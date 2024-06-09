@@ -6,10 +6,12 @@
 
     border: var(--border);
     height: 60%;
-    width: 17%;
+    width: 13%;
 
     pointer-events: all;
     background: var(--background);
+
+    font-size: 0.9em;
 }
 
 #notification-list-title-container {

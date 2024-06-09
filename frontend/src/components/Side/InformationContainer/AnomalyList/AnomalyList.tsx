@@ -46,10 +46,12 @@ function AnomalyList({
     );
   }
 
-  if (listEntries.length === 0)
-    listEntries.push(
-      <div className="no-ships">Currently there are no ships</div>,
+  let noShipsEntry = (<div> </div>);
+  if (listEntries.length === 0) {
+    noShipsEntry = (
+      <div className="no-ships-entry"> Currently there are no ships </div>
     );
+  }
 
   return (
     <Stack
@@ -62,7 +64,8 @@ function AnomalyList({
         setFilterThreshold={setFilterThreshold}
         anomalyThreshold={anomalyThreshold}
       />
-      <List id="anomaly-list-internal-container">{listEntries}</List>
+      {listEntries.length !== 0 ?
+      (<List id="anomaly-list-internal-container">{listEntries}</List>) : noShipsEntry}
     </Stack>
   );
 }

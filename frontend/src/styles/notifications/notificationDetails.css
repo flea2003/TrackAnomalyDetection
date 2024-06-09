@@ -1,6 +1,6 @@
 .notification-details-container {
-    width: 25%;
-    height: 60%;
+    width: 18%;
+    min-height: 60%;
 
     background: var(--background);
     border: var(--border);
@@ -12,6 +12,8 @@
 
     overflow: auto;
     pointer-events: all;
+
+    font-size: 0.9em;
 }
 
 .notification-details-title-container {
@@ -20,8 +22,7 @@
     justify-content: space-between;
     align-items: center;
 
-    height: 50px;
-    padding: var(--title-padding);
+    height: 35px;
     width: 95%;
 
     padding-top: 0;
@@ -34,7 +35,6 @@
 
 .notification-displayed, .notification-not-displayed {
     width: 50%;
-    height: 75%;
 }
 
 .notification-title-div, .ship-id-div {
@@ -48,5 +48,5 @@
 }
 
 .ship-id-div {
-    padding-bottom: 3%;
+    padding-bottom: 10px;
 }

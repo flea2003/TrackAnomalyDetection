@@ -47,7 +47,7 @@ function ObjectDetails({
   }
 
   return (
-    <Stack id="object-details-container">
+    <Stack className="object-details-container">
       <Stack className="object-details-title-container" direction="row">
         {getReturnIcon(pageChanger)}
         <Stack className="object-details-title">Ship #{ship.id}</Stack>
@@ -76,7 +76,7 @@ function ObjectDetails({
  */
 function shipNotFoundElement() {
   return (
-    <Stack id="object-details-container">
+    <Stack className="object-details-container">
       <span className="object-details-title">
         Object ID:&nbsp;&nbsp;
         <span className="object-details-title-id">Not found</span>

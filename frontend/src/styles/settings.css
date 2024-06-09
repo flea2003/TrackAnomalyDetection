@@ -10,3 +10,7 @@
     padding: var(--title-padding);
     font-weight: bold;
 }
+
+.settings-div:hover {
+    background: var(--hover-background);
+}
