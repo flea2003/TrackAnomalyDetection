@@ -6,5 +6,5 @@
   "heartbeatIncoming": 4000,
   "heartbeatOutgoing": 4000,
 
-  "websocketBufferRefreshMs": 5000
+  "websocketBufferRefreshMs": 1000
 }

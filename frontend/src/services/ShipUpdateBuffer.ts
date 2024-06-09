@@ -32,6 +32,7 @@ class ShipUpdateBuffer {
    */
   static getBufferedShipsAndReset() {
     const returnValue = this.bufferedShips;
+    console.log("in buffer: " + returnValue.size);
     this.resetBuffer();
     return returnValue;
   }

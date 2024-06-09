@@ -2,7 +2,11 @@
     "centeringShipTransitionTime": 1.25,
     "centeringShipZoomLevel": 9,
 
+    "doFilteringBeforeDisplaying": false,
+    "maxShipsOnScreen": -1,
+
     "clusterChunkedLoading": true,
     "clusterChunkInterval": 200,
-    "clusterChunkDelay": 100
+    "clusterChunkDelay": 100,
+    "clusterMaxRadius": 80
 }

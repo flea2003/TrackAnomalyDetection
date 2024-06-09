@@ -69,17 +69,39 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     }, []);
 
     // Update the ship markers when the ships array changes.
+    // Also, add ability to update the markers when the user
+    // is dragging through the map or zooming.
     useEffect(() => {
       const map = mapRef.current;
       if (!map) return;
 
-      updateMarkersForShips(
-        ships,
-        map,
-        setHoverInfo,
-        pageChangerRef,
-        markersClustersRef,
-      );
+      const updateFunc = () => {
+        updateMarkersForShips(
+          ships,
+          mapConfig.doFilteringBeforeDisplaying,
+          mapConfig.maxShipsOnScreen,
+          map,
+          setHoverInfo,
+          pageChangerRef,
+          markersClustersRef,
+        );
+      };
+
+      // Same as function above, but only updates if the filtering is turned on
+      const updateOnlyWhenFilterFunc = () => {
+        if (mapConfig.doFilteringBeforeDisplaying) {
+          updateFunc();
+        }
+      };
+
+      updateFunc();
+
+      map.on("moveend", updateOnlyWhenFilterFunc);
+
+      return () => {
+        // Clear the effect
+        map.off("moveend", updateOnlyWhenFilterFunc);
+      };
     }, [pageChangerRef, ships]);
 
     return constructMapContainer(hoverInfo);
