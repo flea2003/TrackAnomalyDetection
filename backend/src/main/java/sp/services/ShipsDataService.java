@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.exceptions.DatabaseException;
 import sp.exceptions.NotExistingShipException;
-import sp.exceptions.PipelineException;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.AnomalyDetectionPipeline;
 import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
@@ -48,7 +47,7 @@ public class ShipsDataService {
      * @return CurrentShipDetails instance encapsulating the current extensive information of a ship
      */
     public CurrentShipDetails getIndividualCurrentShipDetails(Long shipId)
-            throws NotExistingShipException, PipelineException {
+            throws NotExistingShipException {
         CurrentShipDetails anomalyInfo = shipInformationExtractor.getCurrentShipDetails().get(shipId);
         if (anomalyInfo == null) {
             throw new NotExistingShipException("Couldn't find such ship.");

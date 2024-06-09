@@ -9,7 +9,7 @@ import sp.controllers.ShipsDataController;
 import sp.exceptions.DatabaseException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
-import sp.exceptions.PipelineException;
+
 import sp.model.AISSignal;
 import sp.model.CurrentShipDetails;
 import sp.model.MaxAnomalyScoreDetails;
@@ -43,7 +43,7 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getCurrentShipDetailsSuccessful() throws PipelineException, NotExistingShipException {
+    void getCurrentShipDetailsSuccessful() throws NotExistingShipException {
         long shipId = 123L;
         when(shipsDataService.getIndividualCurrentShipDetails(shipId)).thenReturn(
                 new CurrentShipDetails(new AnomalyInformation(1.0f, "explanation1", time1, shipId),
@@ -60,7 +60,7 @@ class ShipsDataControllerTest {
     }
 
     @Test
-    void getCurrentAnomalyInformationShipDoesNotExist() throws PipelineException, NotExistingShipException {
+    void getCurrentAnomalyInformationShipDoesNotExist() throws NotExistingShipException {
         long shipId = 123L;
         when(shipsDataService.getIndividualCurrentShipDetails(shipId))
                 .thenThrow(new NotExistingShipException());
@@ -68,17 +68,6 @@ class ShipsDataControllerTest {
         ResponseEntity<CurrentShipDetails> response = shipsDataController.getIndividualCurrentShipDetails(shipId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-    @Test
-    void getCurrentAnomalyInformationPipelineException() throws PipelineException, NotExistingShipException {
-        long shipId = 123L;
-        when(shipsDataService.getIndividualCurrentShipDetails(shipId))
-                .thenThrow(new PipelineException());
-
-        ResponseEntity<CurrentShipDetails> response = shipsDataController.getIndividualCurrentShipDetails(shipId);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
     @Test

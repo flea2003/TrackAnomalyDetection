@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import sp.exceptions.DatabaseException;
 import sp.exceptions.NotExistingShipException;
-import sp.exceptions.PipelineException;
 import sp.model.CurrentShipDetails;
 import sp.services.ShipsDataService;
 import java.util.List;
@@ -43,8 +42,6 @@ public class ShipsDataController {
             return ResponseEntity.ok(this.shipsDataService.getIndividualCurrentShipDetails(id));
         } catch (NotExistingShipException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (PipelineException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
