@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Stack from "@mui/material/Stack";
 import { useState } from "react";
 import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
@@ -86,18 +85,16 @@ function App() {
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
-      <Stack direction="row">
-        <LMap ships={displayedShips} pageChanger={pageChanger} ref={mapRef} />
-        <Side
-          currentPage={currentPage}
-          ships={displayedShips}
-          notifications={notifications}
-          pageChanger={pageChanger}
-          mapCenteringFun={mapCenteringFun}
-          setFilterThreshold={setFilterThreshold}
-          anomalyThreshold={filterThreshold}
-        />
-      </Stack>
+      <LMap ships={displayedShips} pageChanger={pageChanger} ref={mapRef} />
+      <Side
+        currentPage={currentPage}
+        ships={displayedShips}
+        notifications={notifications}
+        pageChanger={pageChanger}
+        mapCenteringFun={mapCenteringFun}
+        setFilterThreshold={setFilterThreshold}
+        anomalyThreshold={filterThreshold}
+      />
     </div>
   );
 }

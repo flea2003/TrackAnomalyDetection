@@ -13,13 +13,12 @@ import {
 } from "../ShipIcon/ShipIcon";
 import { CurrentPage } from "../../App";
 import ShipDetails from "../../model/ShipDetails";
-
-import "../../styles/map.css";
-import "../../styles/common.css";
-
 import mapStyleConfig from "../../configs/mapConfig.json";
 import ShipIconDetails from "../ShipIconDetails/ShipIconDetails";
 import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
+
+import "../../styles/map.css";
+import "../../styles/common.css";
 
 /**
  * This function creates a Leaflet map with the initial settings. It is called only once, when the component is mounted.
@@ -65,7 +64,7 @@ interface ShipIconTrackingType {
   shipId: number;
 }
 
-const defaulIconTrackingInfo = {
+const defaultIconTrackingInfo = {
   x: 0,
   y: 0,
   shipId: -1,
@@ -100,6 +99,10 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           return;
         }
 
+        // Check if the passed ship is even defined
+        if (ship === undefined) return;
+        if (ship.id === undefined) return;
+
         // Check if requested ship still exists
         if (ships.find((x) => x.id === ship.id) === undefined) return;
 
@@ -118,7 +121,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
     // Initialize the trackingInfo variable that will track the selected ship icon
     const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>(
-      defaulIconTrackingInfo,
+      defaultIconTrackingInfo,
     );
 
     // Event-handling method which enables the tracking of a particular ship
@@ -160,7 +163,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           L.marker([ship.lat, ship.lng], {
             icon: createShipIcon(
               ship.anomalyScore / 100,
-              ship.heading,
+              ship.heading === 511 ? ship.course : ship.heading,
               ship.speed > 0,
             ),
           })
@@ -194,7 +197,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
       map
         .on("drag", () => {
-          setTrackingInfo(defaulIconTrackingInfo);
+          setTrackingInfo(defaultIconTrackingInfo);
         })
         .on("zoom", () => {
           setHoverInfo(defaultHoverInfo);

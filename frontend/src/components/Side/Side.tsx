@@ -2,9 +2,10 @@ import { CurrentPage } from "../../App";
 import React, { JSX } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import Sidebar from "./Sidebar/Sidebar";
-import MiddleColumn from "./MiddleColumn/MiddleColumn";
+import InformationContainer from "./InformationContainer/InformationContainer";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import ShipNotification from "../../model/ShipNotification";
+import { Stack } from "@mui/material";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
@@ -48,16 +49,18 @@ function Side({
 
   return (
     <>
-      <MiddleColumn
-        currentPage={currentPage}
-        ships={ships}
-        notifications={notifications}
-        pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-        setFilterThreshold={setFilterThreshold}
-        anomalyThreshold={anomalyThreshold}
-      />
-      <Sidebar pageChanger={pageChanger} />
+      <Stack direction="row" id="side-container">
+        <InformationContainer
+          currentPage={currentPage}
+          ships={ships}
+          notifications={notifications}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+          setFilterThreshold={setFilterThreshold}
+          anomalyThreshold={anomalyThreshold}
+        />
+        <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
+      </Stack>
     </>
   );
 }

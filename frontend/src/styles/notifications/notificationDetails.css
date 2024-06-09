@@ -1,0 +1,52 @@
+.notification-details-container {
+    width: 20%;
+    min-height: 60%;
+
+    background: var(--background);
+    border: var(--border);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    overflow: auto;
+    pointer-events: all;
+
+    font-size: 0.9em;
+}
+
+.notification-details-title-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    height: 35px;
+    width: 95%;
+
+    padding-top: 0;
+}
+
+.ship-id-div {
+    padding: 0;
+    margin: 0;
+}
+
+.notification-displayed, .notification-not-displayed {
+    width: 50%;
+}
+
+.notification-title-div, .ship-id-div {
+    font-size: var(--title-size);
+    font-weight: bold;
+}
+.notification-title-div {
+    padding-right: 30%;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.ship-id-div {
+    padding-bottom: 10px;
+}
