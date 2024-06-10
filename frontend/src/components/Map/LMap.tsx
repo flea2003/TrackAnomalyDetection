@@ -64,15 +64,15 @@ interface ShipIconTrackingType {
   y: number;
   shipId: number;
   isClicked: boolean;
-  fromList: boolean;
+  clickedFromList: boolean;
 }
 
-const defaulIconTrackingInfo = {
+const defaultIconTrackingInfo = {
   x: 0,
   y: 0,
   shipId: -1,
   isClicked: false,
-  fromList: false,
+  clickedFromList: false,
 } as ShipIconTrackingType;
 
 const defaultHoverInfo = {
@@ -119,7 +119,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
     // Initialize the trackingInfo variable that will track the selected ship icon
     const [trackingInfo, setTrackingInfo] = useState<ShipIconTrackingType>(
-      defaulIconTrackingInfo,
+      defaultIconTrackingInfo,
     );
 
     // Event-handling method which enables the tracking of a particular ship
@@ -129,7 +129,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         y: ship.lat,
         shipId: ship.id,
         isClicked: true,
-        fromList: fromList,
+        clickedFromList: fromList,
       });
     };
 
@@ -155,8 +155,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
             trackingInfo.x !== trackedShip.lng ||
             trackingInfo.y !== trackedShip.lat
           ) {
-            console.log("fly to");
-            if (trackingInfo.fromList) {
+            if (trackingInfo.clickedFromList) {
               map.flyTo(
                 [trackedShip.lat, trackedShip.lng],
                 mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
@@ -176,7 +175,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
               y: trackedShip.lat,
               shipId: trackedShip.id,
               isClicked: false,
-              fromList: false,
+              clickedFromList: false,
             } as ShipIconTrackingType);
           }
         }
@@ -222,7 +221,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
       map
         .on("drag", () => {
-          setTrackingInfo(defaulIconTrackingInfo);
+          setTrackingInfo(defaultIconTrackingInfo);
         })
         .on("zoom", () => {
           setHoverInfo(defaultHoverInfo);
