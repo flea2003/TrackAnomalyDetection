@@ -41,14 +41,14 @@ function ScorePlot(props: ScorePlotProps){
   }
 
   // Requires filtering out the default values assigned to incomplete details
-  const scoreHistory = shipHistory.map((ship) => ship.getAnomalyScore());
+  const scoreHistory = shipHistory.map((ship) => ship.anomalyScore);
   const timestampHistory = shipHistory.map((ship) => ship.timestamp);
 
   const shipNotifications = allNotifications.filter((notification) =>
     notification.shipDetails.id === props.shipId
   );
 
-  const notificationScores = shipNotifications.map((notification) => notification.shipDetails.getAnomalyScore());
+  const notificationScores = shipNotifications.map((notification) => notification.shipDetails.anomalyScore);
   const notificationTimestamps = shipNotifications.map((notification) => notification.shipDetails.timestamp);
 
   // Plot descriptions

@@ -228,6 +228,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         })
         .on("zoom", () => {
           setHoverInfo(defaultHoverInfo);
+          setTrackingInfo(defaultIconTrackingInfo);
         });
 
       return () => {
