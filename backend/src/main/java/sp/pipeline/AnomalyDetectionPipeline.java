@@ -1,68 +1,52 @@
 package sp.pipeline;
 
-import lombok.Getter;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.KTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sp.model.AISSignal;
+import sp.model.AnomalyInformation;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
-import sp.pipeline.parts.aggregation.extractors.ShipInformationExtractor;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
-import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
-import sp.pipeline.utils.StreamUtils;
+import sp.pipeline.utils.OffsetDateTimeSerializer;
 
 @Service
 public class AnomalyDetectionPipeline {
-    private final StreamUtils streamUtils;
-    private StreamExecutionEnvironment flinkEnv;
-    private KafkaStreams kafkaStreams;
-    private KTable<Long, CurrentShipDetails> state;
-    @Getter
-    private ShipInformationExtractor shipInformationExtractor;
+    private final StreamExecutionEnvironment flinkEnv;
     private final IdAssignmentBuilder idAssignmentBuilder;
     private final ScoreCalculationBuilder scoreCalculationBuilder;
     private final ScoreAggregationBuilder scoreAggregationBuilder;
     private final NotificationsDetectionBuilder notificationsDetectionBuilder;
-    private final WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
     /**
      * Constructor for the AnomalyDetectionPipeline class.
      *
-     * @param streamUtils utility class for setting up streams
      * @param idAssignmentBuilder builder for the id assignment part of the pipeline
      * @param scoreCalculationBuilder builder for the score calculation part of the pipeline
      * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
      * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
-     * @param webSocketBroadcasterBuilder builder for the WebSockets message broadcasting part
      */
     @Autowired
-    public AnomalyDetectionPipeline(StreamUtils streamUtils,
-                                    IdAssignmentBuilder idAssignmentBuilder,
+    public AnomalyDetectionPipeline(IdAssignmentBuilder idAssignmentBuilder,
                                     ScoreCalculationBuilder scoreCalculationBuilder,
                                     ScoreAggregationBuilder scoreAggregationBuilder,
-                                    NotificationsDetectionBuilder notificationsDetectionBuilder,
-                                    WebSocketBroadcasterBuilder webSocketBroadcasterBuilder) {
-        this.streamUtils = streamUtils;
+                                    NotificationsDetectionBuilder notificationsDetectionBuilder) {
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
-        this.flinkEnv = StreamExecutionEnvironment.getExecutionEnvironment();
-        this.webSocketBroadcasterBuilder = webSocketBroadcasterBuilder;
 
         // For now, hardcode some flink properties. This will be completely redone in the next MR
         // (we will be connecting to a remote cluster)
         Configuration config = new Configuration();
         config.setString("taskmanager.memory.fraction", "0.3");
         config.setString("taskmanager.memory.network.max", "300 mb");
+        config.setString("pipeline.default-kryo-serializers",
+                "class:java.time.OffsetDateTime,serializer:" + OffsetDateTimeSerializer.class.getName());
 
         this.flinkEnv = StreamExecutionEnvironment.createLocalEnvironment(config);
 
@@ -73,30 +57,24 @@ public class AnomalyDetectionPipeline {
      * An overloaded constructor (same as above) that allows to inject a custom
      * FlinkEnv. Used for testing purposes
      *
-     * @param streamUtils utility class for setting up streams
      * @param idAssignmentBuilder builder for the id assignment part of the pipeline
      * @param scoreCalculationBuilder builder for the score calculation part of the pipeline
      * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
      * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
      * @param flinkEnv injected Flink environment
-     * @param webSocketBroadcasterBuilder  builder for the WebSockets message broadcasting part
      */
     public AnomalyDetectionPipeline(
-            StreamUtils streamUtils,
             IdAssignmentBuilder idAssignmentBuilder,
             ScoreCalculationBuilder scoreCalculationBuilder,
             ScoreAggregationBuilder scoreAggregationBuilder,
             NotificationsDetectionBuilder notificationsDetectionBuilder,
-            StreamExecutionEnvironment flinkEnv,
-            WebSocketBroadcasterBuilder webSocketBroadcasterBuilder
+            StreamExecutionEnvironment flinkEnv
     ) {
-        this.streamUtils = streamUtils;
         this.idAssignmentBuilder = idAssignmentBuilder;
         this.scoreCalculationBuilder = scoreCalculationBuilder;
         this.scoreAggregationBuilder = scoreAggregationBuilder;
         this.notificationsDetectionBuilder = notificationsDetectionBuilder;
         this.flinkEnv = flinkEnv;
-        this.webSocketBroadcasterBuilder = webSocketBroadcasterBuilder;
         buildPipeline();
     }
 
@@ -106,7 +84,6 @@ public class AnomalyDetectionPipeline {
      * @throws Exception when closing Flink environment throws exception
      */
     public void closePipeline() throws Exception {
-        kafkaStreams.close();
         flinkEnv.close();
     }
 
@@ -119,26 +96,16 @@ public class AnomalyDetectionPipeline {
         DataStream<AISSignal> streamWithAssignedIds = idAssignmentBuilder.buildIdAssignmentPart(flinkEnv);
 
         // Build the pipeline part that calculates the anomaly scores (Flink)
-        scoreCalculationBuilder.buildScoreCalculationPart(streamWithAssignedIds);
+        DataStream<AnomalyInformation> streamOfAnomalyInfo =
+                scoreCalculationBuilder.buildScoreCalculationPart(streamWithAssignedIds);
 
-        StreamsBuilder builder = new StreamsBuilder();
-
-        // Build the pipeline part that aggregates the scores (Kafka Streams)
-        this.state = scoreAggregationBuilder.buildScoreAggregationPart(builder);
-
-        // Build the pipeline part that broadcasts ship details via websockets
-        this.webSocketBroadcasterBuilder.buildWebSocketBroadcastingPart(this.state);
+        // Build the pipeline part that creates a stream of CurrentShipDetails. This stream is consumed
+        // by the next part of the pipeline - ship information extractor
+        DataStream<CurrentShipDetails> aggregatedStream =
+                scoreAggregationBuilder.buildScoreAggregationPart(streamWithAssignedIds, streamOfAnomalyInfo);
 
         // Build the pipeline part that produces notifications (Kafka Streams)
-        notificationsDetectionBuilder.buildNotifications(this.state);
-
-        // Build the Kafka part of the pipeline
-        builder.build();
-
-        this.kafkaStreams = streamUtils.getKafkaStreamConsumingFromKafka(builder);
-        this.kafkaStreams.cleanUp();
-
-        this.shipInformationExtractor = new ShipInformationExtractor(state, kafkaStreams);
+        notificationsDetectionBuilder.buildNotifications(aggregatedStream);
     }
 
 
@@ -149,7 +116,6 @@ public class AnomalyDetectionPipeline {
     public void runPipeline() {
         try {
             this.flinkEnv.executeAsync();
-            this.kafkaStreams.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

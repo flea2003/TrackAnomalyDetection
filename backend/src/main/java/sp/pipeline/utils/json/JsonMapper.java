@@ -1,9 +1,12 @@
 package sp.pipeline.utils.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import sp.utils.UtilsObjectMapper;
 
 public class JsonMapper {
+    private static final ObjectMapper mapper = new UtilsObjectMapper();
+
     /**
      * Converts a particular AnomalyInformation object to a JSON string.
      *
@@ -12,7 +15,7 @@ public class JsonMapper {
      * @return the respective JSON string
      */
     public static <T> String toJson(T object) throws JsonProcessingException {
-        return new UtilsObjectMapper().writeValueAsString(object);
+        return mapper.writeValueAsString(object);
     }
 
     /**
@@ -24,6 +27,6 @@ public class JsonMapper {
      * @return the converted AISUpdate object
      */
     public static <T> T fromJson(String val, Class<T> classType) throws JsonProcessingException {
-        return new UtilsObjectMapper().readValue(val, classType);
+        return mapper.readValue(val, classType);
     }
 }

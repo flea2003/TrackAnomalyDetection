@@ -27,7 +27,7 @@ test("Check for invalid time difference", () => {
   expect(result).toBe("Not available");
 });
 
-test("Check for valid time difference", () => {
+test("Check for valid time difference 1", () => {
   const mockCurrentTime = new Date("2004-03-27T02:01:00Z");
   const aisTimestamp = "2004-03-27T01:01:00Z";
   const spyOnErrorServiceMethod = jest.spyOn(
@@ -37,7 +37,35 @@ test("Check for valid time difference", () => {
   TimeUtilities.getCurrentTime = jest.fn().mockReturnValue(mockCurrentTime);
   const result = TimeUtilities.computeTimeDifference(aisTimestamp);
   expect(spyOnErrorServiceMethod).not.toHaveBeenCalled();
-  expect(result).toBe("0d 1h 0m");
+  expect(result).toBe("1h 0m");
+  jest.resetAllMocks();
+});
+
+test("Check for valid time difference 2", () => {
+  const mockCurrentTime = new Date("2004-03-28T02:01:00Z");
+  const aisTimestamp = "2004-03-27T01:01:00Z";
+  const spyOnErrorServiceMethod = jest.spyOn(
+    ErrorNotificationService,
+    "addWarning",
+  );
+  TimeUtilities.getCurrentTime = jest.fn().mockReturnValue(mockCurrentTime);
+  const result = TimeUtilities.computeTimeDifference(aisTimestamp);
+  expect(spyOnErrorServiceMethod).not.toHaveBeenCalled();
+  expect(result).toBe("1d 1h 0m");
+  jest.resetAllMocks();
+});
+
+test("Check for valid time difference 3", () => {
+  const mockCurrentTime = new Date("2004-03-27T01:02:00Z");
+  const aisTimestamp = "2004-03-27T01:01:00Z";
+  const spyOnErrorServiceMethod = jest.spyOn(
+    ErrorNotificationService,
+    "addWarning",
+  );
+  TimeUtilities.getCurrentTime = jest.fn().mockReturnValue(mockCurrentTime);
+  const result = TimeUtilities.computeTimeDifference(aisTimestamp);
+  expect(spyOnErrorServiceMethod).not.toHaveBeenCalled();
+  expect(result).toBe("1m");
   jest.resetAllMocks();
 });
 
@@ -59,6 +87,18 @@ test("Reformat timestamp valid", () => {
 test("Reformat timestamp invalid 1", () => {
   const aisTimestamp = "-04-27T01:01:00Z";
   expect(TimeUtilities.reformatTimestamp(aisTimestamp)).toStrictEqual(
+    "Not available",
+  );
+});
+
+test("Get hours and minutes valid", () => {
+  const aisTimestamp = "2004-03-27T01:02:00Z";
+  expect(TimeUtilities.getHoursAndMinutes(aisTimestamp)).toStrictEqual("01:02");
+});
+
+test("Get hours and minutes invalid", () => {
+  const aisTimestamp = "-2004-03-27T01:02:00Z";
+  expect(TimeUtilities.getHoursAndMinutes(aisTimestamp)).toStrictEqual(
     "Not available",
   );
 });

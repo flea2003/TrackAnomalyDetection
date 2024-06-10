@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../App";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
-import shipIcon from "../../../assets/icons/ship.png";
-import bellIconNotRead from "../../../assets/icons/regular-notifications/bell-notification-not-read.svg";
-import bellIconRead from "../../../assets/icons/regular-notifications/bell-notification-read.svg";
-import settingsIcon from "../../../assets/icons/settings.svg";
-import bugIcon from "../../../assets/icons/bug.svg";
+import shipIcon from "../../../assets/icons/anomaly-list/ship.png";
+import bellIconNotRead from "../../../assets/icons/regular-notifications/notification_bell_orange.png";
+import bellIconRead from "../../../assets/icons/regular-notifications/notification_bell.svg";
+import settingsIcon from "../../../assets/icons/helper-icons/settings.svg";
+import bugIcon from "../../../assets/icons/error-notifications/bug.svg";
+import bugIconRed from "../../../assets/icons/error-notifications/bug-red.png";
+
+import shipIconSelected from "../../../assets/icons/selected-sidebar-icons/ship-blue.png";
+import notificationIconSelected from "../../../assets/icons/selected-sidebar-icons/notification-bell-blue.png";
+import settingsIconSelected from "../../../assets/icons/selected-sidebar-icons/settings-blue.png";
+import bugIconSelected from "../../../assets/icons/selected-sidebar-icons/bug_blue.png";
+
 import { NotificationService } from "../../../services/NotificationService";
 
 import "../../../styles/common.css";
@@ -14,6 +21,7 @@ import "../../../styles/sidebar.css";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
+  currentPage: CurrentPage;
 }
 
 /**
@@ -21,8 +29,9 @@ interface SidebarProps {
  * for future functionality.
  *
  * @param pageChanger function that, when called, changes the page displayed in the second column.
+ * @param currentPage current page that is being displayed
  */
-function Sidebar({ pageChanger }: SidebarProps) {
+function Sidebar({ pageChanger, currentPage }: SidebarProps) {
   // Load the icons
 
   const shipIconAlt = "Ship Icon";
@@ -30,15 +39,72 @@ function Sidebar({ pageChanger }: SidebarProps) {
   const settingsIconAlt = "Settings Icon";
   const bugIconAlt = "Bug Icon";
 
+  const [displayedAnomalyList, setDisplayedAnomalyList] = useState(false);
+  const [displayedNotifications, setDisplayedNotifications] = useState(false);
+  const [displayedSettings, setDisplayedSettings] = useState(false);
+  const [displayedBugs, setDisplayedBugs] = useState(false);
+
+  const changeAnomalyListIcon = () => {
+    setDisplayedAnomalyList((x) => !x);
+    setDisplayedNotifications(false);
+    setDisplayedSettings(false);
+    setDisplayedBugs(false);
+  };
+
+  const changeNotificationsIcon = () => {
+    setDisplayedAnomalyList(false);
+    setDisplayedNotifications((x) => !x);
+    setDisplayedSettings(false);
+    setDisplayedBugs(false);
+  };
+
+  const changeSettingsIcon = () => {
+    setDisplayedAnomalyList(false);
+    setDisplayedNotifications(false);
+    setDisplayedSettings((x) => !x);
+    setDisplayedBugs(false);
+  };
+
+  const changeBugsIcon = () => {
+    setDisplayedAnomalyList(false);
+    setDisplayedNotifications(false);
+    setDisplayedSettings(false);
+    setDisplayedBugs((x) => !x);
+  };
   // Define the click handlers for the icons
-  const onShipIconClicked = () =>
+  const onShipIconClicked = () => {
     pageChanger({ currentPage: "anomalyList", shownItemId: -1 });
-  const onBellIconClicked = () =>
+    changeAnomalyListIcon();
+  };
+
+  const onBellIconClicked = () => {
     pageChanger({ currentPage: "notificationList", shownItemId: -1 });
-  const onSettingsIconClicked = () =>
+    changeNotificationsIcon();
+  };
+
+  const onSettingsIconClicked = () => {
     pageChanger({ currentPage: "settings", shownItemId: -1 });
-  const onBugIconClicked = () =>
+    changeSettingsIcon();
+  };
+
+  const onBugIconClicked = () => {
     pageChanger({ currentPage: "errors", shownItemId: -1 });
+    changeBugsIcon();
+  };
+
+  if (currentPage.currentPage === "none") {
+    if (
+      displayedBugs ||
+      displayedSettings ||
+      displayedNotifications ||
+      displayedAnomalyList
+    ) {
+      setDisplayedAnomalyList(false);
+      setDisplayedNotifications(false);
+      setDisplayedSettings(false);
+      setDisplayedBugs(false);
+    }
+  }
 
   return (
     <Stack id="sidebar" data-testid="sidebar">
@@ -47,52 +113,90 @@ function Sidebar({ pageChanger }: SidebarProps) {
         className="sidebar-entry"
         onClick={onShipIconClicked}
       >
-        <img src={shipIcon} className="sidebar-icon" alt={shipIconAlt} />
+        {!displayedAnomalyList && (
+          <img
+            src={shipIcon}
+            className="anomaly-list-icon-not-selected"
+            alt={shipIconAlt}
+          />
+        )}
+        {displayedAnomalyList && (
+          <img
+            src={shipIconSelected}
+            className="anomaly-list-icon-selected"
+            alt={shipIconAlt}
+          />
+        )}
       </span>
       <span
         data-testid="sidebar-bell-icon"
         className="sidebar-bell-icon"
         onClick={onBellIconClicked}
       >
-        <img
-          src={getNotificationsBellType().toString()}
-          className="sidebar-icon"
-          alt={bellIconAlt}
-        />
+        {!displayedNotifications && (
+          <img
+            src={getNotificationsBellType().toString()}
+            className="bell-icon-not-selected"
+            alt={bellIconAlt}
+          />
+        )}
+        {displayedNotifications && (
+          <img
+            src={notificationIconSelected}
+            className="bell-icon-selected"
+            alt={bellIconAlt}
+          />
+        )}
       </span>
       <span
         data-testid="sidebar-settings-icon"
         className="sidebar-entry"
         onClick={onSettingsIconClicked}
       >
-        <img
-          src={settingsIcon}
-          className="sidebar-icon"
-          alt={settingsIconAlt}
-        />
+        {!displayedSettings && (
+          <img
+            src={settingsIcon}
+            className="settings-icon-not-selected"
+            alt={settingsIconAlt}
+          />
+        )}
+        {displayedSettings && (
+          <img
+            src={settingsIconSelected}
+            className="settings-icon-selected"
+            alt={settingsIconAlt}
+          />
+        )}
       </span>
       <span
         data-testid="sidebar-bug-icon"
-        className={getBugIconClassName()}
+        className="sidebar-entry"
         onClick={onBugIconClicked}
       >
-        <img src={bugIcon} className="sidebar-icon" alt={bugIconAlt} />
+        {!displayedBugs && (
+          <img
+            src={getBugIcon()}
+            className="bug-icon-not-selected"
+            alt={bugIconAlt}
+          />
+        )}
+        {displayedBugs && (
+          <img
+            src={bugIconSelected}
+            className="bug-icon-selected"
+            alt={bugIconAlt}
+          />
+        )}
       </span>
     </Stack>
   );
 }
 
-/**
- * Returns the class name for the icon element that represents error list
- * in the sidebar.
- * The class name is based on whether all notifications were read or not,
- * so that the icon could be shown in red when there are unread notifications.
- */
-function getBugIconClassName() {
+function getBugIcon() {
   if (ErrorNotificationService.areAllRead()) {
-    return "sidebar-bug-icon-all-read";
+    return bugIcon;
   }
-  return "sidebar-bug-icon-not-all-read";
+  return bugIconRed;
 }
 
 /**

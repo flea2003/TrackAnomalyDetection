@@ -1,0 +1,59 @@
+{
+  "type": "kafka",
+  "spec": {
+    "ioConfig": {
+      "type": "kafka",
+      "consumerProperties": {
+        "bootstrap.servers": "localhost:9092"
+      },
+      "topic": "ships-history",
+      "inputFormat": {
+        "type": "kafka",
+        "keyFormat": {
+          "type": "regex",
+          "pattern": "([\\s\\S]*)",
+          "columns": [
+            "line"
+          ]
+        },
+        "valueFormat": {
+          "type": "json"
+        }
+      },
+      "useEarliestOffset": true
+    },
+    "tuningConfig": {
+      "type": "kafka"
+    },
+    "dataSchema": {
+      "dataSource": "ship-details",
+      "timestampSpec": {
+        "column": "kafka.timestamp",
+        "format": "millis"
+      },
+      "dimensionsSpec": {
+        "dimensions": [
+          "kafka.topic",
+          {
+            "type": "json",
+            "name": "maxAnomalyScoreInfo"
+          },
+          {
+            "type": "json",
+            "name": "currentAnomalyInformation"
+          },
+          "kafka.key",
+          {
+            "type": "json",
+            "name": "currentAISSignal"
+          }
+        ]
+      },
+      "granularitySpec": {
+        "queryGranularity": "none",
+        "rollup": false,
+        "segmentGranularity": "hour"
+      }
+    }
+  }
+}

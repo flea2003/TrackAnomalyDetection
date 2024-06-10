@@ -31,4 +31,19 @@ public class CurrentShipDetails implements Serializable {
     public static Serde<CurrentShipDetails> getSerde() {
         return new Jackson2Serde<>(new UtilsObjectMapper(), CurrentShipDetails.class);
     }
+
+    /**
+     * Extracts the ID of the ship, from the fields that it contains.
+     *
+     * @return the ID of the ship
+     */
+    public Long extractId() {
+
+        if (currentAnomalyInformation != null) {
+            return currentAnomalyInformation.getId();
+        } else {
+            return currentAISSignal.getId();
+        }
+    }
+
 }

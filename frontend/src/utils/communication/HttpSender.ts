@@ -4,7 +4,7 @@ import ErrorNotificationService from "../../services/ErrorNotificationService";
  * Utility class that handles request sending to the backend
  */
 class HttpSender {
-  static url = "http://localhost:8081";
+  static url = "http://localhost:8180";
 
   /**
    * Send an asynchronous GET request to the backend server

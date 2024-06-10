@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import sp.exceptions.DatabaseException;
 import sp.exceptions.NotExistingShipException;
-import sp.exceptions.PipelineException;
-import sp.exceptions.PipelineStartingException;
 import sp.model.CurrentShipDetails;
 import sp.services.ShipsDataService;
 import java.util.List;
@@ -43,10 +42,6 @@ public class ShipsDataController {
             return ResponseEntity.ok(this.shipsDataService.getIndividualCurrentShipDetails(id));
         } catch (NotExistingShipException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (PipelineException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (PipelineStartingException e) {
-            return new ResponseEntity<>(HttpStatus.TOO_EARLY);
         }
     }
 
@@ -57,12 +52,24 @@ public class ShipsDataController {
      */
     @GetMapping("/ships/details")
     public ResponseEntity<List<CurrentShipDetails>> getCurrentShipDetails() {
+        return ResponseEntity.ok(this.shipsDataService.getCurrentShipDetailsOfAllShips());
+    }
+
+    /**
+     * Retrieves all the CurrentShipDetails of a corresponding ship.
+     *
+     * @param id - the id of the ships that we retrieve the information of
+     * @return - a list of CurrentShipDetails of the corresponding ship, or
+     *      500 error code in case the sql query fails.
+     */
+    @GetMapping("/ships/history/{id}")
+    public ResponseEntity<List<CurrentShipDetails>> getHistoryOfShip(
+        @PathVariable Long id
+    ) {
         try {
-            return ResponseEntity.ok(this.shipsDataService.getCurrentShipDetails());
-        } catch (PipelineException e) {
+            return ResponseEntity.ok(this.shipsDataService.getHistoryOfShip(id));
+        } catch (DatabaseException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (PipelineStartingException e) {
-            return new ResponseEntity<>(HttpStatus.TOO_EARLY);
         }
     }
 }

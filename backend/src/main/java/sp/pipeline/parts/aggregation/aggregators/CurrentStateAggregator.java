@@ -1,22 +1,32 @@
 package sp.pipeline.parts.aggregation.aggregators;
 
-import org.springframework.stereotype.Service;
+import org.apache.flink.api.common.functions.OpenContext;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.springframework.stereotype.Component;
 import sp.model.*;
+import java.io.IOException;
 import java.time.OffsetDateTime;
 
-@Service
-public class CurrentStateAggregator {
+@Component
+public class CurrentStateAggregator extends RichMapFunction<ShipInformation, CurrentShipDetails> {
+    private ValueState<CurrentShipDetails> aggregatedShipDetailsState;
 
     /**
-     * Aggregates data to a resulting map.
+     * Aggregates data to a single object that encapsulates the current state of a ship.
      *
-     * @param aggregatedShipDetails object that stores the latest received data for a ship
      * @param shipInformation object that stores the latest received data for a ship
-     * @param shipID the id of the ship (not used here, but needed for the signature)
-     * @return updated object that stores all needed data for a ship
+     * @return an updated current ship details for the ship
      */
-    public CurrentShipDetails aggregateSignals(CurrentShipDetails aggregatedShipDetails, ShipInformation shipInformation,
-                                               Long shipID) {
+    @Override
+    public CurrentShipDetails map(ShipInformation shipInformation) throws IOException {
+        // Handle initializing the state
+        if (aggregatedShipDetailsState.value() == null) {
+            aggregatedShipDetailsState.update(new CurrentShipDetails());
+        }
+
+        CurrentShipDetails aggregatedShipDetails = aggregatedShipDetailsState.value();
 
         AnomalyInformation anomalyInformation = shipInformation.getAnomalyInformation();
         AISSignal aisSignal = shipInformation.getAisSignal();
@@ -127,5 +137,19 @@ public class CurrentStateAggregator {
 
         return anomalyInformation.getCorrespondingTimestamp()
                 .isAfter(aggregatedShipDetails.getCurrentAnomalyInformation().getCorrespondingTimestamp());
+    }
+
+    /**
+     * Set up the Flink state.
+     *
+     * @param openContext The context containing information about the context in which the function
+     *     is opened.
+     * @throws Exception in case setting up the state fails
+     */
+    @Override
+    public void open(OpenContext openContext) throws Exception {
+        // Get the state
+        aggregatedShipDetailsState = getRuntimeContext().getState(
+                new ValueStateDescriptor<>("aggregatedShipDetailsState", CurrentShipDetails.class));
     }
 }
