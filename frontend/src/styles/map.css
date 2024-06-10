@@ -1,7 +1,6 @@
 #map {
     width: 100%;
     height: 100%;
-    background-color: var(--map_background_color);
     z-index: 0;
 }
 
@@ -15,4 +14,12 @@
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1; /* higher than box */
+}
+
+#map-container {
+    width: 100%;
+    height: 100vh;
+    flex-grow: 1;
+    position: relative;
+    display: block;
 }

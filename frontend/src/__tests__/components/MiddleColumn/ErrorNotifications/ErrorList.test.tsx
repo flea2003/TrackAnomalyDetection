@@ -3,10 +3,29 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import App, { CurrentPage } from "../../../../App";
 import React from "react";
 import ErrorNotificationService from "../../../../services/ErrorNotificationService";
-import ErrorList from "../../../../components/Side/MiddleColumn/ErrorNotifications/ErrorList";
+import ErrorList from "../../../../components/Side/InformationContainer/ErrorNotificationsList/ErrorList";
+import useWebSocketClient from "../../../../utils/communication/WebSocketClient";
+import ShipDetails from "../../../../model/ShipDetails";
+
+jest.mock("../../../../utils/communication/WebSocketClient", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+const mockedUseWebSocketClient = useWebSocketClient as jest.MockedFunction<
+  typeof useWebSocketClient
+>;
+
+beforeEach(() => {
+  mockedUseWebSocketClient.mockReturnValue(new Map<number, ShipDetails>());
+});
 
 afterEach(() => {
   ErrorNotificationService.clearAllNotifications();
+});
+
+afterAll(() => {
+  jest.resetAllMocks();
 });
 
 test("When bug icon is clicked, the error list is shown with the current errors", async () => {

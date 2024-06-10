@@ -1,27 +1,49 @@
+#sidebar {
+    width: 3%;
+    border: var(--border);
+    border-bottom: none;
+    background: var(--background);
+    pointer-events: all;
+
+    margin-left: 0.5%;
+}
+
 .sidebar-entry, .sidebar-bug-icon-all-read,
 .sidebar-bug-icon-not-all-read, .sidebar-bell-icon
 {
     width: 100%;
     height: 50px;
-    border-bottom: 1px solid black;
+    border-bottom: var(--border);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
 }
 
-.sidebar-icon {
+.anomaly-list-icon-not-selected,
+.anomaly-list-icon-selected,
+.bell-icon-not-selected,
+.bell-icon-selected,
+.settings-icon-not-selected,
+.settings-icon-selected,
+.bug-icon-not-selected,
+.bug-icon-selected {
     width: var(--sidebar-icon-size);
     height: var(--sidebar-icon-size);
 }
 
-.sidebar-entry:hover, .sidebar-bug-icon-all-read:hover,
-.sidebar-bug-icon-not-all-read:hover, .sidebar-bell-icon:hover
-{
-    background-color: lightblue;
+.anomaly-list-icon-not-selected:hover{
+    content: url("../assets/icons/selected-sidebar-icons/ship-blue.png");
 }
 
-.sidebar-bug-icon-not-all-read {
-    background-color: indianred;
+.bell-icon-not-selected:hover{
+    content: url("../assets/icons/selected-sidebar-icons/notification-bell-blue.png");
 }
 
+.settings-icon-not-selected:hover{
+    content: url("../assets/icons/selected-sidebar-icons/settings-blue.png");
+}
+
+.bug-icon-not-selected:hover{
+    content: url("../assets/icons/selected-sidebar-icons/bug_blue.png");
+}

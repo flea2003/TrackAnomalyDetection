@@ -1,0 +1,59 @@
+#error-list-container {
+    width: 15%;
+    height: 60%;
+
+    background: var(--background);
+    border: var(--border);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    pointer-events: all;
+
+    font-size: 0.9em;
+}
+
+#error-list-internal-container {
+    max-height: 100%;
+    width: 95%;
+    overflow: auto;
+    padding: 0;
+
+    border: 1px solid black;
+    border-bottom: none;
+    margin-bottom: 1%;
+}
+
+#error-list-close-icon {
+    height: var(--close-icon-length);
+    width: var(--close-icon-length);
+    cursor: pointer;
+}
+
+#error-list-close-icon:hover {
+    transform: scale(1.1);
+}
+
+#error-list-title-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+
+    padding: var(--title-padding);
+    font-size: var(--title-size);
+    font-weight: bold;
+}
+
+#error-list-mark-all-button, #error-list-mark-all-button:hover {
+    height: var(--check-icon-length);
+    width: var(--check-icon-length);
+    cursor: pointer;
+}
+
+#error-list-mark-all-button:hover {
+    content: url("../../assets/icons/helper-icons/mark-all-green.png");
+}
