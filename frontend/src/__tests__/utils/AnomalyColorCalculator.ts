@@ -14,4 +14,4 @@ test("Anomaly middle (50)", () => {
 
 test("Brighter colours test", () => {
   expect(calculateAnomalyColor(0, true)).toBe("rgba(0, 255, 0, 1)");
-})
+});

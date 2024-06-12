@@ -254,9 +254,7 @@ test("sorting-valid-notification-desc", async () => {
 });
 
 test("sorting without giving desc - sorting-valid-notification-desc", async () => {
-  const result = NotificationService.sortList(
-    [resultItem1, resultItem2]
-  );
+  const result = NotificationService.sortList([resultItem1, resultItem2]);
   expect(result).toStrictEqual([resultItem2, resultItem1]);
 });
 
@@ -296,7 +294,7 @@ test("check-all-read-true", async () => {
 describe("notifications array equality tests", () => {
   const createDummyShipWithId = (id: number) => {
     return new ShipDetails(id, 0, 0, 0, "t", 0, "d", 0, "t", "p", 0, 0);
-  }
+  };
 
   const ship1 = createDummyShipWithId(1);
   const ship2 = createDummyShipWithId(2);
@@ -310,17 +308,17 @@ describe("notifications array equality tests", () => {
     const arr1 = [notification1, notification2];
     const arr2 = [notification1];
     expect(NotificationService.notificationArraysEqual(arr1, arr2)).toBe(false);
-  })
+  });
 
   test("equal arrays", () => {
     const arr1 = [notification1, notification2];
     const arr2 = [notification1, notification2];
     expect(NotificationService.notificationArraysEqual(arr1, arr2)).toBe(true);
-  })
+  });
 
   test("second element differs - not equal arrays", () => {
     const arr1 = [notification1, notification2];
     const arr2 = [notification1, notification3];
     expect(NotificationService.notificationArraysEqual(arr1, arr2)).toBe(false);
-  })
-})
+  });
+});

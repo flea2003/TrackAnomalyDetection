@@ -4,13 +4,14 @@ import ShipDetails from "../../model/ShipDetails";
 beforeEach(() => {
   jest.resetAllMocks();
   ShipUpdateBuffer.resetBuffer();
-})
+});
 
 afterEach(() => {
   ShipUpdateBuffer.resetBuffer();
-})
+});
 
-const createShipWithId = (id: number) => new ShipDetails(id, 0, 0, 0, "t", 0, "d", 0, "t", "p", 0, 0);
+const createShipWithId = (id: number) =>
+  new ShipDetails(id, 0, 0, 0, "t", 0, "d", 0, "t", "p", 0, 0);
 
 test("get and reset buffer test", () => {
   const ship1 = createShipWithId(1);
@@ -21,13 +22,14 @@ test("get and reset buffer test", () => {
 
   const result = ShipUpdateBuffer.getBufferedShipsAndReset();
   expect(Array.from(result)).toStrictEqual([
-    [1, ship1], [2, ship2]
+    [1, ship1],
+    [2, ship2],
   ]);
 
   // after get and reset, there should be no buffered ships left
   const bufferedAgain = ShipUpdateBuffer.getBufferedShipsAndReset();
   expect(Array.from(bufferedAgain)).toStrictEqual([]);
-})
+});
 
 test("reset buffer test", () => {
   const ship1 = createShipWithId(1);
@@ -40,9 +42,9 @@ test("reset buffer test", () => {
   // after reset, there should be no buffered ships left
   const result = ShipUpdateBuffer.getBufferedShipsAndReset();
   expect(Array.from(result)).toStrictEqual([]);
-})
+});
 
 test("buffer initially empty", () => {
   const result = ShipUpdateBuffer.getBufferedShipsAndReset();
   expect(Array.from(result)).toStrictEqual([]);
-})
+});
