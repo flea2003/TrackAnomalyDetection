@@ -1,0 +1,28 @@
+.ais-details-container {
+    width: 95%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.ais-details-column {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.ais-details-subtitle {
+    font-weight: bold;
+}
+
+.ais-details-info, .ais-details-subtitle {
+    font-size: 0.9em;
+}
+
+.ais-details-info-container {
+    margin-top: 5%;
+    margin-left: 8%;
+    width: 100%;
+}

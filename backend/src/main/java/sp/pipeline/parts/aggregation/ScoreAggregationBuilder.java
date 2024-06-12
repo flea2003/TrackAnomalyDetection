@@ -1,10 +1,7 @@
 package sp.pipeline.parts.aggregation;
 
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.state.Stores;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sp.model.AISSignal;
@@ -13,123 +10,85 @@ import sp.model.CurrentShipDetails;
 import sp.model.ShipInformation;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
-import sp.pipeline.utils.binarization.KafkaSerialization;
+import sp.pipeline.utils.StreamUtils;
 
 @Component
 public class ScoreAggregationBuilder {
 
     private final CurrentStateAggregator currentStateAggregator;
     private final PipelineConfiguration configuration;
+    private final StreamUtils streamUtils;
 
     /**
      * Constructor for the ScoreAggregationBuilder class.
      *
      * @param configuration an object that holds configuration properties
-     * @param currentStateAggregator a responsible for aggregating the current state of the pipeline
+     * @param currentStateAggregator a Flink stateful map that aggregates the current state for each ship
+     * @param streamUtils utility class for setting up streams
      */
     @Autowired
     public ScoreAggregationBuilder(PipelineConfiguration configuration,
-                                   CurrentStateAggregator currentStateAggregator) {
+                                   CurrentStateAggregator currentStateAggregator,
+                                   StreamUtils streamUtils) {
         this.currentStateAggregator = currentStateAggregator;
         this.configuration = configuration;
-    }
-
-    /**
-     * Builds a KStream object that consists of computed AnomalyInformation objects, wrapped around
-     * ShipInformation class (i.e. AISSignal is set to null)
-     *
-     * @param builder streams builder
-     * @return KStream object that consists of computed AnomalyInformation objects, wrapped around
-     *     ShipInformation class
-     */
-    private KStream<Long, ShipInformation> streamAnomalyInformation(StreamsBuilder builder) {
-
-        // Take JSON strings from score topic, deserialize them into AnomalyInformation
-        KStream<Long, AnomalyInformation> streamAnomalyInformation = KafkaSerialization.deserialize(
-                builder.stream(configuration.getCalculatedScoresTopicName()),
-                AnomalyInformation.class
-        );
-
-        // Wrap the AnomalyInformation objects into ShipInformation objects, so we could later merge the stream
-        return streamAnomalyInformation.mapValues(x -> new ShipInformation(x.getId(), x, null));
-    }
-
-    /**
-     * Builds a KStream object that consists of computed AISSignal objects, wrapped around
-     * ShipInformation class (i.e. AnomalyInformation is set to null)
-     *
-     * @param builder streams builder
-     * @return a KStream object that consists of computed AISSignal objects, wrapped around
-     *     ShipInformation class
-     */
-    private KStream<Long, ShipInformation> streamAISSignals(StreamsBuilder builder) {
-
-        // Take the initial AISSignal and wrap them into ShipInformation objects, so we could later merge the stream
-        // with already wrapped AnomalyInformation objects
-        KStream<Long, AISSignal> signalsStream = KafkaSerialization.deserialize(
-                builder.stream(configuration.getIncomingAisTopicName()),
-                AISSignal.class
-        );
-
-        // Wrap the AISSignal objects into ShipInformation objects, so we could later merge the stream
-        return signalsStream.mapValues(x -> new ShipInformation(x.getId(), null, x));
+        this.streamUtils = streamUtils;
     }
 
     /**
      * Method that constructs a unified stream of AnomalyInformation and AISSignal instances,
      * wrapped inside a ShipInformation class.
      *
-     * @param builder StreamsBuilder instance responsible for configuring the KStream instances
+     * @param signalStream a stream of identified signals, incoming to the application
+     * @param anomalyInformationStream a stream of anomaly information, incoming to the application
      * @return unified stream
      */
-    private KStream<Long, ShipInformation> mergeStreams(StreamsBuilder builder) {
-        // Construct two separate streams for AISSignals and computed AnomalyScores, and wrap each stream values into
-        // ShipInformation object, so that we could later merge these two streams
-        KStream<Long, ShipInformation> streamAnomalyInformation  = streamAnomalyInformation(builder);
-        KStream<Long, ShipInformation> streamAISSignals = streamAISSignals(builder);
+    private DataStream<ShipInformation> mergeStreams(DataStream<AISSignal> signalStream,
+                                                     DataStream<AnomalyInformation> anomalyInformationStream) {
 
-        // Merge two streams and select the ship hash as a key for the new stream.
-        return streamAISSignals
-                .merge(streamAnomalyInformation)
-                .selectKey((key, value) -> value.getShipId());
+        // Map both streams to ShipInformation streams
+        DataStream<ShipInformation> streamAISSignals = signalStream.map(x -> new ShipInformation(x.getId(), null, x));
+        DataStream<ShipInformation> streamAnomalyInformation = anomalyInformationStream.map(x ->
+                new ShipInformation(x.getId(), x, null));
+
+        return streamAISSignals.union(streamAnomalyInformation);
     }
 
     /**
-     * Builds the second part of the `sp.pipeline`the score aggregation part. In particular, this part
-     * takes the calculated score updates from Kafka (which were pushed there by the previous part)
-     * and aggregates them into a KTable. It also takes care of appending needed AIS signals to the KTable.
-     * This KTable is then used as the state of the sp.pipeline.
-     *
+     * Builds the score aggregation part of the pipeline. In particular, this part merges incoming (identified)
+     * AIS signals and incoming corresponding Anomaly Information objects, and returns a stream of
+     * CurrentShipDetails. I.e., it connects the incoming AIS signals with the corresponding anomaly scores
+     * and produces a stream of new states for ships.
+
      * <p>The actual implementation works the following way:
      * 1. Incoming AIS signals are mapped to ShipInformation object with the anomaly score missing.
      * 2. AIS score updates are mapped to ShipInformation objects as well, with AIS signal missing.
-     * 3. The AIS-signal type ShipInformation objects get to the KTable first and just get added there.
-     * 4. The AIS-score-update type ShipInformation objects  get to the KTable after those and just update the missing
-     * anomaly score field in the corresponding places.
+     * 3. The AIS-signal type ShipInformation objects (usually) get to the state first and just get added there.
+     * 4. The AIS-score-update type ShipInformation objects (usually) get to the state after those and just update
+     * the missing anomaly score field in the corresponding places.
      * </p>
      *
-     * @param builder incoming stream
-     * @return Kafka table hashed by key
+     * @param signalStream a stream of identified signals, incoming to the application
+     * @param anomalyInformationStream a stream of anomaly information, incoming to the application
+     * @return a stream of current ship details
      */
-    public KTable<Long, CurrentShipDetails> buildScoreAggregationPart(StreamsBuilder builder) {
-        // Construct and merge two streams and select the ship hash as a key for the new stream.
-        KStream<Long, ShipInformation> mergedStream = mergeStreams(builder);
+    public DataStream<CurrentShipDetails> buildScoreAggregationPart(
+            DataStream<AISSignal> signalStream,
+            DataStream<AnomalyInformation> anomalyInformationStream
+    ) {
+        // Merge the two incoming streams
+        DataStream<ShipInformation> mergedStream = mergeStreams(signalStream, anomalyInformationStream);
 
-        // Construct the KTable (state that is stored) by aggregating the merged stream
-        KTable<Long, CurrentShipDetails> table =
-                KafkaSerialization.serialize(mergedStream)
-                .groupByKey()
-                .aggregate(
-                        CurrentShipDetails::new,
-                        // Use the KafkaKryo.aggregator helper function to avoid cluttering the lambda
-                        KafkaSerialization.aggregator(currentStateAggregator::aggregateSignals, ShipInformation.class),
-                        Materialized
-                                .<Long, CurrentShipDetails>as(
-                                        Stores.inMemoryKeyValueStore(configuration.getKafkaStoreName())
-                                )
-                                .withValueSerde(CurrentShipDetails.getSerde())
-                                .withCachingDisabled()
-                );
-        return table;
+        // Perform aggregation for each ship (use the currentStateAggregator stateful map)
+        DataStream<CurrentShipDetails> aggregatedStream = mergedStream
+                .keyBy(ShipInformation::getShipId)
+                .map(currentStateAggregator);
+
+        // Sink the aggregated stream to a Kafka topic
+        KafkaSink<CurrentShipDetails> kafkaSink = streamUtils.createSinkFlinkToKafka(
+                configuration.getShipsHistoryTopicName()
+        );
+        aggregatedStream.sinkTo(kafkaSink);
+        return aggregatedStream;
     }
 }

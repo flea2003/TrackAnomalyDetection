@@ -1,5 +1,5 @@
 {
-  "brokerUrl": "ws://localhost:8081/details",
+  "brokerUrl": "ws://localhost:8180/details",
   "topic": "/topic/details",
 
   "reconnectDelayMs": 60000,

@@ -387,5 +387,5 @@ test("construct-map-rich-array", () => {
   const constructedMap = ShipService.constructMap(shipArray);
 
   expect(Array.from(constructedMap.keys()).sort()).toStrictEqual([1, 2, 3]);
-  expect(constructedMap.get(3)?.getAnomalyScore()).toBe(0.5);
+  expect(constructedMap.get(3)?.anomalyScore).toBe(0.5);
 });

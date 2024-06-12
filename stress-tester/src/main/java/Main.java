@@ -24,7 +24,7 @@ public class Main {
 
 
     // Number of threads that will perform the sending of signals
-    private static final int threadCount = 5;
+    private static final int threadCount = 15;
 
 
     /**
@@ -35,6 +35,8 @@ public class Main {
     public static void main(String[] args) {
         // Calculate the number of ships needed to achieve the required signals-per-second
         int shipCount = signalsPerSecond * (maxIntervalBetweenMessages + minIntervalBetweenMessages) / 2;
+
+        System.out.println("Ship count = " + shipCount);
 
         // Create a sender object for each ship. In order to send signals, the step() methods for these
         // sender objects should be called as often as possible. I.e., each call of step() checks if it is
@@ -87,7 +89,7 @@ public class Main {
             // Start the thread that will send signals for the subset of ships
             executor.submit(() -> {
                 while (true) {
-                    Thread.sleep(500);
+                    Thread.sleep(200);
                     for (int j = lowerIndex; j < upperIndex; j++)
                         senders[j].step();
                 }

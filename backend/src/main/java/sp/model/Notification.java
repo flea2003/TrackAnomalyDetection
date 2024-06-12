@@ -6,10 +6,13 @@ import lombok.*;
 import org.apache.kafka.common.serialization.Serde;
 import sp.utils.UtilsObjectMapper;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.Objects;
 
 @Entity
 @AllArgsConstructor
 @EqualsAndHashCode
+@ToString
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
@@ -33,6 +36,9 @@ public class Notification implements Serializable {
         this.currentShipDetails = currentShipDetails;
         this.isRead = false;
         this.shipID = currentShipDetails.getCurrentAnomalyInformation().getId();
+
+        // Assign a unique id to the notification
+        this.id = (long) Objects.hash(currentShipDetails.extractId(), OffsetDateTime.now());
     }
 
     /**

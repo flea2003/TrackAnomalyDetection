@@ -19,7 +19,7 @@ function createShipIcon(
   rotation: number,
   isMoving: boolean,
 ): L.Icon {
-  const color = calculateAnomalyColor(weight * 100);
+  const color = calculateAnomalyColor(weight * 100, false);
 
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
@@ -159,4 +159,9 @@ const handleMouseOutShipIcon = (
   } as ShipIconDetailsType);
 };
 
-export { createShipIcon, handleMouseOverShipIcon, handleMouseOutShipIcon };
+export {
+  createShipIcon,
+  handleMouseOverShipIcon,
+  handleMouseOutShipIcon,
+  extractIconCoordinates,
+};

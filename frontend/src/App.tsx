@@ -1,5 +1,4 @@
 import React from "react";
-import Stack from "@mui/material/Stack";
 import { useState } from "react";
 import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
@@ -9,6 +8,7 @@ import "./styles/common.css";
 import Side, { PageChangerRef } from "./components/Side/Side";
 import useWebSocketClient from "./utils/communication/WebSocketClient";
 import ShipService from "./services/ShipService";
+import "./styles/common.css";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -49,20 +49,14 @@ function App() {
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
-      <Stack direction="row">
-        <LMap
-          ships={displayedShips}
-          pageChangerRef={pageChangerRef}
-          ref={mapRef}
-        />
-        <Side
-          ships={displayedShips}
-          mapCenteringFun={mapCenteringFun}
-          setFilterThreshold={setFilterThreshold}
-          anomalyThreshold={filterThreshold}
-          ref={pageChangerRef}
-        />
-      </Stack>
+      <LMap ships={displayedShips} pageChangerRef={pageChangerRef} ref={mapRef} />
+      <Side
+        ships={displayedShips}
+        mapCenteringFun={mapCenteringFun}
+        setFilterThreshold={setFilterThreshold}
+        anomalyThreshold={filterThreshold}
+        ref={pageChangerRef}
+      />
     </div>
   );
 }

@@ -125,8 +125,8 @@ class ShipService {
       return [];
     }
     const sortedList = list.sort((a, b) => {
-      const aScore = a.getAnomalyScore();
-      const bScore = b.getAnomalyScore();
+      const aScore = a.anomalyScore;
+      const bScore = b.anomalyScore;
       if (aScore > bScore) {
         return -1;
       }

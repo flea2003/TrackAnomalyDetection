@@ -29,18 +29,6 @@ export function getMarkersClustersLayer() {
 }
 
 /**
- * The initial values for the `ShipIconsDetailsType` object.
- */
-export function getInitialShipIconsDetailsInfo() {
-  return {
-    show: false,
-    x: 0,
-    y: 0,
-    shipDetails: null,
-  } as ShipIconDetailsType;
-}
-
-/**
  * Returns the array of the markers (Leaflet layers) for each of the ships.
  *
  * @param ships the array of current ships
@@ -82,20 +70,27 @@ function getMarker(
   ) => void,
   pageChangerRef: React.RefObject<PageChangerRef>,
 ) {
-  return L.marker([ship.lat, ship.lng], {
-    icon: createShipIcon(ship.anomalyScore / 100, ship.heading, ship.speed > 0),
-  })
+  const icon = createShipIcon(
+      ship.anomalyScore / 100,
+      ship.heading === 511 ? ship.course : ship.heading,
+      ship.speed > 0
+    );
+
+  const onClickFunc = (e: L.LeafletMouseEvent) => {
+    map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
+    //     //           trackShipIcon(ship, false);
+    handleMouseOutShipIcon(setHoverInfo);
+    if (pageChangerRef.current !== null) {
+      pageChangerRef.current.pageChanger({
+        currentPage: "objectDetails",
+        shownItemId: ship.id,
+      });
+    }
+  };
+
+  return L.marker([ship.lat, ship.lng], { icon })
     .bindPopup("ID: " + ship.id)
-    .on("click", (e) => {
-      map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
-      handleMouseOutShipIcon(setHoverInfo);
-      if (pageChangerRef.current !== null) {
-        pageChangerRef.current.pageChanger({
-          currentPage: "objectDetails",
-          shownItemId: ship.id,
-        });
-      }
-    })
+    .on("click", onClickFunc)
     .on("mouseover", (e) => {
       handleMouseOverShipIcon(e, ship, map, setHoverInfo);
     })

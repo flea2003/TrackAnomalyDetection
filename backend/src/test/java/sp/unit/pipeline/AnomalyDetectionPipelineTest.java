@@ -14,10 +14,7 @@ import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
 import sp.pipeline.parts.scoring.scorecalculators.ScoreCalculationStrategy;
 import sp.pipeline.parts.scoring.scorecalculators.SimpleScoreCalculator;
-import sp.pipeline.parts.websockets.WebSocketBroadcasterBuilder;
 import sp.pipeline.utils.StreamUtils;
-import sp.services.NotificationService;
-
 import java.io.IOException;
 import java.util.UUID;
 
@@ -29,7 +26,6 @@ import static org.mockito.Mockito.*;
 class AnomalyDetectionPipelineTest {
 
     private AnomalyDetectionPipeline anomalyDetectionPipeline;
-    private NotificationService notificationService;
     private StreamExecutionEnvironment flinkEnv;
 
     private void setupPipelineComponents() throws IOException {
@@ -42,15 +38,8 @@ class AnomalyDetectionPipelineTest {
         CurrentStateAggregator currentStateAggregator;
         PipelineConfiguration config;
         NotificationsAggregator notificationsAggregator;
-        WebSocketBroadcasterBuilder webSocketBroadcasterBuilder;
 
         flinkEnv = spy(StreamExecutionEnvironment.getExecutionEnvironment());
-
-        // Mock the notification service class (to mock the DB)
-        notificationService = mock(NotificationService.class);
-
-        // Mock the WebSocket broadcaster builder
-        webSocketBroadcasterBuilder = mock(WebSocketBroadcasterBuilder.class);
 
         // Create the configuration
         config = new PipelineConfiguration("kafka-connection.properties");
@@ -62,20 +51,34 @@ class AnomalyDetectionPipelineTest {
         // Create the core objects
         scoreCalculationStrategy = new SimpleScoreCalculator();
         currentStateAggregator = new CurrentStateAggregator();
-        notificationsAggregator = new NotificationsAggregator(notificationService);
+        notificationsAggregator = new NotificationsAggregator();
 
         // Create the pipeline builders
         streamUtils = new StreamUtils(config);
         idAssignmentBuilder = new IdAssignmentBuilder(streamUtils, config);
-        scoreCalculationBuilder = new ScoreCalculationBuilder(streamUtils, config, scoreCalculationStrategy);
-        scoreAggregationBuilder = new ScoreAggregationBuilder(config, currentStateAggregator);
-        notificationsDetectionBuilder = new NotificationsDetectionBuilder(notificationsAggregator);
+        scoreCalculationBuilder = new ScoreCalculationBuilder(scoreCalculationStrategy);
+        scoreAggregationBuilder = new ScoreAggregationBuilder(config, currentStateAggregator, streamUtils);
+        notificationsDetectionBuilder = new NotificationsDetectionBuilder(notificationsAggregator, streamUtils, config);
 
         // Create the pipeline itself
         anomalyDetectionPipeline = new AnomalyDetectionPipeline(
-                streamUtils, idAssignmentBuilder, scoreCalculationBuilder, scoreAggregationBuilder, notificationsDetectionBuilder,
-                flinkEnv, webSocketBroadcasterBuilder
+                idAssignmentBuilder,
+                scoreCalculationBuilder,
+                scoreAggregationBuilder,
+                notificationsDetectionBuilder,
+                flinkEnv
         );
+
+        // Create the pipeline with default flink env
+        assertDoesNotThrow(() -> {
+            new AnomalyDetectionPipeline(
+                    idAssignmentBuilder,
+                    scoreCalculationBuilder,
+                    scoreAggregationBuilder,
+                    notificationsDetectionBuilder
+            );
+        });
+
     }
 
     @Test

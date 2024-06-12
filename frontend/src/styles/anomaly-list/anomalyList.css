@@ -1,0 +1,90 @@
+#anomaly-list-container {
+    width: 15%;
+    height: 60%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    background: var(--background);
+    border: var(--border);
+    pointer-events: all;
+
+    font-size: 0.9em;
+}
+
+#anomaly-list-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: var(--title-size);
+    padding: var(--title-padding);
+    font-weight: bold;
+}
+
+#anomaly-list-title-container-with-slider {
+    width: 100%;
+}
+
+#anomaly-list-internal-container {
+    max-height: 100%;
+    width: 95%;
+
+    overflow: auto;
+    margin-bottom: 5px;
+    border-top: var(--border);
+    border-right: var(--border);
+    border-left: var(--border);
+    padding: 0;
+
+    margin-top: 3px;
+}
+
+#anomaly-list-close-icon {
+    height: var(--close-icon-length);
+    width: var(--close-icon-length);
+}
+
+#anomaly-list-close-icon:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.modify-button-container:hover {
+    content: url("../../assets/icons/selected-sidebar-icons/filter-blue.png");
+    height: 20px;
+    width: 20px;
+}
+
+.modify-button-container {
+    height: 20px;
+    width: 20px;
+    display: flex;
+    flex-direction: row;
+    font-size: 0.6em;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 2px 2px 1px 1px;
+    cursor: pointer;
+}
+
+.filter-icon {
+    height: 20px;
+    width: 20px;
+}
+
+.no-ships-entry {
+    font-size: 0.8em;
+    margin-top: 2.5px;
+    padding-top: 6px;
+    border-top: 1px solid black;
+    width: 95%;
+    text-align: center;
+}
+
+.threshold-div {
+    width: 20px;
+    text-align: left;
+}

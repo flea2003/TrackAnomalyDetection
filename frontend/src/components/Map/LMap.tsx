@@ -11,12 +11,13 @@ import { PageChangerRef } from "../Side/Side";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import {
   updateMarkersForShips,
-  getInitialShipIconsDetailsInfo,
   getMarkersClustersLayer,
 } from "./ShipMarkerCluster";
 import L from "leaflet";
 import "leaflet.markercluster";
 
+import "../../styles/map.css";
+import "../../styles/common.css";
 import "../../styles/map.css";
 import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -33,6 +34,14 @@ interface MapProps {
 // Define the type of the ref object
 interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
+}
+
+interface ShipIconTrackingType {
+  x: number;
+  y: number;
+  shipId: number;
+  isClicked: boolean;
+  clickedFromList: boolean;
 }
 
 /**
@@ -58,9 +67,23 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship
-    const [hoverInfo, setHoverInfo] = useState<ShipIconDetailsType>(
-      getInitialShipIconsDetailsInfo(),
-    );
+    const [hoverInfo, setHoverInfo] =
+      useState<ShipIconDetailsType>(getDefaultHoverInfo());
+
+    // Initialize the trackingInfo variable that will track the selected ship icon
+    const [trackingInfo, setTrackingInfo] =
+      useState<ShipIconTrackingType>(getDefaultShipIconTrackingInfo());
+
+    // Event-handling method which enables the tracking of a particular ship
+    const trackShipIcon = (ship: ShipDetails, fromList: boolean) => {
+      setTrackingInfo({
+        x: ship.lng,
+        y: ship.lat,
+        shipId: ship.id,
+        isClicked: true,
+        clickedFromList: fromList,
+      });
+    };
 
     // Initialize map (once).
     useEffect(() => {
@@ -93,7 +116,51 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           updateFunc();
         }
       };
+    //   // When re-rendering the Map component, check if a ship icon is currently tracked
+    //   if (trackingInfo.shipId !== -1) {
+    //     const trackedShip = ships.find((x) => x.id === trackingInfo.shipId);
+    //     if (trackedShip !== undefined) {
+    //       if (
+    //         trackingInfo.isClicked ||
+    //         trackingInfo.x !== trackedShip.lng ||
+    //         trackingInfo.y !== trackedShip.lat
+    //       ) {
+    //         if (trackingInfo.clickedFromList) {
+    //           map.flyTo(
+    //             [trackedShip.lat, trackedShip.lng],
+    //             mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
+    //             {
+    //               animate: true,
+    //               duration: mapStyleConfig["transition-time"],
+    //             },
+    //           );
+    //         } else {
+    //           map.flyTo([trackedShip.lat, trackedShip.lng], map.getZoom(), {
+    //             animate: true,
+    //             duration: mapStyleConfig["transition-time"],
+    //           });
+    //         }
+    //         setTrackingInfo({
+    //           x: trackedShip.lng,
+    //           y: trackedShip.lat,
+    //           shipId: trackedShip.id,
+    //           isClicked: false,
+    //           clickedFromList: false,
+    //         } as ShipIconTrackingType);
+    //       }
+    //     }
+    //   }
+    //
 
+    //
+    //   map
+    //     .on("drag", () => {
+    //       setTrackingInfo(defaultIconTrackingInfo);
+    //     })
+    //     .on("zoom", () => {
+    //       setHoverInfo(defaultHoverInfo);
+    //     });
+    //
       updateFunc();
 
       map.on("moveend", updateOnlyWhenFilterFunc);
@@ -144,7 +211,9 @@ function mapFlyToShip(
   ship: ShipDetails | null | undefined,
   ships: ShipDetails[],
 ) {
-  if (mapRef.current == null) {
+  const map = mapRef.current as L.Map | null;
+
+  if (map == null) {
     ErrorNotificationService.addWarning(
       "map is not initialized in the call centerMapOntoShip",
     );
@@ -163,11 +232,31 @@ function mapFlyToShip(
     return;
   }
 
-  const map = mapRef.current as L.Map;
+  // When icon centering is triggered from the entry list, zoom in on the ship icon
+  //   trackShipIcon(ship, true);
   map.flyTo([ship.lat, ship.lng], mapConfig.centeringShipZoomLevel, {
     animate: true,
     duration: mapConfig.centeringShipTransitionTime,
   });
+}
+
+function getDefaultShipIconTrackingInfo() {
+  return {
+    x: 0,
+    y: 0,
+    shipId: -1,
+    isClicked: false,
+    clickedFromList: false,
+  } as ShipIconTrackingType;
+}
+
+function getDefaultHoverInfo() {
+  return {
+    show: false,
+    x: 0,
+    y: 0,
+    shipDetails: null,
+  } as ShipIconDetailsType;
 }
 
 /**
