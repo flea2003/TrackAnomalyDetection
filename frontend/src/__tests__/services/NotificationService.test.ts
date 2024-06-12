@@ -253,6 +253,13 @@ test("sorting-valid-notification-desc", async () => {
   expect(result).toStrictEqual([resultItem2, resultItem1]);
 });
 
+test("sorting without giving desc - sorting-valid-notification-desc", async () => {
+  const result = NotificationService.sortList(
+    [resultItem1, resultItem2]
+  );
+  expect(result).toStrictEqual([resultItem2, resultItem1]);
+});
+
 test("check-all-read-false", async () => {
   fakeNotificationResponseItem1.isRead = true;
 
@@ -285,3 +292,35 @@ test("check-all-read-true", async () => {
   const result = NotificationService.areAllRead();
   expect(result).toStrictEqual(true);
 });
+
+describe("notifications array equality tests", () => {
+  const createDummyShipWithId = (id: number) => {
+    return new ShipDetails(id, 0, 0, 0, "t", 0, "d", 0, "t", "p", 0, 0);
+  }
+
+  const ship1 = createDummyShipWithId(1);
+  const ship2 = createDummyShipWithId(2);
+  const ship3 = createDummyShipWithId(3);
+
+  const notification1 = new ShipNotification(1, false, ship1);
+  const notification2 = new ShipNotification(2, false, ship2);
+  const notification3 = new ShipNotification(3, false, ship3);
+
+  test("different size notification arrays", () => {
+    const arr1 = [notification1, notification2];
+    const arr2 = [notification1];
+    expect(NotificationService.notificationArraysEqual(arr1, arr2)).toBe(false);
+  })
+
+  test("equal arrays", () => {
+    const arr1 = [notification1, notification2];
+    const arr2 = [notification1, notification2];
+    expect(NotificationService.notificationArraysEqual(arr1, arr2)).toBe(true);
+  })
+
+  test("second element differs - not equal arrays", () => {
+    const arr1 = [notification1, notification2];
+    const arr2 = [notification1, notification3];
+    expect(NotificationService.notificationArraysEqual(arr1, arr2)).toBe(false);
+  })
+})

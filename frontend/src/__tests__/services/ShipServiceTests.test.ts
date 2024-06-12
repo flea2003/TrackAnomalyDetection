@@ -389,3 +389,21 @@ test("construct-map-rich-array", () => {
   expect(Array.from(constructedMap.keys()).sort()).toStrictEqual([1, 2, 3]);
   expect(constructedMap.get(3)?.anomalyScore).toBe(0.5);
 });
+
+describe("sort list tests", () => {
+  const createDummyShipWithId = (id: number, anomalyScore: number) => {
+    return new ShipDetails(id, 0, 0, 0, "t", anomalyScore, "d", 0, "t", "p", 0, 0);
+  }
+
+  const ship1 = createDummyShipWithId(1, 5);
+  const ship2 = createDummyShipWithId(2, 10);
+  const ship3 = createDummyShipWithId(3, 6);
+
+  test("desc sort implicitly", () => {
+    expect(ShipService.sortList([ship1, ship2, ship3])).toStrictEqual([ship2, ship3, ship1]);
+  })
+
+  test("sort desc", () => {
+    expect(ShipService.sortList([ship1, ship2, ship3], "desc")).toStrictEqual([ship2, ship3, ship1]);
+  })
+})

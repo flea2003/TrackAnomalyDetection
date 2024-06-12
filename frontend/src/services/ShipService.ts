@@ -116,10 +116,7 @@ class ShipService {
    * @param list - fetched list with ShipDetails instances
    * @param order - either `asc` for ascending or '`desc` for descending (default)
    */
-  static sortList: (list: ShipDetails[], order: string) => ShipDetails[] = (
-    list,
-    order = "desc",
-  ) => {
+  static sortList = (list: ShipDetails[], order = "desc") => {
     if (!["desc", "asc"].includes(order)) {
       ErrorNotificationService.addError("Invalid sorting order");
       return [];
