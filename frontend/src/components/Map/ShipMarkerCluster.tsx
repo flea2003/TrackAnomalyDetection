@@ -45,9 +45,10 @@ async function getMarkersForAllShips(
       | ShipIconDetailsType,
   ) => void,
   pageChangerRef: React.RefObject<PageChangerRef>,
+  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void
 ) {
   return ships.map((ship) =>
-    getMarker(ship, map, setHoverInfo, pageChangerRef),
+    getMarker(ship, map, setHoverInfo, pageChangerRef, trackShipFunc),
   );
 }
 
@@ -69,6 +70,7 @@ function getMarker(
       | ShipIconDetailsType,
   ) => void,
   pageChangerRef: React.RefObject<PageChangerRef>,
+  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void
 ) {
   const icon = createShipIcon(
       ship.anomalyScore / 100,
@@ -76,9 +78,8 @@ function getMarker(
       ship.speed > 0
     );
 
-  const onClickFunc = (e: L.LeafletMouseEvent) => {
-    map.flyTo(e.latlng, Math.max(map.getZoom(), 4));
-    //     //           trackShipIcon(ship, false);
+  const onClickFunc = () => {
+    trackShipFunc(ship, map.getZoom())
     handleMouseOutShipIcon(setHoverInfo);
     if (pageChangerRef.current !== null) {
       pageChangerRef.current.pageChanger({
@@ -128,12 +129,13 @@ export function updateMarkersForShips(
   ) => void,
   pageChangerRef: React.RefObject<PageChangerRef>,
   markersClustersRef: React.MutableRefObject<L.MarkerClusterGroup | null>,
+  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void
 ) {
   const shipsToRender = doFilteringBeforeDisplaying
     ? filterShips(ships, map, maxShipsOnScreen)
     : ships;
 
-  getMarkersForAllShips(shipsToRender, map, setHoverInfo, pageChangerRef).then(
+  getMarkersForAllShips(shipsToRender, map, setHoverInfo, pageChangerRef, trackShipFunc).then(
     async (lToAdd) => {
       const markersClustersLayer = markersClustersRef.current;
       if (markersClustersLayer === null) return;

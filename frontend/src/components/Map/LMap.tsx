@@ -36,12 +36,9 @@ interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
 }
 
-interface ShipIconTrackingType {
-  x: number;
-  y: number;
-  shipId: number;
-  isClicked: boolean;
-  clickedFromList: boolean;
+interface TrackedShipType {
+  ship: ShipDetails | null,
+  zoomLevel: number
 }
 
 /**
@@ -59,31 +56,24 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     // The ref to layer which handles the clustering logic (using Leaflet.marketcluster library)
     const markersClustersRef = useRef<L.MarkerClusterGroup | null>(null);
 
+    // Initialize the state for tracked ship
+    const [trackedShip, setTrackedShip] = useState(getDefaultShipIconTrackingInfo());
+
+    const trackShip = (ship: ShipDetails, zoomLevel: number) => {
+      const newTrackedShip = {ship, zoomLevel} as TrackedShipType;
+      mapFlyToShip(mapRef, newTrackedShip);
+      setTrackedShip(newTrackedShip);
+    }
+
     // Define the methods that will be reachable from the parent
     useImperativeHandle(ref, () => ({
       centerMapOntoShip: (ship: ShipDetails) =>
-        mapFlyToShip(mapRef, ship, ships),
+        trackShip(ship, mapConfig.centeringShipZoomLevel)
     }));
 
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship
-    const [hoverInfo, setHoverInfo] =
-      useState<ShipIconDetailsType>(getDefaultHoverInfo());
-
-    // Initialize the trackingInfo variable that will track the selected ship icon
-    const [trackingInfo, setTrackingInfo] =
-      useState<ShipIconTrackingType>(getDefaultShipIconTrackingInfo());
-
-    // Event-handling method which enables the tracking of a particular ship
-    const trackShipIcon = (ship: ShipDetails, fromList: boolean) => {
-      setTrackingInfo({
-        x: ship.lng,
-        y: ship.lat,
-        shipId: ship.id,
-        isClicked: true,
-        clickedFromList: fromList,
-      });
-    };
+    const [hoverInfo, setHoverInfo] = useState(getDefaultHoverInfo());
 
     // Initialize map (once).
     useEffect(() => {
@@ -94,9 +84,17 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     // Update the ship markers when the ships array changes.
     // Also, add ability to update the markers when the user
     // is dragging through the map or zooming.
+    // Finally, ship marker tracing functionality is implemented here.
     useEffect(() => {
       const map = mapRef.current;
       if (!map) return;
+
+      // Update centering on the tracked ship
+      const ship = trackedShip.ship
+      const shipInList = ships.find((s) => ship !== null && s.id === ship.id);
+      if (shipInList !== undefined && differentShipPositions(ship, shipInList)) {
+        trackShip(shipInList, trackedShip.zoomLevel);
+      }
 
       const updateFunc = () => {
         updateMarkersForShips(
@@ -107,6 +105,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           setHoverInfo,
           pageChangerRef,
           markersClustersRef,
+          trackShip
         );
       };
 
@@ -116,60 +115,21 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           updateFunc();
         }
       };
-    //   // When re-rendering the Map component, check if a ship icon is currently tracked
-    //   if (trackingInfo.shipId !== -1) {
-    //     const trackedShip = ships.find((x) => x.id === trackingInfo.shipId);
-    //     if (trackedShip !== undefined) {
-    //       if (
-    //         trackingInfo.isClicked ||
-    //         trackingInfo.x !== trackedShip.lng ||
-    //         trackingInfo.y !== trackedShip.lat
-    //       ) {
-    //         if (trackingInfo.clickedFromList) {
-    //           map.flyTo(
-    //             [trackedShip.lat, trackedShip.lng],
-    //             mapStyleConfig["zoom-level-when-clicked-on-ship-in-list"],
-    //             {
-    //               animate: true,
-    //               duration: mapStyleConfig["transition-time"],
-    //             },
-    //           );
-    //         } else {
-    //           map.flyTo([trackedShip.lat, trackedShip.lng], map.getZoom(), {
-    //             animate: true,
-    //             duration: mapStyleConfig["transition-time"],
-    //           });
-    //         }
-    //         setTrackingInfo({
-    //           x: trackedShip.lng,
-    //           y: trackedShip.lat,
-    //           shipId: trackedShip.id,
-    //           isClicked: false,
-    //           clickedFromList: false,
-    //         } as ShipIconTrackingType);
-    //       }
-    //     }
-    //   }
-    //
 
-    //
-    //   map
-    //     .on("drag", () => {
-    //       setTrackingInfo(defaultIconTrackingInfo);
-    //     })
-    //     .on("zoom", () => {
-    //       setHoverInfo(defaultHoverInfo);
-    //     });
-    //
+      // Function for removing centering the ship (used once the drag or zoom starts)
+      const stopTracking = () => setTrackedShip(getDefaultShipIconTrackingInfo());
+
       updateFunc();
 
       map.on("moveend", updateOnlyWhenFilterFunc);
+      map.on("movestart", stopTracking);
 
       return () => {
         // Clear the effect
         map.off("moveend", updateOnlyWhenFilterFunc);
+        map.off("movestart", stopTracking);
       };
-    }, [pageChangerRef, ships]);
+    }, [pageChangerRef, ships, trackedShip]);
 
     return constructMapContainer(hoverInfo);
   },
@@ -195,6 +155,11 @@ function constructMapContainer(hoverInfo: ShipIconDetailsType) {
   );
 }
 
+function differentShipPositions(ship1: ShipDetails | null, ship2: ShipDetails | null) {
+  if (ship1 === null || ship2 === null) return false;
+  return (ship1.lat !== ship2.lat) || (ship1.lng !== ship2.lng)
+}
+
 /**
  * Centers the map to the given ship. This is done using Leaflet's `flyTo` method,
  * which provides a nice animation.
@@ -202,52 +167,33 @@ function constructMapContainer(hoverInfo: ShipIconDetailsType) {
  * If the map is not initialized yet, or the given ship is undefined or not found,
  * the notification is added, and nothing is done with centering the map.
  *
- * @param mapRef the reference to a map
- * @param ship the ship to which the map will be centered to
- * @param ships the array of all current ships
+ * @param mapRef
+ * @param trackedShip
  */
 function mapFlyToShip(
   mapRef: React.MutableRefObject<L.Map | null>,
-  ship: ShipDetails | null | undefined,
-  ships: ShipDetails[],
+  trackedShip: TrackedShipType
 ) {
-  const map = mapRef.current as L.Map | null;
+  const map = mapRef.current;
+  const ship = trackedShip.ship;
 
-  if (map == null) {
+  if (map === null || ship === null) {
     ErrorNotificationService.addWarning(
-      "map is not initialized in the call centerMapOntoShip",
+      "Cannot center the map on the ship: map or ship is null",
     );
     return;
   }
 
-  // Check if requested ship (still) exists
-  if (
-    ship === null ||
-    ship === undefined ||
-    !ships.some((x) => x.id === ship.id)
-  ) {
-    ErrorNotificationService.addWarning(
-      "Required ship does not exist while trying to center map",
-    );
-    return;
-  }
-
-  // When icon centering is triggered from the entry list, zoom in on the ship icon
-  //   trackShipIcon(ship, true);
-  map.flyTo([ship.lat, ship.lng], mapConfig.centeringShipZoomLevel, {
+  map.flyTo([ship.lat, ship.lng], trackedShip.zoomLevel, {
     animate: true,
-    duration: mapConfig.centeringShipTransitionTime,
   });
 }
 
 function getDefaultShipIconTrackingInfo() {
   return {
-    x: 0,
-    y: 0,
-    shipId: -1,
-    isClicked: false,
-    clickedFromList: false,
-  } as ShipIconTrackingType;
+    ship: null,
+    zoomLevel: 8
+  } as TrackedShipType;
 }
 
 function getDefaultHoverInfo() {
