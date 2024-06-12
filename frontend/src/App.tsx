@@ -49,7 +49,11 @@ function App() {
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
-      <LMap ships={displayedShips} pageChangerRef={pageChangerRef} ref={mapRef} />
+      <LMap
+        ships={displayedShips}
+        pageChangerRef={pageChangerRef}
+        ref={mapRef}
+      />
       <Side
         ships={displayedShips}
         mapCenteringFun={mapCenteringFun}

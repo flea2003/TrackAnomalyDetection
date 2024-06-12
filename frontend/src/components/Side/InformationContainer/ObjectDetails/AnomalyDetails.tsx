@@ -16,7 +16,7 @@ interface ObjectDetailsProps {
  * Component that displays the anomaly information of a ship
  *
  * @param ship ships whose anomaly information is being displayed
- * @param addAnomalyScore boolean that defines whether or not anomaly score should be displayed
+ * @param addAnomalyScore boolean that defines whether anomaly score should be displayed
  * @constructor
  */
 function AnomalyDetails({ ship, addAnomalyScore }: ObjectDetailsProps) {

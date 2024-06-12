@@ -40,7 +40,6 @@ interface PageChangerRef {
  */
 const Side = forwardRef<PageChangerRef, SideProps>(
   ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold }, ref) => {
-
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
@@ -68,7 +67,10 @@ const Side = forwardRef<PageChangerRef, SideProps>(
         );
       };
 
-      const intervalId = setInterval(updateNotificationsFunc, config.notificationsRefreshMs);
+      const intervalId = setInterval(
+        updateNotificationsFunc,
+        config.notificationsRefreshMs,
+      );
 
       return () => {
         clearInterval(intervalId);
@@ -83,24 +85,28 @@ const Side = forwardRef<PageChangerRef, SideProps>(
     useImperativeHandle(ref, () => ({ pageChanger }));
 
     return (
-        <Stack direction="row" id="side-container">
-          <InformationContainer
-            currentPage={currentPage}
-            ships={ships}
-            notifications={notifications}
-            pageChanger={pageChanger}
-            mapCenteringFun={mapCenteringFun}
-            setFilterThreshold={setFilterThreshold}
-            anomalyThreshold={anomalyThreshold}
-          />
-          <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
-        </Stack>
+      <Stack direction="row" id="side-container">
+        <InformationContainer
+          currentPage={currentPage}
+          ships={ships}
+          notifications={notifications}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+          setFilterThreshold={setFilterThreshold}
+          anomalyThreshold={anomalyThreshold}
+        />
+        <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
+      </Stack>
     );
   },
 );
 
-function constructPageChanger(currentPage: CurrentPage,
-                              setCurrentPage: (value: (((prevState: CurrentPage) => CurrentPage) | CurrentPage)) => void) {
+function constructPageChanger(
+  currentPage: CurrentPage,
+  setCurrentPage: (
+    value: ((prevState: CurrentPage) => CurrentPage) | CurrentPage,
+  ) => void,
+) {
   return (newPage: CurrentPage) => {
     if (
       currentPage.currentPage !== "none" &&

@@ -35,6 +35,7 @@ export function getMarkersClustersLayer() {
  * @param map Leaflet map
  * @param setHoverInfo the function to change the state of the hover info object
  * @param pageChangerRef the reference to the function that allows to change pages
+ * @param trackShipFunc function to set tracked ship
  */
 async function getMarkersForAllShips(
   ships: ShipDetails[],
@@ -45,7 +46,7 @@ async function getMarkersForAllShips(
       | ShipIconDetailsType,
   ) => void,
   pageChangerRef: React.RefObject<PageChangerRef>,
-  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void
+  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void,
 ) {
   return ships.map((ship) =>
     getMarker(ship, map, setHoverInfo, pageChangerRef, trackShipFunc),
@@ -60,6 +61,7 @@ async function getMarkersForAllShips(
  * @param map Leaflet map
  * @param setHoverInfo the function to change the state of the hover info object
  * @param pageChangerRef the reference to the function that allows to change pages
+ * @param trackShipFunc function to set tracked ship
  */
 function getMarker(
   ship: ShipDetails,
@@ -70,16 +72,16 @@ function getMarker(
       | ShipIconDetailsType,
   ) => void,
   pageChangerRef: React.RefObject<PageChangerRef>,
-  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void
+  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void,
 ) {
   const icon = createShipIcon(
-      ship.anomalyScore / 100,
-      ship.heading === 511 ? ship.course : ship.heading,
-      ship.speed > 0
-    );
+    ship.anomalyScore / 100,
+    ship.heading === 511 ? ship.course : ship.heading,
+    ship.speed > 0,
+  );
 
   const onClickFunc = () => {
-    trackShipFunc(ship, map.getZoom())
+    trackShipFunc(ship, map.getZoom());
     handleMouseOutShipIcon(setHoverInfo);
     if (pageChangerRef.current !== null) {
       pageChangerRef.current.pageChanger({
@@ -116,6 +118,7 @@ function getMarker(
  * @param setHoverInfo the function to change the state of the hover info object
  * @param pageChangerRef the reference to the function that allows to change pages
  * @param markersClustersRef the reference to the market clusters layer
+ * @param trackShipFunc function to set tracked ship
  */
 export function updateMarkersForShips(
   ships: ShipDetails[],
@@ -129,20 +132,24 @@ export function updateMarkersForShips(
   ) => void,
   pageChangerRef: React.RefObject<PageChangerRef>,
   markersClustersRef: React.MutableRefObject<L.MarkerClusterGroup | null>,
-  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void
+  trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void,
 ) {
   const shipsToRender = doFilteringBeforeDisplaying
     ? filterShips(ships, map, maxShipsOnScreen)
     : ships;
 
-  getMarkersForAllShips(shipsToRender, map, setHoverInfo, pageChangerRef, trackShipFunc).then(
-    async (lToAdd) => {
-      const markersClustersLayer = markersClustersRef.current;
-      if (markersClustersLayer === null) return;
-      markersClustersLayer.clearLayers();
-      markersClustersLayer.addLayers(lToAdd);
-    },
-  );
+  getMarkersForAllShips(
+    shipsToRender,
+    map,
+    setHoverInfo,
+    pageChangerRef,
+    trackShipFunc,
+  ).then(async (lToAdd) => {
+    const markersClustersLayer = markersClustersRef.current;
+    if (markersClustersLayer === null) return;
+    markersClustersLayer.clearLayers();
+    markersClustersLayer.addLayers(lToAdd);
+  });
 }
 
 /**

@@ -37,8 +37,8 @@ interface MapExportedMethodsType {
 }
 
 interface TrackedShipType {
-  ship: ShipDetails | null,
-  zoomLevel: number
+  ship: ShipDetails | null;
+  zoomLevel: number;
 }
 
 /**
@@ -57,18 +57,18 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     const markersClustersRef = useRef<L.MarkerClusterGroup | null>(null);
 
     // Initialize the state for tracked ship
-    const [trackedShip, setTrackedShip] = useState(getDefaultShipIconTrackingInfo());
+    const [trackedShip, setTrackedShip] = useState(getDefaultTrackedShipInfo());
 
     const trackShip = (ship: ShipDetails, zoomLevel: number) => {
-      const newTrackedShip = {ship, zoomLevel} as TrackedShipType;
+      const newTrackedShip = { ship, zoomLevel } as TrackedShipType;
       mapFlyToShip(mapRef, newTrackedShip);
       setTrackedShip(newTrackedShip);
-    }
+    };
 
     // Define the methods that will be reachable from the parent
     useImperativeHandle(ref, () => ({
       centerMapOntoShip: (ship: ShipDetails) =>
-        trackShip(ship, mapConfig.centeringShipZoomLevel)
+        trackShip(ship, mapConfig.centeringShipZoomLevel),
     }));
 
     // Initialize the hoverInfo variable that will manage the display of the
@@ -90,9 +90,12 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       if (!map) return;
 
       // Update centering on the tracked ship
-      const ship = trackedShip.ship
+      const ship = trackedShip.ship;
       const shipInList = ships.find((s) => ship !== null && s.id === ship.id);
-      if (shipInList !== undefined && differentShipPositions(ship, shipInList)) {
+      if (
+        shipInList !== undefined &&
+        differentShipPositions(ship, shipInList)
+      ) {
         trackShip(shipInList, trackedShip.zoomLevel);
       }
 
@@ -105,7 +108,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           setHoverInfo,
           pageChangerRef,
           markersClustersRef,
-          trackShip
+          trackShip,
         );
       };
 
@@ -117,7 +120,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       };
 
       // Function for removing centering the ship (used once the drag or zoom starts)
-      const stopTracking = () => setTrackedShip(getDefaultShipIconTrackingInfo());
+      const stopTracking = () => setTrackedShip(getDefaultTrackedShipInfo());
 
       updateFunc();
 
@@ -155,24 +158,34 @@ function constructMapContainer(hoverInfo: ShipIconDetailsType) {
   );
 }
 
-function differentShipPositions(ship1: ShipDetails | null, ship2: ShipDetails | null) {
+/**
+ * Compares the positions (longitude and latitude) of the two ships.
+ * If any of the ship is null, returns false. Else returns true if the positions differ.
+ *
+ * @param ship1 first ship to compare
+ * @param ship2 second ship to compare
+ */
+function differentShipPositions(
+  ship1: ShipDetails | null,
+  ship2: ShipDetails | null,
+) {
   if (ship1 === null || ship2 === null) return false;
-  return (ship1.lat !== ship2.lat) || (ship1.lng !== ship2.lng)
+  return ship1.lat !== ship2.lat || ship1.lng !== ship2.lng;
 }
 
 /**
- * Centers the map to the given ship. This is done using Leaflet's `flyTo` method,
+ * Centers the map to the tracked ship. This is done using Leaflet's `flyTo` method,
  * which provides a nice animation.
  *
- * If the map is not initialized yet, or the given ship is undefined or not found,
+ * If the map is not initialized yet, or the tracked ship is null,
  * the notification is added, and nothing is done with centering the map.
  *
- * @param mapRef
- * @param trackedShip
+ * @param mapRef the reference to the Leaflet map
+ * @param trackedShip the tracked ship and zoom level details
  */
 function mapFlyToShip(
   mapRef: React.MutableRefObject<L.Map | null>,
-  trackedShip: TrackedShipType
+  trackedShip: TrackedShipType,
 ) {
   const map = mapRef.current;
   const ship = trackedShip.ship;
@@ -189,13 +202,20 @@ function mapFlyToShip(
   });
 }
 
-function getDefaultShipIconTrackingInfo() {
+/**
+ * Constructs the default tracked ship info.
+ * Used for setting tracked ship to be null (no ship is tracked).
+ */
+function getDefaultTrackedShipInfo() {
   return {
     ship: null,
-    zoomLevel: 8
+    zoomLevel: 8,
   } as TrackedShipType;
 }
 
+/**
+ * Constructs the default hover info field. Used when no hover should be shown.
+ */
 function getDefaultHoverInfo() {
   return {
     show: false,

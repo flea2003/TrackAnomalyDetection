@@ -46,9 +46,9 @@ function NotificationList({
     />
   );
 
-  let noNotificactionsEntry = <div> </div>;
+  let noNotificationsEntry = <div> </div>;
   if (notifications.length === 0) {
-    noNotificactionsEntry = (
+    noNotificationsEntry = (
       <div className="no-ships-entry"> No notifications </div>
     );
   }
@@ -82,7 +82,7 @@ function NotificationList({
           mapCenteringFun={mapCenteringFun}
         />
       ) : (
-        noNotificactionsEntry
+        noNotificationsEntry
       )}
     </Stack>
   );

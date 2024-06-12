@@ -36,13 +36,13 @@ function NotificationDetails({
   const [displayedAIS, setDisplayedAIS] = useState(false);
 
   const changeAnomalyInfo = () => {
-    setDisplayedAnomalyInfo((x) => true);
-    setDisplayedAIS((x) => false);
+    setDisplayedAnomalyInfo(true);
+    setDisplayedAIS(false);
   };
 
   const changeAIS = () => {
-    setDisplayedAnomalyInfo((x) => false);
-    setDisplayedAIS((x) => true);
+    setDisplayedAnomalyInfo(false);
+    setDisplayedAIS(true);
   };
 
   // Find the notification with the given ID.
