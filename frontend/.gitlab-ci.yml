@@ -1,13 +1,13 @@
 .react_job_template:
   image: node:20.13.1
+  needs: []
   before_script:
     - cd frontend
+    - npm ci
 
 react_tests:
   extends: [.react_job_template]
   stage: test
-  before_script:
-    - npm ci
   script:
     - npm run test:ci
   artifacts:
@@ -26,16 +26,12 @@ react_tests:
 react_linter:
   extends: [.react_job_template]
   stage: code_quality
-  before_script:
-    - npm ci
   script:
     - npm run lint
 
 react_prettier_checks:
   extends: [.react_job_template]
   stage: code_quality
-  before_script:
-    - npm ci
   script:
     - npm run prettier:check
 

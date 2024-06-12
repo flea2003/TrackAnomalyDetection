@@ -1,5 +1,6 @@
 .simulator_job_template:
   image: gradle:8.7.0-jdk17
+  needs: []
   before_script:
     - cd simulator
 
@@ -7,7 +8,7 @@ simulator_tests:
   extends: [.simulator_job_template]
   stage: test
   script:
-    - .gradle test jacocoTestReport
+    - gradle test jacocoTestReport
   artifacts:
     when: always
     expire_in: 1 week

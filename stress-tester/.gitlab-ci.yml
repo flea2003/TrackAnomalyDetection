@@ -1,5 +1,6 @@
 .stress_tester_job_template:
   image: gradle:8.7.0-jdk17
+  needs: []
   before_script:
     - cd stress-tester
 
