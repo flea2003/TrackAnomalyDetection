@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
 import { CurrentPage } from "../../../../App";
-import ErrorNotificationService from "../../../../services/ErrorNotificationService";
 import ShipNotification from "../../../../model/ShipNotification";
 import AnomalyDetails from "../ObjectDetails/AnomalyDetails";
 import AISDetails from "../ObjectDetails/AISDetails";
@@ -48,11 +47,8 @@ function NotificationDetails({
   // Find the notification with the given ID.
   const notification = allNotifications.find((x) => x.id === notificationID);
 
-  // If such notification is not (longer) present, show a message.
+  // Check if notification is present
   if (notification === undefined) {
-    ErrorNotificationService.addWarning(
-      "Notification not found with ID: " + notificationID,
-    );
     return notificationNotFoundElement();
   }
 

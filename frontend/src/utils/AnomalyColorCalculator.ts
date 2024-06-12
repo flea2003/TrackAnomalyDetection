@@ -14,4 +14,21 @@ function calculateAnomalyColor(shipAnomalyScore: number, brighter: boolean) {
   return `rgba(${red}, ${green}, 0, ${alpha})`;
 }
 
-export { calculateAnomalyColor };
+/**
+ * Given an anomaly score, this function calculates the color for the cluster
+ * with such an anomaly score. Similar to `calculateAnomalyColor`, but has a
+ * different alpha channel value.
+ *
+ * @param anomalyScore the score of the anomaly for the cluster
+ * @returns the color of the cluster
+ */
+function calculateClusterColor(anomalyScore: number) {
+  anomalyScore /= 100.0;
+  const green = Math.floor(255 * (1 - anomalyScore));
+  const red = Math.floor(255 * anomalyScore);
+  const alpha = 0.7;
+
+  return `rgba(${red}, ${green}, 0, ${alpha})`;
+}
+
+export { calculateAnomalyColor, calculateClusterColor };

@@ -98,9 +98,7 @@ const useWebSocketClient = () => {
 
     return () => {
       if (stompClient) {
-        stompClient
-          .deactivate()
-          .then(() => console.log("Previous stomp client deactivated."));
+        stompClient.deactivate();
       }
     };
   }, []);

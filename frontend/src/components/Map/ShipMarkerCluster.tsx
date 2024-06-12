@@ -9,6 +9,47 @@ import {
   handleMouseOverShipIcon,
 } from "./ShipIcon";
 import { ShipIconDetailsType } from "./ShipIconDetails";
+import { calculateClusterColor } from "../../utils/AnomalyColorCalculator";
+
+/**
+ * ShipMarker class is used instead of the default Leaflet marker. This allows to also
+ * save ship data to later be able to retrieve it (useful for cluster color calculation).
+ */
+class ShipMarker extends L.Marker {
+  ship: ShipDetails;
+
+  constructor(ship: ShipDetails) {
+    const icon = createShipIcon(
+      ship.anomalyScore / 100,
+      ship.heading === 511 ? ship.course : ship.heading,
+      ship.speed > 0,
+    );
+    super([ship.lat, ship.lng], { icon });
+
+    this.ship = ship;
+  }
+}
+
+/**
+ * Icon creation function for the cluster. Creates a circular icon with the background color
+ * representing the maximum anomaly among the ships in this cluster.
+ */
+function getClusterIcon(cluster: L.MarkerCluster) {
+  const anomalyScores = cluster
+    .getAllChildMarkers()
+    .map((marker) => (marker as ShipMarker).ship.anomalyScore);
+
+  const maxAnomalyScore = Math.max(...anomalyScores);
+
+  const color = calculateClusterColor(maxAnomalyScore);
+  const style = `background-color: ${color};`;
+
+  return new L.DivIcon({
+    html: `<div style="${style}"></div>`,
+    className: "marker-cluster",
+    iconSize: new L.Point(60, 60),
+  });
+}
 
 /**
  * Creates and returns the layer for clustering the markers. This layer is introduced by
@@ -20,6 +61,7 @@ import { ShipIconDetailsType } from "./ShipIconDetails";
 export function getMarkersClustersLayer() {
   return L.markerClusterGroup({
     maxClusterRadius: mapConfig.clusterMaxRadius,
+    iconCreateFunction: (cluster) => getClusterIcon(cluster),
 
     // Chunked loading settings
     chunkedLoading: mapConfig.clusterChunkedLoading,
@@ -74,12 +116,6 @@ function getMarker(
   pageChangerRef: React.RefObject<PageChangerRef>,
   trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void,
 ) {
-  const icon = createShipIcon(
-    ship.anomalyScore / 100,
-    ship.heading === 511 ? ship.course : ship.heading,
-    ship.speed > 0,
-  );
-
   const onClickFunc = () => {
     trackShipFunc(ship, map.getZoom());
     handleMouseOutShipIcon(setHoverInfo);
@@ -91,8 +127,7 @@ function getMarker(
     }
   };
 
-  return L.marker([ship.lat, ship.lng], { icon })
-    .bindPopup("ID: " + ship.id)
+  return new ShipMarker(ship)
     .on("click", onClickFunc)
     .on("mouseover", (e) => {
       handleMouseOverShipIcon(e, ship, map, setHoverInfo);

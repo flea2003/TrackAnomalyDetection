@@ -7,6 +7,8 @@ import List from "@mui/material/List";
 
 import "../../../../styles/notifications/notificationList.css";
 
+import config from "../../../../configs/generalConfig.json";
+
 interface NotificationListProps {
   notifications: ShipNotification[];
   ships: ShipDetails[];
@@ -38,20 +40,22 @@ function NotificationListWithoutTitle({
     );
   }
 
-  const listEntries = notifications.slice(0, 250).map((notification, i) => {
-    const shipDetails = ships
-      .filter((x) => x.id === notifications[i].shipDetails.id)
-      .slice()[0];
-    return (
-      <ShipsNotificationEntry
-        key={i}
-        notification={notification}
-        shipDetails={shipDetails}
-        pageChanger={pageChanger}
-        mapCenteringFun={mapCenteringFun}
-      />
-    );
-  });
+  const listEntries = notifications
+    .slice(0, config.notificationListMaxEntries)
+    .map((notification, i) => {
+      const shipDetails = ships
+        .filter((x) => x.id === notifications[i].shipDetails.id)
+        .slice()[0];
+      return (
+        <ShipsNotificationEntry
+          key={i}
+          notification={notification}
+          shipDetails={shipDetails}
+          pageChanger={pageChanger}
+          mapCenteringFun={mapCenteringFun}
+        />
+      );
+    });
   return <List id="notification-list-internal-container">{listEntries}</List>;
 }
 

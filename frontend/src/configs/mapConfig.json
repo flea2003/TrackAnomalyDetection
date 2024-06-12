@@ -1,6 +1,6 @@
 {
     "centeringShipTransitionTime": 1.25,
-    "centeringShipZoomLevel": 8,
+    "centeringShipZoomLevel": 15,
 
     "doFilteringBeforeDisplaying": false,
     "maxShipsOnScreen": -1,

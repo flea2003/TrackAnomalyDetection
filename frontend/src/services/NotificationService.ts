@@ -156,25 +156,4 @@ export class NotificationService {
   static areAllRead() {
     return this.notifications.every((notification) => notification.isRead);
   }
-
-  // equality is based on array length and notification ids
-  static notificationArraysEqual(
-    notifications1: ShipNotification[],
-    notifications2: ShipNotification[],
-  ) {
-    if (notifications1.length !== notifications2.length) {
-      return false;
-    }
-
-    for (let i = 0; i < notifications1.length; i++) {
-      const not1 = notifications1[i];
-      const not2 = notifications2[i];
-
-      if (not1.id !== not2.id) {
-        return false;
-      }
-    }
-
-    return true;
-  }
 }

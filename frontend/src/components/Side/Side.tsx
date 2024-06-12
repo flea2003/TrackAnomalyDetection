@@ -55,12 +55,7 @@ const Side = forwardRef<PageChangerRef, SideProps>(
         // Query for notifications. When the results arrive, update the state
         NotificationService.queryBackendForAllNotifications().then(
           (newNotifications: ShipNotification[]) => {
-            if (
-              !NotificationService.notificationArraysEqual(
-                notifications,
-                newNotifications,
-              )
-            ) {
+            if (newNotifications.length > notifications.length) {
               setNotifications(newNotifications);
             }
           },

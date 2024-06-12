@@ -5,19 +5,17 @@ import React, {
   useRef,
   useState,
 } from "react";
-import ShipDetails from "../../model/ShipDetails";
+import ShipDetails, { differentShipPositions } from "../../model/ShipDetails";
 import ShipIconDetails, { ShipIconDetailsType } from "./ShipIconDetails";
 import { PageChangerRef } from "../Side/Side";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import {
-  updateMarkersForShips,
   getMarkersClustersLayer,
+  updateMarkersForShips,
 } from "./ShipMarkerCluster";
 import L from "leaflet";
 import "leaflet.markercluster";
 
-import "../../styles/map.css";
-import "../../styles/common.css";
 import "../../styles/map.css";
 import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -156,21 +154,6 @@ function constructMapContainer(hoverInfo: ShipIconDetailsType) {
       )}
     </div>
   );
-}
-
-/**
- * Compares the positions (longitude and latitude) of the two ships.
- * If any of the ship is null, returns false. Else returns true if the positions differ.
- *
- * @param ship1 first ship to compare
- * @param ship2 second ship to compare
- */
-function differentShipPositions(
-  ship1: ShipDetails | null,
-  ship2: ShipDetails | null,
-) {
-  if (ship1 === null || ship2 === null) return false;
-  return ship1.lat !== ship2.lat || ship1.lng !== ship2.lng;
 }
 
 /**

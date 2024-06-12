@@ -1,3 +1,5 @@
 {
-  "notificationsRefreshMs": 1000
+  "notificationsRefreshMs": 1000,
+  "anomalyListMaxEntries": 250,
+  "notificationListMaxEntries": 250
 }
