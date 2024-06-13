@@ -1,29 +1,17 @@
-stress_tester_build:
-  stage: build
+.stress_tester_job_template:
   image: gradle:8.7.0-jdk17
   needs: []
   before_script:
     - cd stress-tester
-    - chmod +x ./gradlew
-  script:
-    - ./gradlew assemble
 
 stress_tester_checkstyle:
+  extends: [.stress_tester_job_template]
   stage: code_quality
-  image: gradle:8.7.0-jdk17
-  needs: ["stress_tester_build"]
-  before_script:
-    - cd stress-tester
-    - chmod +x ./gradlew
   script:
-    - ./gradlew checkstyleMain
+    - gradle checkstyleMain
 
 stress_tester_pmd_static_analysis:
+  extends: [.stress_tester_job_template]
   stage: code_quality
-  image: gradle:8.7.0-jdk17
-  needs: ["stress_tester_build"]
-  before_script:
-    - cd stress-tester
-    - chmod +x ./gradlew
   script:
-    - ./gradlew pmdMain
+    - gradle pmdMain

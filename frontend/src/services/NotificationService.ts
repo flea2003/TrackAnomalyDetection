@@ -103,7 +103,7 @@ export class NotificationService {
   ) => ShipNotification = (item) => {
     return new ShipNotification(
       item.id,
-      item.read,
+      item.isRead,
       new ShipDetails(
         item.shipID,
         item.currentShipDetails.currentAISSignal.heading,
@@ -127,10 +127,7 @@ export class NotificationService {
    * @param list - fetched list of notifications
    * @param order - either `asc` for ascending or '`desc` for descending (default)
    */
-  static sortList: (
-    list: ShipNotification[],
-    order: string,
-  ) => ShipNotification[] = (list, order = "desc") => {
+  static sortList = (list: ShipNotification[], order = "desc") => {
     if (!["desc", "asc"].includes(order)) {
       ErrorNotificationService.addError("Invalid sorting order");
       return [];
@@ -160,5 +157,3 @@ export class NotificationService {
     return this.notifications.every((notification) => notification.isRead);
   }
 }
-
-export default ShipNotification;

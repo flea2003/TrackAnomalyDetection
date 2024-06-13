@@ -5,7 +5,6 @@ workflow:
     - if: $CI_COMMIT_BRANCH == "dev"
 
 stages:
-  - build
   - test
   - code_quality
   - collect_coverage

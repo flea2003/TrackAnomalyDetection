@@ -1,24 +1,17 @@
-backend_build:
-  stage: build
+.backend_job_template:
   image: gradle:8.7.0-jdk17
   needs: []
   before_script:
     - cd backend
-    - chmod +x ./gradlew
-  script:
-    - ./gradlew assemble
 
 backend_tests:
+  extends: [.backend_job_template]
   stage: test
-  image: gradle:8.7.0-jdk17
-  needs: ["backend_build"]
-  before_script:
-    - cd backend
-    - chmod +x ./gradlew
   script:
-    - ./gradlew test jacocoTestReport
+    - gradle test jacocoTestReport
   artifacts:
     when: always
+    expire_in: 1 week
     paths:
       - backend/build/test-results/test/**/TEST-*.xml
       - backend/build/reports/jacoco/test/cobertura-jacocoTestReport.xml
@@ -31,51 +24,37 @@ backend_tests:
 
 
 backend_mutation_testing:
+  extends: [.backend_job_template]
   stage: test
-  image: gradle:8.7.0-jdk17
-  needs: ["backend_build"]
-  before_script:
-    - cd backend
-    - chmod +x ./gradlew
   script:
-    - ./gradlew pitest
+    - gradle pitest
     - cat build/reports/pitest/index.html | head -n25 | tail -n1 | grep -Po "([0-9]{1,3})%"
   coverage: /([0-9]{1,3})%/
 
 backend_checkstyle:
+  extends: [.backend_job_template]
   stage: code_quality
-  image: gradle:8.7.0-jdk17
-  needs: ["backend_build"]
-  before_script:
-    - cd backend
-    - chmod +x ./gradlew
   script:
-    - ./gradlew checkstyleMain
+    - gradle checkstyleMain
 
 backend_pmd_static_analysis:
+  extends: [.backend_job_template]
   stage: code_quality
-  image: gradle:8.7.0-jdk17
-  needs: ["backend_build"]
-  before_script:
-    - cd backend
-    - chmod +x ./gradlew
   script:
-    - ./gradlew pmdMain
+    - gradle pmdMain
 
 backend_statement_coverage:
+  extends: [.backend_job_template]
   stage: collect_coverage
-  image: gradle:8.7.0-jdk17
   needs: ["backend_tests"]
-  before_script: cd backend
   script:
     - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%"
   coverage: /([0-9]{1,3})%/
 
 backend_branch_coverage:
+  extends: [.backend_job_template]
   stage: collect_coverage
-  image: gradle:8.7.0-jdk17
   needs: ["backend_tests"]
-  before_script: cd backend
   script:
     - cat build/reports/jacoco/test/html/index.html | grep -Po "Total.*?([0-9]{1,3})%.*?([0-9]{1,3})%"
   coverage: /([0-9]{1,3})%/

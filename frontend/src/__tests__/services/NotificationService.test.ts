@@ -8,7 +8,7 @@ import ShipNotification from "../../model/ShipNotification";
 const fakeNotificationResponseItem1: NotificationResponseItem = {
   id: 0,
   shipID: 1,
-  read: false,
+  isRead: false,
   currentShipDetails: {
     currentAISSignal: {
       id: 1,
@@ -36,7 +36,7 @@ const fakeNotificationResponseItem1: NotificationResponseItem = {
 const fakeNotificationResponseItem2: NotificationResponseItem = {
   id: 1,
   shipID: 1,
-  read: false,
+  isRead: false,
   currentShipDetails: {
     currentAISSignal: {
       id: 1,
@@ -253,8 +253,13 @@ test("sorting-valid-notification-desc", async () => {
   expect(result).toStrictEqual([resultItem2, resultItem1]);
 });
 
+test("sorting without giving desc - sorting-valid-notification-desc", async () => {
+  const result = NotificationService.sortList([resultItem1, resultItem2]);
+  expect(result).toStrictEqual([resultItem2, resultItem1]);
+});
+
 test("check-all-read-false", async () => {
-  fakeNotificationResponseItem1.read = true;
+  fakeNotificationResponseItem1.isRead = true;
 
   HttpSender.get = jest
     .fn()
@@ -270,8 +275,8 @@ test("check-all-read-false", async () => {
 });
 
 test("check-all-read-true", async () => {
-  fakeNotificationResponseItem1.read = true;
-  fakeNotificationResponseItem2.read = true;
+  fakeNotificationResponseItem1.isRead = true;
+  fakeNotificationResponseItem2.isRead = true;
 
   HttpSender.get = jest
     .fn()

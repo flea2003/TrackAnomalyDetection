@@ -1,4 +1,10 @@
 {
   "brokerUrl": "ws://localhost:8180/details",
-  "topic": "/topic/details"
+  "topic": "/topic/details",
+
+  "reconnectDelayMs": 60000,
+  "heartbeatIncoming": 4000,
+  "heartbeatOutgoing": 4000,
+
+  "websocketBufferRefreshMs": 1000
 }
