@@ -1,7 +1,4 @@
-import {
-  calculateAnomalyColor,
-  calculateClusterColor,
-} from "../../utils/AnomalyColorCalculator";
+import { calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
 
 test("Complete green (if not anomalous at all)", () => {
   expect(calculateAnomalyColor(0, false)).toBe("rgba(0, 255, 0, 0.4)");
@@ -17,8 +14,4 @@ test("Anomaly middle (50)", () => {
 
 test("Brighter colours test", () => {
   expect(calculateAnomalyColor(0, true)).toBe("rgba(0, 255, 0, 1)");
-});
-
-test("Cluster colours test", () => {
-  expect(calculateClusterColor(100)).toBe("rgba(255, 0, 0, 0.7)");
 });

@@ -7,7 +7,7 @@ them also helps to set the way the map renders ship markers.
 There are two different ways, described below, to do that. Of course, any other values
 are also possible. Everything depends on the computer the application is run on.
 
-1. **Beautiful clustering mode**. Map clusters the ships if there are two many on the screen. However, if used without filtering (described in the 2nd mode below), this may impact performance when there are many ships. To use this mode, set the following values in the config files:
+1. **Beautiful clustering mode**. Map clusters the ships if there are too many on the screen. However, if used without filtering (described in the 2nd mode below), this may impact performance when there are many ships. To use this mode, set the following values in the config files:
 ```
 // in websocketConfig.js:
     "websocketBufferRefreshMs": 5000 
@@ -40,7 +40,7 @@ are also possible. Everything depends on the computer the application is run on.
 
 ## Building the project
 
-In order to work with the frontend, one has to install the NodeJS programming environment. This can be done by running:
+In order to work with the frontend, one has to install the Node.js programming environment. This can be done by running:
 ```
 sudo apt update
 sudo apt install nodejs
@@ -75,7 +75,7 @@ npx create-react-app frontend --template typescript --use-npm
 
 `npx` - npm package runner.
 
-`create-react-app` - command to initiate a react app.
+`create-react-app` - command to initiate a React app.
 
 `--template typescript` - flag to create a typescript template instead of javascript.
 
