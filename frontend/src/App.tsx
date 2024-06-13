@@ -37,7 +37,6 @@ function App() {
   // Use effect to query for the ships every 1000ms
   useEffect(() => {
     const intervalId = setInterval(() => {
-
       ShipService.queryBackendForShipsArray().then(
         (newShipsArray: ShipDetails[]) => {
           if (newShipsArray.length === 0) {
