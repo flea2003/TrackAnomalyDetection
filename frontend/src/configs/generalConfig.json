@@ -1,3 +1,4 @@
 {
-  "notificationsRefreshMs": 1000
+  "notificationsRefreshMs": 1000,
+  "shipsRefreshMs": 2000
 }
