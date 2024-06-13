@@ -1,48 +1,52 @@
 import React, { useState } from "react";
 import { CurrentPage } from "../../App";
 import "../../styles/informationPopUp.css";
-import infoIcon from "../../assets/icons/helper-icons/info.svg"
-import closeIcon from "../../assets/icons/helper-icons/close.svg"
-
+import infoIcon from "../../assets/icons/helper-icons/info.svg";
+import closeIcon from "../../assets/icons/helper-icons/close.svg";
 
 interface InformationProps {
   currentPage: CurrentPage;
 }
 
 function InformationPopUp({ currentPage }: InformationProps) {
-    const [isDisplayed, setDisplayed] = useState<boolean>(false);
-    const changePopUpState = () => {
-      setDisplayed((x) => !x);
-    };
+  const [isDisplayed, setDisplayed] = useState<boolean>(false);
+  const changePopUpState = () => {
+    setDisplayed((x) => !x);
+  };
 
-    const infoIconImage = (
-      <img
+  const infoIconImage = (
+    <img
       src={infoIcon}
       className="info-icon"
       alt="sth"
       onClick={changePopUpState}
-      />
-    );
-  const closeIconImage = (<img
-    src={closeIcon}
-    className="close-icon"
-    alt="sth"
-    onClick={changePopUpState}
-  />);
+    />
+  );
+  const closeIconImage = (
+    <img
+      src={closeIcon}
+      className="close-icon"
+      alt="sth"
+      onClick={changePopUpState}
+    />
+  );
 
   if (isDisplayed) {
     return (
       <div>
         <div className="info-container">
-          <div className="info-container-title">{getInfoTitle(currentPage.currentPage)}</div>
-          <div className="info-text">{getInfoExplanation(currentPage.currentPage)}</div>
+          <div className="info-container-title">
+            {getInfoTitle(currentPage.currentPage)}
+          </div>
+          <div className="info-text">
+            {getInfoExplanation(currentPage.currentPage)}
+          </div>
           {closeIconImage}
         </div>
         {infoIconImage}
       </div>
-    )
-    } else return infoIconImage
-
+    );
+  } else return infoIconImage;
 }
 
 function getInfoExplanation(page: string) {
@@ -119,7 +123,7 @@ function getInfoExplanation(page: string) {
       can be marked as read by clicking a button in the top-right corner. 
       Finally, the error list window can be closed by clicking the exit button 
       in the top-left corner, or a corresponding warning icon in the menu.
-      `
+      `;
     case "none":
       return `
       The map displays real-time ship locations based on their AIS data. Each ship's 
@@ -162,6 +166,5 @@ function getInfoTitle(page: string) {
     }
   }
 }
-
 
 export default InformationPopUp;

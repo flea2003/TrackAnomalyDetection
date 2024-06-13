@@ -8,15 +8,11 @@ import bellIconRead from "../../../assets/icons/regular-notifications/notificati
 import settingsIcon from "../../../assets/icons/helper-icons/settings.svg";
 import bugIcon from "../../../assets/icons/error-notifications/bug.svg";
 import bugIconRed from "../../../assets/icons/error-notifications/bug-red.png";
-import bugIconReder from "../../../assets/icons/error-notifications/bug-reder.png";
-
 
 import shipIconSelected from "../../../assets/icons/selected-sidebar-icons/ship-blue.png";
 import notificationIconSelected from "../../../assets/icons/selected-sidebar-icons/notification-bell-blue.png";
 import settingsIconSelected from "../../../assets/icons/selected-sidebar-icons/settings-blue.png";
 import bugIconSelected from "../../../assets/icons/selected-sidebar-icons/bug_blue.png";
-
-
 
 import { NotificationService } from "../../../services/NotificationService";
 
@@ -146,7 +142,11 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
         )}
         {displayedNotifications && (
           <img
-            src={NotificationService.areAllRead() ? notificationIconSelected : bellIconNotRead}
+            src={
+              NotificationService.areAllRead()
+                ? notificationIconSelected
+                : bellIconNotRead
+            }
             className="bell-icon-selected"
             alt={bellIconAlt}
           />
@@ -186,7 +186,11 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
         )}
         {displayedBugs && (
           <img
-            src={ErrorNotificationService.areAllRead() ? bugIconSelected : bugIconRed}
+            src={
+              ErrorNotificationService.areAllRead()
+                ? bugIconSelected
+                : bugIconRed
+            }
             className="bug-icon-selected"
             alt={bugIconAlt}
           />
@@ -225,7 +229,6 @@ function getNotificationsClass() {
   }
   return "bell-icon-not-selected-not-all-read";
 }
-
 
 /**
  * Changes the style of the bug notifications icon when notifications window is not displayed,

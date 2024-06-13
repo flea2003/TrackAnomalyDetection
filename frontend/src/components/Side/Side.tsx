@@ -94,9 +94,7 @@ const Side = forwardRef<PageChangerRef, SideProps>(
           />
           <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
         </Stack>
-        <InformationPopUp
-          currentPage={currentPage}
-        />
+        <InformationPopUp currentPage={currentPage} />
       </div>
     );
   },

@@ -9,7 +9,6 @@ import Side, { PageChangerRef } from "./components/Side/Side";
 import useWebSocketClient from "./utils/communication/WebSocketClient";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
-import InformationPopUp from "./components/Information/InformationPopUp";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
