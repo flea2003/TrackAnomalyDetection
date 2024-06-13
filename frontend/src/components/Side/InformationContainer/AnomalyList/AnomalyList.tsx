@@ -9,6 +9,8 @@ import ShipThresholdModifier from "./AnomalyTitleWithSlider";
 import "../../../../styles/common.css";
 import "../../../../styles/anomaly-list/anomalyList.css";
 
+import config from "../../../../configs/generalConfig.json";
+
 interface AnomalyListProps {
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
@@ -35,7 +37,7 @@ function AnomalyList({
   anomalyThreshold,
 }: AnomalyListProps) {
   const listEntries = ships
-    .slice(0, 250)
+    .slice(0, config.anomalyListMaxEntries)
     .map((ship, id) => (
       <AnomalyListEntry
         key={id}

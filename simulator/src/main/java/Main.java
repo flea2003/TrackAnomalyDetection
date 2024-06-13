@@ -32,7 +32,7 @@ public class Main {
         Parser parser = new DEBSParser(getReader(dataSetName));
         try (KafkaProducer<String, String> producer = createProducer(serverName)) {
             Simulator simulator = new Simulator(parser, startTime, endTimestamp, topicName, producer);
-            simulator.setSpeed(600);
+            simulator.setSpeed(60);
 
             simulator.startStream();
         }
