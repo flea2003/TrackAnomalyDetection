@@ -89,7 +89,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
       // Update centering on the tracked ship
       const ship = trackedShip.ship;
-      const shipInList = ships.find((s) => ship !== null && s.id === ship.id);
+      const shipInList = ships.find((s) => ship !== null && ship !== undefined && s.id === ship.id);
       if (
         shipInList !== undefined &&
         differentShipPositions(ship, shipInList)
@@ -172,10 +172,11 @@ function mapFlyToShip(
 ) {
   const map = mapRef.current;
   const ship = trackedShip.ship;
+  console.log(ship);
 
-  if (map === null || ship === null) {
+  if (map === null || ship === null || ship === undefined || ship.lat === undefined || ship.lng === undefined) {
     ErrorNotificationService.addWarning(
-      "Cannot center the map on the ship: map or ship is null",
+      "Cannot center the map on the ship: map, ship or its position is null",
     );
     return;
   }

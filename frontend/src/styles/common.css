@@ -10,7 +10,7 @@
     --background-blue: #AAD3DFFF;
     --title-padding: 7px 8px;
     --close-icon-length: 20px;
-    --check-icon-length: 25px;
+    --check-icon-length: 23px;
 
     *::-webkit-scrollbar{
         display: none;

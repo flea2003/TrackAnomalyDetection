@@ -1,0 +1,66 @@
+.info-container {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+
+    width: 15%;
+    height: 15%;
+
+    background: #bbbbbb80;
+
+    overflow-y: auto;
+    text-align: justify;
+    font-size: small;
+    font-weight: 400;
+    word-break: break-word;
+
+    padding: 25px 6px 6px;
+
+    border: var(--border);
+}
+
+.info-container-title {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 100%;
+    text-align: center;
+
+
+    font-size: small;
+    font-weight: 600;
+}
+
+.info-container:hover {
+    background: #bbbbbb;
+}
+
+.info-icon {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+
+    width: 25px;
+    height: 25px;
+
+    cursor: pointer;
+}
+
+.info-icon:hover {
+    content: url("../assets/icons/helper-icons/info-hover.png");
+}
+
+.close-icon {
+    position: absolute;
+    height: var(--close-icon-length);
+    width: var(--close-icon-length);
+
+    cursor: pointer;
+
+    top: 2px;
+    right: 2px;
+}
+
+.close-icon:hover {
+   transform: scale(1.1);
+}

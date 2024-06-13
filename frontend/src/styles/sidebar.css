@@ -22,11 +22,13 @@
 
 .anomaly-list-icon-not-selected,
 .anomaly-list-icon-selected,
-.bell-icon-not-selected,
+.bell-icon-not-selected-all-read,
+.bell-icon-not-selected-not-all-read,
 .bell-icon-selected,
 .settings-icon-not-selected,
 .settings-icon-selected,
-.bug-icon-not-selected,
+.bug-icon-not-selected-all-read,
+.bug-icon-not-selected-not-all-read,
 .bug-icon-selected {
     width: var(--sidebar-icon-size);
     height: var(--sidebar-icon-size);
@@ -36,14 +38,22 @@
     content: url("../assets/icons/selected-sidebar-icons/ship-blue.png");
 }
 
-.bell-icon-not-selected:hover{
+.bell-icon-not-selected-all-read:hover{
     content: url("../assets/icons/selected-sidebar-icons/notification-bell-blue.png");
+}
+
+.bell-icon-not-selected-not-all-read:hover{
+    content: url("../assets/icons/regular-notifications/notification_bell_oranger.png");
 }
 
 .settings-icon-not-selected:hover{
     content: url("../assets/icons/selected-sidebar-icons/settings-blue.png");
 }
 
-.bug-icon-not-selected:hover{
+.bug-icon-not-selected-all-read:hover{
     content: url("../assets/icons/selected-sidebar-icons/bug_blue.png");
+}
+
+.bug-icon-not-selected-not-all-read:hover{
+    content: url("../assets/icons/error-notifications/bug-reder.png");
 }

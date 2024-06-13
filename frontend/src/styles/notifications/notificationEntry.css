@@ -3,16 +3,21 @@
 
     font-weight: bold;
     border-bottom: 1px solid black;
+    /*border-left: 1px solid black;*/
+    /*border-right: 1px solid black;*/
+    border-top: none;
 
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 
     cursor: pointer;
     background: var(--background);
 
     overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .notification-list-entry-read {

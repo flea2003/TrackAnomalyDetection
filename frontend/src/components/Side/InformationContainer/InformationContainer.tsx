@@ -87,7 +87,7 @@ function InformationContainer({
       return <div></div>;
     default: {
       ErrorNotificationService.addWarning(
-        "InformationContainer required page not found: " +
+        "InformationPopUp required page not found: " +
           currentPage.currentPage,
       );
       return <div></div>;
