@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CurrentPage } from "../../App";
+import "../../styles/common.css";
 import "../../styles/informationPopUp.css";
 import infoIcon from "../../assets/icons/helper-icons/info.svg";
 import closeIcon from "../../assets/icons/helper-icons/close.svg";
@@ -17,8 +18,8 @@ function InformationPopUp({ currentPage }: InformationProps) {
   const infoIconImage = (
     <img
       src={infoIcon}
-      className="info-icon"
-      alt="sth"
+      className="information-icon"
+      alt="alt"
       onClick={changePopUpState}
     />
   );
@@ -26,7 +27,7 @@ function InformationPopUp({ currentPage }: InformationProps) {
     <img
       src={closeIcon}
       className="close-icon"
-      alt="sth"
+      alt="alt"
       onClick={changePopUpState}
     />
   );
@@ -34,11 +35,11 @@ function InformationPopUp({ currentPage }: InformationProps) {
   if (isDisplayed) {
     return (
       <div>
-        <div className="info-container">
-          <div className="info-container-title">
+        <div className="information-container">
+          <div className="information-container-title">
             {getInfoTitle(currentPage.currentPage)}
           </div>
-          <div className="info-text">
+          <div className="information-text">
             {getInfoExplanation(currentPage.currentPage)}
           </div>
           {closeIconImage}

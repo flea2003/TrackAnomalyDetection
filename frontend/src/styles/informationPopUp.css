@@ -1,4 +1,4 @@
-.info-container {
+.information-container {
     position: absolute;
     bottom: 5px;
     left: 5px;
@@ -11,7 +11,8 @@
     padding: 25px 6px 25px;
 }
 
-.info-text {
+.information-text {
+    max-height: 100%;
     overflow-y: auto;
     text-align: justify;
     font-size: 0.7em;
@@ -20,7 +21,7 @@
 }
 
 
-.info-container-title {
+.information-container-title {
     position: absolute;
     top: 3px;
     left: 3px;
@@ -31,11 +32,11 @@
     font-weight: 600;
 }
 
-.info-container:hover {
+.information-container:hover {
     background: #bbbbbb;
 }
 
-.info-icon {
+.information-icon {
     position: absolute;
     bottom: 10px;
     left: 10px;
@@ -46,7 +47,7 @@
     cursor: pointer;
 }
 
-.info-icon:hover {
+.information-icon:hover {
     content: url("../assets/icons/helper-icons/info-hover.png");
 }
 
