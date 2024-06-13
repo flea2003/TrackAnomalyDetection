@@ -3,31 +3,31 @@
     bottom: 5px;
     left: 5px;
 
-    width: 15%;
-    height: 15%;
+    width: 25%;
+    height: 20%;
 
-    background: #bbbbbb80;
+    background: #bbbbbbCC;
+    border: var(--border);
+    padding: 25px 6px 35px;
+}
 
+.info-text {
     overflow-y: auto;
     text-align: justify;
-    font-size: small;
+    font-size: 0.8em;
     font-weight: 400;
     word-break: break-word;
-
-    padding: 25px 6px 6px;
-
-    border: var(--border);
 }
+
 
 .info-container-title {
     position: absolute;
-    top: 1px;
-    left: 1px;
+    top: 3px;
+    left: 3px;
     width: 100%;
     text-align: center;
 
-
-    font-size: small;
+    font-size: 0.9em;
     font-weight: 600;
 }
 
