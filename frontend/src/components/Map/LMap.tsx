@@ -15,14 +15,13 @@ import {
 } from "./ShipMarkerCluster";
 import L from "leaflet";
 import "leaflet.markercluster";
+import mapConfig from "../../configs/mapConfig.json";
 
 import "../../styles/map.css";
 import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
-
-import mapConfig from "../../configs/mapConfig.json";
 
 interface MapProps {
   ships: ShipDetails[];

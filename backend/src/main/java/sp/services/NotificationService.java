@@ -24,7 +24,7 @@ public class NotificationService {
     }
 
     /**
-     * Gets all notifications from the "database".
+     * Gets all notifications from the state stored in the backend.
      *
      * @return a list of all notifications
      */
@@ -34,7 +34,8 @@ public class NotificationService {
                 .stream()
                 .sorted()
                 .toList()
-                .subList(0, maxNumberOfNotificationsToSend);
+                .subList(0, Math
+                        .min(maxNumberOfNotificationsToSend, notificationExtractor.getAllNotifications().size()));
     }
 
     /**

@@ -2,9 +2,12 @@ import ErrorNotificationService from "../services/ErrorNotificationService";
 
 class TimeUtilities {
   /**
+   * Function that compares two timestamps. If first timestamp corresponds
+   * to later time than sencond one, -1 is returned. It is used to sort
+   * notifications by their date
    *
-   * @param timestamp1
-   * @param timestamp2
+   * @param timestamp1 timestamp1 that is being compared
+   * @param timestamp2 timestamp2 that is being compared
    */
   static compareDates(timestamp1: string, timestamp2: string) {
     const signalTime1 = new Date(timestamp1);

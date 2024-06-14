@@ -4,10 +4,9 @@ import ShipDetails from "../../../../model/ShipDetails";
 import { CurrentPage } from "../../../../App";
 import ShipsNotificationEntry from "./NotificationListEntry";
 import List from "@mui/material/List";
+import config from "../../../../configs/generalConfig.json";
 
 import "../../../../styles/notifications/notificationList.css";
-
-import config from "../../../../configs/generalConfig.json";
 
 interface NotificationListProps {
   notifications: ShipNotification[];

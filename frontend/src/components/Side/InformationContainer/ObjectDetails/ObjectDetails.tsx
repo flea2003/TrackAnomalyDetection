@@ -6,10 +6,10 @@ import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import DisplayedInformation from "./DisplayedInformation";
+import { NotificationService } from "../../../../services/NotificationService";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
-import { NotificationService } from "../../../../services/NotificationService";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { CurrentPage } from "../../App";
-import "../../styles/common.css";
-import "../../styles/informationPopUp.css";
 import infoIcon from "../../assets/icons/helper-icons/info.svg";
 import closeIcon from "../../assets/icons/helper-icons/close.svg";
+
+import "../../styles/common.css";
+import "../../styles/informationPopUp.css";
 
 interface InformationProps {
   currentPage: CurrentPage;

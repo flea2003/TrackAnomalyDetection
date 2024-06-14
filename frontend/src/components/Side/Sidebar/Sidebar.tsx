@@ -8,17 +8,15 @@ import bellIconRead from "../../../assets/icons/regular-notifications/notificati
 import settingsIcon from "../../../assets/icons/helper-icons/settings.svg";
 import bugIcon from "../../../assets/icons/error-notifications/bug.svg";
 import bugIconRed from "../../../assets/icons/error-notifications/bug-red.png";
-
 import shipIconSelected from "../../../assets/icons/selected-sidebar-icons/ship-blue.png";
 import notificationIconSelected from "../../../assets/icons/selected-sidebar-icons/notification-bell-blue.png";
 import settingsIconSelected from "../../../assets/icons/selected-sidebar-icons/settings-blue.png";
 import bugIconSelected from "../../../assets/icons/selected-sidebar-icons/bug_blue.png";
-
+import ShipNotification from "../../../model/ShipNotification";
 import { NotificationService } from "../../../services/NotificationService";
 
 import "../../../styles/common.css";
 import "../../../styles/sidebar.css";
-import ShipNotification from "../../../model/ShipNotification";
 
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;

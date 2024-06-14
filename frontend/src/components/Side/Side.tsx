@@ -12,12 +12,11 @@ import ErrorNotificationService from "../../services/ErrorNotificationService";
 import ShipNotification from "../../model/ShipNotification";
 import { NotificationService } from "../../services/NotificationService";
 import { Stack } from "@mui/material";
+import config from "../../configs/generalConfig.json";
+import InformationPopUp from "../Information/InformationPopUp";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
-
-import config from "../../configs/generalConfig.json";
-import InformationPopUp from "../Information/InformationPopUp";
 
 interface SideProps {
   ships: ShipDetails[];

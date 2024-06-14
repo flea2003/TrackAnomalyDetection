@@ -21,7 +21,6 @@ public class Notification implements Serializable, Comparable<Notification> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long shipID;
-    private boolean isRead;
 
     @Column(length = 2048)
     private final CurrentShipDetails currentShipDetails;
@@ -34,7 +33,6 @@ public class Notification implements Serializable, Comparable<Notification> {
      */
     public Notification(CurrentShipDetails currentShipDetails) {
         this.currentShipDetails = currentShipDetails;
-        this.isRead = false;
         this.shipID = currentShipDetails.getCurrentAnomalyInformation().getId();
 
         // Assign a unique id to the notification
@@ -53,15 +51,15 @@ public class Notification implements Serializable, Comparable<Notification> {
 
     /**
      * Comparable method that compares two dates for notifications. If this notification
-     * was computed later than otherNotification, then 1 is returned, if they are equal, 0, and
-     * else -1 is returned.
+     * was computed later than otherNotification, then -1 is returned, if they are equal, 0, and
+     * else 1 is returned.
      *
      * @param otherNotification the object to be compared.
      * @return integer representing which notification was computed earlier
      */
     @Override
     public int compareTo(Notification otherNotification) {
-        return this.currentShipDetails.getCurrentAISSignal().getTimestamp()
+        return -this.currentShipDetails.getCurrentAISSignal().getTimestamp()
                 .compareTo(otherNotification.currentShipDetails.getCurrentAISSignal().getTimestamp());
     }
 }

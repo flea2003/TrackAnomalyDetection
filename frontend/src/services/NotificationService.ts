@@ -166,7 +166,7 @@ export class NotificationService {
     endpoint: string,
   ) => Promise<ShipNotification[]> = async (endpoint) => {
     const response = await HttpSender.get(endpoint);
-
+    console.log(response);
     if (!Array.isArray(response)) {
       ErrorNotificationService.addError("Server returned not an array");
       return [];
