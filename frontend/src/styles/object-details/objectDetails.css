@@ -1,7 +1,6 @@
 .object-details-container {
     width: 20%;
-    min-height: 60%;
-    max-height: 60%;
+    height: 60%;
     background: var(--background);
     border: var(--border);
 
