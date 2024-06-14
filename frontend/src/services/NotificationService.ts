@@ -6,42 +6,44 @@ import ShipDetails from "../model/ShipDetails";
 import TimeUtilities from "../utils/TimeUtilities";
 
 export class NotificationService {
-  // Stores ids of notifications that have been read
+  // Stores ids of notifications that have been read by the user since the page was refreshed
   static idsOfReadNotifications: number[] = [];
 
   // Endpoint for accessing all notifications
   static allNotificationsEndpoint = "/notifications";
 
+  // Endpoint for accessing all notifications for a particular ship
   static getNotificationWithIdEndpoint = "/notifications/ship/";
 
-  // Method to initialize idsOfReadNotifications with all fetched notification IDs
+  /**
+   * Method that initializes the array of idsOfReadNotifications. It takes all notifications
+   * that are in the backend before the frontend has started, and marks them as read.
+   */
   static initializeReadNotifications = async () => {
+    // Fetch all notifications that are currently in the backend
     const allNotifications =
       await NotificationService.queryBackendForAllNotifications();
-    NotificationService.idsOfReadNotifications = allNotifications.map(
-      (notification) => notification.id,
-    );
+    NotificationService.markAllNotificationsAsRead(allNotifications);
   };
 
   /**
-   * Method that fetches all notifications for a particular ship. It is however, for now, not used,
-   * as currently we store all notifications in the frontend. However, in the future it may be needed,
-   * as we may not want to fetch all the notifications in the history.
-   *
-   * @param shipID id of the ship for which notifications are
+   * Method that fetches all notifications from the backend.
    */
-  static queryBackendForAllNotificationsForShip: (
-    shipID: number,
-  ) => Promise<ShipNotification[]> = async (shipID) => {
-    if (shipID < 0) {
-      ErrorNotificationService.addWarning("Notification ID was negative");
-      return [];
-    } else
+  static queryBackendForAllNotifications: () => Promise<ShipNotification[]> =
+    async () => {
       return NotificationService.queryBackendHttpGet(
-        NotificationService.getNotificationWithIdEndpoint + shipID,
+        NotificationService.allNotificationsEndpoint,
       );
-  };
+    };
 
+  /**
+   * Method that fetches all notifications for a particular ship. Unlike the
+   * history of all notifications, this endpoint does not limit the amount of
+   * notifications that are fetched from backend. Note that this method, once
+   * fetched, assigns proper isRead values to the notifications
+   *
+   * @param shipID id of the ship for which notifications are fetched
+   */
   static getAllNotificationsForShip: (
     shipID: number,
   ) => Promise<ShipNotification[]> = async (shipID) => {
@@ -56,50 +58,86 @@ export class NotificationService {
   };
 
   /**
-   * Method that fetches all notifications from the backend.
-   */
-  static queryBackendForAllNotifications: () => Promise<ShipNotification[]> =
-    async () => {
-      return NotificationService.queryBackendHttpGet(
-        NotificationService.allNotificationsEndpoint,
-      );
-    };
-
-  /**
-   * Utility method that parses the received JSON data and assembles the
-   * corresponding ShipNotifications object
+   * Function that fetches all notifications for a particular ship. Unlike the
+   * history of all notifications, this function does not limit the amount of
+   * notifications that are fetched from backend. Note that this method only
+   * queries the backend, but does not deal with assigning proper isRead value
    *
-   * @param item the received JSON object
-   * @return corresponding ShipNotifications objects
+   * @param shipID id of the ship for which notifications are fetched
    */
-  static extractNotificationDetails: (
-    item: NotificationResponseItem,
-  ) => ShipNotification = (item) => {
-    return new ShipNotification(
-      item.id,
-      false,
-      new ShipDetails(
-        item.shipID,
-        item.currentShipDetails.currentAISSignal.heading,
-        item.currentShipDetails.currentAISSignal.latitude,
-        item.currentShipDetails.currentAISSignal.longitude,
-        item.currentShipDetails.currentAISSignal.timestamp,
-        item.currentShipDetails.currentAnomalyInformation.score,
-        item.currentShipDetails.currentAnomalyInformation.explanation,
-        item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
-        item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
-        item.currentShipDetails.currentAISSignal.departurePort,
-        item.currentShipDetails.currentAISSignal.course,
-        item.currentShipDetails.currentAISSignal.speed,
-      ),
-    );
+  static queryBackendForAllNotificationsForShip: (
+    shipID: number,
+  ) => Promise<ShipNotification[]> = async (shipID) => {
+    // Check if the ID is valid
+    if (shipID < 0) {
+      ErrorNotificationService.addWarning("Notification ID was negative");
+      return [];
+    } else
+      return NotificationService.queryBackendHttpGet(
+        NotificationService.getNotificationWithIdEndpoint + shipID,
+      );
   };
 
   /**
-   * Utility method that sorts the list of Notifications entries based on their date
+   * Function that, given an array of notifications fetched straight from backend,
+   * assigns needed  isRead status. Those notifications that have been read by
+   * the user (meaning that their ID is in idsOfReadNotifications array) are marked
+   * as read, otherwise - left at false.
+   *
+   * @param newNotifications
+   */
+  static updateNotifications(newNotifications: ShipNotification[]) {
+    return newNotifications.map((x) => {
+      if (this.idsOfReadNotifications.includes(x.id)) {
+        x.isRead = true;
+        return x;
+      } else return x;
+    });
+  }
+
+  /**
+   * Function that checks if all notifications in a list are marked as read.
+   *
+   * @param notifications array of ShipNotification objects
+   */
+  static areAllRead(notifications: ShipNotification[]) {
+    return notifications.every((notification) => notification.isRead);
+  }
+
+  /**
+   * Method that marks a list of notifications as read. It does not query the backend,
+   * as currently notifications are sent locally. This method is called after
+   * pressing the read all button.
+   *
+   * @param notifications an of notifications that will be marked as read
+   */
+  static markAllNotificationsAsRead = (notifications: ShipNotification[]) => {
+    for (let i = 0; i < notifications.length; i++) {
+      this.markANotificationAsRead(notifications[i]);
+    }
+  };
+
+  /**
+   * Method that marks a single notification as read. It does not query the backend,
+   * as currently notification read status is stored locally. This method is called after
+   * clicking on a notification button
+   *
+   * @param notification notification object
+   */
+  static markANotificationAsRead = (notification: ShipNotification) => {
+    if (notification.isRead) return;
+
+    notification.isRead = true;
+    this.idsOfReadNotifications.push(notification.id);
+  };
+
+  /**
+   * Utility method that sorts the list of Notifications entries based on their date.
+   * Newest notifications are put in front.
    *
    * @param list fetched list of notifications
-   * @param order either `asc` for ascending or '`desc` for descending (default)
+   * @param order order in which notifications are sorted.
+   * Either `asc` for ascending or '`desc` for descending (default)
    */
   static sortList = (list: ShipNotification[], order = "desc") => {
     if (!["desc", "asc"].includes(order)) {
@@ -119,25 +157,11 @@ export class NotificationService {
   };
 
   /**
-   * Checks if all current notifications are marked as read.
-   */
-  static areAllRead(notifications: ShipNotification[]) {
-    return notifications.every((notification) => notification.isRead);
-  }
-
-  /**
+   * Function that fetches a list of notifications from backend, depending on
+   * needed endpoint. It is extracted so less code duplication exists.
    *
-   * @param newNotifications
+   * @param endpoint name of the endpoint that is being requested
    */
-  static updateNotifications(newNotifications: ShipNotification[]) {
-    return newNotifications.map((x) => {
-      if (this.idsOfReadNotifications.includes(x.id)) {
-        x.isRead = true;
-        return x;
-      } else return x;
-    });
-  }
-
   static queryBackendHttpGet: (
     endpoint: string,
   ) => Promise<ShipNotification[]> = async (endpoint) => {
@@ -165,27 +189,32 @@ export class NotificationService {
   };
 
   /**
-   * Method that marks a single notification as read. It does not query the backend,
-   * as currently notifications are sent locally. This method is called after
-   * clicking on a notification button
+   * Utility method that parses the received JSON data and assembles the
+   * corresponding ShipNotifications object
    *
-   * @param notification notification object
+   * @param item the received JSON object
+   * @return corresponding ShipNotifications objects
    */
-  static markANotificationAsRead = (notification: ShipNotification) => {
-    if (notification.isRead) return;
-    notification.isRead = true;
-    this.idsOfReadNotifications.push(notification.id);
-  };
-
-  /**
-   * Method that marks a list of notifications as read. It does not query the backend,
-   * as currently notifications are sent locally. This method is called after
-   * pressing the read all button.
-   *
-   */
-  static markAllNotificationsAsRead = (notifications: ShipNotification[]) => {
-    for (let i = 0; i < notifications.length; i++) {
-      this.markANotificationAsRead(notifications[i]);
-    }
+  static extractNotificationDetails: (
+    item: NotificationResponseItem,
+  ) => ShipNotification = (item) => {
+    return new ShipNotification(
+      item.id,
+      false, // Set notification status as NOT read
+      new ShipDetails(
+        item.shipID,
+        item.currentShipDetails.currentAISSignal.heading,
+        item.currentShipDetails.currentAISSignal.latitude,
+        item.currentShipDetails.currentAISSignal.longitude,
+        item.currentShipDetails.currentAISSignal.timestamp,
+        item.currentShipDetails.currentAnomalyInformation.score,
+        item.currentShipDetails.currentAnomalyInformation.explanation,
+        item.currentShipDetails.maxAnomalyScoreInfo.maxAnomalyScore,
+        item.currentShipDetails.maxAnomalyScoreInfo.correspondingTimestamp,
+        item.currentShipDetails.currentAISSignal.departurePort,
+        item.currentShipDetails.currentAISSignal.course,
+        item.currentShipDetails.currentAISSignal.speed,
+      ),
+    );
   };
 }

@@ -103,6 +103,35 @@ beforeEach(() => {
   // Make refreshState do nothing, so that it does not print to console.
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   ErrorNotificationService.refreshState = () => {};
+
+  // Reset all mocks
+  jest.resetAllMocks();
+
+  // Reset NotificationService state
+  NotificationService.idsOfReadNotifications = [];
+});
+
+test("initialize-read-notifications-several", async () => {
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(
+      Promise.resolve([
+        fakeNotificationResponseItem1,
+        fakeNotificationResponseItem2,
+      ]),
+    );
+  await NotificationService.initializeReadNotifications();
+  expect(NotificationService.idsOfReadNotifications).toStrictEqual([
+    resultItem1.id,
+    resultItem2.id,
+  ]);
+  NotificationService.idsOfReadNotifications = [];
+});
+
+test("initialize-read-notifications-none", async () => {
+  HttpSender.get = jest.fn().mockReturnValue(Promise.resolve([]));
+  await NotificationService.initializeReadNotifications();
+  expect(NotificationService.idsOfReadNotifications).toStrictEqual([]);
 });
 
 test("mark-notification-as-read", async () => {
@@ -295,4 +324,59 @@ test("check-all-read-true", async () => {
   await NotificationService.queryBackendForAllNotifications();
   const result = NotificationService.areAllRead([resultItem1, resultItem2]);
   expect(result).toStrictEqual(true);
+});
+
+test("get-all-notifications-for-ship", async () => {
+  jest.resetAllMocks();
+
+  fakeNotificationResponseItem2.id = 1;
+  resultItem2.id = 1;
+
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(
+      Promise.resolve([
+        fakeNotificationResponseItem1,
+        fakeNotificationResponseItem2,
+      ]),
+    );
+  NotificationService.idsOfReadNotifications = [
+    fakeNotificationResponseItem1.id,
+  ];
+
+  const result = await NotificationService.getAllNotificationsForShip(1);
+
+  resultItem1.isRead = true;
+  resultItem2.isRead = false;
+
+  expect(result).toStrictEqual([resultItem1, resultItem2]);
+});
+
+test("update-notifications", async () => {
+  jest.resetAllMocks();
+
+  fakeNotificationResponseItem2.id = 1;
+  resultItem2.id = 1;
+
+  HttpSender.get = jest
+    .fn()
+    .mockReturnValue(
+      Promise.resolve([
+        fakeNotificationResponseItem1,
+        fakeNotificationResponseItem2,
+      ]),
+    );
+  NotificationService.idsOfReadNotifications = [
+    fakeNotificationResponseItem1.id,
+  ];
+
+  const result = await NotificationService.updateNotifications([
+    resultItem1,
+    resultItem2,
+  ]);
+
+  resultItem1.isRead = true;
+  resultItem2.isRead = false;
+
+  expect(result).toStrictEqual([resultItem1, resultItem2]);
 });

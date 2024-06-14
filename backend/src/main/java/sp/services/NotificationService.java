@@ -11,6 +11,9 @@ public class NotificationService {
 
     private final NotificationExtractor notificationExtractor;
 
+    // Specifies the maximum amount of notifications that should be sent to the frontend
+    private final int maxNumberOfNotificationsToSend = 1000;
+
     /**
      * Constructor for notification service class.
      *
@@ -26,7 +29,12 @@ public class NotificationService {
      * @return a list of all notifications
      */
     public List<Notification> getAllNotifications() {
-        return notificationExtractor.getAllNotifications();
+        return notificationExtractor
+                .getAllNotifications()
+                .stream()
+                .sorted()
+                .toList()
+                .subList(0, maxNumberOfNotificationsToSend);
     }
 
     /**
