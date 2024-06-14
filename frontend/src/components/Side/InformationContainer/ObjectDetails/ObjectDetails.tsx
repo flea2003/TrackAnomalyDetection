@@ -9,10 +9,10 @@ import DisplayedInformation from "./DisplayedInformation";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
+import { NotificationService } from "../../../../services/NotificationService";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
-  notifications: ShipNotification[];
   mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
   shipId: number;
@@ -31,16 +31,13 @@ interface ObjectDetailsProps {
  */
 function ObjectDetails({
   ships,
-  notifications,
   mapCenteringFun,
   pageChanger,
   shipId,
 }: ObjectDetailsProps) {
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = ships.find((ship) => ship.id === shipId);
-  const shipNotifications = notifications.filter(
-    (x) => x.shipDetails.id === shipId,
-  );
+  const shipNotifications = NotificationService.getAllNotificationsForShip(shipId);
 
   if (ship === undefined) {
     return shipNotFoundElement();

@@ -55,7 +55,7 @@ function NotificationListEntry({
   const onClick = () => {
     pageChanger({ currentPage: "notificationDetails", shownItemId: id });
     mapCenteringFun(shipDetails);
-    NotificationService.queryBackendToMarkANotificationAsRead(notification);
+    NotificationService.markANotificationAsRead(notification);
   };
 
   return (

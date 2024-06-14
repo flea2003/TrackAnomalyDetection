@@ -41,24 +41,26 @@ interface PageChangerRef {
  */
 const Side = forwardRef<PageChangerRef, SideProps>(
   ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold }, ref) => {
+
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
     );
     ErrorNotificationService.initialize(setErrorNotificationState);
 
-    // Set up the state for Notifications about ships
+    // Set up the state for notifications
     const [notifications, setNotifications] = useState<ShipNotification[]>([]);
 
     // Update the notifications by querying the server frequently
     useEffect(() => {
       const updateNotificationsFunc = () => {
-        // Query for notifications. When the results arrive, update the state
+
+        // Query for notifications from backend.
+        // When the results arrive, update the state by setting notifications that
+        // have been read to read
         NotificationService.queryBackendForAllNotifications().then(
           (newNotifications: ShipNotification[]) => {
-            if (newNotifications.length > notifications.length) {
-              setNotifications(newNotifications);
-            }
+            return setNotifications(NotificationService.updateNotifications(newNotifications));
           },
         );
       };
@@ -92,7 +94,11 @@ const Side = forwardRef<PageChangerRef, SideProps>(
             setFilterThreshold={setFilterThreshold}
             anomalyThreshold={anomalyThreshold}
           />
-          <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
+          <Sidebar
+            pageChanger={pageChanger}
+            currentPage={currentPage}
+            notifications={notifications}
+          />
         </Stack>
         <InformationPopUp currentPage={currentPage} />
       </div>

@@ -1,46 +1,19 @@
 import ShipNotification from "../model/ShipNotification";
 import HttpSender from "../utils/communication/HttpSender";
-import ErrorNotificationService from "./ErrorNotificationService";
+import ErrorNotificationService, { ErrorNotification } from "./ErrorNotificationService";
 import NotificationResponseItem from "../templates/NotificationResponseItem";
 import ShipDetails from "../model/ShipDetails";
+import TimeUtilities from "../utils/TimeUtilities";
+import React from "react";
+import shipNotification from "../model/ShipNotification";
 
 export class NotificationService {
-  // THIS IS ONLY USED FOR OPTIMIZATION REASONS FOR areAllRead() METHOD WHICH
-  // THEN DOES NOT HAVE TO QUERY THE BACKEND AGAIN
-  private static notifications: ShipNotification[] = [];
 
+  // Stores all notifications
+  private static idsOfReadNotifications: number[] = [];
+
+  // Endpoint for accessing all notifications
   static allNotificationsEndpoint = "/notifications";
-  static markNotificationAsReadEndpoint = "/notifications/read/";
-
-  /**
-   * Method that queries the backend to mark a single notification as read.
-   *
-   * @param notification notification object
-   */
-  static queryBackendToMarkANotificationAsRead = async (
-    notification: ShipNotification,
-  ) => {
-    if (notification.isRead) return;
-    await HttpSender.put(
-      NotificationService.markNotificationAsReadEndpoint + notification.id,
-    );
-  };
-
-  /**
-   * Method that queries the backend to mark a list of notifications as read.
-   * This is called after pressing the read all button.
-   *
-   * @param notifications a list of notifications that should be marked as read
-   */
-  static queryBackendToMarkAllNotificationsAsRead = async (
-    notifications: ShipNotification[],
-  ) => {
-    for (let i = 0; i < notifications.length; i++) {
-      await NotificationService.queryBackendToMarkANotificationAsRead(
-        notifications[i],
-      );
-    }
-  };
 
   /**
    * Method that fetches all notifications for a particular ship. It is however, for now, not used,
@@ -52,43 +25,36 @@ export class NotificationService {
   static queryBackendForAllNotificationsForShip: (
     shipID: number,
   ) => Promise<ShipNotification[]> = async (shipID) => {
-    if (shipID < 0) return;
-
-    return await HttpSender.get(
-      NotificationService.allNotificationsEndpoint + "/" + shipID,
-    );
+    if (shipID < 0) {
+      ErrorNotificationService.addWarning("Notification ID was negative");
+      return [];
+    }
+    else return NotificationService.queryBackendHttpGet(NotificationService.allNotificationsEndpoint + '/' + shipID);
   };
+
+  static getAllNotificationsForShip(shipID: number) {
+    let notificationsForShip: ShipNotification[] = [];
+
+    this.queryBackendForAllNotificationsForShip(shipID)
+        .then((newNotifications: ShipNotification[]) => {
+          notificationsForShip = newNotifications.map((notification) => {
+            if (this.idsOfReadNotifications.includes(notification.id)) {
+              notification.isRead = true;
+              return notification;
+            } else return notification;
+          })
+        });
+
+    return notificationsForShip;
+  }
+
 
   /**
    * Method that fetches all notifications from the backend.
    */
   static queryBackendForAllNotifications: () => Promise<ShipNotification[]> =
     async () => {
-      const response = await HttpSender.get(
-        NotificationService.allNotificationsEndpoint,
-      );
-
-      if (!Array.isArray(response)) {
-        ErrorNotificationService.addError("Server returned not an array");
-        return [];
-      }
-
-      const responseWithoutNulls = response.filter((item) => item !== null);
-      if (responseWithoutNulls.length !== response.length) {
-        ErrorNotificationService.addError(
-          "Notifications array contained null items",
-        );
-      }
-
-      this.notifications = NotificationService.sortList(
-        responseWithoutNulls.map(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (item: any) => NotificationService.extractNotificationDetails(item),
-        ),
-        "desc",
-      );
-
-      return this.notifications;
+      return NotificationService.queryBackendHttpGet(NotificationService.allNotificationsEndpoint);
     };
 
   /**
@@ -103,7 +69,7 @@ export class NotificationService {
   ) => ShipNotification = (item) => {
     return new ShipNotification(
       item.id,
-      item.isRead,
+      false,
       new ShipDetails(
         item.shipID,
         item.currentShipDetails.currentAISSignal.heading,
@@ -122,10 +88,10 @@ export class NotificationService {
   };
 
   /**
-   * Utility method that sorts the list of Notifications entries based on their ID (TODO: later change to be sorted by date)
+   * Utility method that sorts the list of Notifications entries based on their date
    *
-   * @param list - fetched list of notifications
-   * @param order - either `asc` for ascending or '`desc` for descending (default)
+   * @param list fetched list of notifications
+   * @param order either `asc` for ascending or '`desc` for descending (default)
    */
   static sortList = (list: ShipNotification[], order = "desc") => {
     if (!["desc", "asc"].includes(order)) {
@@ -133,16 +99,7 @@ export class NotificationService {
       return [];
     }
     const sortedList = list.sort((a, b) => {
-      const aScore = a.id;
-      const bScore = b.id;
-      if (aScore > bScore) {
-        return -1;
-      }
-      if (aScore === bScore) {
-        return 0;
-      } else {
-        return 1;
-      }
+      return TimeUtilities.compareDates(a.shipDetails.timestamp, b.shipDetails.timestamp);
     });
     if (order === "asc") {
       return sortedList.reverse();
@@ -153,7 +110,74 @@ export class NotificationService {
   /**
    * Checks if all current notifications are marked as read.
    */
-  static areAllRead() {
-    return this.notifications.every((notification) => notification.isRead);
+  static areAllRead(notifications: ShipNotification[]) {
+    return notifications.every((notification) => notification.isRead);
   }
+
+  /**
+   *
+   * @param newNotifications
+   */
+  static updateNotifications(newNotifications: ShipNotification[]) {
+    return newNotifications.map(x => {
+      if (this.idsOfReadNotifications.includes(x.id)) {
+        x.isRead = true;
+        return x;
+      } else return x;
+    });
+  }
+
+  static queryBackendHttpGet: (endpoint: string) => Promise<ShipNotification[]> = async (endpoint) => {
+    const response = await HttpSender.get(
+      endpoint
+    );
+
+    if (!Array.isArray(response)) {
+      ErrorNotificationService.addError("Server returned not an array");
+      return [];
+    }
+
+    const responseWithoutNulls = response.filter((item) => item !== null);
+    if (responseWithoutNulls.length !== response.length) {
+      ErrorNotificationService.addError(
+        "Notifications array contained null items",
+      );
+    }
+
+    return NotificationService.sortList(
+      responseWithoutNulls.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (item: any) => NotificationService.extractNotificationDetails(item),
+      ),
+      "desc",
+    );
+  }
+
+  /**
+   * Method that marks a single notification as read. It does not query the backend,
+   * as currently notifications are sent locally. This method is called after
+   * clicking on a notification button
+   *
+   * @param notification notification object
+   */
+  static markANotificationAsRead = (
+    notification: ShipNotification,
+  ) => {
+    if (notification.isRead) return;
+    notification.isRead = true;
+    this.idsOfReadNotifications.push(notification.id);
+  };
+
+  /**
+   * Method that marks a list of notifications as read. It does not query the backend,
+   * as currently notifications are sent locally. This method is called after
+   * pressing the read all button.
+   *
+   */
+  static markAllNotificationsAsRead = (notifications: ShipNotification[]) => {
+    for (let i = 0; i < notifications.length; i++) {
+      this.markANotificationAsRead(notifications[i]);
+    }
+  };
+
 }

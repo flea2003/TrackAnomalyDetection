@@ -56,7 +56,6 @@ function InformationContainer({
       return (
         <ObjectDetails
           ships={ships}
-          notifications={notifications}
           mapCenteringFun={mapCenteringFun}
           shipId={currentPage.shownItemId}
           pageChanger={pageChanger}

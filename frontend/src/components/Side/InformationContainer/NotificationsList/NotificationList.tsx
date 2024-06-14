@@ -67,7 +67,7 @@ function NotificationList({
           id="notification-list-mark-all-button"
           title="Mark all as read"
           onClick={() => {
-            NotificationService.queryBackendToMarkAllNotificationsAsRead(
+            NotificationService.markAllNotificationsAsRead(
               notifications,
             );
           }}

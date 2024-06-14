@@ -108,7 +108,7 @@ beforeEach(() => {
 });
 
 test("query-mark-notification-as-read", async () => {
-  await NotificationService.queryBackendToMarkANotificationAsRead(resultItem1);
+  await NotificationService.markANotificationAsRead(resultItem1);
   expect(HttpSender.put).toHaveBeenCalledTimes(1);
   expect(HttpSender.put).toHaveBeenCalledWith(
     NotificationService.markNotificationAsReadEndpoint + "0",
@@ -117,13 +117,13 @@ test("query-mark-notification-as-read", async () => {
 
 test("query-mark-notification-as-read-already-read", async () => {
   resultItem1.isRead = true;
-  await NotificationService.queryBackendToMarkANotificationAsRead(resultItem1);
+  await NotificationService.markANotificationAsRead(resultItem1);
   expect(HttpSender.put).toHaveBeenCalledTimes(0);
   resultItem1.isRead = false;
 });
 
 test("query-mark-all-notifications-as-read-proper", async () => {
-  await NotificationService.queryBackendToMarkAllNotificationsAsRead([
+  await NotificationService.markAllNotificationsAsRead([
     resultItem1,
     resultItem2,
   ]);
@@ -137,7 +137,7 @@ test("query-mark-all-notifications-as-read-proper", async () => {
 });
 
 test("query-mark-all-notifications-as-read-zero", async () => {
-  await NotificationService.queryBackendToMarkAllNotificationsAsRead([]);
+  await NotificationService.markAllNotificationsAsRead([]);
   expect(HttpSender.put).toHaveBeenCalledTimes(0);
 });
 

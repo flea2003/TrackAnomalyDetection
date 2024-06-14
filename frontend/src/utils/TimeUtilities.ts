@@ -1,6 +1,20 @@
 import ErrorNotificationService from "../services/ErrorNotificationService";
 
 class TimeUtilities {
+
+  /**
+   *
+   * @param timestamp1
+   * @param timestamp2
+   */
+  static compareDates(timestamp1: string, timestamp2: string) {
+    const signalTime1 = new Date(timestamp1);
+    const signalTime2 = new Date(timestamp2);
+
+    if (signalTime1 >= signalTime2) return 1;
+    else return -1;
+  }
+
   /**
    * Given the timestamp of the last received AIS signal, compute the time difference
    * between the respective timestamp and the live time and convert the difference to
