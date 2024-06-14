@@ -9,7 +9,7 @@ import {
   handleMouseOverShipIcon,
 } from "./ShipIcon";
 import { ShipIconDetailsType } from "./ShipIconDetails";
-import { calculateClusterColor } from "../../utils/AnomalyColorCalculator";
+import { calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
 
 /**
  * ShipMarker class is used instead of the default Leaflet marker. This allows to also
@@ -40,14 +40,15 @@ function getClusterIcon(cluster: L.MarkerCluster) {
     .map((marker) => (marker as ShipMarker).ship.anomalyScore);
 
   const maxAnomalyScore = Math.max(...anomalyScores);
+  const iconText = maxAnomalyScore + "%";
 
-  const color = calculateClusterColor(maxAnomalyScore);
+  const color = calculateAnomalyColor(maxAnomalyScore, false);
   const style = `background-color: ${color};`;
 
   return new L.DivIcon({
-    html: `<div style="${style}"></div>`,
-    className: "marker-cluster",
-    iconSize: new L.Point(60, 60),
+    html: `<div style="${style}"><span>${iconText}<span aria-label="markers"></span></span></div>`,
+    className: "ship-marker-cluster",
+    iconSize: new L.Point(40, 40),
   });
 }
 
