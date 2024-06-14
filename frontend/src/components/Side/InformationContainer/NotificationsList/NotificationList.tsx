@@ -67,9 +67,7 @@ function NotificationList({
           id="notification-list-mark-all-button"
           title="Mark all as read"
           onClick={() => {
-            NotificationService.markAllNotificationsAsRead(
-              notifications,
-            );
+            NotificationService.markAllNotificationsAsRead(notifications);
           }}
           alt="Close"
         ></img>

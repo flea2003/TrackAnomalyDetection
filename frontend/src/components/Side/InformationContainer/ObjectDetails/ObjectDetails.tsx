@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import ShipDetails from "../../../../model/ShipDetails";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
@@ -37,7 +37,15 @@ function ObjectDetails({
 }: ObjectDetailsProps) {
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = ships.find((ship) => ship.id === shipId);
-  const shipNotifications = NotificationService.getAllNotificationsForShip(shipId);
+
+  const [shipNotifications, setShipNotifications] = useState<
+    ShipNotification[]
+  >([]);
+
+  NotificationService.getAllNotificationsForShip(shipId).then(
+    (newNotifications: ShipNotification[]) =>
+      setShipNotifications(newNotifications),
+  );
 
   if (ship === undefined) {
     return shipNotFoundElement();

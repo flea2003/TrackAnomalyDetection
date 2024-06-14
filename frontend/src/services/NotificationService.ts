@@ -1,19 +1,27 @@
 import ShipNotification from "../model/ShipNotification";
 import HttpSender from "../utils/communication/HttpSender";
-import ErrorNotificationService, { ErrorNotification } from "./ErrorNotificationService";
+import ErrorNotificationService from "./ErrorNotificationService";
 import NotificationResponseItem from "../templates/NotificationResponseItem";
 import ShipDetails from "../model/ShipDetails";
 import TimeUtilities from "../utils/TimeUtilities";
-import React from "react";
-import shipNotification from "../model/ShipNotification";
 
 export class NotificationService {
-
-  // Stores all notifications
-  private static idsOfReadNotifications: number[] = [];
+  // Stores ids of notifications that have been read
+  static idsOfReadNotifications: number[] = [];
 
   // Endpoint for accessing all notifications
   static allNotificationsEndpoint = "/notifications";
+
+  static getNotificationWithIdEndpoint = "/notifications/ship/";
+
+  // Method to initialize idsOfReadNotifications with all fetched notification IDs
+  static initializeReadNotifications = async () => {
+    const allNotifications =
+      await NotificationService.queryBackendForAllNotifications();
+    NotificationService.idsOfReadNotifications = allNotifications.map(
+      (notification) => notification.id,
+    );
+  };
 
   /**
    * Method that fetches all notifications for a particular ship. It is however, for now, not used,
@@ -28,33 +36,33 @@ export class NotificationService {
     if (shipID < 0) {
       ErrorNotificationService.addWarning("Notification ID was negative");
       return [];
-    }
-    else return NotificationService.queryBackendHttpGet(NotificationService.allNotificationsEndpoint + '/' + shipID);
+    } else
+      return NotificationService.queryBackendHttpGet(
+        NotificationService.getNotificationWithIdEndpoint + shipID,
+      );
   };
 
-  static getAllNotificationsForShip(shipID: number) {
-    let notificationsForShip: ShipNotification[] = [];
-
-    this.queryBackendForAllNotificationsForShip(shipID)
-        .then((newNotifications: ShipNotification[]) => {
-          notificationsForShip = newNotifications.map((notification) => {
-            if (this.idsOfReadNotifications.includes(notification.id)) {
-              notification.isRead = true;
-              return notification;
-            } else return notification;
-          })
-        });
-
-    return notificationsForShip;
-  }
-
+  static getAllNotificationsForShip: (
+    shipID: number,
+  ) => Promise<ShipNotification[]> = async (shipID) => {
+    const newNotifications: ShipNotification[] =
+      await this.queryBackendForAllNotificationsForShip(shipID);
+    return newNotifications.map((notification) => {
+      if (this.idsOfReadNotifications.includes(notification.id)) {
+        notification.isRead = true;
+      }
+      return notification;
+    });
+  };
 
   /**
    * Method that fetches all notifications from the backend.
    */
   static queryBackendForAllNotifications: () => Promise<ShipNotification[]> =
     async () => {
-      return NotificationService.queryBackendHttpGet(NotificationService.allNotificationsEndpoint);
+      return NotificationService.queryBackendHttpGet(
+        NotificationService.allNotificationsEndpoint,
+      );
     };
 
   /**
@@ -99,7 +107,10 @@ export class NotificationService {
       return [];
     }
     const sortedList = list.sort((a, b) => {
-      return TimeUtilities.compareDates(a.shipDetails.timestamp, b.shipDetails.timestamp);
+      return TimeUtilities.compareDates(
+        a.shipDetails.timestamp,
+        b.shipDetails.timestamp,
+      );
     });
     if (order === "asc") {
       return sortedList.reverse();
@@ -119,7 +130,7 @@ export class NotificationService {
    * @param newNotifications
    */
   static updateNotifications(newNotifications: ShipNotification[]) {
-    return newNotifications.map(x => {
+    return newNotifications.map((x) => {
       if (this.idsOfReadNotifications.includes(x.id)) {
         x.isRead = true;
         return x;
@@ -127,10 +138,10 @@ export class NotificationService {
     });
   }
 
-  static queryBackendHttpGet: (endpoint: string) => Promise<ShipNotification[]> = async (endpoint) => {
-    const response = await HttpSender.get(
-      endpoint
-    );
+  static queryBackendHttpGet: (
+    endpoint: string,
+  ) => Promise<ShipNotification[]> = async (endpoint) => {
+    const response = await HttpSender.get(endpoint);
 
     if (!Array.isArray(response)) {
       ErrorNotificationService.addError("Server returned not an array");
@@ -151,7 +162,7 @@ export class NotificationService {
       ),
       "desc",
     );
-  }
+  };
 
   /**
    * Method that marks a single notification as read. It does not query the backend,
@@ -160,9 +171,7 @@ export class NotificationService {
    *
    * @param notification notification object
    */
-  static markANotificationAsRead = (
-    notification: ShipNotification,
-  ) => {
+  static markANotificationAsRead = (notification: ShipNotification) => {
     if (notification.isRead) return;
     notification.isRead = true;
     this.idsOfReadNotifications.push(notification.id);
@@ -179,5 +188,4 @@ export class NotificationService {
       this.markANotificationAsRead(notifications[i]);
     }
   };
-
 }

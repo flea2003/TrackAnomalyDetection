@@ -174,7 +174,6 @@ function mapFlyToShip(
 ) {
   const map = mapRef.current;
   const ship = trackedShip.ship;
-  console.log(ship);
 
   if (
     map === null ||

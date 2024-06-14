@@ -8,7 +8,6 @@ import ShipNotification from "../../model/ShipNotification";
 const fakeNotificationResponseItem1: NotificationResponseItem = {
   id: 0,
   shipID: 1,
-  isRead: false,
   currentShipDetails: {
     currentAISSignal: {
       id: 1,
@@ -36,7 +35,6 @@ const fakeNotificationResponseItem1: NotificationResponseItem = {
 const fakeNotificationResponseItem2: NotificationResponseItem = {
   id: 1,
   shipID: 1,
-  isRead: false,
   currentShipDetails: {
     currentAISSignal: {
       id: 1,
@@ -107,47 +105,55 @@ beforeEach(() => {
   ErrorNotificationService.refreshState = () => {};
 });
 
-test("query-mark-notification-as-read", async () => {
-  await NotificationService.markANotificationAsRead(resultItem1);
-  expect(HttpSender.put).toHaveBeenCalledTimes(1);
-  expect(HttpSender.put).toHaveBeenCalledWith(
-    NotificationService.markNotificationAsReadEndpoint + "0",
-  );
-});
-
-test("query-mark-notification-as-read-already-read", async () => {
-  resultItem1.isRead = true;
-  await NotificationService.markANotificationAsRead(resultItem1);
-  expect(HttpSender.put).toHaveBeenCalledTimes(0);
+test("mark-notification-as-read", async () => {
+  NotificationService.markANotificationAsRead(resultItem1);
+  expect(resultItem1.isRead).toStrictEqual(true);
+  expect(NotificationService.idsOfReadNotifications).toContain(resultItem1.id);
   resultItem1.isRead = false;
 });
 
-test("query-mark-all-notifications-as-read-proper", async () => {
-  await NotificationService.markAllNotificationsAsRead([
-    resultItem1,
-    resultItem2,
-  ]);
-  expect(HttpSender.put).toHaveBeenCalledTimes(2);
-  expect(HttpSender.put).toHaveBeenCalledWith(
-    NotificationService.markNotificationAsReadEndpoint + "0",
-  );
-  expect(HttpSender.put).toHaveBeenCalledWith(
-    NotificationService.markNotificationAsReadEndpoint + "1",
-  );
+test("mark-notification-as-read-already-read", async () => {
+  NotificationService.idsOfReadNotifications = [];
+
+  resultItem1.isRead = false;
+  NotificationService.markANotificationAsRead(resultItem1);
+  NotificationService.markANotificationAsRead(resultItem1);
+
+  expect(resultItem1.isRead).toStrictEqual(true);
+  expect(
+    NotificationService.idsOfReadNotifications.filter(
+      (x) => x === resultItem1.id,
+    ).length,
+  ).toStrictEqual(1);
+  resultItem1.isRead = false;
 });
 
-test("query-mark-all-notifications-as-read-zero", async () => {
-  await NotificationService.markAllNotificationsAsRead([]);
-  expect(HttpSender.put).toHaveBeenCalledTimes(0);
+test("mark-all-notifications-as-read-proper", async () => {
+  NotificationService.markAllNotificationsAsRead([resultItem1, resultItem2]);
+  expect(resultItem1.isRead).toStrictEqual(true);
+  expect(resultItem2.isRead).toStrictEqual(true);
+
+  expect(NotificationService.idsOfReadNotifications).toContain(resultItem1.id);
+  expect(NotificationService.idsOfReadNotifications).toContain(resultItem2.id);
+
+  resultItem1.isRead = false;
+  resultItem2.isRead = false;
 });
 
-test("query-mark-all-notifications-for-a-ship-valid", async () => {
+test("mark-all-notifications-as-read-zero", async () => {
+  NotificationService.idsOfReadNotifications = [];
+
+  NotificationService.markAllNotificationsAsRead([]);
+  expect(NotificationService.idsOfReadNotifications).toStrictEqual([]);
+});
+
+test("query-all-notifications-for-a-ship-valid", async () => {
   await NotificationService.queryBackendForAllNotificationsForShip(1);
   expect(HttpSender.get).toHaveBeenCalledTimes(1);
-  expect(HttpSender.get).toHaveBeenCalledWith("/notifications/1");
+  expect(HttpSender.get).toHaveBeenCalledWith("/notifications/ship/1");
 });
 
-test("query-mark-all-notifications-for-a-ship-invalid", async () => {
+test("query-all-notifications-for-a-ship-invalid", async () => {
   await NotificationService.queryBackendForAllNotificationsForShip(-1);
   expect(HttpSender.get).toHaveBeenCalledTimes(0);
 });
@@ -180,7 +186,7 @@ test("backend-fetching-all-notifications-valid-details", async () => {
       ]),
     );
   const result = await NotificationService.queryBackendForAllNotifications();
-  expect(result).toStrictEqual([resultItem2, resultItem1]);
+  expect(result).toStrictEqual([resultItem1, resultItem2]);
 });
 
 test("backend-fetching-all-notifications-some-invalid-details", async () => {
@@ -194,7 +200,7 @@ test("backend-fetching-all-notifications-some-invalid-details", async () => {
       ]),
     );
   const result = await NotificationService.queryBackendForAllNotifications();
-  expect(result).toStrictEqual([resultItem2, resultItem1]);
+  expect(result).toStrictEqual([resultItem1, resultItem2]);
 });
 
 test("extract-notification-details-valid", async () => {
@@ -259,7 +265,7 @@ test("sorting without giving desc - sorting-valid-notification-desc", async () =
 });
 
 test("check-all-read-false", async () => {
-  fakeNotificationResponseItem1.isRead = true;
+  resultItem1.isRead = false;
 
   HttpSender.get = jest
     .fn()
@@ -270,13 +276,13 @@ test("check-all-read-false", async () => {
       ]),
     );
   await NotificationService.queryBackendForAllNotifications();
-  const result = NotificationService.areAllRead();
+  const result = NotificationService.areAllRead([resultItem1, resultItem2]);
   expect(result).toStrictEqual(false);
 });
 
 test("check-all-read-true", async () => {
-  fakeNotificationResponseItem1.isRead = true;
-  fakeNotificationResponseItem2.isRead = true;
+  resultItem1.isRead = true;
+  resultItem2.isRead = true;
 
   HttpSender.get = jest
     .fn()
@@ -287,6 +293,6 @@ test("check-all-read-true", async () => {
       ]),
     );
   await NotificationService.queryBackendForAllNotifications();
-  const result = NotificationService.areAllRead();
+  const result = NotificationService.areAllRead([resultItem1, resultItem2]);
   expect(result).toStrictEqual(true);
 });

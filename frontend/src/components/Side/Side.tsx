@@ -41,7 +41,6 @@ interface PageChangerRef {
  */
 const Side = forwardRef<PageChangerRef, SideProps>(
   ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold }, ref) => {
-
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
@@ -54,13 +53,14 @@ const Side = forwardRef<PageChangerRef, SideProps>(
     // Update the notifications by querying the server frequently
     useEffect(() => {
       const updateNotificationsFunc = () => {
-
         // Query for notifications from backend.
         // When the results arrive, update the state by setting notifications that
         // have been read to read
         NotificationService.queryBackendForAllNotifications().then(
           (newNotifications: ShipNotification[]) => {
-            return setNotifications(NotificationService.updateNotifications(newNotifications));
+            return setNotifications(
+              NotificationService.updateNotifications(newNotifications),
+            );
           },
         );
       };
