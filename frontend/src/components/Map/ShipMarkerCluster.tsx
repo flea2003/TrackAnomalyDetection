@@ -69,6 +69,7 @@ export function getMarkersClustersLayer() {
     chunkInterval: mapConfig.clusterChunkInterval,
     chunkDelay: mapConfig.clusterChunkDelay,
   });
+
 }
 
 /**

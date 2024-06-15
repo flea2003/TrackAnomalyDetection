@@ -9,6 +9,7 @@ import "./styles/common.css";
 import Side, { PageChangerRef } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
+import TrajectoryPoint from "./model/TrajectoryPoint";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -57,6 +58,9 @@ function App() {
   // Put filter threshold as a state
   const [filterThreshold, setFilterThreshold] = useState<number>(0);
 
+  // Initialize the displayed trajectory
+  const [dispalyedTrajectory, setDisplayedTrajectory] = useState<TrajectoryPoint[]>([]);
+
   // Create a separate array for displayed ships
   const displayedShips = sortedShips.filter(
     (x) => x.anomalyScore >= filterThreshold,
@@ -68,6 +72,7 @@ function App() {
       <LMap
         ships={displayedShips}
         pageChangerRef={pageChangerRef}
+        displayedTrajectory={dispalyedTrajectory}
         ref={mapRef}
       />
       <Side
@@ -75,6 +80,7 @@ function App() {
         mapCenteringFun={mapCenteringFun}
         setFilterThreshold={setFilterThreshold}
         anomalyThreshold={filterThreshold}
+        setDisplayedTrajectory={setDisplayedTrajectory}
         ref={pageChangerRef}
       />
     </div>

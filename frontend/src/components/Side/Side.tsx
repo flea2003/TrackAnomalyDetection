@@ -17,12 +17,15 @@ import "../../styles/common.css";
 import "../../styles/side.css";
 
 import config from "../../configs/generalConfig.json";
+import TrajectoryPoint from "../../model/TrajectoryPoint";
+import ShipService from "../../services/ShipService";
 
 interface SideProps {
   ships: ShipDetails[];
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
+  setDisplayedTrajectory: (value:TrajectoryPoint[]) => void;
 }
 
 interface PageChangerRef {
@@ -39,7 +42,7 @@ interface PageChangerRef {
  * @constructor
  */
 const Side = forwardRef<PageChangerRef, SideProps>(
-  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold }, ref) => {
+  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold, setDisplayedTrajectory }, ref) => {
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
@@ -61,6 +64,9 @@ const Side = forwardRef<PageChangerRef, SideProps>(
           },
         );
       };
+
+      ShipService.queryBackendForSampledHistoryOfAShip(1).then((newData) => setDisplayedTrajectory(newData));
+
 
       const intervalId = setInterval(
         updateNotificationsFunc,

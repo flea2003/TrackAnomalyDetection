@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import ShipDetails from "../../../../model/ShipDetails";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
@@ -9,6 +9,8 @@ import DisplayedInformation from "./DisplayedInformation";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
+import TrajectoryResponseItem from "../../../../templates/TrajectoryResponseItem";
+import ShipService from "../../../../services/ShipService";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
@@ -22,11 +24,11 @@ interface ObjectDetailsProps {
  * This component is the second column of the main view of the application. It displays the details of a selected object.
  * The object to whose details are to be displayed is passed as a prop.
  *
- * @param ships
- * @param notifications
- * @param mapCenteringFun
- * @param pageChanger
- * @param shipId
+ * @param ships array of all ships
+ * @param notifications a list of all notifications
+ * @param mapCenteringFun function used for map centering on a needed ship
+ * @param pageChanger page changer function
+ * @param shipId id of the ship
  * @constructor
  */
 function ObjectDetails({
@@ -41,7 +43,7 @@ function ObjectDetails({
   const shipNotifications = notifications.filter(
     (x) => x.shipDetails.id === shipId,
   );
-
+  
   if (ship === undefined) {
     return shipNotFoundElement();
   }

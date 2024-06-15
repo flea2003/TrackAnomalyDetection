@@ -13,8 +13,9 @@ import {
   getMarkersClustersLayer,
   updateMarkersForShips,
 } from "./ShipMarkerCluster";
-import L from "leaflet";
+import L, { LatLng } from "leaflet";
 import "leaflet.markercluster";
+import {getTrajectoriesLayer} from "./TrajectoriesLayer";
 
 import "../../styles/map.css";
 import "../../styles/common.css";
@@ -23,10 +24,13 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
 
 import mapConfig from "../../configs/mapConfig.json";
+import TrajectoryResponseItem from "../../templates/TrajectoryResponseItem";
+import TrajectoryPoint from "../../model/TrajectoryPoint";
 
 interface MapProps {
   ships: ShipDetails[];
   pageChangerRef: React.RefObject<PageChangerRef>;
+  displayedTrajectory: TrajectoryPoint[];
 }
 
 // Define the type of the ref object
@@ -47,7 +51,7 @@ interface TrackedShipType {
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 const LMap = forwardRef<MapExportedMethodsType, MapProps>(
-  ({ ships, pageChangerRef }, ref) => {
+  ({ ships, pageChangerRef, displayedTrajectory }, ref) => {
     // Map is ref to have one instance. This ref will be initialized in useEffect.
     const mapRef = useRef<L.Map | null>(null);
 
@@ -56,6 +60,10 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
     // Initialize the state for tracked ship
     const [trackedShip, setTrackedShip] = useState(getDefaultTrackedShipInfo());
+
+
+    const [map, setMapState] = useState(mapRef.current);
+
 
     const trackShip = (ship: ShipDetails, zoomLevel: number) => {
       const newTrackedShip = { ship, zoomLevel } as TrackedShipType;
@@ -73,6 +81,14 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     // pop-up div containing reduced information about a particular ship
     const [hoverInfo, setHoverInfo] = useState(getDefaultHoverInfo());
 
+
+    useEffect(() => {
+      const sth = L.polyline(displayedTrajectory.map(x => new LatLng(x.latitude, x.longitude)));
+      if (map == null) return;
+      map.addLayer(sth);
+
+    }, [displayedTrajectory]);
+
     // Initialize map (once).
     useEffect(() => {
       if (mapRef.current !== null) return;
@@ -84,7 +100,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     // is dragging through the map or zooming.
     // Finally, ship marker tracing functionality is implemented here.
     useEffect(() => {
-      const map = mapRef.current;
+      setMapState(mapRef.current);
       if (!map) return;
 
       // Update centering on the tracked ship
@@ -109,7 +125,6 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           trackShip,
         );
       };
-
       // Same as function above, but only updates if the filtering is turned on
       const updateOnlyWhenFilterFunc = () => {
         if (mapConfig.doFilteringBeforeDisplaying) {
@@ -228,6 +243,7 @@ function initializeMap(
   const markersClustersLayer = getMarkersClustersLayer();
 
   markersClustersRef.current = markersClustersLayer;
+
   mapRef.current = L.map("map", {
     minZoom: 2,
     maxZoom: 17,
