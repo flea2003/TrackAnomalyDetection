@@ -4,9 +4,9 @@
     left: 5px;
 
     width: 20%;
-    height: 30%;
+    height: 21%;
 
-    background: #bbbbbbCC;
+    background: var(--background);
     border: var(--border);
     padding: 25px 6px 25px;
 }
@@ -33,7 +33,7 @@
 }
 
 .information-container:hover {
-    background: #bbbbbb;
+    background: rgba(255, 255, 255, 1);
 }
 
 .information-icon {
