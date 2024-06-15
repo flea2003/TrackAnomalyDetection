@@ -18,7 +18,8 @@ import "../../styles/side.css";
 
 import config from "../../configs/generalConfig.json";
 import TrajectoryPoint from "../../model/TrajectoryPoint";
-import ShipService from "../../services/ShipService";
+import TrajectoryService from "../../services/TrajectoryService";
+import generalConfig from "../../configs/generalConfig.json";
 
 interface SideProps {
   ships: ShipDetails[];
@@ -65,9 +66,6 @@ const Side = forwardRef<PageChangerRef, SideProps>(
         );
       };
 
-      ShipService.queryBackendForSampledHistoryOfAShip(1).then((newData) => setDisplayedTrajectory(newData));
-
-
       const intervalId = setInterval(
         updateNotificationsFunc,
         config.notificationsRefreshMs,
@@ -76,11 +74,19 @@ const Side = forwardRef<PageChangerRef, SideProps>(
       return () => {
         clearInterval(intervalId);
       };
+
     }, [notifications]);
 
     // Create state for current page
     const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
     const pageChanger = constructPageChanger(currentPage, setCurrentPage);
+
+    useEffect(() => {
+      if (areShipDetailsOpened(currentPage) && TrajectoryService.shouldQueryBackend(ships, currentPage.shownItemId)) {
+        TrajectoryService.queryBackendForSampledHistoryOfAShip(currentPage.shownItemId).then((newarray) => setDisplayedTrajectory(newarray));
+      }
+      else setDisplayedTrajectory([]);
+    }, [currentPage, ships]);
 
     // Save pageChanger in ref reachable by components above in the tree
     useImperativeHandle(ref, () => ({ pageChanger }));
@@ -117,6 +123,8 @@ function constructPageChanger(
       // If we clicked the same icon for the second time
       setCurrentPage(getPageChangerDefaultPage());
     } else {
+      //
+
       // Else, just set what was clicked
       setCurrentPage(newPage);
     }

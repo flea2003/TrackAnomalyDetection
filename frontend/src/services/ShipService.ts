@@ -12,12 +12,6 @@ class ShipService {
    */
   static shipsCurrentDetailsEndpoint = "/ships/details";
 
-  /**
-   * Backend API endpoint for retrieving the subsampled information about the
-   * previous AIS signals and their corresponding anomaly information of a ship.
-   * The fetched information is used for drawing past trajectories
-   */
-  static shipSampledHistory = "/ships/history/sampled/";
 
   /**
    * This method queries the backend for the CurrentShipDetails array
@@ -54,41 +48,6 @@ class ShipService {
       "desc",
     );
   };
-
-
-  /**
-   * Function that retrieves the subsampled information about the previous AIS
-   * signals and their corresponding anomaly information of a particular ship.
-   * The fetched information is used for drawing past trajectories
-   * @param id
-   */
-  static queryBackendForSampledHistoryOfAShip: (id: number) =>
-    Promise<TrajectoryPoint[]> = async (id) =>
-  {
-    /*
-    const response = await HttpSender.get(
-      ShipService.shipSampledHistory + 'id'
-    );
-
-    if (!Array.isArray(response)) {
-      ErrorNotificationService.addError("Server returned not an array for the trajectory history");
-      return [];
-    }
-
-    if (response.length === 0) {
-      ErrorNotificationService.addInformation("Trajectory length is 0");
-      return [];
-    }
-
-    const responseWithoutNulls = response.filter((item) => item !== null);
-    if (responseWithoutNulls.length !== response.length) {
-      ErrorNotificationService.addError("Trajectory array contained null items");
-    }
-
-    return responseWithoutNulls;
-    */
-    return HttpSender.getDummyData();
-  }
 
 
   /**

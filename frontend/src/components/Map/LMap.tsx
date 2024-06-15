@@ -22,6 +22,7 @@ import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
+import {calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
 
 import mapConfig from "../../configs/mapConfig.json";
 import TrajectoryResponseItem from "../../templates/TrajectoryResponseItem";
@@ -81,11 +82,31 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     // pop-up div containing reduced information about a particular ship
     const [hoverInfo, setHoverInfo] = useState(getDefaultHoverInfo());
 
+    const [layers, setLayer] = useState<L.Layer[]>([]);
 
     useEffect(() => {
-      const sth = L.polyline(displayedTrajectory.map(x => new LatLng(x.latitude, x.longitude)));
       if (map == null) return;
-      map.addLayer(sth);
+
+      layers.forEach(x => map.removeLayer(x));
+
+      const tempLayers = [];
+
+      for (let i = 0; i < displayedTrajectory.length - 1; i++) {
+        const point1 = displayedTrajectory[i];
+        const point2 = displayedTrajectory[i+1];
+
+        const polyline = L.polyline([[point1.latitude, point1.longitude], [point2.latitude, point2.longitude``]], {
+          color: calculateAnomalyColor(point2.anomalyScore, false),
+          weight: 5,
+          opacity: 0.7,
+        });
+
+        polyline.addTo(map);
+
+        tempLayers.push(polyline);
+      }
+
+      setLayer(tempLayers);
 
     }, [displayedTrajectory]);
 

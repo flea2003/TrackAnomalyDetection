@@ -18,8 +18,6 @@ class HttpSender {
     const singal4 = new TrajectoryPoint(1, Math.floor(Math.random()*20), 14, "", 37)
     const singal5 = new TrajectoryPoint(1, 17, 60, "", 37)
 
-    console.log(singal1.longitude);
-
     /*
     const singal1 = new TrajectoryPoint(1, randomInt(10, 20), 26, "", 37)
     const singal2 = new TrajectoryPoint(1, 24, randomInt(10, 20), "", 37)
