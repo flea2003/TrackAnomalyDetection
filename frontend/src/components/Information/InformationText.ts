@@ -8,7 +8,7 @@ export const informationText = (page: string) => {
        on an entry for more detailed information. Also, once the entry is clicked, a corresponding
        ship is centered on the map. Moreover, by clicking the filter icon, you can change
        the anomaly score threshold to filter out vessels with scores below the threshold.
-       Lastly, click the close button or the ship icon in the menu to exit the Anomaly List.
+       Lastly, you can click the close button or the ship icon in the menu to exit the Anomaly List.
         `;
     case "objectDetails":
       return `
@@ -21,7 +21,7 @@ export const informationText = (page: string) => {
 
         Additionally, once the information was displayed, a vessel that corresponds to the displayed 
         information was centered in a map, and its past trajectory displayed. To exit the detailed 
-        information window, click the arrow in the top-left corner.
+        information window, you can click the arrow in the top-left corner.
         `;
     case "notificationList":
       return `
@@ -33,17 +33,17 @@ export const informationText = (page: string) => {
       means read), the type of vessel that received the notification (indicated by an icon),
       the last three digits of its ID, and the time and date when the notification was received.
 
-      Clicking on a notification provides more detailed information about it, centers the 
-      corresponding ship on the map, and automatically marks the notification as read. 
-      Additionally, all notifications can be marked as read by clicking the check button 
-      in the top right corner. Finally, the notification list can be closed by clicking the 
+      You can click on a notification to get more detailed information about it, and also center the 
+      corresponding ship on the map; notification is then automatically marked as read. 
+      Additionally, you can mark all notifications as read by clicking the check button 
+      in the top right corner. Finally, you can close the notification list by clicking the 
       close button in the top left corner or a bell icon in the menu list.
       `;
     case "notificationDetails":
       return `
       The Notification Details window displays information about a specific notification. 
       At the top, you can see the ID of the notification and right below it, the ship's ID is shown. 
-      Below this, there is a two-choice menu. By clicking on the desired option, you can view either the 
+      Below this, there is a two-choice menu. You can click on the desired option to view either the 
       anomaly information corresponding to the ship's anomaly at the time the notification was sent, or 
       view the AIS information at the time of the notification.
 
@@ -68,9 +68,9 @@ export const informationText = (page: string) => {
       Each entry in the scrollable list of notifications includes, from left to 
       right, an icon corresponding to the type of error or notification, a brief
       description, and a bin icon that, when clicked, deletes the notification.
-      Clicking on an entry marks it as read. Additionally, all notifications 
-      can be marked as read by clicking a button in the top-right corner. 
-      Finally, the error list window can be closed by clicking the exit button 
+      You can click an entry to mark it as read. Additionally, you can mark all notifications 
+      as read by clicking a button in the top-right corner. 
+      Finally, you can close the error list window by clicking the exit button 
       in the top-left corner, or a corresponding warning icon in the menu.
       `;
     case "none":
@@ -78,15 +78,15 @@ export const informationText = (page: string) => {
       The map displays real-time ship locations based on their AIS data. Each ship's 
       color indicates its anomaly score, with greener colors representing less 
       anomalous ships and redder colors representing more anomalous ships. You 
-      can use the mouse to zoom in and move around the map. Clicking on a ship's 
-      visual indicator will provide more detailed information about its anomaly 
+      can use the mouse to zoom in and move around the map. You can also click on a ship's 
+      visual indicator to get more detailed information about its anomaly 
       score, AIS data, and notifications specific to that ship.
 
       Additionally, the clickable menu on the right-hand side includes the following 
       options from top to bottom: full anomaly list of all ships, notification history, 
       settings, and application errors.
       
-      Finally, brief information about a ship is displayed when hovering the mouse over the visual indicator.
+      Finally, you can see brief information about a ship when hovering the mouse over the ship's visual indicator.
       `;
     default: {
       return "";

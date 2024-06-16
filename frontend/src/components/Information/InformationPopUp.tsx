@@ -11,6 +11,14 @@ interface InformationProps {
   currentPage: CurrentPage;
 }
 
+/**
+ * Function that returns UI component for the information of the visual components that could be
+ * seen at the current page. It is displayed in the botoom-left corner of the page, once the information
+ * button is clicked.
+ *
+ * @param currentPage current page that is displayed in the application
+ * @constructor
+ */
 function InformationPopUp({ currentPage }: InformationProps) {
   const [isDisplayed, setDisplayed] = useState<boolean>(false);
   const changePopUpState = () => {
@@ -52,22 +60,27 @@ function InformationPopUp({ currentPage }: InformationProps) {
   } else return infoIconImage;
 }
 
+/**
+ * Function that returns the title for the information container.
+ *
+ * @param page name of the page that is currently being displayed
+ */
 function getInfoTitle(page: string) {
   switch (page) {
     case "anomalyList":
-      return "Anomaly List Information";
+      return "Anomaly List";
     case "objectDetails":
-      return "Ship Details Information";
+      return "Ship Details";
     case "notificationList":
-      return "Notification List Information";
+      return "Notification List";
     case "notificationDetails":
-      return "Notification Details Information";
+      return "Notification Details";
     case "settings":
-      return "Settings Information";
+      return "Settings";
     case "errors":
-      return "Error List Information";
+      return "Error List";
     case "none":
-      return "Map Information";
+      return "Map";
     default: {
       return "";
     }
