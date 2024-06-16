@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9bd95ea6-6dbc-4c96-a67a-fa51559a6e21" name="Changes" comment="" />
+    <list default="true" id="9bd95ea6-6dbc-4c96-a67a-fa51559a6e21" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AISSignal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/stresstester/AISSignal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/stresstester/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ShipSignalSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/stresstester/ShipSignalSender.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,7 +60,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "optimize__frontend",
+    "git-widget-placeholder": "improve__readmes",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/augus/Desktop/codebase/stress-tester",
     "node.js.detected.package.eslint": "true",
@@ -85,6 +90,7 @@
       <workItem from="1717667783430" duration="13872000" />
       <workItem from="1717749907913" duration="2370000" />
       <workItem from="1718179592561" duration="2595000" />
+      <workItem from="1718554712105" duration="52000" />
     </task>
     <servers />
   </component>
