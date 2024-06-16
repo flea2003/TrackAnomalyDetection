@@ -1,101 +1,56 @@
-# Frontend Documentation
+# Frontend
 
-## Two different modes of map rendering
+This frontend (website) is the part of the application that is visible to the user. It displays the ships and their information on the map, in addition to providing some other features (such as, notifications).
 
-In the folder `src/configs` there are some configuration files with values to change if wanted. Changing
-them also helps to set the way the map renders ship markers. 
-There are two different ways, described below, to do that. Of course, any other values
-are also possible. Everything depends on the computer the application is run on.
+Frontend is implemented using [React.js framework](https://react.dev/).
 
-1. **Beautiful clustering mode**. Map clusters the ships if there are too many on the screen. However, if used without filtering (described in the 2nd mode below), this may impact performance when there are many ships. To use this mode, set the following values in the config files:
-```
-// in websocketConfig.js:
-    "websocketBufferRefreshMs": 5000 
+## Table of Contents
+- [Running Frontend](#running-frontend)
+- [Running Tests and Static Checks](#running-tests-and-static-checks)
+- [Icon Sources](#icon-sources)
 
-// in mapConfig.js:
-    "doFilteringBeforeDisplaying": false,
-    "maxShipsOnScreen": -1,
+## Running Frontend
 
-    "clusterChunkedLoading": true,
-    "clusterChunkInterval": 200,
-    "clusterChunkDelay": 100,
-    "clusterMaxRadius": 80
-```
+**Before starting the frontend, you need to setup and start the Druid, Kafka and backend.** The instructions can be found in the [README.md in the folder above](../README.md).
 
-2. **Efficient mode**. To render the map faster, filtering should be turned on. Filtering means that only the ships that are seen on the current map view are rendered, and only up to some set limit (for example, only the 50 most anomalous ships). Since in this way not all ships are rendered, it is recommended to turn off the clustering. This is done by setting the clustering radius to 0. All constants that should be written to config files are as below:
-```
-// in websocketConfig.js:
-    "websocketBufferRefreshMs": 1000 
-
-// in mapConfig.js:
-    "doFilteringBeforeDisplaying": true,
-    "maxShipsOnScreen": 100,
-
-    "clusterChunkedLoading": true,
-    "clusterChunkInterval": 200,
-    "clusterChunkDelay": 100,
-    "clusterMaxRadius": 0
+When you are ready to start the frontend, you need to install the required packages and run the frontend using the following commands:
+```shell
+cd codebase/frontend
+npm ci # install the Node packages based on 
+       # the package.json and package-lock.json.
+npm run start # the website can now be reached at
+              # http://localhost:3000/ 
 ```
 
-
-## Building the project
-
-In order to work with the frontend, one has to install the Node.js programming environment. This can be done by running:
-```
-sudo apt update
-sudo apt install nodejs
-node -v
+If you want to run the production build, then you need to run the following command and follow the instructions written there:
+```shell
+npm run build
 ```
 
-Afterwards, locate to the frontend directory and run the following command to install the npm dependencies:
+## Running tests and static checks
 
-```
-npm install
-```
+To ensure code quality of the frontend code, the following tools are used (also included in the GitLab pipeline):
+- [Jest testing framework](https://jestjs.io/)
+- [ESLint linter](https://eslint.org/)
+- [Prettier formatter](https://prettier.io/)
 
-## Running the project
-
-In order to run the project, one can use the following commands:
-
-`npm start` - runs the app in the development mode. Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits. You will also see any lint errors in the console.
-
-`npm test` - this command runs the test suite. See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-`npm run build` - builds the app for production to the `build` folder. This command prepares the code for deployment.
-
-## Additional information
-
-This template project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-The command that was used to generate it is:
-```
-npx create-react-app frontend --template typescript --use-npm
+Before running any of these, go to the `frontend` folder, and install the Node packages:
+```shell
+cd codebase/frontend
+npm ci
 ```
 
-`npm` - Node package manager.
+Then you can run the tests and other checks using the following commands:
+```shell
+npm run lint # runs ESLint
+npm run prettier:check # runs Prettier to check the formatting
+npm run prettier:format # runs Prettier to automatically 
+                        # format the code
+npm run test:ci # runs the test and generates report in the
+                # folder codebase/frontend/coverage/lcov-report
+```
 
-`npx` - npm package runner.
-
-`create-react-app` - command to initiate a React app.
-
-`--template typescript` - flag to create a typescript template instead of javascript.
-
-`--use-npm` - npx doesn't create a repo in the current folder.
-
-## Description of the files
-
-`tsconfig` - Typescript configuration.
-
-`package.json` - the dependencies of the frontend.
-
-`package-lock.json` - fetched versions of the dependencies.
-
-`robots.txt` - a file used to communicate with web crawlers and other web robots about which parts of your site they are allowed to access.
-
-## Learn More
-
-If this documentation wasn't clear enough, here is the [React documentation](https://reactjs.org/).
-
-## Icons
+## Icon Sources
 
 - bell-notifications.svg - taken from https://iconoir.com/
 - settings.svg - taken from https://iconoir.com/

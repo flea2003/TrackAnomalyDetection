@@ -204,19 +204,7 @@ To check that the backend started, you can go to http://localhost:8180/ships/det
 
 ### 8. Start the frontend
 
-You need to install the required packages and run the frontend using the following commands:
-```shell
-cd codebase/frontend
-npm ci # install the Node packages based on 
-       # the package.json and package-lock.json.
-npm run start # the website can now be reached at
-              # http://localhost:3000/ 
-```
-
-If you want to run the production build, then you need to run the following command and follow the instructions written there:
-```shell
-npm run build
-```
+Follow the instructions in [the section Running Frontend in the file frontend/README.md](frontend/README.md#running-frontend).
 
 ### 9. Run the Simulator or Stress Tester
 
