@@ -5,7 +5,6 @@ import TrajectoryResponseItem from "../templates/TrajectoryResponseItem";
 import ShipDetails from "../model/ShipDetails";
 
 class TrajectoryService {
-
   /**
    * Backend API endpoint for retrieving the subsampled information about the
    * previous AIS signals and their corresponding anomaly information of a ship.
@@ -23,8 +22,6 @@ class TrajectoryService {
    */
   static newestTimestampOfCurrentlyStoredShip = "";
 
-
-
   /**
    * Function that retrieves the subsampled information about the previous AIS
    * signals and their corresponding anomaly information of a particular ship.
@@ -35,14 +32,15 @@ class TrajectoryService {
    *
    * @param id id of the ship that whose trajectory is requested
    */
-  static queryBackendForSampledHistoryOfAShip = async (id: number) =>
-  {
+  static queryBackendForSampledHistoryOfAShip = async (id: number) => {
     const response = await HttpSender.get(
-      TrajectoryService.shipSampledHistory + id
+      TrajectoryService.shipSampledHistory + id,
     );
 
     if (!Array.isArray(response)) {
-      ErrorNotificationService.addError("Server returned not an array for the trajectory history");
+      ErrorNotificationService.addError(
+        "Server returned not an array for the trajectory history",
+      );
       return [];
     }
 
@@ -53,17 +51,29 @@ class TrajectoryService {
 
     const responseWithoutNulls = response.filter((item) => item !== null);
     if (responseWithoutNulls.length !== response.length) {
-      ErrorNotificationService.addError("Trajectory array contained null items");
+      ErrorNotificationService.addError(
+        "Trajectory array contained null items",
+      );
     }
 
-    const finalResult = responseWithoutNulls.map((x: TrajectoryResponseItem) =>
-      new TrajectoryPoint(x.shipId, x.longitude, x.latitude, x.timestamp, x.anomalyScore));
+    if (responseWithoutNulls.length === 0) return [];
+
+    const finalResult = responseWithoutNulls.map(
+      (x: TrajectoryResponseItem) =>
+        new TrajectoryPoint(
+          x.shipId,
+          x.longitude,
+          x.latitude,
+          x.timestamp,
+          x.anomalyScore,
+        ),
+    );
 
     this.newestTimestampOfCurrentlyStoredShip = finalResult[0].timestamp;
     this.idOfCurrentlyStoredShip = finalResult[0].shipId;
 
     return finalResult;
-  }
+  };
 
   /**
    * Function that checks whether backend should be queried for a more recent version
@@ -78,14 +88,14 @@ class TrajectoryService {
    * @param ship instance of a ship whose trajectory needs to be displayed
    */
   static shouldQueryBackend = (ship: ShipDetails | undefined) => {
-      if (ship === undefined) return false;
+    if (ship === undefined) return false;
 
-      const timestamp = ship.timestamp;
-      const id = ship.id;
+    const timestamp = ship.timestamp;
+    const id = ship.id;
 
-      if (id !== this.idOfCurrentlyStoredShip) return true;
-      return timestamp !== this.newestTimestampOfCurrentlyStoredShip;
-  }
+    if (id !== this.idOfCurrentlyStoredShip) return true;
+    return timestamp !== this.newestTimestampOfCurrentlyStoredShip;
+  };
 }
 
 export default TrajectoryService;

@@ -9,9 +9,6 @@ import "./styles/common.css";
 import Side, { ExtractedFunctionsSide } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
-import TrajectoryPoint from "./model/TrajectoryPoint";
-import { util } from "prettier";
-import skipEverythingButNewLine = util.skipEverythingButNewLine;
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.

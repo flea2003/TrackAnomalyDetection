@@ -164,5 +164,5 @@ export {
   handleMouseOverShipIcon,
   handleMouseOutShipIcon,
   extractIconCoordinates,
-  drawShipStationaryCircle
+  drawShipStationaryCircle,
 };

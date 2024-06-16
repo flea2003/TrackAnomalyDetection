@@ -13,23 +13,19 @@ import {
   getMarkersClustersLayer,
   updateMarkersForShips,
 } from "./ShipMarkerCluster";
-import L, { LatLng } from "leaflet";
+import L from "leaflet";
 import "leaflet.markercluster";
-import {getTrajectoriesLayer} from "./TrajectoriesLayer";
+import { calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
+import mapConfig from "../../configs/mapConfig.json";
+import TrajectoryPoint from "../../model/TrajectoryPoint";
+import TrajectoryService from "../../services/TrajectoryService";
+import { CurrentPage } from "../../App";
 
 import "../../styles/map.css";
 import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
-import {calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
-
-import mapConfig from "../../configs/mapConfig.json";
-import TrajectoryResponseItem from "../../templates/TrajectoryResponseItem";
-import TrajectoryPoint from "../../model/TrajectoryPoint";
-import { red } from "@mui/material/colors";
-import TrajectoryService from "../../services/TrajectoryService";
-import { CurrentPage } from "../../App";
 
 interface MapProps {
   ships: ShipDetails[];
@@ -56,7 +52,6 @@ interface TrackedShipType {
  */
 const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
   ({ ships, refObjects }, ref) => {
-
     // Map is ref to have one instance. This ref will be initialized in useEffect.
     const mapRef = useRef<L.Map | null>(null);
 
@@ -69,7 +64,8 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
     // Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
     // 1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
     // 2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
-    const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] = useState<TrajectoryPoint[][]>([]);
+    const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
+      useState<TrajectoryPoint[][]>([]);
 
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship
@@ -98,7 +94,7 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
     useImperativeHandle(ref, () => ({
       centerMapOntoShip: (ship: ShipDetails) =>
         trackShip(ship, mapConfig.centeringShipZoomLevel),
-      setCurrentPageMap: setCurrentPage
+      setCurrentPageMap: setCurrentPage,
     }));
 
     /**
@@ -112,21 +108,20 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       // If currently object details are displayed, a trajectory of a corresponding ship must
       // be present on a map.
       if (currentPage.currentPage === "objectDetails") {
+        // Find a needed ship from the array of all ships
+        const ship = ships.find((x) => x.id === currentPage.shownItemId);
 
-         // Find a needed ship from the array of all ships
-          const ship = ships.find(x => x.id === currentPage.shownItemId);
-
-          // Check if the trajectory should be updated in the map. If it has to be updated,
-          // update the trajectory state by querying the needed data from the backend
-          if (TrajectoryService.shouldQueryBackend(ship))
-            TrajectoryService.queryBackendForSampledHistoryOfAShip(currentPage.shownItemId)
-              .then((trajectory) => setDisplayedTrajectory([trajectory, []]));
-        }
+        // Check if the trajectory should be updated in the map. If it has to be updated,
+        // update the trajectory state by querying the needed data from the backend
+        if (TrajectoryService.shouldQueryBackend(ship))
+          TrajectoryService.queryBackendForSampledHistoryOfAShip(
+            currentPage.shownItemId,
+          ).then((trajectory) => setDisplayedTrajectory([trajectory, []]));
+      }
 
       // If currently notification details are displayed, a trajectory of a corresponding ship must
       // be present on a map, and ALSO, a marker where the notification took place must appear.
-      else if (currentPage.currentPage ===  "notificationDetails") {
-
+      else if (currentPage.currentPage === "notificationDetails") {
         // Check if notifications array is defined
         if (notifications === undefined) {
           setDisplayedTrajectory([]);
@@ -134,7 +129,9 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
         }
 
         // Find the needed notification from the array
-        const notification = notifications.find((x) => x.id === currentPage.shownItemId);
+        const notification = notifications.find(
+          (x) => x.id === currentPage.shownItemId,
+        );
 
         // TODO: ACTUALLY, THIS CAN HAPPEN, AS WE ONLY STORE LIKE 1000 NOTIFICATIONS IN THE FRONTEND.
         //  PERHAPS IN THIS CASE, BACKEND SHOULD BE QUERIED TO RETRIEVE THE NOTIFICATION. However, we won't cosider this now.
@@ -144,19 +141,22 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
         }
 
         // Compute the wrapper object for the notification marker that will be displayed
-        const notificationLat = notification.shipDetails.lat
-        const notificationLng = notification.shipDetails.lng
+        const notificationLat = notification.shipDetails.lat;
+        const notificationLng = notification.shipDetails.lng;
         const notificationLatLng = // Add dummy data
-          new TrajectoryPoint(-1, notificationLat, notificationLng, "", -1)
+          new TrajectoryPoint(-1, notificationLat, notificationLng, "", -1);
 
         // Find the ship in the ships array
-        const ship = ships.find(x => x.id === notification.shipDetails.id);
+        const ship = ships.find((x) => x.id === notification.shipDetails.id);
 
         // Check if the trajectory should be updated in the map. If it has to be updated,
         // update the trajectory state by querying the needed data from the backend
         if (TrajectoryService.shouldQueryBackend(ship))
-          TrajectoryService.queryBackendForSampledHistoryOfAShip(notification.shipDetails.id)
-            .then((trajectory) => setDisplayedTrajectory([trajectory, [notificationLatLng]]));
+          TrajectoryService.queryBackendForSampledHistoryOfAShip(
+            notification.shipDetails.id,
+          ).then((trajectory) =>
+            setDisplayedTrajectory([trajectory, [notificationLatLng]]),
+          );
       }
 
       // In case any other page is displayed, get rid of the displayed trajectory
@@ -165,20 +165,19 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       }
     }, [currentPage, notifications, ships]);
 
-
     /**
      * Updates trajectory visually on the map
      */
     useEffect(() => {
-
-      if (mapRef.current == null) return;
+      const map = mapRef.current;
+      if (map == null) return;
 
       // The displayedTrajectoryAndNotifications is a pair of two elements: trajectory array, and
       // an array of notification points. So its length should be equal to two.
       if (displayedTrajectoryAndNotifications.length !== 2) return;
 
-      const displayedTrajectory = displayedTrajectoryAndNotifications[0]
-      const notificationCoordinates = displayedTrajectoryAndNotifications[1]
+      const displayedTrajectory = displayedTrajectoryAndNotifications[0];
+      const notificationCoordinates = displayedTrajectoryAndNotifications[1];
 
       if (displayedTrajectory.length === 0) return;
 
@@ -187,28 +186,36 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       const tempLayers: L.Layer[] = [];
 
       // Create a blue circle for the initial coordinate of the ship
-      const initialMarker = L.circleMarker([displayedTrajectory[0].latitude, displayedTrajectory[0].longitude], {
-        radius: 7,
-        color: '0000ff',
-        fillColor: '#0000ff',
-        fillOpacity: 0.5,
-      });
+      const initialMarker = L.circleMarker(
+        [displayedTrajectory[0].latitude, displayedTrajectory[0].longitude],
+        {
+          radius: 7,
+          color: "0000ff",
+          fillColor: "#0000ff",
+          fillOpacity: 0.5,
+        },
+      );
 
       // Add that circle to the map, and also the layers reference list
-      mapRef.current.addLayer(initialMarker);
+      map.addLayer(initialMarker);
       tempLayers.push(initialMarker);
 
       // Add colored trajectory as a composition of all parts in the coordinates array
       for (let i = 0; i < displayedTrajectory.length - 1; i++) {
-
         const point1 = displayedTrajectory[i];
-        const point2 = displayedTrajectory[i+1];
+        const point2 = displayedTrajectory[i + 1];
 
-        const polyline = L.polyline([[point1.latitude, point1.longitude], [point2.latitude, point2.longitude]], {
-          color: calculateAnomalyColor(point2.anomalyScore, true),
-        });
+        const polyline = L.polyline(
+          [
+            [point1.latitude, point1.longitude],
+            [point2.latitude, point2.longitude],
+          ],
+          {
+            color: calculateAnomalyColor(point2.anomalyScore, true),
+          },
+        );
 
-        polyline.addTo(mapRef.current);
+        polyline.addTo(map);
         tempLayers.push(polyline);
       }
 
@@ -217,22 +224,26 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       // as needed, which may come in handy in the future
       for (let i = 0; i < notificationCoordinates.length; i++) {
         const notificationCoordinate = notificationCoordinates[i];
-        const circleMarker =
-          L.circleMarker([notificationCoordinate.longitude, notificationCoordinate.latitude], {
+        const circleMarker = L.circleMarker(
+          [notificationCoordinate.longitude, notificationCoordinate.latitude],
+          {
             radius: 7,
-            color: 'orange',
-            fillColor: 'orange',
+            color: "orange",
+            fillColor: "orange",
             fillOpacity: 1,
-          });
+          },
+        );
 
-        circleMarker.addTo(mapRef.current);
+        circleMarker.addTo(map);
         tempLayers.push(circleMarker);
       }
 
       // Once the state changes, remove the trajectory from the map
       return () => {
-        tempLayers.forEach(x => {if (mapRef.current !== null) mapRef.current.removeLayer(x)});
-      }
+        tempLayers.forEach((x) => {
+          if (map !== null) map.removeLayer(x);
+        });
+      };
     }, [displayedTrajectoryAndNotifications]);
 
     // Initialize map (once).
@@ -240,7 +251,6 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       if (mapRef.current !== null) return;
       initializeMap(mapRef, markersClustersRef);
     }, []);
-
 
     // Update the ship markers when the ships array changes.
     // Also, add ability to update the markers when the user

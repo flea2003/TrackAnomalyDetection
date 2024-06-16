@@ -1,9 +1,9 @@
 import { CurrentPage } from "../../App";
 import React, {
-  forwardRef, useDebugValue,
+  forwardRef,
   useEffect,
   useImperativeHandle,
-  useState
+  useState,
 } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import Sidebar from "./Sidebar/Sidebar";
@@ -12,22 +12,18 @@ import ErrorNotificationService from "../../services/ErrorNotificationService";
 import ShipNotification from "../../model/ShipNotification";
 import { NotificationService } from "../../services/NotificationService";
 import { Stack } from "@mui/material";
+import config from "../../configs/generalConfig.json";
+import { ExtractedFunctionsMap } from "../Map/LMap";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
-
-import config from "../../configs/generalConfig.json";
-import TrajectoryPoint from "../../model/TrajectoryPoint";
-import TrajectoryService from "../../services/TrajectoryService";
-import generalConfig from "../../configs/generalConfig.json";
-import { ExtractedFunctionsMap } from "../Map/LMap";
 
 interface SideProps {
   ships: ShipDetails[];
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
-  extractedFunctionsMap:  React.RefObject<ExtractedFunctionsMap>;
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
 }
 
 interface ExtractedFunctionsSide {
@@ -45,8 +41,16 @@ interface ExtractedFunctionsSide {
  * @constructor
  */
 const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
-  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold, extractedFunctionsMap}, ref) => {
-    
+  (
+    {
+      ships,
+      mapCenteringFun,
+      setFilterThreshold,
+      anomalyThreshold,
+      extractedFunctionsMap,
+    },
+    ref,
+  ) => {
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
@@ -80,14 +84,21 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
       return () => {
         clearInterval(intervalId);
       };
-
     }, [notifications]);
 
     // Construct page changer function
-    const pageChanger = constructPageChanger(currentPage, setCurrentPage, extractedFunctionsMap.current?.setCurrentPageMap);
+    const pageChanger = constructPageChanger(
+      currentPage,
+      setCurrentPage,
+      extractedFunctionsMap.current?.setCurrentPageMap,
+    );
 
     // Save pageChanger in ref reachable by components above in the tree
-    useImperativeHandle(ref, () => ({ pageChanger, currentPage, notifications }));
+    useImperativeHandle(ref, () => ({
+      pageChanger,
+      currentPage,
+      notifications,
+    }));
 
     return (
       <Stack direction="row" id="side-container">
@@ -111,7 +122,7 @@ function constructPageChanger(
   setCurrentPage: (
     value: ((prevState: CurrentPage) => CurrentPage) | CurrentPage,
   ) => void,
-  setCurrentPageMap: ((page: CurrentPage) => void) | undefined
+  setCurrentPageMap: ((page: CurrentPage) => void) | undefined,
 ) {
   return (newPage: CurrentPage) => {
     if (
@@ -130,8 +141,7 @@ function constructPageChanger(
       setCurrentPage(newPage);
 
       // Set the needed page to the
-      if (setCurrentPageMap !== undefined)
-        setCurrentPageMap(newPage);
+      if (setCurrentPageMap !== undefined) setCurrentPageMap(newPage);
     }
   };
 }
@@ -149,7 +159,6 @@ function getPageChangerDefaultPage() {
     shownItemId: -1,
   } as CurrentPage;
 }
-
 
 Side.displayName = "Side";
 

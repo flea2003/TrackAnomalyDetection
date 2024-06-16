@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Stack from "@mui/material/Stack";
 import ShipDetails from "../../../../model/ShipDetails";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
@@ -9,8 +9,6 @@ import DisplayedInformation from "./DisplayedInformation";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
-import TrajectoryResponseItem from "../../../../templates/TrajectoryResponseItem";
-import ShipService from "../../../../services/ShipService";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
@@ -43,7 +41,7 @@ function ObjectDetails({
   const shipNotifications = notifications.filter(
     (x) => x.shipDetails.id === shipId,
   );
-  
+
   if (ship === undefined) {
     return shipNotFoundElement();
   }
