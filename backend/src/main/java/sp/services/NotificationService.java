@@ -29,13 +29,12 @@ public class NotificationService {
      * @return a list of all notifications
      */
     public List<Notification> getAllNotifications() {
-        return notificationExtractor
-                .getAllNotifications()
-                .stream()
+        List<Notification> allNotifications = notificationExtractor.getAllNotifications();
+        
+        return allNotifications.stream()
                 .sorted()
                 .toList()
-                .subList(0, Math
-                        .min(maxNumberOfNotificationsToSend, notificationExtractor.getAllNotifications().size()));
+                .subList(0, Math.min(maxNumberOfNotificationsToSend, allNotifications.size()));
     }
 
     /**

@@ -13,8 +13,9 @@ class TimeUtilities {
     const signalTime1 = new Date(timestamp1);
     const signalTime2 = new Date(timestamp2);
 
-    if (signalTime1 >= signalTime2) return -1;
-    else return 1;
+    if (signalTime1 > signalTime2) return -1;
+    else if (signalTime1 < signalTime2) return 1;
+    else return 0;
   }
 
   /**
