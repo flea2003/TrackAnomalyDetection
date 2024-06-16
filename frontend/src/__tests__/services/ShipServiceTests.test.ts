@@ -331,61 +331,41 @@ test("sorting-invalid-order", () => {
   expect(result).toStrictEqual([]);
 });
 
-test("construct-map-empty-array", () => {
-  const shipArray: ShipDetails[] = [];
-  expect(ShipService.constructMap(shipArray)).toStrictEqual(
-    new Map<number, ShipDetails>(),
-  );
-});
+describe("sort list tests", () => {
+  const createDummyShipWithId = (id: number, anomalyScore: number) => {
+    return new ShipDetails(
+      id,
+      0,
+      0,
+      0,
+      "t",
+      anomalyScore,
+      "d",
+      0,
+      "t",
+      "p",
+      0,
+      0,
+    );
+  };
 
-test("construct-map-rich-array", () => {
-  const shipArray = [
-    new ShipDetails(
-      2,
-      1,
-      47.0,
-      29.0,
-      "t2",
-      2,
-      "explanation",
-      2,
-      "t2",
-      "p2",
-      90,
-      350.0,
-    ),
-    new ShipDetails(
-      1,
-      1,
-      47.0,
-      29.0,
-      "t1",
-      1,
-      "explanation",
-      1,
-      "t1",
-      "p1",
-      90,
-      350.0,
-    ),
-    new ShipDetails(
-      3,
-      1,
-      47.0,
-      29.0,
-      "t3",
-      0.5,
-      "explanation",
-      0.5,
-      "t3",
-      "p3",
-      90,
-      350.0,
-    ),
-  ];
+  const ship1 = createDummyShipWithId(1, 5);
+  const ship2 = createDummyShipWithId(2, 10);
+  const ship3 = createDummyShipWithId(3, 6);
 
-  const constructedMap = ShipService.constructMap(shipArray);
+  test("desc sort implicitly", () => {
+    expect(ShipService.sortList([ship1, ship2, ship3])).toStrictEqual([
+      ship2,
+      ship3,
+      ship1,
+    ]);
+  });
 
-  expect(Array.from(constructedMap.keys()).sort()).toStrictEqual([1, 2, 3]);
-  expect(constructedMap.get(3)?.anomalyScore).toBe(0.5);
+  test("sort desc", () => {
+    expect(ShipService.sortList([ship1, ship2, ship3], "desc")).toStrictEqual([
+      ship2,
+      ship3,
+      ship1,
+    ]);
+  });
 });

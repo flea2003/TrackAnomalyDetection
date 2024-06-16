@@ -20,7 +20,7 @@ public class Main {
 
 
     // Main value to customize - defines how many signals are sent per second
-    private static final int signalsPerSecond = 5000;
+    private static final int signalsPerSecond = 100;
 
 
     // Number of threads that will perform the sending of signals

@@ -1,0 +1,6 @@
+{
+  "notificationsRefreshMs": 1000,
+  "shipsRefreshMs": 2000,
+  "anomalyListMaxEntries": 250,
+  "notificationListMaxEntries": 250
+}

@@ -1,4 +1,0 @@
-{
-  "brokerUrl": "ws://localhost:8180/details",
-  "topic": "/topic/details"
-}

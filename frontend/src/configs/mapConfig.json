@@ -1,4 +1,12 @@
 {
-    "transition-time": 1.25,
-    "zoom-level-when-clicked-on-ship-in-list": 8
+    "centeringShipTransitionTime": 1.25,
+    "centeringShipZoomLevel": 15,
+
+    "doFilteringBeforeDisplaying": true,
+    "maxShipsOnScreen": 50,
+
+    "clusterChunkedLoading": true,
+    "clusterChunkInterval": 200,
+    "clusterChunkDelay": 100,
+    "clusterMaxRadius": 80
 }
