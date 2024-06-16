@@ -121,15 +121,20 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
       // Function for removing centering the ship (used once the drag or zoom starts)
       const stopTracking = () => setTrackedShip(getDefaultTrackedShipInfo());
 
+      // Function to reset the hover info
+      const stopHoverInfo = () => setHoverInfo(getDefaultHoverInfo());
+
       updateFunc();
 
       map.on("moveend", updateOnlyWhenFilterFunc);
       map.on("movestart", stopTracking);
+      map.on("movestart", stopHoverInfo);
 
       return () => {
         // Clear the effect
         map.off("moveend", updateOnlyWhenFilterFunc);
         map.off("movestart", stopTracking);
+        map.off("movestart", stopHoverInfo);
       };
     }, [pageChangerRef, ships, trackedShip]);
 

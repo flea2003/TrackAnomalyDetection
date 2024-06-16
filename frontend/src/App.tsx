@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
+import generalConfig from "./configs/generalConfig.json";
 import { MapExportedMethodsType } from "./components/Map/LMap";
 import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
 import Side, { PageChangerRef } from "./components/Side/Side";
-import useWebSocketClient from "./utils/communication/WebSocketClient";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
 
@@ -32,17 +32,33 @@ function App() {
     }
   };
 
+  const [rawShips, setRawShips] = useState<ShipDetails[]>([]);
+
+  // Use effect to query for the ships every 1000ms
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      ShipService.queryBackendForShipsArray().then(
+        (newShipsArray: ShipDetails[]) => {
+          if (newShipsArray.length === 0) {
+            return;
+          }
+          setRawShips(newShipsArray);
+        },
+      );
+    }, generalConfig.shipsRefreshMs);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
   // Configure the state and the WebSocket connection with the backend server
-  const allShips = ShipService.sortList(
-    Array.from(useWebSocketClient().values()),
-    "desc",
-  );
+  const sortedShips = ShipService.sortList(rawShips, "desc");
 
   // Put filter threshold as a state
   const [filterThreshold, setFilterThreshold] = useState<number>(0);
 
   // Create a separate array for displayed ships
-  const displayedShips = allShips.filter(
+  const displayedShips = sortedShips.filter(
     (x) => x.anomalyScore >= filterThreshold,
   );
 

@@ -1,12 +1,9 @@
 package sp.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
 import sp.model.CurrentShipDetails;
 import sp.utils.websockets.WebSocketSessionManager;
 
-@Service
 public class WebSocketShipsDataService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final WebSocketSessionManager webSocketSessionManager;
@@ -17,7 +14,6 @@ public class WebSocketShipsDataService {
      * @param simpMessagingTemplate SimpMessagingTemplate instance
      * @param webSocketSessionManager WebSocketSessionManager instance
      */
-    @Autowired
     public WebSocketShipsDataService(SimpMessagingTemplate simpMessagingTemplate,
                                      WebSocketSessionManager webSocketSessionManager) {
         this.simpMessagingTemplate = simpMessagingTemplate;
