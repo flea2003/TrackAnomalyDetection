@@ -1,0 +1,5 @@
+{
+  "shipsCurrentDetailsEndpoint": "/ships/details",
+  "allNotificationsEndpoint": "/notifications",
+  "getNotificationWithIdEndpoint": "/notifications/ship/"
+}

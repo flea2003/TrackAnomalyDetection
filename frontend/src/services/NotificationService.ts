@@ -4,16 +4,18 @@ import ErrorNotificationService from "./ErrorNotificationService";
 import NotificationResponseItem from "../templates/NotificationResponseItem";
 import ShipDetails from "../model/ShipDetails";
 import TimeUtilities from "../utils/TimeUtilities";
+import endpointConfig from "../configs/endpointsConfig.json";
 
 export class NotificationService {
   // Stores ids of notifications that have been read by the user since the page was refreshed
   static idsOfReadNotifications: number[] = [];
 
   // Endpoint for accessing all notifications
-  static allNotificationsEndpoint = "/notifications";
+  static allNotificationsEndpoint = endpointConfig["allNotificationsEndpoint"];
 
   // Endpoint for accessing all notifications for a particular ship
-  static getNotificationWithIdEndpoint = "/notifications/ship/";
+  static getNotificationWithIdEndpoint =
+    endpointConfig["getNotificationWithIdEndpoint"];
 
   /**
    * Method that initializes the array of idsOfReadNotifications. It takes all notifications
@@ -47,14 +49,19 @@ export class NotificationService {
   static getAllNotificationsForShip: (
     shipID: number,
   ) => Promise<ShipNotification[]> = async (shipID) => {
-    const newNotifications: ShipNotification[] =
-      await this.queryBackendForAllNotificationsForShip(shipID);
-    return newNotifications.map((notification) => {
-      if (this.idsOfReadNotifications.includes(notification.id)) {
-        notification.isRead = true;
-      }
-      return notification;
-    });
+    if (shipID < 0) {
+      ErrorNotificationService.addWarning("Notification ID was negative");
+      return [];
+    } else {
+      const newNotifications: ShipNotification[] =
+        await this.queryBackendForAllNotificationsForShip(shipID);
+      return newNotifications.map((notification) => {
+        if (this.idsOfReadNotifications.includes(notification.id)) {
+          notification.isRead = true;
+        }
+        return notification;
+      });
+    }
   };
 
   /**
@@ -166,7 +173,6 @@ export class NotificationService {
     endpoint: string,
   ) => Promise<ShipNotification[]> = async (endpoint) => {
     const response = await HttpSender.get(endpoint);
-    console.log(response);
     if (!Array.isArray(response)) {
       ErrorNotificationService.addError("Server returned not an array");
       return [];
