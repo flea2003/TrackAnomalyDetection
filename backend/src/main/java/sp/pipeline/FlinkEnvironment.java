@@ -17,8 +17,8 @@ public class FlinkEnvironment {
      * @param configuration an object that holds pipeline configuration properties
      * @return stream execution environment for Flink
      */
-    @Bean
     @Lazy
+    @Bean
     public StreamExecutionEnvironment distributedFlinkEnv(PipelineConfiguration configuration) {
         Configuration config = new Configuration();
         config.setString("pipeline.default-kryo-serializers",

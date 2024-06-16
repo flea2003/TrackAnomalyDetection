@@ -177,7 +177,7 @@ distributability testing can be found in the developer manual.
 
 
 Additionally, if you are using WSL, and you wish to have other parts of the cluster running on different machines, you might
-have to expose some WSL ports as the main machine's ports. To do that, use the following command, ran from Poweshell with
+have to expose some WSL ports as the main machine's ports. To do that, use the following command, ran from Powershell with
 Administrator privileges:
 
 ```
