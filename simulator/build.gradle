@@ -5,6 +5,17 @@ plugins {
     id 'jacoco'
     id 'pmd'
     id 'net.razvan.jacoco-to-cobertura' version '1.2.0'
+    id 'application'
+}
+
+apply plugin : "java"
+
+ext {
+    javaMainClass = "simulator.Main"
+}
+
+application {
+    mainClassName = javaMainClass
 }
 
 group = 'org.example'
