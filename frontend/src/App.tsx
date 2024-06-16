@@ -32,7 +32,7 @@ function App() {
     }
   };
 
-  const [rawShips, setRawShips] = useState<Map<number, ShipDetails>>(new Map());
+  const [rawShips, setRawShips] = useState<ShipDetails[]>([]);
 
   // Use effect to query for the ships every 1000ms
   useEffect(() => {
@@ -42,7 +42,7 @@ function App() {
           if (newShipsArray.length === 0) {
             return;
           }
-          setRawShips(ShipService.constructMap(newShipsArray));
+          setRawShips(newShipsArray);
         },
       );
     }, generalConfig.shipsRefreshMs);
@@ -52,10 +52,7 @@ function App() {
   }, []);
 
   // Configure the state and the WebSocket connection with the backend server
-  const sortedShips = ShipService.sortList(
-    Array.from(rawShips.values()),
-    "desc",
-  );
+  const sortedShips = ShipService.sortList(rawShips, "desc");
 
   // Put filter threshold as a state
   const [filterThreshold, setFilterThreshold] = useState<number>(0);
