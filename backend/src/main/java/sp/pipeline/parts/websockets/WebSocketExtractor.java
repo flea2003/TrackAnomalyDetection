@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import sp.model.CurrentShipDetails;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.extractors.GenericKafkaExtractor;
@@ -13,7 +11,6 @@ import sp.pipeline.utils.StreamUtils;
 import sp.pipeline.utils.json.JsonMapper;
 import sp.services.WebSocketShipsDataService;
 
-@Service
 public class WebSocketExtractor extends GenericKafkaExtractor {
     private final WebSocketShipsDataService webSocketShipsDataService;
     private final Logger logger = LoggerFactory.getLogger(WebSocketExtractor.class);
@@ -25,7 +22,6 @@ public class WebSocketExtractor extends GenericKafkaExtractor {
      * @param configuration an object that holds configuration properties
      * @param webSocketShipsDataService an instance of websockets service
      */
-    @Autowired
     public WebSocketExtractor(StreamUtils streamUtils,
                               PipelineConfiguration configuration,
                               WebSocketShipsDataService webSocketShipsDataService) {

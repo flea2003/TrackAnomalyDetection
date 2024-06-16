@@ -1,8 +1,8 @@
 {
     "centeringShipZoomLevel": 15,
 
-    "doFilteringBeforeDisplaying": false,
-    "maxShipsOnScreen": -1,
+    "doFilteringBeforeDisplaying": true,
+    "maxShipsOnScreen": 50,
 
     "clusterChunkedLoading": true,
     "clusterChunkInterval": 200,
