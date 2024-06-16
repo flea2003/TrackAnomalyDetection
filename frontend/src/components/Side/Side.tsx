@@ -1,9 +1,9 @@
 import { CurrentPage } from "../../App";
 import React, {
-  forwardRef,
+  forwardRef, useDebugValue,
   useEffect,
   useImperativeHandle,
-  useState,
+  useState
 } from "react";
 import ShipDetails from "../../model/ShipDetails";
 import Sidebar from "./Sidebar/Sidebar";
@@ -26,11 +26,13 @@ interface SideProps {
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
-  setDisplayedTrajectory: (value:TrajectoryPoint[]) => void;
+  setCurrentPageMap: (page: CurrentPage) => void;
 }
 
-interface PageChangerRef {
+interface RefObjects {
   pageChanger: (currentPage: CurrentPage) => void;
+  currentPage: CurrentPage;
+  notifications: ShipNotification[];
 }
 
 /**
@@ -42,8 +44,9 @@ interface PageChangerRef {
  * @param anomalyThreshold the anomaly threshold that is used for filtering
  * @constructor
  */
-const Side = forwardRef<PageChangerRef, SideProps>(
-  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold, setDisplayedTrajectory }, ref) => {
+const Side = forwardRef<RefObjects, SideProps>(
+  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold, setCurrentPageMap}, ref) => {
+    
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
@@ -52,6 +55,9 @@ const Side = forwardRef<PageChangerRef, SideProps>(
 
     // Set up the state for Notifications about ships
     const [notifications, setNotifications] = useState<ShipNotification[]>([]);
+
+    // Create state for current page
+    const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
 
     // Update the notifications by querying the server frequently
     useEffect(() => {
@@ -77,19 +83,11 @@ const Side = forwardRef<PageChangerRef, SideProps>(
 
     }, [notifications]);
 
-    // Create state for current page
-    const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
-    const pageChanger = constructPageChanger(currentPage, setCurrentPage);
-
-    useEffect(() => {
-      if (areShipDetailsOpened(currentPage) && TrajectoryService.shouldQueryBackend(ships, currentPage.shownItemId)) {
-        TrajectoryService.queryBackendForSampledHistoryOfAShip(currentPage.shownItemId).then((newarray) => setDisplayedTrajectory(newarray));
-      }
-      else setDisplayedTrajectory([]);
-    }, [currentPage, ships]);
+    // Construct page changer function
+    const pageChanger = constructPageChanger(currentPage, setCurrentPage, setCurrentPageMap);
 
     // Save pageChanger in ref reachable by components above in the tree
-    useImperativeHandle(ref, () => ({ pageChanger }));
+    useImperativeHandle(ref, () => ({ pageChanger, currentPage, notifications }));
 
     return (
       <Stack direction="row" id="side-container">
@@ -113,6 +111,7 @@ function constructPageChanger(
   setCurrentPage: (
     value: ((prevState: CurrentPage) => CurrentPage) | CurrentPage,
   ) => void,
+  setCurrentPageMap: (page: CurrentPage) => void
 ) {
   return (newPage: CurrentPage) => {
     if (
@@ -122,11 +121,13 @@ function constructPageChanger(
     ) {
       // If we clicked the same icon for the second time
       setCurrentPage(getPageChangerDefaultPage());
-    } else {
-      //
 
+      // Set the needed page to the
+      setCurrentPageMap(getPageChangerDefaultPage());
+    } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);
+      setCurrentPageMap(newPage);
     }
   };
 }
@@ -145,7 +146,8 @@ function getPageChangerDefaultPage() {
   } as CurrentPage;
 }
 
+
 Side.displayName = "Side";
 
 export default Side;
-export type { PageChangerRef };
+export type { RefObjects };

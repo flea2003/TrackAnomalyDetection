@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import ShipDetails, { differentShipPositions } from "../../model/ShipDetails";
 import ShipIconDetails, { ShipIconDetailsType } from "./ShipIconDetails";
-import { PageChangerRef } from "../Side/Side";
+import { RefObjects } from "../Side/Side";
 import ErrorNotificationService from "../../services/ErrorNotificationService";
 import {
   getMarkersClustersLayer,
@@ -27,16 +27,19 @@ import {calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
 import mapConfig from "../../configs/mapConfig.json";
 import TrajectoryResponseItem from "../../templates/TrajectoryResponseItem";
 import TrajectoryPoint from "../../model/TrajectoryPoint";
+import { red } from "@mui/material/colors";
+import TrajectoryService from "../../services/TrajectoryService";
+import { CurrentPage } from "../../App";
 
 interface MapProps {
   ships: ShipDetails[];
-  pageChangerRef: React.RefObject<PageChangerRef>;
-  displayedTrajectory: TrajectoryPoint[];
+  refObjects: React.RefObject<RefObjects>;
 }
 
 // Define the type of the ref object
 interface MapExportedMethodsType {
   centerMapOntoShip: (details: ShipDetails) => void;
+  setCurrentPageMap: (page: CurrentPage) => void;
 }
 
 interface TrackedShipType {
@@ -52,19 +55,18 @@ interface TrackedShipType {
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 const LMap = forwardRef<MapExportedMethodsType, MapProps>(
-  ({ ships, pageChangerRef, displayedTrajectory }, ref) => {
+  ({ ships, refObjects }, ref) => {
     // Map is ref to have one instance. This ref will be initialized in useEffect.
     const mapRef = useRef<L.Map | null>(null);
 
-    // The ref to layer which handles the clustering logic (using Leaflet.marketcluster library)
+    // The ref to layer which handles the clustering logic (using Leaflet.markercluster library)
     const markersClustersRef = useRef<L.MarkerClusterGroup | null>(null);
 
     // Initialize the state for tracked ship
     const [trackedShip, setTrackedShip] = useState(getDefaultTrackedShipInfo());
 
-
-    const [map, setMapState] = useState(mapRef.current);
-
+    // Initialize the displayed trajectory
+    const [dispalyedTrajectory, setDisplayedTrajectory] = useState<TrajectoryPoint[]>([]);
 
     const trackShip = (ship: ShipDetails, zoomLevel: number) => {
       const newTrackedShip = { ship, zoomLevel } as TrackedShipType;
@@ -76,39 +78,100 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     useImperativeHandle(ref, () => ({
       centerMapOntoShip: (ship: ShipDetails) =>
         trackShip(ship, mapConfig.centeringShipZoomLevel),
+      setCurrentPageMap: setCurrentPage
     }));
 
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship
     const [hoverInfo, setHoverInfo] = useState(getDefaultHoverInfo());
 
-    const [layers, setLayer] = useState<L.Layer[]>([]);
+    // const [currentPage, ] = useState(refObjects.current?.currentPage);
+    const [currentPage, setCurrentPage] = useState(refObjects.current?.currentPage);
+    const notifications = refObjects.current?.notifications;
 
     useEffect(() => {
-      if (map == null) return;
+        if (currentPage === undefined) return;
 
-      layers.forEach(x => map.removeLayer(x));
+        else if (currentPage.currentPage === "objectDetails") {
+          if (TrajectoryService.shouldQueryBackend(ships, currentPage.shownItemId))
+            TrajectoryService.queryBackendForSampledHistoryOfAShip(currentPage.shownItemId)
+              .then((newarray) => setDisplayedTrajectory(newarray));
+        }
 
-      const tempLayers = [];
+        else if (currentPage.currentPage ===  "notificationDetails") {
+          if (notifications === undefined) {
+            setDisplayedTrajectory([]);
+            return;
+          }
+          const notification = notifications.find((x) => x.id === currentPage.shownItemId);
+          if (notification === undefined) {
+            setDisplayedTrajectory([]);
+            return;
+          }
+          const shipID = notification.shipDetails.id;
+          if (TrajectoryService.shouldQueryBackend(ships, shipID))
+            TrajectoryService.queryBackendForSampledHistoryOfAShip(shipID)
+              .then((newarray) => setDisplayedTrajectory(newarray));
+        }
 
-      for (let i = 0; i < displayedTrajectory.length - 1; i++) {
-        const point1 = displayedTrajectory[i];
-        const point2 = displayedTrajectory[i+1];
+        else {
+          setDisplayedTrajectory([]);
+        }
+    }, [currentPage, notifications, ships, refObjects.current?.pageChanger]);
 
-        const polyline = L.polyline([[point1.latitude, point1.longitude], [point2.latitude, point2.longitude``]], {
+    /*
+      Updates the trajectory
+    */
+    useEffect(() => {
+      if (mapRef.current == null) return;
+      if (dispalyedTrajectory.length === 0) return;
+
+      const tempLayers: L.Layer[] = [];
+      const initialMarker = L.circleMarker([dispalyedTrajectory[0].latitude, dispalyedTrajectory[0].longitude], {
+        radius: 7,
+        color: '0000ff',
+        fillColor: '#0000ff',
+        fillOpacity: 0.5,
+      });
+      mapRef.current.addLayer(initialMarker);
+      tempLayers.push(initialMarker);
+
+
+
+      // const initialPoint = L.circle([displayedTrajectory[0].latitude, displayedTrajectory[0].longitude], {
+      //   color: "#0000FF",
+      //   radius: 300
+      // });
+
+      // map.addLayer(initialPoint);
+      // tempLayers.push(initialPoint);
+
+      for (let i = 0; i < dispalyedTrajectory.length - 1; i++) {
+        const point1 = dispalyedTrajectory[i];
+        const point2 = dispalyedTrajectory[i+1];
+
+        const polyline = L.polyline([[point1.latitude, point1.longitude], [point2.latitude, point2.longitude]], {
           color: calculateAnomalyColor(point2.anomalyScore, false),
           weight: 5,
           opacity: 0.7,
         });
 
-        polyline.addTo(map);
-
+        polyline.addTo(mapRef.current);
         tempLayers.push(polyline);
+        // map.on("zoomend",  () => {
+        //   if (!map || !initialPoint) return;
+        //   const zoomLevel = map.getZoom();
+        //   const scaleFactor = Math.pow(2, zoomLevel) / Math.pow(2, 2); // Adjusted to zoom level 13
+        //   const radiusOnScreen = initialPoint.getRadius() / scaleFactor;
+        //   initialPoint.setRadius(radiusOnScreen);
+        // });
+
       }
 
-      setLayer(tempLayers);
-
-    }, [displayedTrajectory]);
+      return () => {
+        tempLayers.forEach(x => {if (mapRef.current !== null) mapRef.current.removeLayer(x)});
+      }
+    }, [dispalyedTrajectory]);
 
     // Initialize map (once).
     useEffect(() => {
@@ -121,7 +184,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
     // is dragging through the map or zooming.
     // Finally, ship marker tracing functionality is implemented here.
     useEffect(() => {
-      setMapState(mapRef.current);
+      const map = mapRef.current;
       if (!map) return;
 
       // Update centering on the tracked ship
@@ -141,7 +204,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
           mapConfig.maxShipsOnScreen,
           map,
           setHoverInfo,
-          pageChangerRef,
+          refObjects,
           markersClustersRef,
           trackShip,
         );
@@ -171,7 +234,7 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
         map.off("movestart", stopTracking);
         map.off("movestart", stopHoverInfo);
       };
-    }, [pageChangerRef, ships, trackedShip]);
+    }, [refObjects, ships, trackedShip]);
 
     return constructMapContainer(hoverInfo);
   },

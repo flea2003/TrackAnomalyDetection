@@ -6,7 +6,7 @@ import generalConfig from "./configs/generalConfig.json";
 import { MapExportedMethodsType } from "./components/Map/LMap";
 import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
-import Side, { PageChangerRef } from "./components/Side/Side";
+import Side, { RefObjects } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
 import TrajectoryPoint from "./model/TrajectoryPoint";
@@ -24,7 +24,7 @@ export interface CurrentPage {
 function App() {
   // References to the `map` and `pageChanger` objects. Will be assigned later.
   const mapRef = React.useRef<MapExportedMethodsType>(null);
-  const pageChangerRef = React.useRef<PageChangerRef>(null);
+  const refObjects = React.useRef<RefObjects>(null);
 
   // Create a function that passes a ship-centering function call to the map component
   const mapCenteringFun = (details: ShipDetails) => {
@@ -60,21 +60,19 @@ function App() {
   // Put filter threshold as a state
   const [filterThreshold, setFilterThreshold] = useState<number>(0);
 
-  // Initialize the displayed trajectory
-  const [dispalyedTrajectory, setDisplayedTrajectory] = useState<TrajectoryPoint[]>([]);
-
   // Create a separate array for displayed ships
   const displayedShips = sortedShips.filter(
     (x) => x.anomalyScore >= filterThreshold,
   );
+
+  if (mapRef.current === null) return;
 
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
       <LMap
         ships={displayedShips}
-        pageChangerRef={pageChangerRef}
-        displayedTrajectory={dispalyedTrajectory}
+        refObjects={refObjects}
         ref={mapRef}
       />
       <Side
@@ -82,8 +80,8 @@ function App() {
         mapCenteringFun={mapCenteringFun}
         setFilterThreshold={setFilterThreshold}
         anomalyThreshold={filterThreshold}
-        setDisplayedTrajectory={setDisplayedTrajectory}
-        ref={pageChangerRef}
+        ref={refObjects}
+        setCurrentPageMap={mapRef.current.setCurrentPageMap}
       />
     </div>
   );

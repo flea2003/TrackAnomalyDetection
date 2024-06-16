@@ -24,16 +24,12 @@ class TrajectoryService {
    * The fetched information is used for drawing past trajectories
    * @param id
    */
-  static queryBackendForSampledHistoryOfAShip: (id: number) =>
-    Promise<TrajectoryPoint[]> = async (id) =>
+  static queryBackendForSampledHistoryOfAShip = async (id: number) =>
   {
 
     const response = await HttpSender.get(
       TrajectoryService.shipSampledHistory + id
     );
-
-    console.log(response);
-    console.log(TrajectoryService.shipSampledHistory + id);
 
     if (!Array.isArray(response)) {
       ErrorNotificationService.addError("Server returned not an array for the trajectory history");
