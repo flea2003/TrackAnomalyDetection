@@ -58,7 +58,9 @@ public class AnomalyDetectionPipeline {
      */
     @PreDestroy
     public void closePipeline() throws Exception {
-        flinkJob.cancel();
+        if (flinkJob != null) {
+            flinkJob.cancel();
+        }
         flinkEnv.close();
     }
 
