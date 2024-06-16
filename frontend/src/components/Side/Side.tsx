@@ -20,18 +20,18 @@ import config from "../../configs/generalConfig.json";
 import TrajectoryPoint from "../../model/TrajectoryPoint";
 import TrajectoryService from "../../services/TrajectoryService";
 import generalConfig from "../../configs/generalConfig.json";
+import { ExtractedFunctionsMap } from "../Map/LMap";
 
 interface SideProps {
   ships: ShipDetails[];
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
-  setCurrentPageMap: (page: CurrentPage) => void;
+  extractedFunctionsMap:  React.RefObject<ExtractedFunctionsMap>;
 }
 
-interface RefObjects {
+interface ExtractedFunctionsSide {
   pageChanger: (currentPage: CurrentPage) => void;
-  currentPage: CurrentPage;
   notifications: ShipNotification[];
 }
 
@@ -44,8 +44,8 @@ interface RefObjects {
  * @param anomalyThreshold the anomaly threshold that is used for filtering
  * @constructor
  */
-const Side = forwardRef<RefObjects, SideProps>(
-  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold, setCurrentPageMap}, ref) => {
+const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
+  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold, extractedFunctionsMap}, ref) => {
     
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
@@ -84,7 +84,7 @@ const Side = forwardRef<RefObjects, SideProps>(
     }, [notifications]);
 
     // Construct page changer function
-    const pageChanger = constructPageChanger(currentPage, setCurrentPage, setCurrentPageMap);
+    const pageChanger = constructPageChanger(currentPage, setCurrentPage, extractedFunctionsMap.current?.setCurrentPageMap);
 
     // Save pageChanger in ref reachable by components above in the tree
     useImperativeHandle(ref, () => ({ pageChanger, currentPage, notifications }));
@@ -111,7 +111,7 @@ function constructPageChanger(
   setCurrentPage: (
     value: ((prevState: CurrentPage) => CurrentPage) | CurrentPage,
   ) => void,
-  setCurrentPageMap: (page: CurrentPage) => void
+  setCurrentPageMap: ((page: CurrentPage) => void) | undefined
 ) {
   return (newPage: CurrentPage) => {
     if (
@@ -123,11 +123,15 @@ function constructPageChanger(
       setCurrentPage(getPageChangerDefaultPage());
 
       // Set the needed page to the
-      setCurrentPageMap(getPageChangerDefaultPage());
+      if (setCurrentPageMap !== undefined)
+        setCurrentPageMap(getPageChangerDefaultPage());
     } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);
-      setCurrentPageMap(newPage);
+
+      // Set the needed page to the
+      if (setCurrentPageMap !== undefined)
+        setCurrentPageMap(newPage);
     }
   };
 }
@@ -150,4 +154,4 @@ function getPageChangerDefaultPage() {
 Side.displayName = "Side";
 
 export default Side;
-export type { RefObjects };
+export type { ExtractedFunctionsSide };

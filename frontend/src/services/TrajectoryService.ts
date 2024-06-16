@@ -3,7 +3,6 @@ import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
 import TrajectoryResponseItem from "../templates/TrajectoryResponseItem";
 import ShipDetails from "../model/ShipDetails";
-import TimeUtilities from "../utils/TimeUtilities";
 
 class TrajectoryService {
 
@@ -14,7 +13,15 @@ class TrajectoryService {
    */
   static shipSampledHistory = "/ships/history/sampled/";
 
-  static newestTimestampOfCurrentShip = "";
+  /**
+   * Id of the ship whose trajectory is/was most recently displayed on the map
+   */
+  static idOfCurrentlyStoredShip = -1;
+
+  /**
+   * Timestamp of the newest signal that corresponds to the displayed trajectory
+   */
+  static newestTimestampOfCurrentlyStoredShip = "";
 
 
 
@@ -22,11 +29,14 @@ class TrajectoryService {
    * Function that retrieves the subsampled information about the previous AIS
    * signals and their corresponding anomaly information of a particular ship.
    * The fetched information is used for drawing past trajectories
-   * @param id
+   *
+   * Also, note that the trajectory should come in sorted value, with first elements
+   * of the array being the most recent signals.
+   *
+   * @param id id of the ship that whose trajectory is requested
    */
   static queryBackendForSampledHistoryOfAShip = async (id: number) =>
   {
-
     const response = await HttpSender.get(
       TrajectoryService.shipSampledHistory + id
     );
@@ -46,19 +56,35 @@ class TrajectoryService {
       ErrorNotificationService.addError("Trajectory array contained null items");
     }
 
-    this.newestTimestampOfCurrentShip = responseWithoutNulls[0];
-
-    return responseWithoutNulls.map((x: TrajectoryResponseItem) =>
+    const finalResult = responseWithoutNulls.map((x: TrajectoryResponseItem) =>
       new TrajectoryPoint(x.shipId, x.longitude, x.latitude, x.timestamp, x.anomalyScore));
 
-    // return HttpSender.getDummyData();
+    this.newestTimestampOfCurrentlyStoredShip = finalResult[0].timestamp;
+    this.idOfCurrentlyStoredShip = finalResult[0].shipId;
+
+    return finalResult;
   }
 
+  /**
+   * Function that checks whether backend should be queried for a more recent version
+   * of the trajectory.
+   *
+   * If trajectory is needed for a ship which is not the same that has just been displayed
+   * (meaning that the stored id and new id differ), then backend needs to be queried.
+   *
+   * Also, if the same ship is still being displayed, however, the newest displayed signal
+   * is older than the most recent update of the ship, trajectory should also be updated.
+   *
+   * @param ship instance of a ship whose trajectory needs to be displayed
+   */
+  static shouldQueryBackend = (ship: ShipDetails | undefined) => {
+      if (ship === undefined) return false;
 
-  static shouldQueryBackend = (ships: ShipDetails[], id: number) => {
-      const newestSignal = ships.find(x => x.id === id);
-      if (newestSignal === undefined) return true;
-      else return newestSignal.timestamp !== this.newestTimestampOfCurrentShip;
+      const timestamp = ship.timestamp;
+      const id = ship.id;
+
+      if (id !== this.idOfCurrentlyStoredShip) return true;
+      return timestamp !== this.newestTimestampOfCurrentlyStoredShip;
   }
 }
 

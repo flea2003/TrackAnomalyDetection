@@ -2,7 +2,7 @@ import L from "leaflet";
 import React from "react";
 import mapConfig from "../../configs/mapConfig.json";
 import ShipDetails from "../../model/ShipDetails";
-import { RefObjects } from "../Side/Side";
+import { ExtractedFunctionsSide } from "../Side/Side";
 import {
   createShipIcon,
   handleMouseOutShipIcon,
@@ -89,7 +89,7 @@ async function getMarkersForAllShips(
       | ((prevState: ShipIconDetailsType) => ShipIconDetailsType)
       | ShipIconDetailsType,
   ) => void,
-  pageChangerRef: React.RefObject<RefObjects>,
+  pageChangerRef: React.RefObject<ExtractedFunctionsSide>,
   trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void,
 ) {
   return ships.map((ship) =>
@@ -115,7 +115,7 @@ function getMarker(
       | ((prevState: ShipIconDetailsType) => ShipIconDetailsType)
       | ShipIconDetailsType,
   ) => void,
-  pageChangerRef: React.RefObject<RefObjects>,
+  pageChangerRef: React.RefObject<ExtractedFunctionsSide>,
   trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void,
 ) {
   const onClickFunc = () => {
@@ -167,7 +167,7 @@ export function updateMarkersForShips(
       | ((prevState: ShipIconDetailsType) => ShipIconDetailsType)
       | ShipIconDetailsType,
   ) => void,
-  pageChangerRef: React.RefObject<RefObjects>,
+  pageChangerRef: React.RefObject<ExtractedFunctionsSide>,
   markersClustersRef: React.MutableRefObject<L.MarkerClusterGroup | null>,
   trackShipFunc: (ship: ShipDetails, zoomLevel: number) => void,
 ) {

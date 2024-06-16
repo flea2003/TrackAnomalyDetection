@@ -3,10 +3,10 @@ import { useState } from "react";
 import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
 import generalConfig from "./configs/generalConfig.json";
-import { MapExportedMethodsType } from "./components/Map/LMap";
+import { ExtractedFunctionsMap } from "./components/Map/LMap";
 import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
-import Side, { RefObjects } from "./components/Side/Side";
+import Side, { ExtractedFunctionsSide } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
 import TrajectoryPoint from "./model/TrajectoryPoint";
@@ -23,15 +23,15 @@ export interface CurrentPage {
 
 function App() {
   // References to the `map` and `pageChanger` objects. Will be assigned later.
-  const mapRef = React.useRef<MapExportedMethodsType>(null);
-  const refObjects = React.useRef<RefObjects>(null);
+  const extractedFunctionsMap = React.useRef<ExtractedFunctionsMap>(null);
+  const extractedFunctionsSide = React.useRef<ExtractedFunctionsSide>(null);
 
   // Create a function that passes a ship-centering function call to the map component
   const mapCenteringFun = (details: ShipDetails) => {
-    if (mapRef.current !== null) {
-      mapRef.current.centerMapOntoShip(details);
+    if (extractedFunctionsMap.current !== null) {
+      extractedFunctionsMap.current.centerMapOntoShip(details);
     } else {
-      ErrorNotificationService.addWarning("mapRef is null");
+      ErrorNotificationService.addWarning("extractedFunctionsMap is null");
     }
   };
 
@@ -65,23 +65,21 @@ function App() {
     (x) => x.anomalyScore >= filterThreshold,
   );
 
-  if (mapRef.current === null) return;
-
   // Return the main view of the application
   return (
     <div className="App" id="root-div">
       <LMap
         ships={displayedShips}
-        refObjects={refObjects}
-        ref={mapRef}
+        refObjects={extractedFunctionsSide}
+        ref={extractedFunctionsMap}
       />
       <Side
         ships={displayedShips}
         mapCenteringFun={mapCenteringFun}
         setFilterThreshold={setFilterThreshold}
         anomalyThreshold={filterThreshold}
-        ref={refObjects}
-        setCurrentPageMap={mapRef.current.setCurrentPageMap}
+        ref={extractedFunctionsSide}
+        extractedFunctionsMap={extractedFunctionsMap}
       />
     </div>
   );
