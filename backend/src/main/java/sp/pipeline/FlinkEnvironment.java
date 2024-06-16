@@ -4,6 +4,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.environment.RemoteStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import sp.pipeline.utils.OffsetDateTimeSerializer;
 
 @org.springframework.context.annotation.Configuration
@@ -17,6 +18,7 @@ public class FlinkEnvironment {
      * @return stream execution environment for Flink
      */
     @Bean
+    @Lazy
     public StreamExecutionEnvironment distributedFlinkEnv(PipelineConfiguration configuration) {
         Configuration config = new Configuration();
         config.setString("pipeline.default-kryo-serializers",
@@ -36,6 +38,7 @@ public class FlinkEnvironment {
      *
      * @return local stream execution environment for Flink
      */
+    @Lazy
     @Bean
     public StreamExecutionEnvironment localFlinkEnv() {
         Configuration config = new Configuration();
