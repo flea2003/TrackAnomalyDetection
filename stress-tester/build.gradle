@@ -2,11 +2,21 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'pmd'
+    id 'application'
 }
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 
+apply plugin : "java"
+
+ext {
+    javaMainClass = "stresstester.Main"
+}
+
+application {
+    mainClassName = javaMainClass
+}
 repositories {
     mavenCentral()
 }

@@ -83,7 +83,11 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+<<<<<<< HEAD
     "git-widget-placeholder": "branchas",
+=======
+    "git-widget-placeholder": "improve__readmes",
+>>>>>>> dev
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Legion Slim 7/Desktop/codebase/stress-tester",
     "node.js.detected.package.eslint": "true",
@@ -173,7 +177,11 @@
       <workItem from="1717667783430" duration="13872000" />
       <workItem from="1717749907913" duration="2370000" />
       <workItem from="1718179592561" duration="2595000" />
+<<<<<<< HEAD
       <workItem from="1718635816474" duration="957000" />
+=======
+      <workItem from="1718554712105" duration="52000" />
+>>>>>>> dev
     </task>
     <servers />
   </component>
