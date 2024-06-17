@@ -9,7 +9,7 @@ Backend is the part of the application which implements the logic for consuming 
 
 ## Running Backend
 
-**Before starting the frontend, you need to set up and start the Druid and Kafka.** The instructions can be found in the [README.md in the folder above](../README.md).
+**Before starting the backend, you need to set up and start the Druid and Kafka.** The instructions can be found in the [README.md in the folder above](../README.md).
 
 Note: if you want to run the distributed Flink cluster, check the instructions [below](#distributed-flink-cluster-optional).
 

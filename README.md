@@ -25,18 +25,18 @@ Defence.
 ## Project Components
 
 The application consists of four main parts:
-- [`backend`](backend). Backend takes care of reading events from the Kafka topic, processing them, and also exposing an API interface to query the details about ships.
-- [`frontend`](frontend). Frontend is the web client written in React.js. It is used to graphically display the relevant information on the map.
-- [`simulator`](simulator). Simulator is used to read the historic AIS signal dataset and produce those signals to the Kafka topic.
-- [`stress-tester`](stress-tester). Stress tester is needed to perform the Scalability testing.
+- [`backend`](backend) - takes care of reading events from the Kafka topic, processing them, and also exposing an API interface to query the details about ships.
+- [`frontend`](frontend) - the web client written in React.js. It is used to graphically display the relevant information on the map.
+- [`simulator`](simulator) - used to read the historic AIS signal dataset and produce those signals to the Kafka topic.
+- [`stress-tester`](stress-tester) - needed to perform the Scalability testing.
 
 The project was developed using IntelliJ IDEA IDE. If you want to also use the same IDE, we recommend opening each of the mentioned folders (`backend`, `frontend`, `simulator`, `stress-tester`) as separate projects, instead of opening the root of this repository.
 This way, you can leverage starting separate parts using IDE.
 
 Other folders in this repository:
-- [`.gitlab`](.gitlab). Templates for GitLab issues and merge requests.
-- [`.idea`](.idea). IntelliJ IDEA project files.
-- [`config`](config). CheckStyle and PMD rulesets.
+- [`.gitlab`](.gitlab) - templates for GitLab issues and merge requests.
+- [`.idea`](.idea) - IntelliJ IDEA project files.
+- [`config`](config) - CheckStyle and PMD rulesets.
 
 ## Setup
 
