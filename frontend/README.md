@@ -16,10 +16,12 @@ Frontend is implemented using [React.js framework](https://react.dev/).
 When you are ready to start the frontend, you need to install the required packages and run the frontend using the following commands:
 ```shell
 cd codebase/frontend
-npm ci # install the Node packages based on 
-       # the package.json and package-lock.json.
-npm run start # the website can now be reached at
-              # http://localhost:3000/ 
+
+npm ci        # Install the Node packages based on 
+              # the package.json and package-lock.json.
+              
+npm run start # The website can now be reached at
+              # http://localhost:3000/.
 ```
 
 If you want to run the production build, then you need to run the following command and follow the instructions written there:
@@ -42,12 +44,12 @@ npm ci
 
 Then you can run the tests and other checks using the following commands:
 ```shell
-npm run lint # runs ESLint
-npm run prettier:check # runs Prettier to check the formatting
-npm run prettier:format # runs Prettier to automatically 
-                        # format the code
-npm run test:ci # runs the test and generates report in the
-                # folder codebase/frontend/coverage/lcov-report
+npm run lint            # Runs ESLint.
+npm run prettier:check  # Runs Prettier to check the formatting.
+npm run prettier:format # Runs Prettier to automatically 
+                        # format the code.
+npm run test:ci         # Runs the test and generates report in the folder 
+                        # codebase/frontend/coverage/lcov-report.
 ```
 
 ## Icon Sources

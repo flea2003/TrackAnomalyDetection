@@ -1,4 +1,4 @@
-# Anomaly Detection Pipeline
+# Track Anomaly Detection
 
 The source code for the project Anomaly Detection Pipeline developed by team 18A
 for the course *Software Project* at TU Delft. It has been developed for the Dutch Ministry of
@@ -34,9 +34,9 @@ The project was developed using IntelliJ IDEA IDE. If you want to also use the s
 This way, you can leverage starting separate parts using IDE.
 
 Other folders in this repository:
-- [`.gitlab`](.gitlab) - GitLab templates for issues and merge requests.
-- [`.idea`](.idea) - IntelliJ IDEA project files.
-- [`config`](config) - CheckStyle and PMD rulesets.
+- [`.gitlab`](.gitlab). Templates for GitLab issues and merge requests.
+- [`.idea`](.idea). IntelliJ IDEA project files.
+- [`config`](config). CheckStyle and PMD rulesets.
 
 ## Setup
 
@@ -45,6 +45,7 @@ The project was built to work on Linux (Ubuntu 22.04). Different Linux distribut
 In case you are using Windows, please use WSL (Windows Subsystem for Linux). In case you are using macOS, all the written commands and setup should still work. However, we do not take the responsibility of the setup or application not working for the operating systems other than Linux.
 
 The required technologies are:
+- [Java](https://www.java.com/en/), version 17
 - [Apache Druid](https://druid.apache.org/), version 29.0.1
 - [Apache Kafka](https://kafka.apache.org/), version 3.6.2
 - [Node.js](https://nodejs.org/en), version 20.14.0 (latest LTS version)
@@ -69,9 +70,19 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 # Before the next command you may need to restart the terminal.
 nvm install 20
 node -v # Should print `v20.14.0`.
-npm -v # Should print `10.7.0`.
+npm -v  # Should print `10.7.0`.
 
-# Install the required Apache Druid version.
+# Install Java version 17.
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt install openjdk-17-jdk openjdk-17-jre
+java -version
+# You should see the following lines to be printed:
+#   java version "17.0.6" 2023-01-17 LTS
+#   Java(TM) SE Runtime Environment (build 17.0.6+9-LTS-190)
+#   Java HotSpot(TM) 64-Bit Server VM (build 17.0.6+9-LTS-190, mixed mode, sharing)
+
+# Download and unzip the required Apache Druid version.
 # Based on https://druid.apache.org/docs/latest/tutorials/.
 curl -O https://dlcdn.apache.org/druid/29.0.1/apache-druid-29.0.1-bin.tar.gz 
 tar -xzf apache-druid-29.0.1-bin.tar.gz
@@ -81,7 +92,7 @@ ls # The folder contains LICENCE, NOTICE, README files,
    # files, and more.
 cd ..
 
-# Install the required Apache Kafka version.
+# Download and unzip the required Apache Kafka version.
 # Note that this project is using NOT the latest version.
 # Based on https://kafka.apache.org/quickstart.
 curl -O https://downloads.apache.org/kafka/3.6.2/kafka_2.13-3.6.2.tgz
@@ -97,7 +108,9 @@ cd ..
 
 After you have [downloaded the required tools](#setup), you can run them. Note that you may need to use multiple terminal windows for these.
 
-To run the application, you should follow the steps described below in this order. To be more precise, firstly you need to start Druid database (it also starts Zookeeper), then you can start Kafka server. Only when Kafka is running, you can start the backend, and then the frontend. After these, you can also choose to start the simulator or the stress tester.
+To run the application, you should follow the steps described below in this order. To be more precise, firstly you need to start Druid database (it also starts Zookeeper), then you can start Kafka server. Only when Kafka is running, you can start the backend, and then the frontend. 
+
+Additionally, you may also choose to start the simulator or the stress tester. Before running them, you need to start Druid database, Kafka server and the backend (frontend is not necessary for them).
 
 ### 1. Start Druid
 
@@ -135,7 +148,7 @@ It is worth noting that Druid reads the data from the topic by considering its o
 
 ### 3. Start Kafka server
 
-Run the commands:
+On a separate terminal, run the commands:
 ```shell
 cd kafka_2.13-3.6.2 # the installed Kafka folder
 bin/kafka-server-start.sh config/server.properties
@@ -143,7 +156,7 @@ bin/kafka-server-start.sh config/server.properties
 
 ### 4. Create Kafka topics
 
-**Creating new topics.** To create the required Kafka topics, run the commands:
+Once Kafka server was started, on a separate terminal, run the commands:
 ```shell
 cd kafka_2.13-3.6.2 # the installed Kafka folder
 

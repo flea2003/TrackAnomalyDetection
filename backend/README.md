@@ -16,11 +16,11 @@ Note: if you want to run the distributed Flink cluster, check the instructions [
 You need to build and then start the backend using the following commands:
 ```shell
 cd codebase/backend
-chmod +x ./gradlew # make the wrapper script executable
-./gradlew clean # optional, if you want to clean the previous build
-./gradlew build # build the project; also runs tests and static analysis
-./gradlew bootRun # starts the web server which now can be
-                  # reached at http://localhost:8180/
+chmod +x ./gradlew # Make the wrapper script executable.
+./gradlew clean    # Optional. Run if you want to clean the previous build.
+./gradlew build    # Build the project; also runs tests and static analysis.
+./gradlew bootRun  # Starts the web server which now can be
+                   # reached at http://localhost:8180/.
 ```
 
 To check that the backend started, you can go to http://localhost:8180/ships/details.
@@ -48,7 +48,7 @@ If you wish to use an external Flink cluster, once you have set it up, you will 
 Additionally, before running the application, you need to run `./gradlew shadowJar`, to make sure that a Jar containing the dependencies
 for the Flink job is created. Running this command is only necessary in the case of using an external Flink cluster.
 
-Furthermore, you might have to change a file in Kafka: change `config/server.properties` file by adding the following 2 lines:
+Furthermore, you might have to change a file in Kafka: change `kafka_2.13-3.6.2/config/server.properties` file by adding the following 2 lines:
 ```
 listeners=PLAINTEXT://0.0.0.0:9092
 advertised.listeners=PLAINTEXT://<IP>:9092
@@ -90,17 +90,17 @@ To ensure code quality of the backend code, the following tools are used (also i
 You can run them using the following commands:
 ```shell
 cd codebase/backend
-chmod +x ./gradlew # make the wrapper script executable
+chmod +x ./gradlew              # Make the wrapper script executable.
 
-./gradlew test jacocoTestReport # runs unit tests, the JaCoCo report is generated at
-                                # codebase/backend/build/reports/jacoco/test/html/index.html
+./gradlew test jacocoTestReport # Runs unit tests, the JaCoCo report is generated at
+                                # codebase/backend/build/reports/jacoco/test/html/index.html.
 
-./gradlew pitest # runs mutation testing, the report is generated at
-                 # codebase/backend/build/reports/pitest/index.html
+./gradlew pitest                # Runs mutation testing, the report is generated at
+                                # codebase/backend/build/reports/pitest/index.html.
 
-./gradlew checkstyleMain # runs checkstyle, the report is generated at 
-                         # codebase/backend/build/reports/checkstyle/main.html
+./gradlew checkstyleMain        # Runs checkstyle, the report is generated at 
+                                # codebase/backend/build/reports/checkstyle/main.html.
                          
-./gradlew pmdMain # runs PMD, the report is generated at
-                  # codebase/backend/build/reports/pmd/main.html
+./gradlew pmdMain               # Runs PMD, the report is generated at
+                                # codebase/backend/build/reports/pmd/main.html.
 ```

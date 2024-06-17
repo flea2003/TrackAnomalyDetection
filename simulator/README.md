@@ -9,7 +9,8 @@ Simulator is an application for simulating the stream of AIS signals that should
 
 ### 1. Selecting the dataset
 
-A wanted dataset file should be added to [`streaming_data`](streaming_data) directory. The default dataset that we have been using can be downloaded from https://www.marinetraffic.com/research/dataset/marinetraffic-automatic-identification-system-ais/.
+You should create the folder `streaming_data` (inside the `codebase/simulator`).
+In this folder you should add a wanted dataset file. The default dataset that we have been using can be downloaded from https://www.marinetraffic.com/research/dataset/marinetraffic-automatic-identification-system-ais/.
 
 If another dataset which has a different format is added, a new parser class should be implemented in [`parsers`](src/main/java/parsers) directory. It should implement the interface [`Parser`](src/main/java/parsers/Parser.java). You can check how [the current parser](src/main/java/parsers/DEBSParser.java) is implemented.
 
@@ -32,9 +33,9 @@ In the method [`main()`] of the class [Main](src/main/java/simulator/Main.java) 
 Then, you can start the simulator by running the following commands:
 ```shell
 cd codebase/simulator
-chmod +x ./gradlew # make the wrapper script executable
-./gradlew clean # optional, if you want to clean the previous build
-./gradlew build # build the project; also runs tests and static analysis
+chmod +x ./gradlew # Make the wrapper script executable.
+./gradlew clean    # Optional. Run if you want to clean the previous build.
+./gradlew build    # Build the project; also runs tests and static analysis.
 ./gradlew run 
 ```
 
@@ -52,19 +53,19 @@ To ensure code quality of the simulator code, the following tools are used (also
 You can run them using the following commands:
 ```shell
 cd codebase/simulator
-chmod +x ./gradlew # make the wrapper script executable
+chmod +x ./gradlew              # Make the wrapper script executable.
 
-./gradlew test jacocoTestReport # runs unit tests, the JaCoCo report is generated at
-                                # codebase/simulator/build/reports/jacoco/test/html/index.html
+./gradlew test jacocoTestReport # Runs unit tests, the JaCoCo report is generated at
+                                # codebase/simulator/build/reports/jacoco/test/html/index.html.
 
-./gradlew pitest # runs mutation testing, the report is generated at
-                 # codebase/simulator/build/reports/pitest/index.html
+./gradlew pitest                # Runs mutation testing, the report is generated at
+                                # codebase/simulator/build/reports/pitest/index.html.
 
-./gradlew checkstyleMain # runs checkstyle, the report is generated at 
-                         # codebase/simulator/build/reports/checkstyle/main.html
+./gradlew checkstyleMain        # Runs checkstyle, the report is generated at 
+                                # codebase/simulator/build/reports/checkstyle/main.html.
                          
-./gradlew pmdMain # runs PMD, the report is generated at
-                  # codebase/simulator/build/reports/pmd/main.html
+./gradlew pmdMain               # Runs PMD, the report is generated at
+                                # codebase/simulator/build/reports/pmd/main.html.
 ```
    
 

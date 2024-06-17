@@ -20,8 +20,8 @@ The variables to customize are:
 - `topicName` specifies the Kafka topic to which the ship AIS signals are send.
 - `serverName` specifies the Kafka server URL (and port).
 - `minIntervalBetweenMessages` and `maxIntervalBetweenMessages` specify the bounds of the time between one ship's messages. The time interval to send next signal for a ship is selected randomly between these bounds for each event.
-- `signalsPerSecond` specifies how many signals are sent per second in total (summed over all ships). **This is the value that you should focus on changing.**
-- `threadCount` specifies how many threads will be used for generating AIS signals.
+- `signalsPerSecond` specifies how many signals are sent per second in total **on average** (summed over all ships). **This is the value that you should focus on changing.**
+- `threadCount` specifies how many threads will be used for parallelized sending AIS signals.
 
 ### 2. Starting the tester
 
@@ -30,9 +30,9 @@ The variables to customize are:
 Then, you can start the stress tester by running the following commands:
 ```shell
 cd codebase/stress-tester
-chmod +x ./gradlew # make the wrapper script executable
-./gradlew clean # optional, if you want to clean the previous build
-./gradlew build # build the project; also runs tests and static analysis
+chmod +x ./gradlew # Make the wrapper script executable.
+./gradlew clean    # Optional. Run if you want to clean the previous build.
+./gradlew build    # Build the project; also runs tests and static analysis.
 ./gradlew run 
 ```
 
@@ -48,13 +48,13 @@ To ensure code quality of this tester, the following tools are used (also includ
 You can run them using the following commands:
 ```shell
 cd codebase/stress-tester
-chmod +x ./gradlew # make the wrapper script executable
+chmod +x ./gradlew       # Make the wrapper script executable.
 
-./gradlew checkstyleMain # runs checkstyle, the report is generated at 
-                         # codebase/stress-tester/build/reports/checkstyle/main.html
+./gradlew checkstyleMain # Runs checkstyle, the report is generated at 
+                         # codebase/stress-tester/build/reports/checkstyle/main.html.
                          
-./gradlew pmdMain # runs PMD, the report is generated at
-                  # codebase/stress-tester/build/reports/pmd/main.html
+./gradlew pmdMain        # Runs PMD, the report is generated at
+                         # codebase/stress-tester/build/reports/pmd/main.html.
 ```
 
 
