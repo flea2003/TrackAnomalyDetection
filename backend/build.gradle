@@ -128,7 +128,6 @@ dependencies {
 	// For JPA:
 	implementation group: 'org.apache.calcite.avatica', name: 'avatica-core', version: '1.25.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'com.h2database:h2'
 
 	// For testing kafka
 	testImplementation 'org.springframework.kafka:spring-kafka-test:3.1.0'
@@ -160,8 +159,13 @@ jar {
 	}
 }
 
+// Load the name for the shadowJar
+def kafkaConnectionProperties = new Properties()
+file("kafka-connection.properties").withInputStream { kafkaConnectionProperties.load(it) }
+
 shadowJar {
 	configurations = [project.configurations.flinkShadowJar]
+	archiveFileName = kafkaConnectionProperties.getProperty('flink.shadow.jar.name')
 }
 
 test {

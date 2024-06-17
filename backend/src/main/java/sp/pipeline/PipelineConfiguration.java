@@ -23,16 +23,24 @@ public class PipelineConfiguration {
     private static final String POLLING_FREQUENCY_FOR_SOCKETS_PROPERTY = "polling.frequency.for.sockets";
     private static final String POLLING_FREQUENCY_FOR_CURRENT_DETAILS_PROPERTY = "polling.frequency.for.current.details";
     private static final String POLLING_FREQUENCY_FOR_NOTIFICATIONS_PROPERTY = "polling.frequency.for.notifications";
+    private static final String FLINK_DEPENDENCY_JAR_PATH_PROPERTY = "flink.shadow.jar.name";
+    private static final String FLINK_JOB_MANAGER_IP_PROPERTY = "flink.job.manager.ip";
+    private static final String FLINK_JOB_MANAGER_PORT_PROPERTY = "flink.job.manager.port";
+    private static final String FLINK_PARALLELISM_PROPERTY = "flink.parallelism";
 
     private String rawIncomingAisTopicName;
     private String shipsHistoryTopicName;
     private String notificationsTopicName;
     private String kafkaServerAddress;
     private String kafkaStoreName;
+    private String flinkDependencyJarPath;
+    private String flinkJobManagerIp;
     private int extractorThreadPoolSize;
     private int pollingFrequencyForSockets;
     private int pollingFrequencyForCurrentDetails;
     private int pollingFrequencyForNotifications;
+    private int flinkJobManagerPort;
+    private int flinkParallelism;
 
     private String druidUrl;
 
@@ -70,6 +78,10 @@ public class PipelineConfiguration {
         pollingFrequencyForNotifications = Integer.parseInt(
                 savedConfiguration.getProperty(POLLING_FREQUENCY_FOR_NOTIFICATIONS_PROPERTY)
         );
+        flinkDependencyJarPath = savedConfiguration.getProperty(FLINK_DEPENDENCY_JAR_PATH_PROPERTY);
+        flinkJobManagerIp = savedConfiguration.getProperty(FLINK_JOB_MANAGER_IP_PROPERTY);
+        flinkJobManagerPort = Integer.parseInt(savedConfiguration.getProperty(FLINK_JOB_MANAGER_PORT_PROPERTY));
+        flinkParallelism = Integer.parseInt(savedConfiguration.getProperty(FLINK_PARALLELISM_PROPERTY));
     }
 
     /**
