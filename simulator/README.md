@@ -9,7 +9,7 @@ Simulator is an application for simulating the stream of AIS signals that should
 
 ### 1. Selecting the dataset
 
-A wanted dataset file should be added to [`streaming_data`](streaming_data) directory. The default dataset that we have been using can downloaded from https://www.marinetraffic.com/research/dataset/marinetraffic-automatic-identification-system-ais/.
+A wanted dataset file should be added to [`streaming_data`](streaming_data) directory. The default dataset that we have been using can be downloaded from https://www.marinetraffic.com/research/dataset/marinetraffic-automatic-identification-system-ais/.
 
 If another dataset which has a different format is added, a new parser class should be implemented in [`parsers`](src/main/java/parsers) directory. It should implement the interface [`Parser`](src/main/java/parsers/Parser.java). You can check how [the current parser](src/main/java/parsers/DEBSParser.java) is implemented.
 

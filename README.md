@@ -43,7 +43,7 @@ Other folders in this repository:
 
 The project was built to work on Linux (Ubuntu 22.04). Different Linux distributions might have slightly different commands than what is written here (depends on the package manager). Please check the official installation guide for each of the mentioned tools in such case.
 
-In case you are using Windows, please use WSL (Windows Subsystem for Linux). In case you are using MacOS, all the written commands and setup should still work. However, we do not take the responsibility of the setup or application not working for the operating systems other than Linux.
+In case you are using Windows, please use WSL (Windows Subsystem for Linux). In case you are using macOS, all the written commands and setup should still work. However, we do not take the responsibility of the setup or application not working for the operating systems other than Linux.
 
 The required technologies are:
 - [Apache Druid](https://druid.apache.org/), version 29.0.1
@@ -209,7 +209,7 @@ the events that are sent to the mentioned Kafka topic. In this repository there 
 - Simulator that takes the dataset of AIS signals, and sends them to the Kafka topic. To run this, follow [simulator/README.md](simulator/README.md).
 - Stress Tester generates the specified amount of signals per second and sends them to the Kafka topic. This is used as a tool for Scalability testing. To run this, follow [stress-tester/README.md](stress-tester/README.md).
 
-**Note** that it is recommended to run only one of the specified appications, either only Simulator or only Stress Tester. This recommendation is given only because these two tools generate ships in different flavour (simulator simulates historic data, whereas stress tester just generates random ships without knowing which places are land and which are water). However, Kafka Messaging Queue can handle multiple producers easily.
+**Note** that it is recommended to run only one of the specified applications, either only Simulator or only Stress Tester. This recommendation is given only because these two tools generate ships in different flavour (simulator simulates historic data, whereas stress tester just generates random ships without knowing which places are land and which are water). However, Kafka Messaging Queue can handle multiple producers easily.
 
 ## CI Pipeline
 

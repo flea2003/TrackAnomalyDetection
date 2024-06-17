@@ -3,7 +3,9 @@
 Backend is the part of the application which implements the logic for consuming the Kafka topics, processing stream of AIS signals data, and the logic for web server as well. 
 
 ## Table of Contents
-- TODO
+- [Running Backend](#running-backend)
+  - [Distributed Flink Cluster (Optional)](#distributed-flink-cluster-optional)
+- [Running Tests and Static Checks](#running-tests-and-static-checks)
 
 ## Running Backend
 
@@ -38,12 +40,12 @@ same machine. However, in practice, using a distributed Flink cluster is recomme
 If you wish to use an external Flink cluster, once you have set it up, you will (or may) need to update the following parameters in this project:
 - `flink.jobmanager.host` in `kafka-connection.properties` to the IP address of the external Flink cluster's job manager.
 - `flink.jobmanager.port` in `kafka-connection.properties` to the port of the external Flink cluster's job manager (most likely 8084).
-- `bootstrap.servers` in `kafka-connection.properties` to the IP address of the Kafka server - make sure this IP is accessible from all of the Flink cluster
-- `kafka.server.address` in `kafka-connection.properties` to the IP address of the Kafka server - make sure this IP is accessible from all of the Flink cluster
+- `bootstrap.servers` in `kafka-connection.properties` to the IP address of the Kafka server - make sure this IP is accessible from all the Flink cluster
+- `kafka.server.address` in `kafka-connection.properties` to the IP address of the Kafka server - make sure this IP is accessible from all the Flink cluster
 - `kafka.server.port` in `kafka-connection.properties` to the port of the Kafka server (most likely 9092).
 - In AnomalyDetectionPipeline class, change the injected flink environment qualifier from `localFlinkEnv` to `distributedFlinkEnv`. I.e., change the injected bean.
 
-Additionally, before running the application, you need to run `./gradlew shadowJar`, to make sure that a Jar containing the dependecies
+Additionally, before running the application, you need to run `./gradlew shadowJar`, to make sure that a Jar containing the dependencies
 for the Flink job is created. Running this command is only necessary in the case of using an external Flink cluster.
 
 Furthermore, you might have to change a file in Kafka: change `config/server.properties` file by adding the following 2 lines:

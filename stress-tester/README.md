@@ -25,7 +25,7 @@ The variables to customize are:
 
 ### 2. Starting the tester
 
-**Before starting the stress tester, you need to set up and start the Druid and Kafka.** The instructions can be found in the [README.md in the folder above](../README.md). You also must download and specify the dataset ([step 1](#1-selecting-the-dataset)).
+**Before starting the stress tester, you need to set up and start the Druid and Kafka.** The instructions can be found in the [README.md in the folder above](../README.md). 
 
 Then, you can start the stress tester by running the following commands:
 ```shell
