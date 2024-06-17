@@ -54,8 +54,8 @@ You can run them using the following commands:
 cd codebase/simulator
 chmod +x ./gradlew # make the wrapper script executable
 
-./gradlew test # runs unit tests, the JaCoCo report is generated at
-               # codebase/simulator/build/reports/jacoco/test/html/index.html
+./gradlew test jacocoTestReport # runs unit tests, the JaCoCo report is generated at
+                                # codebase/simulator/build/reports/jacoco/test/html/index.html
 
 ./gradlew pitest # runs mutation testing, the report is generated at
                  # codebase/simulator/build/reports/pitest/index.html
