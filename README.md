@@ -53,7 +53,7 @@ The required technologies are:
 
 [Gradle Build Tool](https://gradle.org/) is also used, however gradle wrapper scripts can be run that will automatically download and used the required Gradle version.
 
-### Cloning Repository and Downloding Tools
+### Cloning Repository and Downloading Tools
 
 To clone the repository and download the mentioned tools, you should follow these commands:
 ```shell
@@ -158,6 +158,11 @@ curl -X POST -H 'Content-Type: application/json' -d @backend/src/main/resources/
 
 When successful, the message `{"id" : "ship-details"}` will be printed in the terminal. In addition, there will be a supervisor named `ship-details` added to the [Supervisors tab of the web console](http://localhost:8888/unified-console.html#supervisors).
 
+Also, the consumed data is deeply stored (stored on the disk) every hour with the current configuration, so if a crash happens, at most one hour of ship data will be lost from the database.
+
+It is worth noting that Druid reads the data from the topic by considering its offset. In other words, if the topic is deleted and the details are re-written from the offset `0`, Druid will simply overwrite the processed ship details.
+
+
 ### 5. Start Kafka server
 
 Run the commands:
@@ -190,17 +195,7 @@ bin/kafka-topics.sh --create --topic ships-history --bootstrap-server localhost:
 
 ### 7. Start the backend
 
-You need to build and then start the backend using the following commands:
-```shell
-cd codebase/backend
-chmod +x ./gradlew # make the wrapper script executable
-./gradlew clean # optional, if you want to clean the previous build
-./gradlew build # build the project; also runs tests and static analysis
-./gradlew bootRun # starts the web server which now can be
-                  # reached at http://localhost:8180/
-```
-
-To check that the backend started, you can go to http://localhost:8180/ships/details. 
+Follow the instructions in [the section Running Backend in the file backend/README.md](backend/README.md#running-backend).
 
 ### 8. Start the frontend
 

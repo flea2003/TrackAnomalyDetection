@@ -11,7 +11,7 @@ Frontend is implemented using [React.js framework](https://react.dev/).
 
 ## Running Frontend
 
-**Before starting the frontend, you need to setup and start the Druid, Kafka and backend.** The instructions can be found in the [README.md in the folder above](../README.md).
+**Before starting the frontend, you need to set up and start the Druid, Kafka and backend.** The instructions can be found in the [README.md in the folder above](../README.md).
 
 When you are ready to start the frontend, you need to install the required packages and run the frontend using the following commands:
 ```shell

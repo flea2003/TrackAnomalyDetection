@@ -51,10 +51,10 @@ cd codebase/stress-tester
 chmod +x ./gradlew # make the wrapper script executable
 
 ./gradlew checkstyleMain # runs checkstyle, the report is generated at 
-                         # codebase/simulator/build/reports/checkstyle/main.html
+                         # codebase/stress-tester/build/reports/checkstyle/main.html
                          
 ./gradlew pmdMain # runs PMD, the report is generated at
-                  # codebase/simulator/build/reports/pmd/main.html
+                  # codebase/stress-tester/build/reports/pmd/main.html
 ```
 
 
