@@ -51,7 +51,7 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
       anomalyThreshold,
       extractedFunctionsMap,
       currentPage,
-      setCurrentPage
+      setCurrentPage,
     },
     ref,
   ) => {
@@ -88,10 +88,7 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
     }, [notifications]);
 
     // Construct page changer function
-    const pageChanger = constructPageChanger(
-      currentPage,
-      setCurrentPage,
-    );
+    const pageChanger = constructPageChanger(currentPage, setCurrentPage);
 
     // Save pageChanger in ref reachable by components above in the tree
     useImperativeHandle(ref, () => ({
@@ -119,7 +116,7 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
 
 function constructPageChanger(
   currentPage: CurrentPage,
-  setCurrentPage: (value: CurrentPage) => void
+  setCurrentPage: (value: CurrentPage) => void,
 ) {
   return (newPage: CurrentPage) => {
     if (
@@ -129,7 +126,6 @@ function constructPageChanger(
     ) {
       // If we clicked the same icon for the second time
       setCurrentPage(getPageChangerDefaultPage());
-
     } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);
