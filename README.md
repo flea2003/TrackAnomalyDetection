@@ -9,6 +9,7 @@ Defence.
 - [Project Components](#project-components)
 - [Setup](#setup)
 - [Running the Project](#running-the-project)
+- [Resetting the State](#resetting-the-state)
 - [CI Pipeline](#ci-pipeline)
 
 ## Organizational Details
@@ -98,17 +99,7 @@ After you have [downloaded the required tools](#setup), you can run them. Note t
 
 To run the application, you should follow the steps described below in this order. To be more precise, firstly you need to start Druid database (it also starts Zookeeper), then you can start Kafka server. Only when Kafka is running, you can start the backend, and then the frontend. After these, you can also choose to start the simulator or the stress tester.
 
-### 1. Clear previous Kafka and Zookeeper logs
-
-**Note: this is not needed when running the project first time.** In addition, this should not be needed in general, but sometimes
-weird bugs can appear because of previously terminated Kafka processes.
-
-To delete the logs, run the following command:
-```shell
-rm -rf /tmp/kafka-logs /tmp/zookeeper
-```
-
-### 2. Start Druid
+### 1. Start Druid
 
 **Start druid** in one terminal window:
 ```shell
@@ -126,26 +117,7 @@ In WSL, when trying to run Druid you can get a `CANNOT CREATE FIFO` error. This 
 
 **Druid configuration file** is located at `backend/src/main/resources/ship-scores-kafka-supervisor.json`.
 
-### 3. Reset the Druid after previous run
-
-**Note: this step is NOT required when starting the project for the first time.** It is only important when the Druid, Kafka and the backend was started previously, and later backend was closed. In such case, you need to kill the task that
-keeps the Druid's connection with the previous process. Additionally, the supervisor can be removed.
-
-**Killing previous tasks.** In the [Tasks tab of the Druid web console](http://localhost:8888/unified-console.html#tasks), you need to select the task that is `Running`, and under the Actions select to kill it.
-
-**[Optional] Removing the previous supervisor.** Usually this is not needed, and can be skipped unless you encounter weird behaviour with the setup. To see the list of 
-the supervisors you can either go to the [Supervisors tab of the web console](http://localhost:8888/unified-console.html#supervisors), or run the following command:
-```shell
-curl "http://localhost:8888/druid/indexer/v1/supervisor"
-```
-After identifying the id of the supervisor that you want to terminate, you can run the following command:
-```bash
-curl --request POST "http://localhost:8888/druid/indexer/v1/supervisor/<id>/terminate"
-```
-Where instead of `<id>` you should write identifier of the supervisor that you want to terminate. Note that the terminated supervisors still exist in the metadata store and their history can be retrieved.
-The data is persistently stored on disk in the structure of so-called segments. You can delete them through the [Segments tab of the web console](http://localhost:8888/unified-console.html#segments).
-
-### 4. Create a Druid supervisor for the Kafka topic
+### 2. Create a Druid supervisor for the Kafka topic
 
 When Druid is running, you need to tell the Druid database to retrieve data from the Kafka topic. You can do that by doing 
 the following commands. Note that this only needs to be done once (if you stop the Druid and start it again without, and skip the 3rd step, the supervisor is still there).
@@ -161,7 +133,7 @@ Also, the consumed data is deeply stored (stored on the disk) every hour with th
 It is worth noting that Druid reads the data from the topic by considering its offset. In other words, if the topic is deleted and the details are re-written from the offset `0`, Druid will simply overwrite the processed ship details.
 
 
-### 5. Start Kafka server
+### 3. Start Kafka server
 
 Run the commands:
 ```shell
@@ -169,17 +141,7 @@ cd kafka_2.13-3.6.2 # the installed Kafka folder
 bin/kafka-server-start.sh config/server.properties
 ```
 
-### 6. Create (and reset) Kafka topics
-
-**Deleting previous topics.** If you are running the project not the first time, you should delete the previously created
-Kafka topics. To do that, you can run:
-```shell
-cd kafka_2.13-3.6.2 # the installed Kafka folder
-
-bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
-bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
-```
+### 4. Create Kafka topics
 
 **Creating new topics.** To create the required Kafka topics, run the commands:
 ```shell
@@ -190,23 +152,64 @@ bin/kafka-topics.sh --create --topic notifications --bootstrap-server localhost:
 bin/kafka-topics.sh --create --topic ships-history --bootstrap-server localhost:9092
 ```
 
-### 7. Start the backend
+### 5. Start the backend
 
 Follow the instructions in [the section Running Backend in the file backend/README.md](backend/README.md#running-backend).
 
-### 8. Start the frontend
+### 6. Start the frontend
 
 Follow the instructions in [the section Running Frontend in the file frontend/README.md](frontend/README.md#running-frontend).
 
-### 9. Run the Simulator or Stress Tester
+### 7. Run the Simulator or Stress Tester
 
-If you finished steps 1-8, then the application is already running. When ship AIS signals come to the `ship-raw-AIS` Kafka topic,
+If you finished steps 1-6, then the application is already running. When ship AIS signals come to the `ship-raw-AIS` Kafka topic,
 they will be processed in the backend and shown in the frontend. The only missing piece is to have the source for 
 the events that are sent to the mentioned Kafka topic. In this repository there are two options for that:
 - Simulator that takes the dataset of AIS signals, and sends them to the Kafka topic. To run this, follow [simulator/README.md](simulator/README.md).
 - Stress Tester generates the specified amount of signals per second and sends them to the Kafka topic. This is used as a tool for Scalability testing. To run this, follow [stress-tester/README.md](stress-tester/README.md).
 
 **Note** that it is recommended to run only one of the specified applications, either only Simulator or only Stress Tester. This recommendation is given only because these two tools generate ships in different flavour (simulator simulates historic data, whereas stress tester just generates random ships without knowing which places are land and which are water). However, Kafka Messaging Queue can handle multiple producers easily.
+
+## Resetting the State
+
+When application is stopped, before running it again, you may want to reset (some parts of) its state. In this 
+section you can find the steps for resetting the parts you want.
+
+### Clear previous Kafka and Zookeeper logs
+
+To delete the logs, run the following command:
+```shell
+rm -rf /tmp/kafka-logs /tmp/zookeeper
+```
+
+### Resetting the Druid tasks and supervisors
+
+**Killing previous tasks.** In the [Tasks tab of the Druid web console](http://localhost:8888/unified-console.html#tasks), you need to select the task that is `Running`, and under the Actions select to kill it.
+
+**Removing the previous supervisor.** Usually this is not needed, and can be skipped unless you encounter weird behaviour with the setup. To see the list of
+the supervisors you can either go to the [Supervisors tab of the web console](http://localhost:8888/unified-console.html#supervisors), or run the following command:
+```shell
+curl "http://localhost:8888/druid/indexer/v1/supervisor"
+```
+After identifying the id of the supervisor that you want to terminate, you can run the following command:
+```bash
+curl --request POST "http://localhost:8888/druid/indexer/v1/supervisor/<id>/terminate"
+```
+Where instead of `<id>` you should write identifier of the supervisor that you want to terminate. Note that the terminated supervisors still exist in the metadata store and their history can be retrieved.
+The data is persistently stored on disk in the structure of so-called segments. You can delete them through the [Segments tab of the web console](http://localhost:8888/unified-console.html#segments).
+
+### Delete Kafka topics
+
+Note that the Kafka server should be running to do this ([step 3](#3-start-kafka-server)). To delete the Kafka topics, you can run:
+```shell
+cd kafka_2.13-3.6.2 # the installed Kafka folder
+
+bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
+bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
+```
+
+**Note:** after deleting Kafka topics, don't forget to create them again before using the application ([step 4](#4-create-kafka-topics)).
 
 ## CI Pipeline
 
