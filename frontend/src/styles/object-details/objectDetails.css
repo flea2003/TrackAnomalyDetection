@@ -88,7 +88,7 @@
 .info-container {
     display: flex;
     width: 100%;
-    max-height: 100%;
+    max-height: 330px;
 
     overflow-y: scroll;
     padding-top: 15px;
@@ -121,16 +121,18 @@
 
 .notifications-container {
     height: 100%;
-    width: 80%;
+    width: 90%;
 
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    margin-left: 10%;
+    margin-left: 5%;
     margin-right: 3%;
     padding: 0;
     border: none;
+
+    overflow-y: auto;
 }
 
 .no-notifications {
