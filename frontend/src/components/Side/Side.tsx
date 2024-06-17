@@ -24,6 +24,8 @@ interface SideProps {
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
   extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
+  currentPage: CurrentPage;
+  setCurrentPage: (value: CurrentPage) => void;
 }
 
 interface ExtractedFunctionsSide {
@@ -48,6 +50,8 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
       setFilterThreshold,
       anomalyThreshold,
       extractedFunctionsMap,
+      currentPage,
+      setCurrentPage
     },
     ref,
   ) => {
@@ -59,9 +63,6 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
 
     // Set up the state for Notifications about ships
     const [notifications, setNotifications] = useState<ShipNotification[]>([]);
-
-    // Create state for current page
-    const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
 
     // Update the notifications by querying the server frequently
     useEffect(() => {
@@ -90,7 +91,6 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
     const pageChanger = constructPageChanger(
       currentPage,
       setCurrentPage,
-      extractedFunctionsMap.current?.setCurrentPageMap,
     );
 
     // Save pageChanger in ref reachable by components above in the tree
@@ -119,10 +119,7 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
 
 function constructPageChanger(
   currentPage: CurrentPage,
-  setCurrentPage: (
-    value: ((prevState: CurrentPage) => CurrentPage) | CurrentPage,
-  ) => void,
-  setCurrentPageMap: ((page: CurrentPage) => void) | undefined,
+  setCurrentPage: (value: CurrentPage) => void
 ) {
   return (newPage: CurrentPage) => {
     if (
@@ -133,15 +130,9 @@ function constructPageChanger(
       // If we clicked the same icon for the second time
       setCurrentPage(getPageChangerDefaultPage());
 
-      // Set the needed page to the
-      if (setCurrentPageMap !== undefined)
-        setCurrentPageMap(getPageChangerDefaultPage());
     } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);
-
-      // Set the needed page to the
-      if (setCurrentPageMap !== undefined) setCurrentPageMap(newPage);
     }
   };
 }

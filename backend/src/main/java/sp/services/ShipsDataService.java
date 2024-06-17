@@ -94,11 +94,10 @@ public class ShipsDataService {
      * @throws DatabaseException in case the query doesn't succeed
      */
     public List<TrajectoryObject> getSubsampledHistoryOfShip(long id) throws DatabaseException {
-        List<CurrentShipDetails> fullHistory = queryExecutor
-                .executeQueryOneLong(id, "src/main/resources/db/history.sql", CurrentShipDetails.class);
-//                .executeQueryOneLong(id, "src/main/resources/db/sampledHistory.sql", TrajectoryObject.class);
+        List<TrajectoryObject> fullHistory = queryExecutor
+                .executeQueryOneLong(id, "src/main/resources/db/sampledHistory.sql", TrajectoryObject.class);
 
-        List<CurrentShipDetails> result = new ArrayList<>();
+        List<TrajectoryObject> result = new ArrayList<>();
 
         if (fullHistory.size() <= subsamplingThreshold)
             result = fullHistory;
@@ -115,20 +114,9 @@ public class ShipsDataService {
             result.add(fullHistory.get(fullHistory.size() - 1));
         }
 
-        OffsetDateTime currentTime = OffsetDateTime.now();
-
         return result
                 .stream()
-                .map(
-                        x -> new TrajectoryObject(
-                                x.extractId(),
-                                x.getCurrentAISSignal() == null ? -1 : x.getCurrentAISSignal().getLongitude(),
-                                x.getCurrentAISSignal() == null ? -1 : x.getCurrentAISSignal().getLatitude(),
-                                x.getCurrentAISSignal() == null ?  currentTime : x.getCurrentAISSignal().getTimestamp(),
-                                x.getCurrentAnomalyInformation() == null ? -1: x.getCurrentAnomalyInformation().getScore()
-                        )
-                )
-                .sorted(Comparator.comparing(TrajectoryObject::getTimestamp))
+                .sorted((x, y) -> -x.getAisSignal().getTimestamp().compareTo(y.getAisSignal().getTimestamp()))
                 .toList();
     }
 }

@@ -61,10 +61,10 @@ class TrajectoryService {
     const finalResult = responseWithoutNulls.map(
       (x: TrajectoryResponseItem) =>
         new TrajectoryPoint(
-          x.shipId,
-          x.longitude,
-          x.latitude,
-          x.timestamp,
+          x.aisSignal.id,
+          x.aisSignal.longitude,
+          x.aisSignal.latitude,
+          x.aisSignal.timestamp,
           x.anomalyScore,
         ),
     );

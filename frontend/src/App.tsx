@@ -32,9 +32,15 @@ function App() {
     }
   };
 
+  // Initialize a state for the current page. Note that it needs to be initialized here, in
+  // App.tsx, as it is needed for both LMap (for synchronized trajectory displaying) and Side functions
+  // Create state for current page
+  const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
+
+  // State for storing all ships retrieved from backend
   const [rawShips, setRawShips] = useState<ShipDetails[]>([]);
 
-  // Use effect to query for the ships every 1000ms
+  // Use effect to query for the ships every 2000ms
   useEffect(() => {
     const intervalId = setInterval(() => {
       ShipService.queryBackendForShipsArray().then(
@@ -68,6 +74,7 @@ function App() {
       <LMap
         ships={displayedShips}
         refObjects={extractedFunctionsSide}
+        currentPage={currentPage}
         ref={extractedFunctionsMap}
       />
       <Side
@@ -77,9 +84,22 @@ function App() {
         anomalyThreshold={filterThreshold}
         ref={extractedFunctionsSide}
         extractedFunctionsMap={extractedFunctionsMap}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
     </div>
   );
+}
+
+/**
+ * Function for intrducing the initial page, which is a map without any information
+ * widndow being displayed
+ */
+function getPageChangerDefaultPage() {
+  return {
+    currentPage: "none",
+    shownItemId: -1,
+  } as CurrentPage;
 }
 
 export default App;
