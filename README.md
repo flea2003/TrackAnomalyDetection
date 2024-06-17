@@ -11,8 +11,6 @@ Defence.
 - [Running the Project](#running-the-project)
 - [CI Pipeline](#ci-pipeline)
 
-TODO: steps to run checks from the pipeline (inside each of the projects)
-
 ## Organizational Details
 
 - **Course**: CSE2000 Software Project (2023/24)
@@ -178,7 +176,6 @@ Kafka topics. To do that, you can run:
 ```shell
 cd kafka_2.13-3.6.2 # the installed Kafka folder
 
-bin/kafka-streams-application-reset.sh --application-id anomaly-detection-pipeline --force
 bin/kafka-topics.sh --delete --topic ships-raw-AIS --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic notifications --bootstrap-server localhost:9092
 bin/kafka-topics.sh --delete --topic ships-history --bootstrap-server localhost:9092
