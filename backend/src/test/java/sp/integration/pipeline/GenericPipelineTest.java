@@ -106,9 +106,9 @@ class GenericPipelineTest {
 
     @AfterEach
     void tearDown() throws Exception {
+        anomalyDetectionPipeline.closePipeline();
         embeddedKafka.doWithAdmin(x -> x.deleteTopics(List.of(rawAISTopic, rawAISTopic, currentShipDetailsTopic)));
         embeddedKafka.destroy();
-        env.close();
     }
 
     /**
