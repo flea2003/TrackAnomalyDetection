@@ -10,7 +10,7 @@ class HttpSender {
   /**
    * Send an asynchronous GET request to the backend server
    * mentioning the desired endpoint
-   * @param endpoint - endpoint accessed
+   * @param endpoint endpoint accessed
    */
   // eslint-disable-next-line
   static async get(endpoint: string): Promise<any> {
