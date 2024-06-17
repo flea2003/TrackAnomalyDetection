@@ -10,6 +10,7 @@ import ShipNotification from "../../../../model/ShipNotification";
 import { CurrentPage } from "../../../../App";
 
 import "../../../../styles/object-details/objectDetails.css";
+import ScorePlot from "./ScorePlot";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
@@ -117,7 +118,14 @@ const DisplayedInformation = ({
         {displayedNotifications && notifications.length === 0 && (
           <div className="no-notifications">No notifications</div>
         )}
-        {displayedPlot && <div>Plot</div>}
+        {displayedPlot &&
+          (<div>
+            <ScorePlot
+              ship={ship}
+              notifications={notifications}
+              pageChanger={pageChanger}
+            />
+          </div>)}
       </Stack>
     </Stack>
   );
