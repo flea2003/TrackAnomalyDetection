@@ -9,9 +9,11 @@ import DisplayedInformation from "./DisplayedInformation";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
+import TrajectoryPoint from "../../../../model/TrajectoryPoint";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
+  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
   notifications: ShipNotification[];
   mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
@@ -23,6 +25,7 @@ interface ObjectDetailsProps {
  * The object to whose details are to be displayed is passed as a prop.
  *
  * @param ships array of all ships
+ * @param displayedTrajectoryAndNotifications historical data about the ship
  * @param notifications a list of all notifications
  * @param mapCenteringFun function used for map centering on a needed ship
  * @param pageChanger page changer function
@@ -31,6 +34,7 @@ interface ObjectDetailsProps {
  */
 function ObjectDetails({
   ships,
+  displayedTrajectoryAndNotifications,
   notifications,
   mapCenteringFun,
   pageChanger,
@@ -62,6 +66,9 @@ function ObjectDetails({
 
       <DisplayedInformation
         ship={ship}
+        displayedTrajectoryAndNotifications={
+          displayedTrajectoryAndNotifications
+        }
         notifications={shipNotifications}
         pageChanger={pageChanger}
         mapCenteringFun={mapCenteringFun}

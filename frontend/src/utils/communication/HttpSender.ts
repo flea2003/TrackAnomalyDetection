@@ -1,5 +1,5 @@
 import ErrorNotificationService from "../../services/ErrorNotificationService";
-import connectionSettings from "../../configs/connectionSettings.json"
+import connectionSettings from "../../configs/connectionSettings.json";
 
 /**
  * Utility class that handles request sending to the backend

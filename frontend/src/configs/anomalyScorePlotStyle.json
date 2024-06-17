@@ -1,5 +1,7 @@
 {
-  "width": 720,
-  "height": 440,
-  "title": "Anomaly Score Plot"
+  "width": 300,
+  "height": 300,
+  "title": "Anomaly Score Plot",
+  "autosize": true,
+  "showlegend": true
 }

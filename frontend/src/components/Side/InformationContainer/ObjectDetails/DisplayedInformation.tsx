@@ -11,9 +11,11 @@ import { CurrentPage } from "../../../../App";
 
 import "../../../../styles/object-details/objectDetails.css";
 import ScorePlot from "./ScorePlot";
+import TrajectoryPoint from "../../../../model/TrajectoryPoint";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
+  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
   notifications: ShipNotification[];
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
@@ -25,6 +27,7 @@ interface ObjectDetailsProps {
  * in object details window
  *
  * @param ship ship whose data is being displayed
+ * @param displayedTrajectoryAndNotifications historical data of the ship
  * @param notifications array of all notifications
  * @param ships array of all ships
  * @param pageChanger page changer function
@@ -33,6 +36,7 @@ interface ObjectDetailsProps {
  */
 const DisplayedInformation = ({
   ship,
+  displayedTrajectoryAndNotifications,
   notifications,
   ships,
   pageChanger,
@@ -118,14 +122,17 @@ const DisplayedInformation = ({
         {displayedNotifications && notifications.length === 0 && (
           <div className="no-notifications">No notifications</div>
         )}
-        {displayedPlot &&
-          (<div>
+        {displayedPlot && (
+          <div className="plot-container">
             <ScorePlot
               ship={ship}
               notifications={notifications}
-              pageChanger={pageChanger}
+              displayedTrajectoryAndNotifications={
+                displayedTrajectoryAndNotifications
+              }
             />
-          </div>)}
+          </div>
+        )}
       </Stack>
     </Stack>
   );

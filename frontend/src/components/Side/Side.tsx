@@ -17,9 +17,11 @@ import { ExtractedFunctionsMap } from "../Map/LMap";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
+import TrajectoryPoint from "../../model/TrajectoryPoint";
 
 interface SideProps {
   ships: ShipDetails[];
+  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
@@ -44,6 +46,7 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
   (
     {
       ships,
+      displayedTrajectoryAndNotifications,
       mapCenteringFun,
       setFilterThreshold,
       anomalyThreshold,
@@ -105,6 +108,9 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
         <InformationContainer
           currentPage={currentPage}
           ships={ships}
+          displayedTrajectoryAndNotifications={
+            displayedTrajectoryAndNotifications
+          }
           notifications={notifications}
           pageChanger={pageChanger}
           mapCenteringFun={mapCenteringFun}

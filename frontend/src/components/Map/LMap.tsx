@@ -29,6 +29,10 @@ import "leaflet/dist/leaflet.css";
 
 interface MapProps {
   ships: ShipDetails[];
+  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
+  setDisplayedTrajectory: React.Dispatch<
+    React.SetStateAction<TrajectoryPoint[][]>
+  >;
   refObjects: React.RefObject<ExtractedFunctionsSide>;
 }
 
@@ -51,7 +55,15 @@ interface TrackedShipType {
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
-  ({ ships, refObjects }, ref) => {
+  (
+    {
+      ships,
+      displayedTrajectoryAndNotifications,
+      setDisplayedTrajectory,
+      refObjects,
+    },
+    ref,
+  ) => {
     // Map is ref to have one instance. This ref will be initialized in useEffect.
     const mapRef = useRef<L.Map | null>(null);
 
@@ -60,12 +72,6 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
 
     // Initialize the state for tracked ship
     const [trackedShip, setTrackedShip] = useState(getDefaultTrackedShipInfo());
-
-    // Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
-    // 1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
-    // 2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
-    const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
-      useState<TrajectoryPoint[][]>([]);
 
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship

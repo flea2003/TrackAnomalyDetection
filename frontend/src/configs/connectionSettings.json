@@ -1,5 +1,6 @@
 {
   "backendURL": "http://localhost:8180",
   "backendHistoryEndpoint": "/ships/history/",
+  "backendSampledHistoryEndpoint": "/ships/history/sampled/",
   "backendCurrentShipDetailsEndpoint": "/ships/details"
 }

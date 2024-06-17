@@ -89,6 +89,13 @@
     padding-top: 15px;
 }
 
+.plot-container {
+    flex-grow: 1;
+    display: flex;
+    width: 100%;
+    padding-top: 15px;
+}
+
 .displayed, .not-displayed, .notification-displayed, .notification-not-displayed {
     border: 1px solid black;
     border-left: none;

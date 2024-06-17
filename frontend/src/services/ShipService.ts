@@ -3,13 +3,14 @@ import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";
 import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
-import connectionSettings from "../configs/connectionSettings.json"
+import connectionSettings from "../configs/connectionSettings.json";
 
 class ShipService {
   /** Backend API endpoint for retrieving (polling) the information about
    * the latest ship details for each ship, encapsulating: the AIS information and current/max anomaly information
    */
-  static shipsCurrentDetailsEndpoint = connectionSettings.backendCurrentShipDetailsEndpoint;
+  static shipsCurrentDetailsEndpoint =
+    connectionSettings.backendCurrentShipDetailsEndpoint;
   static historyEndpoint = connectionSettings.backendHistoryEndpoint;
 
   /**

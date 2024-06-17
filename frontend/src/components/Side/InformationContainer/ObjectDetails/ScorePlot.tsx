@@ -1,75 +1,114 @@
 import ShipDetails from "../../../../model/ShipDetails";
-import ShipNotification from "../../../../model/ShipNotification";
-import { CurrentPage } from "../../../../App";
-import React, { useEffect, useState } from "react";
-import HttpSender from "../../../../utils/communication/HttpSender";
 import plottingConfig from "../../../../configs/plottingConfig.json";
 import Plot from "react-plotly.js";
 import anomalyScorePlotStyle from "../../../../configs/anomalyScorePlotStyle.json";
+import TrajectoryPoint from "../../../../model/TrajectoryPoint";
+import ShipNotification from "../../../../model/ShipNotification";
+import React from "react";
+import PlotDataPointItem from "../../../../templates/PlotDataPointItem";
+import "../../../../styles/object-details/scorePlot.css";
+import { Stack } from "@mui/material";
 
 interface ScorePlotProps {
   ship: ShipDetails;
+  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
   notifications: ShipNotification[];
-  pageChanger: (currentPage: CurrentPage) => void;
 }
 
-function ScorePlot(props: ScorePlotProps){
-
-  // Extract the props
+function ScorePlot(props: ScorePlotProps) {
   const selectedShipId = props.ship.id;
 
   const threshold = plottingConfig.notificationThreshold;
 
   const allNotifications = props.notifications;
 
-  const shipNotifications = allNotifications.filter((notification) =>
-    notification.shipDetails.id === selectedShipId
+  const shipNotifications = allNotifications.filter((notification) => {
+    return notification.shipDetails.id === selectedShipId;
+  });
+
+  const notificationScoreHistory = shipNotifications.map(
+    (notification) => notification.shipDetails.anomalyScore,
+  );
+  const notificationTimestampHistory = shipNotifications.map(
+    (notification) => notification.shipDetails.timestamp,
   );
 
-  const notificationScores = shipNotifications.map((notification) => notification.shipDetails.anomalyScore);
-  const notificationTimestamps = shipNotifications.map((notification) => notification.shipDetails.timestamp);
+  const shipHistory = props.displayedTrajectoryAndNotifications[0].map(
+    (trajectoryPoint) => {
+      return {
+        anomalyScore: trajectoryPoint.anomalyScore,
+        timestamp: trajectoryPoint.timestamp,
+      } as PlotDataPointItem;
+    },
+  );
 
-  const [ shipHistory, setShipHistory ] = useState<ShipDetails[]>([]);
-
-  // Requires filtering out the default values assigned to incomplete details
-  const scoreHistory = shipHistory.map((ship) => ship.anomalyScore);
-  const timestampHistory = shipHistory.map((ship) => ship.timestamp);
-
+  const scoreHistory = shipHistory.map((dataPoint) => dataPoint.anomalyScore);
+  const timestampHistory = shipHistory.map((dataPoint) => dataPoint.timestamp);
+  console.log(scoreHistory);
+  console.log(timestampHistory);
   // Plot datapoint descriptions
   const anomalyScoreDescriptions = scoreHistory.map((score, index) => {
-    return `Score: ${score}<br>Timestamp: ${timestampHistory[index]}`
+    return `Score: ${score}<br>Timestamp: ${timestampHistory[index]}`;
   });
 
-  const notificationDescriptions = notificationScores.map((score, index) => {
-    return `Score: ${score}<br>Timestamp: ${notificationTimestamps[index]}`
-  });
+  const notificationDescriptions = notificationScoreHistory.map(
+    (score, index) => {
+      return `Score: ${score}<br>Timestamp: ${notificationTimestampHistory[index]}`;
+    },
+  );
 
   return (
-    <Plot
-      data={[
-        {
-          x: timestampHistory,
-          y: scoreHistory,
-          type: 'scatter',
-          mode: 'lines',
-          name: 'Anomaly Scores',
-          text: anomalyScoreDescriptions,
-          hoverinfo: 'text',
-          line: { color: 'blue'},
-        },
-        {
-          x: notificationTimestamps,
-          y: notificationScores,
-          type: 'scatter',
-          mode: 'markers',
-          name: 'Notifications',
-          text: notificationDescriptions,
-          hoverinfo: 'text',
-          marker: { color: 'yellow', size: 8}
-        }
-      ]}
-      layout={anomalyScorePlotStyle}
-    />
+    <Stack className="plot-container">
+      <Plot
+        data={[
+          {
+            x: timestampHistory,
+            y: scoreHistory,
+            type: "scatter",
+            mode: "lines",
+            name: "Anomaly Scores",
+            text: anomalyScoreDescriptions,
+            hoverinfo: "text",
+            line: { color: "blue" },
+          },
+          {
+            x: notificationTimestampHistory,
+            y: notificationScoreHistory,
+            type: "scatter",
+            mode: "markers",
+            name: "Notifications",
+            text: notificationDescriptions,
+            hoverinfo: "text",
+            marker: { color: "yellow", size: 8 },
+          },
+        ]}
+        layout={{
+          ...anomalyScorePlotStyle,
+          xaxis: {
+            title: "Timestamp",
+            tickfont: {"size": 12}
+          },
+          yaxis: {
+            title: "Anomaly Score (%)",
+            tickfont: {"size": 12}
+          },
+          shapes: [
+            {
+              type: "line",
+              x0: timestampHistory[0],
+              x1: timestampHistory[timestampHistory.length - 1],
+              y0: threshold,
+              y1: threshold,
+              line: {
+                color: "red",
+                width: 2,
+                dash: "dash",
+              },
+            },
+          ],
+        }}
+      />
+    </Stack>
   );
 }
 
