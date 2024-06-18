@@ -17,6 +17,7 @@ import "../../styles/common.css";
 import "../../styles/side.css";
 
 import config from "../../configs/generalConfig.json";
+import InformationPopUp from "../Information/InformationPopUp";
 
 interface SideProps {
   ships: ShipDetails[];
@@ -80,18 +81,21 @@ const Side = forwardRef<PageChangerRef, SideProps>(
     useImperativeHandle(ref, () => ({ pageChanger }));
 
     return (
-      <Stack direction="row" id="side-container">
-        <InformationContainer
-          currentPage={currentPage}
-          ships={ships}
-          notifications={notifications}
-          pageChanger={pageChanger}
-          mapCenteringFun={mapCenteringFun}
-          setFilterThreshold={setFilterThreshold}
-          anomalyThreshold={anomalyThreshold}
-        />
-        <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
-      </Stack>
+      <div>
+        <Stack direction="row" id="side-container">
+          <InformationContainer
+            currentPage={currentPage}
+            ships={ships}
+            notifications={notifications}
+            pageChanger={pageChanger}
+            mapCenteringFun={mapCenteringFun}
+            setFilterThreshold={setFilterThreshold}
+            anomalyThreshold={anomalyThreshold}
+          />
+          <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
+        </Stack>
+        <InformationPopUp currentPage={currentPage} />
+      </div>
     );
   },
 );

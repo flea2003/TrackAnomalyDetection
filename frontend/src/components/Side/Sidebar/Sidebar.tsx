@@ -135,14 +135,18 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
       >
         {!displayedNotifications && (
           <img
-            src={getNotificationsBellType().toString()}
-            className="bell-icon-not-selected"
+            src={getNotificationsBell().toString()}
+            className={getNotificationsClass()}
             alt={bellIconAlt}
           />
         )}
         {displayedNotifications && (
           <img
-            src={notificationIconSelected}
+            src={
+              NotificationService.areAllRead()
+                ? notificationIconSelected
+                : bellIconNotRead
+            }
             className="bell-icon-selected"
             alt={bellIconAlt}
           />
@@ -175,14 +179,18 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
       >
         {!displayedBugs && (
           <img
-            src={getBugIcon()}
-            className="bug-icon-not-selected"
+            src={getBugIconNotSelected()}
+            className={getErrorNotificationsClass()}
             alt={bugIconAlt}
           />
         )}
         {displayedBugs && (
           <img
-            src={bugIconSelected}
+            src={
+              ErrorNotificationService.areAllRead()
+                ? bugIconSelected
+                : bugIconRed
+            }
             className="bug-icon-selected"
             alt={bugIconAlt}
           />
@@ -192,7 +200,7 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
   );
 }
 
-function getBugIcon() {
+function getBugIconNotSelected() {
   if (ErrorNotificationService.areAllRead()) {
     return bugIcon;
   }
@@ -200,14 +208,38 @@ function getBugIcon() {
 }
 
 /**
- * Changes the style of the notification bell background based on whether
+ * Changes the icon of the notification bell based on whether
  * there are any unread notifications
  */
-function getNotificationsBellType() {
+function getNotificationsBell() {
   if (NotificationService.areAllRead()) {
     return bellIconRead;
   }
   return bellIconNotRead;
+}
+
+/**
+ * Changes the style of the notification bell when notifications window is not displayed,
+ * based on whether all notifications are read or not (the hovering should differ
+ * for these scenarios)
+ */
+function getNotificationsClass() {
+  if (NotificationService.areAllRead()) {
+    return "bell-icon-not-selected-all-read";
+  }
+  return "bell-icon-not-selected-not-all-read";
+}
+
+/**
+ * Changes the style of the bug notifications icon when notifications window is not displayed,
+ * based on whether all error notifications are read or not (the hovering should differ
+ * for these scenarios)
+ */
+function getErrorNotificationsClass() {
+  if (ErrorNotificationService.areAllRead()) {
+    return "bug-icon-not-selected-all-read";
+  }
+  return "bug-icon-not-selected-not-all-read";
 }
 
 export default Sidebar;
