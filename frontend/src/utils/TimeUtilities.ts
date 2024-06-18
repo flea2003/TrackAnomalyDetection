@@ -2,6 +2,23 @@ import ErrorNotificationService from "../services/ErrorNotificationService";
 
 class TimeUtilities {
   /**
+   * Function that compares two timestamps. If first timestamp corresponds
+   * to later time than sencond one, -1 is returned. It is used to sort
+   * notifications by their date
+   *
+   * @param timestamp1 timestamp1 that is being compared
+   * @param timestamp2 timestamp2 that is being compared
+   */
+  static compareDates(timestamp1: string, timestamp2: string) {
+    const signalTime1 = new Date(timestamp1);
+    const signalTime2 = new Date(timestamp2);
+
+    if (signalTime1 > signalTime2) return -1;
+    else if (signalTime1 < signalTime2) return 1;
+    else return 0;
+  }
+
+  /**
    * Given the timestamp of the last received AIS signal, compute the time difference
    * between the respective timestamp and the live time and convert the difference to
    * a human-readable string

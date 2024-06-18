@@ -4,10 +4,9 @@ import ShipDetails from "../../../../model/ShipDetails";
 import { CurrentPage } from "../../../../App";
 import ShipsNotificationEntry from "./NotificationListEntry";
 import List from "@mui/material/List";
+import config from "../../../../configs/generalConfig.json";
 
 import "../../../../styles/notifications/notificationList.css";
-
-import config from "../../../../configs/generalConfig.json";
 
 interface NotificationListProps {
   notifications: ShipNotification[];
@@ -43,6 +42,9 @@ function NotificationListWithoutTitle({
   const listEntries = notifications
     .slice(0, config.notificationListMaxEntries)
     .map((notification, i) => {
+      // For all notifications, find the newest ship details entry, which
+      // will only be used for map centering function.
+
       const shipDetails = ships
         .filter((x) => x.id === notifications[i].shipDetails.id)
         .slice()[0];

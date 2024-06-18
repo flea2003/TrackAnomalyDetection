@@ -8,7 +8,6 @@ import ErrorNotificationService from "../../../services/ErrorNotificationService
 import NotificationList from "./NotificationsList/NotificationList";
 import ShipNotification from "../../../model/ShipNotification";
 import NotificationDetails from "./NotificationsList/NotificationDetails";
-import "../../../styles/settings.css";
 
 interface ObjectProps {
   currentPage: CurrentPage;
@@ -56,7 +55,6 @@ function InformationContainer({
       return (
         <ObjectDetails
           ships={ships}
-          notifications={notifications}
           mapCenteringFun={mapCenteringFun}
           shipId={currentPage.shownItemId}
           pageChanger={pageChanger}

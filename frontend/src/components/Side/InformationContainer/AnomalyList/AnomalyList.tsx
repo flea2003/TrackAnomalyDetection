@@ -5,11 +5,10 @@ import List from "@mui/material/List";
 import { CurrentPage } from "../../../../App";
 import ShipDetails from "../../../../model/ShipDetails";
 import ShipThresholdModifier from "./AnomalyTitleWithSlider";
+import config from "../../../../configs/generalConfig.json";
 
 import "../../../../styles/common.css";
 import "../../../../styles/anomaly-list/anomalyList.css";
-
-import config from "../../../../configs/generalConfig.json";
 
 interface AnomalyListProps {
   ships: ShipDetails[];

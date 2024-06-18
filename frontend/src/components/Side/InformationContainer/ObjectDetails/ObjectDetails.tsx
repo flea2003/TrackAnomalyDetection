@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import ShipDetails from "../../../../model/ShipDetails";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
@@ -6,13 +6,13 @@ import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import DisplayedInformation from "./DisplayedInformation";
+import { NotificationService } from "../../../../services/NotificationService";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
-  notifications: ShipNotification[];
   mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
   shipId: number;
@@ -31,15 +31,20 @@ interface ObjectDetailsProps {
  */
 function ObjectDetails({
   ships,
-  notifications,
   mapCenteringFun,
   pageChanger,
   shipId,
 }: ObjectDetailsProps) {
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = ships.find((ship) => ship.id === shipId);
-  const shipNotifications = notifications.filter(
-    (x) => x.shipDetails.id === shipId,
+
+  const [shipNotifications, setShipNotifications] = useState<
+    ShipNotification[]
+  >([]);
+
+  NotificationService.getAllNotificationsForShip(shipId).then(
+    (newNotifications: ShipNotification[]) =>
+      setShipNotifications(newNotifications),
   );
 
   if (ship === undefined) {

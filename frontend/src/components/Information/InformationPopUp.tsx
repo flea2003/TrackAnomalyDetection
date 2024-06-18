@@ -7,6 +7,9 @@ import { informationText } from "./InformationText";
 import "../../styles/common.css";
 import "../../styles/informationPopUp.css";
 
+import "../../styles/common.css";
+import "../../styles/informationPopUp.css";
+
 interface InformationProps {
   currentPage: CurrentPage;
 }
@@ -75,8 +78,6 @@ function getInfoTitle(page: string) {
       return "Notification List";
     case "notificationDetails":
       return "Notification Details";
-    case "settings":
-      return "Settings";
     case "errors":
       return "Error List";
     case "none":
