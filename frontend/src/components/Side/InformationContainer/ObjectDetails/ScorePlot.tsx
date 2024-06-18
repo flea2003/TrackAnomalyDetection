@@ -29,8 +29,8 @@ function ScorePlot(props: ScorePlotProps) {
     (notification) => notification.shipDetails.anomalyScore,
   );
   console.log("NSCORE:{" + notificationScoreHistory + "}");
-  const notificationTimestampHistory = shipNotifications.map((notification) =>
-    new Date(notification.shipDetails.timestamp)
+  const notificationTimestampHistory = shipNotifications.map(
+    (notification) => new Date(notification.shipDetails.timestamp),
   );
   console.log("NTIME:{" + notificationTimestampHistory + "}");
 
@@ -39,8 +39,8 @@ function ScorePlot(props: ScorePlotProps) {
   );
 
   const scoreHistory = shipHistory.map((dataPoint) => dataPoint.anomalyScore);
-  const timestampHistory = shipHistory.map((dataPoint) =>
-    new Date(dataPoint.timestamp)
+  const timestampHistory = shipHistory.map(
+    (dataPoint) => new Date(dataPoint.timestamp),
   );
 
   console.log("SCORE:{" + scoreHistory + "}");
@@ -48,12 +48,12 @@ function ScorePlot(props: ScorePlotProps) {
   // Plot datapoint descriptions
 
   const anomalyScoreDescriptions = scoreHistory.map((score, index) => {
-    return `Score: ${score}<br>Timestamp: ${timestampHistory[index].toLocaleTimeString()}`;
+    return `Score: ${score}<br>Timestamp: ${timestampHistory[index].toLocaleString()}`;
   });
 
   const notificationDescriptions = notificationScoreHistory.map(
     (score, index) => {
-      return `Score: ${score}<br>Timestamp: ${notificationTimestampHistory[index].toLocaleDateString()}`;
+      return `Score: ${score}<br>Timestamp: ${notificationTimestampHistory[index].toLocaleString()}`;
     },
   );
 
@@ -62,7 +62,7 @@ function ScorePlot(props: ScorePlotProps) {
       <Plot
         data={[
           {
-            x: timestampHistory,
+            x: timestampHistory.map((val) => val.getTime()),
             y: scoreHistory,
             type: "scatter",
             mode: "lines+markers",
@@ -86,7 +86,7 @@ function ScorePlot(props: ScorePlotProps) {
             },
           },
           {
-            x: notificationTimestampHistory,
+            x: notificationTimestampHistory.map((val) => val.getTime()),
             y: notificationScoreHistory,
             type: "scatter",
             mode: "markers",
@@ -105,7 +105,7 @@ function ScorePlot(props: ScorePlotProps) {
             marker: {
               color: "yellow",
               size: 5,
-              symbol: "square",
+              symbol: "circle",
             },
           },
         ]}
@@ -127,16 +127,21 @@ function ScorePlot(props: ScorePlotProps) {
             showticklabels: true,
             tickmode: "array",
             tickvals: [
-              timestampHistory[0],
-              timestampHistory[timestampHistory.length - 1]
+              timestampHistory[0].getTime(),
+              timestampHistory[timestampHistory.length - 1].getTime(),
             ],
             ticktext: [
-              timestampHistory[0].toLocaleTimeString(),
-              timestampHistory[timestampHistory.length - 1].toLocaleTimeString()
+              timestampHistory[0].toLocaleString(),
+              timestampHistory[timestampHistory.length - 1].toLocaleString(),
             ],
             showgrid: false,
+            range: [
+              timestampHistory[0].getTime(),
+              timestampHistory[timestampHistory.length - 1].getTime(),
+            ],
           },
           yaxis: {
+            range: [0, 100],
             tickfont: { size: 6 },
           },
           legend: {
@@ -173,15 +178,26 @@ const preprocessHistory = (trajectoryData: TrajectoryPoint[][]) => {
     .map((trajectoryPoint) => {
       return {
         anomalyScore: trajectoryPoint.anomalyScore,
-        timestamp: trajectoryPoint.timestamp,
+        timestamp: new Date(trajectoryPoint.timestamp),
       } as PlotDataPointItem;
     })
     .filter((trajectoryPnt) => trajectoryPnt.anomalyScore !== -1);
 
   // Remove duplicate instances
-  return Array.from(
+  const uniqueDataPoints = Array.from(
     new Set(parsedFilteredData.map((obj) => JSON.stringify(obj))),
   ).map((json) => JSON.parse(json) as PlotDataPointItem);
+
+  return uniqueDataPoints.sort((p1, p2) => {
+    if (p1.timestamp < p2.timestamp) {
+      return -1;
+    }
+    if (p1.timestamp === p2.timestamp) {
+      return 0;
+    } else {
+      return 1;
+    }
+  });
 };
 
 function arePropsEqual(prevProps: ScorePlotProps, nextProps: ScorePlotProps) {

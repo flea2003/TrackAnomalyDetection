@@ -1,6 +1,6 @@
 interface PlotDataPointItem {
   anomalyScore: number;
-  timestamp: string;
+  timestamp: Date;
 }
 
 export default PlotDataPointItem;
