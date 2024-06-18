@@ -122,7 +122,7 @@ cd apache-druid-29.0.1 # the installed Druid folder
 # http://localhost:8888/
 ```
 
-**Stopping the Druid.**
+**Stopping Druid.**
 You can just use `Ctrl+C` in the terminal window where Druid is running.
 
 **Starting Druid in WSL error.**
@@ -210,6 +210,12 @@ curl --request POST "http://localhost:8888/druid/indexer/v1/supervisor/<id>/term
 ```
 Where instead of `<id>` you should write identifier of the supervisor that you want to terminate. Note that the terminated supervisors still exist in the metadata store and their history can be retrieved.
 The data is persistently stored on disk in the structure of so-called segments. You can delete them through the [Segments tab of the web console](http://localhost:8888/unified-console.html#segments).
+
+**Fully resetting Druid.** In case you wish to reset Druid to post-installation state, after stopping Druid, simply remove the `logs` and `var` directories:
+```
+cd apache-druid-29.0.1
+rm -rf var logs
+```
 
 ### Delete Kafka topics
 

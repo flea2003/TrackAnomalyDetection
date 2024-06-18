@@ -467,7 +467,10 @@ function addInitialPointMarkerOnTheMap(
 ) {
   // Create a blue circle for the initial coordinate of the ship
   const initialMarker = L.circleMarker(
-    [displayedTrajectory[0].latitude, displayedTrajectory[0].longitude],
+    [
+      displayedTrajectory[displayedTrajectory.length - 1].latitude,
+      displayedTrajectory[displayedTrajectory.length - 1].longitude,
+    ],
     {
       radius: 7,
       color: "0000ff",

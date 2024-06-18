@@ -134,7 +134,7 @@ public class ShipsDataService {
         finalResult.addAll(notificationsData);
 
         // Return a final result, sorted by the timestamp
-        return finalResult.stream().sorted((x, y) -> -x.getTimeValue().compareTo(y.getTimeValue())).toList();
+        return finalResult.stream().sorted((x, y) -> -x.getTimestamp().compareTo(y.getTimestamp())).toList();
     }
 
     /**
