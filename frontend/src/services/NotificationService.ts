@@ -5,6 +5,7 @@ import NotificationResponseItem from "../templates/NotificationResponseItem";
 import ShipDetails from "../model/ShipDetails";
 import TimeUtilities from "../utils/TimeUtilities";
 import endpointConfig from "../configs/endpointsConfig.json";
+import Cookies from "js-cookie";
 
 export class NotificationService {
   // Stores ids of notifications that have been read by the user since the page was refreshed
@@ -22,10 +23,18 @@ export class NotificationService {
    * that are in the backend before the frontend has started, and marks them as read.
    */
   static initializeReadNotifications = async () => {
-    // Fetch all notifications that are currently in the backend
-    const allNotifications =
-      await NotificationService.queryBackendForAllNotifications();
-    NotificationService.markAllNotificationsAsRead(allNotifications);
+    const cookieValue = Cookies.get("idsOfReadNotifications");
+    if (cookieValue === undefined) {
+      // Fetch all notifications that are currently in the backend
+      const allNotifications =
+        await NotificationService.queryBackendForAllNotifications();
+      NotificationService.markAllNotificationsAsRead(allNotifications);
+
+      const jsonIds = JSON.stringify(allNotifications.map((x) => x.id));
+      Cookies.set("idsOfReadNotifications", jsonIds, { expires: 7 });
+    } else {
+      this.idsOfReadNotifications = JSON.parse(cookieValue);
+    }
   };
 
   /**
@@ -55,6 +64,7 @@ export class NotificationService {
     } else {
       const newNotifications: ShipNotification[] =
         await this.queryBackendForAllNotificationsForShip(shipID);
+
       return newNotifications.map((notification) => {
         if (this.idsOfReadNotifications.includes(notification.id)) {
           notification.isRead = true;
@@ -98,7 +108,9 @@ export class NotificationService {
       if (this.idsOfReadNotifications.includes(x.id)) {
         x.isRead = true;
         return x;
-      } else return x;
+      } else {
+        return x;
+      }
     });
   }
 
@@ -132,10 +144,15 @@ export class NotificationService {
    * @param notification notification object
    */
   static markANotificationAsRead = (notification: ShipNotification) => {
-    if (notification.isRead) return;
+    if (notification.isRead) {
+      return;
+    }
 
     notification.isRead = true;
     this.idsOfReadNotifications.push(notification.id);
+
+    const updatedArrayJson = JSON.stringify(this.idsOfReadNotifications);
+    Cookies.set("idsOfReadNotifications", updatedArrayJson, { expires: 7 });
   };
 
   /**

@@ -4,6 +4,7 @@ import ErrorNotificationService from "../../services/ErrorNotificationService";
 import NotificationResponseItem from "../../templates/NotificationResponseItem";
 import { NotificationService } from "../../services/NotificationService";
 import ShipNotification from "../../model/ShipNotification";
+import Cookies from "js-cookie";
 
 const fakeNotificationResponseItem1: NotificationResponseItem = {
   id: 0,
@@ -130,6 +131,7 @@ test("initialize-read-notifications-several", async () => {
 
 test("initialize-read-notifications-none", async () => {
   HttpSender.get = jest.fn().mockReturnValue(Promise.resolve([]));
+  Cookies.get = jest.fn().mockReturnValue("[]");
   await NotificationService.initializeReadNotifications();
   expect(NotificationService.idsOfReadNotifications).toStrictEqual([]);
 });
