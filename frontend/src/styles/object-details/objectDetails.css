@@ -93,7 +93,7 @@
     flex-grow: 1;
     display: flex;
     width: 100%;
-    padding-top: 15px;
+    padding-bottom: 5px;
 }
 
 .displayed, .not-displayed, .notification-displayed, .notification-not-displayed {
