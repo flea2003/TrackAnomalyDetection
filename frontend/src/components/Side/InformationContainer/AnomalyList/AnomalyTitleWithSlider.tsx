@@ -93,18 +93,22 @@ const AnomalyTitleWithSlider = ({
           />
           <div className="threshold-div">
             {isEditing ? (
-              <input type="number"
-               value={Number(anomalyThreshold).toString()}
-               onChange = {(e) => handleInputChange(e)}
-               onBlur={(e) => {
-                 handleInputChange(e)
-                 setIsEditing(!isEditing)
-               }}
-               className="number-input"
-               autoFocus
-              />
-              ) : (
-              <div onClick={() => {setIsEditing(!isEditing)}}>
+              <Stack direction="row">
+                <input type="number"
+                          value={Number(anomalyThreshold)}
+                          onChange={(e) => handleInputChange(e)}
+                          onBlur={(e) => {
+                            handleInputChange(e)
+                            setIsEditing(!isEditing)
+                          }}
+                          className="number-input"
+                          autoFocus
+              />%
+              </Stack>
+            ) : (
+              <div onClick={() => {
+                setIsEditing(!isEditing)
+              }}>
                 {anomalyThreshold}%
               </div>
             )}
