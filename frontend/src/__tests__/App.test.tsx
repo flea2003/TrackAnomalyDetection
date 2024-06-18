@@ -8,7 +8,6 @@ beforeAll(() => {
   // In setupTests.js or beforeAll in a test file
   window.URL = window.URL || {};
   window.URL.createObjectURL = jest.fn();
-
 });
 
 afterAll(() => {
