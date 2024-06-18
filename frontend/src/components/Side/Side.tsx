@@ -13,6 +13,7 @@ import ShipNotification from "../../model/ShipNotification";
 import { NotificationService } from "../../services/NotificationService";
 import { Stack } from "@mui/material";
 import config from "../../configs/generalConfig.json";
+import { ExtractedFunctionsMap } from "../Map/LMap";
 import InformationPopUp from "../Information/InformationPopUp";
 
 import "../../styles/common.css";
@@ -23,10 +24,14 @@ interface SideProps {
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
+  currentPage: CurrentPage;
+  setCurrentPage: (value: CurrentPage) => void;
 }
 
-interface PageChangerRef {
+interface ExtractedFunctionsSide {
   pageChanger: (currentPage: CurrentPage) => void;
+  notifications: ShipNotification[];
 }
 
 /**
@@ -38,8 +43,19 @@ interface PageChangerRef {
  * @param anomalyThreshold the anomaly threshold that is used for filtering
  * @constructor
  */
-const Side = forwardRef<PageChangerRef, SideProps>(
-  ({ ships, mapCenteringFun, setFilterThreshold, anomalyThreshold }, ref) => {
+const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
+  (
+    {
+      ships,
+      mapCenteringFun,
+      setFilterThreshold,
+      anomalyThreshold,
+      extractedFunctionsMap,
+      currentPage,
+      setCurrentPage,
+    },
+    ref,
+  ) => {
     // Set up the ErrorNotificationService
     const [, setErrorNotificationState] = React.useState(
       ErrorNotificationService.getAllNotifications(),
@@ -74,12 +90,15 @@ const Side = forwardRef<PageChangerRef, SideProps>(
       };
     }, [notifications]);
 
-    // Create state for current page
-    const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
+    // Construct page changer function
     const pageChanger = constructPageChanger(currentPage, setCurrentPage);
 
     // Save pageChanger in ref reachable by components above in the tree
-    useImperativeHandle(ref, () => ({ pageChanger }));
+    useImperativeHandle(ref, () => ({
+      pageChanger,
+      currentPage,
+      notifications,
+    }));
 
     return (
       <div>
@@ -107,9 +126,7 @@ const Side = forwardRef<PageChangerRef, SideProps>(
 
 function constructPageChanger(
   currentPage: CurrentPage,
-  setCurrentPage: (
-    value: ((prevState: CurrentPage) => CurrentPage) | CurrentPage,
-  ) => void,
+  setCurrentPage: (value: CurrentPage) => void,
 ) {
   return (newPage: CurrentPage) => {
     if (
@@ -143,4 +160,4 @@ function getPageChangerDefaultPage() {
 Side.displayName = "Side";
 
 export default Side;
-export type { PageChangerRef };
+export type { ExtractedFunctionsSide };

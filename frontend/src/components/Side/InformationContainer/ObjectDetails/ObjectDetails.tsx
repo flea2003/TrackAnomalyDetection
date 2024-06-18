@@ -22,11 +22,11 @@ interface ObjectDetailsProps {
  * This component is the second column of the main view of the application. It displays the details of a selected object.
  * The object to whose details are to be displayed is passed as a prop.
  *
- * @param ships
- * @param notifications
- * @param mapCenteringFun
- * @param pageChanger
- * @param shipId
+ * @param ships array of all ships
+ * @param notifications a list of all notifications
+ * @param mapCenteringFun function used for map centering on a needed ship
+ * @param pageChanger page changer function
+ * @param shipId id of the ship
  * @constructor
  */
 function ObjectDetails({

@@ -20,7 +20,9 @@ application {
 repositories {
     mavenCentral()
 }
-
+java {
+    sourceCompatibility = '17'
+}
 dependencies {
     implementation 'org.apache.kafka:kafka-clients:3.6.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'

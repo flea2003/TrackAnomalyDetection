@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import sp.controllers.ShipsDataController;
+import sp.dtos.TrajectoryObject;
 import sp.exceptions.DatabaseException;
 import sp.model.AnomalyInformation;
 import sp.exceptions.NotExistingShipException;
@@ -17,6 +18,8 @@ import sp.services.ShipsDataService;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,4 +111,26 @@ class ShipsDataControllerTest {
         assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Test
+    void getSampledShipDetailsError() throws DatabaseException{
+        when(shipsDataService.getSubsampledHistoryOfShip(5L)).thenThrow(new DatabaseException());
+        ResponseEntity<List<TrajectoryObject>>response = shipsDataController.getSampledHistoryOfShip(5L);
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void getSampledShipDetailsFine() throws DatabaseException{
+        List<TrajectoryObject> answer = new ArrayList<>(Arrays
+                .asList(
+                        new TrajectoryObject(1, 12, 14, OffsetDateTime.now(), 12.0F),
+                        new TrajectoryObject(1, 124, 146, OffsetDateTime.now(), 12.0F)
+                ));
+
+        when(shipsDataService.getSubsampledHistoryOfShip(5L)).thenReturn(answer);
+        ResponseEntity<List<TrajectoryObject>>response = shipsDataController.getSampledHistoryOfShip(5L);
+
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(response.getBody(), answer);
+
+    }
 }

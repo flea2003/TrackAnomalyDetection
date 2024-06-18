@@ -3,10 +3,10 @@ import { useState } from "react";
 import LMap from "./components/Map/LMap";
 import ShipDetails from "./model/ShipDetails";
 import generalConfig from "./configs/generalConfig.json";
-import { MapExportedMethodsType } from "./components/Map/LMap";
+import { ExtractedFunctionsMap } from "./components/Map/LMap";
 import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
-import Side, { PageChangerRef } from "./components/Side/Side";
+import Side, { ExtractedFunctionsSide } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
 
@@ -20,21 +20,27 @@ export interface CurrentPage {
 
 function App() {
   // References to the `map` and `pageChanger` objects. Will be assigned later.
-  const mapRef = React.useRef<MapExportedMethodsType>(null);
-  const pageChangerRef = React.useRef<PageChangerRef>(null);
+  const extractedFunctionsMap = React.useRef<ExtractedFunctionsMap>(null);
+  const extractedFunctionsSide = React.useRef<ExtractedFunctionsSide>(null);
 
   // Create a function that passes a ship-centering function call to the map component
   const mapCenteringFun = (details: ShipDetails) => {
-    if (mapRef.current !== null) {
-      mapRef.current.centerMapOntoShip(details);
+    if (extractedFunctionsMap.current !== null) {
+      extractedFunctionsMap.current.centerMapOntoShip(details);
     } else {
-      ErrorNotificationService.addWarning("mapRef is null");
+      ErrorNotificationService.addWarning("extractedFunctionsMap is null");
     }
   };
 
+  // Initialize a state for the current page. Note that it needs to be initialized here, in
+  // App.tsx, as it is needed for both LMap (for synchronized trajectory displaying) and Side functions
+  // Create state for current page
+  const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
+
+  // State for storing all ships retrieved from backend
   const [rawShips, setRawShips] = useState<ShipDetails[]>([]);
 
-  // Use effect to query for the ships every 1000ms
+  // Use effect to query for the ships every 2000ms
   useEffect(() => {
     const intervalId = setInterval(() => {
       ShipService.queryBackendForShipsArray().then(
@@ -67,18 +73,33 @@ function App() {
     <div className="App" id="root-div">
       <LMap
         ships={displayedShips}
-        pageChangerRef={pageChangerRef}
-        ref={mapRef}
+        refObjects={extractedFunctionsSide}
+        currentPage={currentPage}
+        ref={extractedFunctionsMap}
       />
       <Side
         ships={displayedShips}
         mapCenteringFun={mapCenteringFun}
         setFilterThreshold={setFilterThreshold}
         anomalyThreshold={filterThreshold}
-        ref={pageChangerRef}
+        ref={extractedFunctionsSide}
+        extractedFunctionsMap={extractedFunctionsMap}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
       />
     </div>
   );
+}
+
+/**
+ * Function for intrducing the initial page, which is a map without any information
+ * widndow being displayed
+ */
+function getPageChangerDefaultPage() {
+  return {
+    currentPage: "none",
+    shownItemId: -1,
+  } as CurrentPage;
 }
 
 export default App;
