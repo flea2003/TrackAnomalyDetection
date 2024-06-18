@@ -78,8 +78,6 @@ function getInfoTitle(page: string) {
       return "Notification List";
     case "notificationDetails":
       return "Notification Details";
-    case "settings":
-      return "Settings";
     case "errors":
       return "Error List";
     case "none":

@@ -23,16 +23,21 @@ export class NotificationService {
    * that are in the backend before the frontend has started, and marks them as read.
    */
   static initializeReadNotifications = async () => {
+    // Retrieve the value of the cookie that should store the ids of read notification
     const cookieValue = Cookies.get("idsOfReadNotifications");
+
+    // In case cookie does not exist, initialize it by quering the backend
     if (cookieValue === undefined) {
       // Fetch all notifications that are currently in the backend
       const allNotifications =
         await NotificationService.queryBackendForAllNotifications();
       NotificationService.markAllNotificationsAsRead(allNotifications);
 
+      // Parse the list to json, and set the cookie value
       const jsonIds = JSON.stringify(allNotifications.map((x) => x.id));
       Cookies.set("idsOfReadNotifications", jsonIds, { expires: 7 });
     } else {
+      // Otherwiese, set the ids of read notifications to the ones that were stored in cookie
       this.idsOfReadNotifications = JSON.parse(cookieValue);
     }
   };
@@ -108,9 +113,7 @@ export class NotificationService {
       if (this.idsOfReadNotifications.includes(x.id)) {
         x.isRead = true;
         return x;
-      } else {
-        return x;
-      }
+      } else return x;
     });
   }
 
@@ -144,9 +147,7 @@ export class NotificationService {
    * @param notification notification object
    */
   static markANotificationAsRead = (notification: ShipNotification) => {
-    if (notification.isRead) {
-      return;
-    }
+    if (notification.isRead) return;
 
     notification.isRead = true;
     this.idsOfReadNotifications.push(notification.id);
@@ -203,9 +204,8 @@ export class NotificationService {
     }
 
     return NotificationService.sortList(
-      responseWithoutNulls.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (item: any) => NotificationService.extractNotificationDetails(item),
+      responseWithoutNulls.map((item: NotificationResponseItem) =>
+        NotificationService.extractNotificationDetails(item),
       ),
       "desc",
     );
