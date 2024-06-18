@@ -42,7 +42,6 @@
             "type": "json",
             "name": "currentAnomalyInformation"
           },
-          "kafka.key",
           {
             "type": "json",
             "name": "currentAISSignal"
