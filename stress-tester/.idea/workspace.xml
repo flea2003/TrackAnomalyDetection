@@ -7,15 +7,8 @@
     <list default="true" id="9bd95ea6-6dbc-4c96-a67a-fa51559a6e21" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/dtos/TrajectoryObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/dtos/TrajectoryObject.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/services/ShipsDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/services/ShipsDataService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../backend/src/main/resources/db/sampledHistory.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/resources/db/sampledHistory.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/components/Map/LMap.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/Map/LMap.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/components/Side/Side.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/components/Side/Side.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/services/TrajectoryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/services/TrajectoryService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/src/templates/TrajectoryResponseItem.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/templates/TrajectoryResponseItem.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../simulator/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../simulator/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/resources/ship-scores-kafka-supervisor.json" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/resources/ship-scores-kafka-supervisor.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,26 +23,12 @@
   <component name="ExternalProjectsManager">
     <system id="GRADLE">
       <state>
-        <task path="$PROJECT_DIR$">
-          <activation />
-        </task>
         <projects_view>
           <tree_state>
             <expand>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="stress-tester" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="stress-tester" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="stress-tester" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
               </path>
             </expand>
             <select />
@@ -68,8 +47,8 @@
     <option name="version" value="2" />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 8
-}</component>
+    &quot;associatedIndex&quot;: 8
+    }</component>
   <component name="ProjectId" id="2hV8Fek12SXDImWsmp3UtVgMbEx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -78,18 +57,12 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Gradle.stress-tester [:Main.main()].executor": "Run",
-    "Gradle.stress-tester [build].executor": "Run",
-    "Gradle.stress-tester [clean].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-<<<<<<< HEAD
     "git-widget-placeholder": "branchas",
-=======
-    "git-widget-placeholder": "improve__readmes",
->>>>>>> dev
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Legion Slim 7/Desktop/codebase/stress-tester",
+    "last_opened_file_path": "C:/Users/augus/Desktop/codebase/stress-tester",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -98,71 +71,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.Main">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Main" />
-      <module name="stress-tester.main" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="stress-tester [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="build" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="stress-tester [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="clean" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Gradle.stress-tester [build]" />
-        <item itemvalue="Gradle.stress-tester [clean]" />
-        <item itemvalue="Application.Main" />
-      </list>
-    </recent_temporary>
-  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.15989.150" />
-        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-IU-241.15989.150" />
+        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
       </set>
     </attachedChunks>
   </component>
@@ -177,11 +90,7 @@
       <workItem from="1717667783430" duration="13872000" />
       <workItem from="1717749907913" duration="2370000" />
       <workItem from="1718179592561" duration="2595000" />
-<<<<<<< HEAD
-      <workItem from="1718635816474" duration="957000" />
-=======
       <workItem from="1718554712105" duration="52000" />
->>>>>>> dev
     </task>
     <servers />
   </component>

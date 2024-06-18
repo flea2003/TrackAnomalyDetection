@@ -148,16 +148,9 @@ public class ShipsDataService {
         return notificationService
                 .getAllNotificationForShip(id)
                 .stream()
-                .map(x -> new TrajectoryObject(
-                        x.getShipID(),
-                        x.getCurrentShipDetails().getCurrentAISSignal().getLongitude(),
-                        x.getCurrentShipDetails().getCurrentAISSignal().getLatitude(),
-                        x.getCurrentShipDetails().getCurrentAISSignal().getTimestamp(),
-                        x.getCurrentShipDetails().getCurrentAnomalyInformation().getScore()
-                ))
+                .map(TrajectoryObject::new)
                 .toList();
     }
-
 
     /**
      * Helper method to map the contents of subsampled trajectory list to a list DTOs.
@@ -168,13 +161,7 @@ public class ShipsDataService {
     private List<TrajectoryObject> castTrajectoryObjects(List<DatabaseExtractObject> subsampledTrajectory) {
         return subsampledTrajectory
                 .stream()
-                .map(x -> new TrajectoryObject(
-                        x.getAisSignal().getId(),
-                        x.getAisSignal().getLongitude(),
-                        x.getAisSignal().getLatitude(),
-                        x.getAisSignal().getTimestamp(),
-                        x.getAnomalyScore()
-                ))
+                .map(TrajectoryObject::new)
                 .toList();
     }
 }
