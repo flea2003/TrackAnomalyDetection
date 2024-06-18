@@ -25,8 +25,6 @@
 .bell-icon-not-selected-all-read,
 .bell-icon-not-selected-not-all-read,
 .bell-icon-selected,
-.settings-icon-not-selected,
-.settings-icon-selected,
 .bug-icon-not-selected-all-read,
 .bug-icon-not-selected-not-all-read,
 .bug-icon-selected {
@@ -44,10 +42,6 @@
 
 .bell-icon-not-selected-not-all-read:hover{
     content: url("../assets/icons/regular-notifications/notification_bell_oranger.png");
-}
-
-.settings-icon-not-selected:hover{
-    content: url("../assets/icons/selected-sidebar-icons/settings-blue.png");
 }
 
 .bug-icon-not-selected-all-read:hover{

@@ -1,7 +1,6 @@
 interface NotificationResponseItem {
   id: number;
   shipID: number;
-  isRead: boolean;
   currentShipDetails: {
     currentAISSignal: {
       id: number;
