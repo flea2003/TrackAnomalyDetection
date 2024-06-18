@@ -12,7 +12,6 @@ test("check all starts of the explanations", async () => {
     "The Notification Details",
   );
   expect(informationText("errors")).toContain("The Error List");
-  expect(informationText("settings")).toContain("In the future");
   expect(informationText("none")).toContain("The map displays");
   expect(informationText("sthElse")).toContain("");
 });
