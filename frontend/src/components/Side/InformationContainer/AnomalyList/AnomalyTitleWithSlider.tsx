@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from "react";
+import React, { KeyboardEventHandler, MouseEventHandler, useRef } from "react";
 import { useState } from "react";
 import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
 import filterIconBlue from "../../../../assets/icons/selected-sidebar-icons/filter-blue.png";
@@ -33,6 +33,7 @@ const AnomalyTitleWithSlider = ({
   // State to manage the visibility of the extended container
   const [isExtended, setIsExtended] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef(null);
 
   // Function used to alter the state of whether the slider is shown or not
   const toggleExtended = () => {
@@ -46,15 +47,17 @@ const AnomalyTitleWithSlider = ({
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const sanitizedValue = event.target.value.replace(/(\.[0-9]*[1-9])0+$/, '$1');
+    const sanitizedValue = event.target.value.replace(
+      /(\.[0-9]*[1-9])0+$/,
+      "$1",
+    );
     let newValue = parseFloat(sanitizedValue);
-    if(isNaN(newValue)){
+    if (isNaN(newValue) || newValue < 0) {
       newValue = 0;
     }
-
     newValue = Math.min(newValue, 100);
     setFilterThreshold(newValue);
-  }
+  };
 
   return (
     <Stack id="anomaly-list-title-container-with-slider" direction={"column"}>
@@ -94,21 +97,30 @@ const AnomalyTitleWithSlider = ({
           <div className="threshold-div">
             {isEditing ? (
               <Stack direction="row">
-                <input type="number"
-                          value={Number(anomalyThreshold)}
-                          onChange={(e) => handleInputChange(e)}
-                          onBlur={(e) => {
-                            handleInputChange(e)
-                            setIsEditing(!isEditing)
-                          }}
-                          className="number-input"
-                          autoFocus
-              />%
+                <input
+                  type="number"
+                  value={Number(anomalyThreshold).toString()}
+                  onChange={(e) => handleInputChange(e)}
+                  onBlur={(e) => {
+                    handleInputChange(e);
+                    setIsEditing(!isEditing);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                  className="number-input"
+                  autoFocus
+                />
+                %
               </Stack>
             ) : (
-              <div onClick={() => {
-                setIsEditing(!isEditing)
-              }}>
+              <div
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                }}
+              >
                 {anomalyThreshold}%
               </div>
             )}
@@ -118,6 +130,5 @@ const AnomalyTitleWithSlider = ({
     </Stack>
   );
 };
-
 
 export default AnomalyTitleWithSlider;
