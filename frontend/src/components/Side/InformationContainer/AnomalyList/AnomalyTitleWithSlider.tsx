@@ -1,4 +1,4 @@
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import { useState } from "react";
 import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
 import filterIconBlue from "../../../../assets/icons/selected-sidebar-icons/filter-blue.png";
@@ -33,6 +33,7 @@ const AnomalyTitleWithSlider = ({
 }: ObjectDetailsProps) => {
   // State to manage the visibility of the extended container
   const [isExtended, setIsExtended] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Function used to alter the state of whether the slider is shown or not
   const toggleExtended = () => {
@@ -44,6 +45,15 @@ const AnomalyTitleWithSlider = ({
     const value = Number(event.target.value);
     setFilterThreshold(value);
   };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(event.target.value);
+    // if(value >= 0 && value <= 100){
+    //   console.log(anomalyThreshold);
+    //   setFilterThreshold(value);
+    //   console.log(anomalyThreshold);
+    // }
+  }
 
   return (
     <Stack id="anomaly-list-title-container-with-slider" direction={"column"}>
@@ -80,11 +90,28 @@ const AnomalyTitleWithSlider = ({
             value={anomalyThreshold}
             onChange={handleSliderChange}
           />
-          <div className="threshold-div">{anomalyThreshold}%</div>
+          <div className="threshold-div">
+            {isEditing ? (
+              <input type="number"
+                // value={anomalyThreshold.toString()}
+                // onChange={handleInputChange}
+                onBlur={() => {
+                  setIsEditing(!isEditing)
+                }}
+                className="number-input"
+                autoFocus
+              />
+            ) : (
+              <div onClick={() => {setIsEditing(!isEditing)}}>
+                {anomalyThreshold}%
+              </div>
+            )}
+          </div>
         </span>
       )}
     </Stack>
   );
 };
+
 
 export default AnomalyTitleWithSlider;
