@@ -1,4 +1,4 @@
-import React, { KeyboardEventHandler, MouseEventHandler, useRef } from "react";
+import React from "react";
 import { useState } from "react";
 import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
 import filterIconBlue from "../../../../assets/icons/selected-sidebar-icons/filter-blue.png";
@@ -33,7 +33,6 @@ const AnomalyTitleWithSlider = ({
   // State to manage the visibility of the extended container
   const [isExtended, setIsExtended] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef(null);
 
   // Function used to alter the state of whether the slider is shown or not
   const toggleExtended = () => {
