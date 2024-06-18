@@ -380,3 +380,8 @@ test("update-notifications", async () => {
 
   expect(result).toStrictEqual([resultItem1, resultItem2]);
 });
+
+test("get-all-notification-invalid", async () => {
+  const result = await NotificationService.getAllNotificationsForShip(-1);
+  expect(result).toStrictEqual([]);
+});
