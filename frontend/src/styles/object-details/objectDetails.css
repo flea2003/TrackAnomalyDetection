@@ -135,7 +135,7 @@
 .notifications-container {
     padding: 0;
     border: 1px solid black;
-    flex-grow: 1;
+    flex-grow: 0.9;
 }
 .notifications-container #notification-list-internal-container {
     width: 100%;
