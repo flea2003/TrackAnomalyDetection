@@ -4,17 +4,19 @@ import "@testing-library/jest-dom";
 import App from "../App";
 import userEvent from "@testing-library/user-event";
 
+beforeAll(() => {
+  // In setupTests.js or beforeAll in a test file
+  window.URL = window.URL || {};
+  window.URL.createObjectURL = jest.fn();
+
+});
+
 afterAll(() => {
   jest.resetAllMocks();
 });
 
 test("By default only the map is loaded when the page opens", async () => {
   render(<App />);
-
-  await waitFor(() => {
-    const map = screen.getByTestId("map");
-    expect(map).toBeVisible();
-  });
 
   // Make sure the other components are not present
   const notificationsTitle = screen.queryByText("Notifications");

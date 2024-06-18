@@ -29,10 +29,11 @@ function ScorePlot(props: ScorePlotProps) {
   const notificationScoreHistory = shipNotifications.map(
     (notification) => notification.shipDetails.anomalyScore,
   );
+  console.log("NSCORE"+notificationScoreHistory);
   const notificationTimestampHistory = shipNotifications.map(
     (notification) => notification.shipDetails.timestamp,
   );
-
+  console.log("NTIME"+notificationTimestampHistory);
   const shipHistory = props.displayedTrajectoryAndNotifications[0].map(
     (trajectoryPoint) => {
       return {
@@ -44,8 +45,8 @@ function ScorePlot(props: ScorePlotProps) {
 
   const scoreHistory = shipHistory.map((dataPoint) => dataPoint.anomalyScore);
   const timestampHistory = shipHistory.map((dataPoint) => dataPoint.timestamp);
-  console.log(scoreHistory);
-  console.log(timestampHistory);
+  console.log("SCORE"+scoreHistory);
+  console.log("TIME"+timestampHistory);
   // Plot datapoint descriptions
   const anomalyScoreDescriptions = scoreHistory.map((score, index) => {
     return `Score: ${score}<br>Timestamp: ${timestampHistory[index]}`;
@@ -86,11 +87,12 @@ function ScorePlot(props: ScorePlotProps) {
           ...anomalyScorePlotStyle,
           xaxis: {
             title: "Timestamp",
-            tickfont: {"size": 12}
+            tickfont: { size: 6 },
+            showticklabels: false
           },
           yaxis: {
             title: "Anomaly Score (%)",
-            tickfont: {"size": 12}
+            tickfont: { size: 6 },
           },
           shapes: [
             {
