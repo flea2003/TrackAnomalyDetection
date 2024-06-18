@@ -16,6 +16,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "bootstrap": "^5.3.3",
+    "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "plotly.js": "^2.33.0",
@@ -71,6 +72,7 @@
     ]
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/react-leaflet-markercluster": "^3.0.4",
     "@types/react-plotly.js": "^2.6.3",
     "axios": "^1.6.8",

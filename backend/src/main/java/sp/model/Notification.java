@@ -16,12 +16,11 @@ import java.util.Objects;
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
-public class Notification implements Serializable {
+public class Notification implements Serializable, Comparable<Notification> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long shipID;
-    private boolean isRead;
 
     @Column(length = 2048)
     private final CurrentShipDetails currentShipDetails;
@@ -34,11 +33,10 @@ public class Notification implements Serializable {
      */
     public Notification(CurrentShipDetails currentShipDetails) {
         this.currentShipDetails = currentShipDetails;
-        this.isRead = false;
         this.shipID = currentShipDetails.getCurrentAnomalyInformation().getId();
 
         // Assign a unique id to the notification
-        this.id = (long) Objects.hash(currentShipDetails.extractId(), OffsetDateTime.now());
+        this.id = Math.abs((long) Objects.hash(currentShipDetails.extractId(), OffsetDateTime.now()));
     }
 
     /**
@@ -49,5 +47,19 @@ public class Notification implements Serializable {
      */
     public static Serde<Notification> getSerde() {
         return new Jackson2Serde<>(new UtilsObjectMapper(), Notification.class);
+    }
+
+    /**
+     * Comparable method that compares two dates for notifications. If this notification
+     * was computed later than otherNotification, then -1 is returned, if they are equal, 0, and
+     * else 1 is returned.
+     *
+     * @param otherNotification the object to be compared.
+     * @return integer representing which notification was computed earlier
+     */
+    @Override
+    public int compareTo(Notification otherNotification) {
+        return -this.currentShipDetails.getCurrentAISSignal().getTimestamp()
+                .compareTo(otherNotification.currentShipDetails.getCurrentAISSignal().getTimestamp());
     }
 }

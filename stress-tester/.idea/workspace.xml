@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9bd95ea6-6dbc-4c96-a67a-fa51559a6e21" name="Changes" comment="" />
+    <list default="true" id="9bd95ea6-6dbc-4c96-a67a-fa51559a6e21" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/dtos/TrajectoryObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/dtos/TrajectoryObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/java/sp/services/ShipsDataService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/java/sp/services/ShipsDataService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/main/resources/ship-scores-kafka-supervisor.json" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/main/resources/ship-scores-kafka-supervisor.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,8 +47,8 @@
     <option name="version" value="2" />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 8
-}</component>
+    &quot;associatedIndex&quot;: 8
+    }</component>
   <component name="ProjectId" id="2hV8Fek12SXDImWsmp3UtVgMbEx" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -55,7 +60,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "optimize__frontend",
+    "git-widget-placeholder": "branchas",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/augus/Desktop/codebase/stress-tester",
     "node.js.detected.package.eslint": "true",
@@ -85,6 +90,7 @@
       <workItem from="1717667783430" duration="13872000" />
       <workItem from="1717749907913" duration="2370000" />
       <workItem from="1718179592561" duration="2595000" />
+      <workItem from="1718554712105" duration="52000" />
     </task>
     <servers />
   </component>

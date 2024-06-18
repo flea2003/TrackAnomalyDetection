@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Stack from "@mui/material/Stack";
 import ShipDetails from "../../../../model/ShipDetails";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
@@ -6,6 +6,7 @@ import { CurrentPage } from "../../../../App";
 import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import DisplayedInformation from "./DisplayedInformation";
+import { NotificationService } from "../../../../services/NotificationService";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
@@ -14,7 +15,6 @@ import TrajectoryPoint from "../../../../model/TrajectoryPoint";
 interface ObjectDetailsProps {
   ships: ShipDetails[];
   displayedTrajectoryAndNotifications: TrajectoryPoint[][];
-  notifications: ShipNotification[];
   mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
   shipId: number;
@@ -26,7 +26,6 @@ interface ObjectDetailsProps {
  *
  * @param ships array of all ships
  * @param displayedTrajectoryAndNotifications historical data about the ship
- * @param notifications a list of all notifications
  * @param mapCenteringFun function used for map centering on a needed ship
  * @param pageChanger page changer function
  * @param shipId id of the ship
@@ -35,15 +34,20 @@ interface ObjectDetailsProps {
 function ObjectDetails({
   ships,
   displayedTrajectoryAndNotifications,
-  notifications,
   mapCenteringFun,
   pageChanger,
   shipId,
 }: ObjectDetailsProps) {
   // Find the ship with the given ID in the map. If such ship is not (longer) present, show a message.
   const ship = ships.find((ship) => ship.id === shipId);
-  const shipNotifications = notifications.filter(
-    (x) => x.shipDetails.id === shipId,
+
+  const [shipNotifications, setShipNotifications] = useState<
+    ShipNotification[]
+  >([]);
+
+  NotificationService.getAllNotificationsForShip(shipId).then(
+    (newNotifications: ShipNotification[]) =>
+      setShipNotifications(newNotifications),
   );
 
   if (ship === undefined) {

@@ -9,13 +9,6 @@
       "topic": "ships-history",
       "inputFormat": {
         "type": "kafka",
-        "keyFormat": {
-          "type": "regex",
-          "pattern": "([\\s\\S]*)",
-          "columns": [
-            "line"
-          ]
-        },
         "valueFormat": {
           "type": "json"
         }
@@ -29,7 +22,7 @@
       "dataSource": "ship-details",
       "timestampSpec": {
         "column": "kafka.timestamp",
-        "format": "millis"
+        "format": "posix"
       },
       "dimensionsSpec": {
         "dimensions": [
@@ -42,7 +35,6 @@
             "type": "json",
             "name": "currentAnomalyInformation"
           },
-          "kafka.key",
           {
             "type": "json",
             "name": "currentAISSignal"

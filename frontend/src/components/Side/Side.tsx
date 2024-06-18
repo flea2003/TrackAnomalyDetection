@@ -14,6 +14,7 @@ import { NotificationService } from "../../services/NotificationService";
 import { Stack } from "@mui/material";
 import config from "../../configs/generalConfig.json";
 import { ExtractedFunctionsMap } from "../Map/LMap";
+import InformationPopUp from "../Information/InformationPopUp";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
@@ -26,6 +27,8 @@ interface SideProps {
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
   extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
+  currentPage: CurrentPage;
+  setCurrentPage: (value: CurrentPage) => void;
 }
 
 interface ExtractedFunctionsSide {
@@ -51,6 +54,8 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
       setFilterThreshold,
       anomalyThreshold,
       extractedFunctionsMap,
+      currentPage,
+      setCurrentPage,
     },
     ref,
   ) => {
@@ -60,21 +65,20 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
     );
     ErrorNotificationService.initialize(setErrorNotificationState);
 
-    // Set up the state for Notifications about ships
+    // Set up the state for notifications
     const [notifications, setNotifications] = useState<ShipNotification[]>([]);
-
-    // Create state for current page
-    const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
 
     // Update the notifications by querying the server frequently
     useEffect(() => {
       const updateNotificationsFunc = () => {
-        // Query for notifications. When the results arrive, update the state
+        // Query for notifications from backend.
+        // When the results arrive, update the state by setting notifications that
+        // have been read to read
         NotificationService.queryBackendForAllNotifications().then(
           (newNotifications: ShipNotification[]) => {
-            if (newNotifications.length > notifications.length) {
-              setNotifications(newNotifications);
-            }
+            return setNotifications(
+              NotificationService.updateNotifications(newNotifications),
+            );
           },
         );
       };
@@ -90,11 +94,7 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
     }, [notifications]);
 
     // Construct page changer function
-    const pageChanger = constructPageChanger(
-      currentPage,
-      setCurrentPage,
-      extractedFunctionsMap.current?.setCurrentPageMap,
-    );
+    const pageChanger = constructPageChanger(currentPage, setCurrentPage);
 
     // Save pageChanger in ref reachable by components above in the tree
     useImperativeHandle(ref, () => ({
@@ -104,11 +104,12 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
     }));
 
     return (
-      <Stack direction="row" id="side-container">
-        <InformationContainer
-          currentPage={currentPage}
-          ships={ships}
-          displayedTrajectoryAndNotifications={
+      <div>
+        <Stack direction="row" id="side-container">
+          <InformationContainer
+            currentPage={currentPage}
+            ships={ships}
+            displayedTrajectoryAndNotifications={
             displayedTrajectoryAndNotifications
           }
           notifications={notifications}
@@ -117,18 +118,19 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
           setFilterThreshold={setFilterThreshold}
           anomalyThreshold={anomalyThreshold}
         />
-        <Sidebar pageChanger={pageChanger} currentPage={currentPage} />
-      </Stack>
+        <Sidebar pageChanger={pageChanger} currentPage={currentPage}
+            notifications={notifications}
+          />
+        </Stack>
+        <InformationPopUp currentPage={currentPage} />
+      </div>
     );
   },
 );
 
 function constructPageChanger(
   currentPage: CurrentPage,
-  setCurrentPage: (
-    value: ((prevState: CurrentPage) => CurrentPage) | CurrentPage,
-  ) => void,
-  setCurrentPageMap: ((page: CurrentPage) => void) | undefined,
+  setCurrentPage: (value: CurrentPage) => void,
 ) {
   return (newPage: CurrentPage) => {
     if (
@@ -138,16 +140,9 @@ function constructPageChanger(
     ) {
       // If we clicked the same icon for the second time
       setCurrentPage(getPageChangerDefaultPage());
-
-      // Set the needed page to the
-      if (setCurrentPageMap !== undefined)
-        setCurrentPageMap(getPageChangerDefaultPage());
     } else {
       // Else, just set what was clicked
       setCurrentPage(newPage);
-
-      // Set the needed page to the
-      if (setCurrentPageMap !== undefined) setCurrentPageMap(newPage);
     }
   };
 }

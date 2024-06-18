@@ -9,7 +9,6 @@ import NotificationList from "./NotificationsList/NotificationList";
 import ShipNotification from "../../../model/ShipNotification";
 import TrajectoryPoint from "../../../model/TrajectoryPoint";
 import NotificationDetails from "./NotificationsList/NotificationDetails";
-import "../../../styles/settings.css";
 
 interface ObjectProps {
   currentPage: CurrentPage;

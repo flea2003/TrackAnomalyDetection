@@ -19,11 +19,9 @@ test("By default only the map is loaded when the page opens", async () => {
 
   // Make sure the other components are not present
   const notificationsTitle = screen.queryByText("Notifications");
-  const settingsTitle = screen.queryByText("Settings");
   const anomalyListTitle = screen.queryByText("Anomaly list");
 
   expect(notificationsTitle).toBeNull();
-  expect(settingsTitle).toBeNull();
   expect(anomalyListTitle).toBeNull();
 });
 
@@ -33,17 +31,15 @@ test("The map is present when the component loads", () => {
   expect(map).toBeVisible();
 });
 
-test("3 icons are present in the sidebar", () => {
+test("at least 2 icons are present in the sidebar", () => {
   render(<App />);
   const sidebar = screen.getByTestId("sidebar");
 
   const shipIcon = screen.getByTestId("sidebar-ship-icon");
   const bellIcon = screen.getByTestId("sidebar-bell-icon");
-  const settingsIcon = screen.getByTestId("sidebar-settings-icon");
 
   expect(sidebar).toContainElement(shipIcon);
   expect(sidebar).toContainElement(bellIcon);
-  expect(sidebar).toContainElement(settingsIcon);
 });
 
 test("When notifications icon is clicked, notifications appear", async () => {
@@ -56,28 +52,11 @@ test("When notifications icon is clicked, notifications appear", async () => {
   });
 });
 
-test("When settings icon is clicked, settings appear", async () => {
+test("When notifications is clicked, only latter is present", async () => {
   render(<App />);
-  const settingsIcon = screen.getByTestId("sidebar-settings-icon");
-  await userEvent.click(settingsIcon);
-  await waitFor(() => {
-    const settingsTitle = screen.getByText("Settings");
-    expect(settingsTitle).toBeVisible();
-  });
-});
-
-test("When settings is clicked and then notifications is clicked, only latter is present", async () => {
-  render(<App />);
-  const settingsIcon = screen.getByTestId("sidebar-settings-icon");
   const notificationsIcon = screen.getByTestId("sidebar-bell-icon");
 
-  await userEvent.click(settingsIcon);
   await userEvent.click(notificationsIcon);
-
-  await waitFor(() => {
-    const settingsTitle = screen.queryByText("Settings");
-    expect(settingsTitle).toBeNull();
-  });
 
   await waitFor(() => {
     const notificationsTitle = screen.queryByText("Notifications");
@@ -85,18 +64,13 @@ test("When settings is clicked and then notifications is clicked, only latter is
   });
 });
 
-test("When settings is clicked and then ships icon is clicked, only latter is present", async () => {
+test("When ships icon is clicked, only latter is present", async () => {
   render(<App />);
-  const settingsIcon = screen.getByTestId("sidebar-settings-icon");
-  await userEvent.click(settingsIcon);
 
   const shipsIcon = screen.getByTestId("sidebar-ship-icon");
   await userEvent.click(shipsIcon);
-
-  const settingsTitle = screen.queryByText("Settings");
   const anomalyListElement = screen.getByTestId("anomaly-list-container");
 
-  expect(settingsTitle).toBeNull();
   expect(anomalyListElement).toBeVisible();
 });
 

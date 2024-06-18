@@ -5,12 +5,12 @@
     --border: 1px solid black;
     --title-size: 1em;
     /* --background: #dad5cffe; */
-    --background: rgba(255, 255, 255, 0.812) ;
+    --background: rgba(255, 255, 255, 0.812);
     --background-on-hover: #FFFFFF;
     --background-blue: #AAD3DFFF;
     --title-padding: 7px 8px;
     --close-icon-length: 20px;
-    --check-icon-length: 25px;
+    --check-icon-length: 23px;
 
     *::-webkit-scrollbar{
         display: none;

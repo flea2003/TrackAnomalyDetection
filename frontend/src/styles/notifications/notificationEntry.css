@@ -3,26 +3,31 @@
 
     font-weight: bold;
     border-bottom: 1px solid black;
+    border-top: none;
 
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 
     cursor: pointer;
     background: var(--background);
 
     overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 .notification-list-entry-read {
     font-weight: normal;
 }
 
+.notification-list-entry-not-read, .notification-list-entry-not-read:hover {
+    background: #90A4B04D;
+}
+
 .notification-list-entry-read:hover, .notification-list-entry-not-read:hover {
     transform: scale(1.01);
-    /* I have commented out next line since it creates issues with scroll bars. To be solved later */
-    /* transform: scale(1.01); */
 }
 
 .notification-list-ship-entry-icon-id-container {

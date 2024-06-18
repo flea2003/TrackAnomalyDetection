@@ -21,10 +21,9 @@ class HttpSender {
       }
       return await response.json();
     } catch (error) {
-      if (error instanceof Error)
-        ErrorNotificationService.addError(
-          "Error while fetching " + endpoint + ": " + error.message,
-        );
+      ErrorNotificationService.addError(
+        "Error while fetching " + endpoint + ": " + (error as Error).message,
+      );
 
       return null;
     }
@@ -43,10 +42,9 @@ class HttpSender {
         ErrorNotificationService.addWarning("Error while fetching " + endpoint);
       }
     } catch (error) {
-      if (error instanceof Error)
-        ErrorNotificationService.addError(
-          "Error while fetching " + endpoint + ": " + error.message,
-        );
+      ErrorNotificationService.addError(
+        "Error while fetching " + endpoint + ": " + (error as Error).message,
+      );
     }
   }
 }
