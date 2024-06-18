@@ -19,7 +19,7 @@ Defence.
 - **Members**: Augustinas Jučas, Victor Purice, Justinas Jučas, Marius Frija, Aldas Lenkšas
 - **Client**: Dutch Ministry of Defence
 - **Client representative**: Sebastiaan Alvarez Rodriguez
-- **Teaching Assistant**: Nathalie van der Werken
+- **Teaching Assistant**: Nathalie van de Werken
 - **Coach**: Kubilay Atasu
 
 ## Project Components

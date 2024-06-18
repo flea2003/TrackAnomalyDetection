@@ -252,7 +252,6 @@ public class TestShipsDataService {
         List<DatabaseExtractObject> queryResult = new ArrayList<>();
 
         queryResult.add(new DatabaseExtractObject(signal7, 2F));
-        DatabaseExtractObject object2 = new DatabaseExtractObject(signal7, 1F);
         for (int i = 0; i < 2000; i++) {
             DatabaseExtractObject object1 = new DatabaseExtractObject(signal3, 1F);
             queryResult.add(object1);
@@ -279,6 +278,33 @@ public class TestShipsDataService {
         }
 
         assertThat(shipsDataService.getSubsampledHistoryOfShip(1L).size()).isEqualTo(1003);
+        assertThat(shipsDataService.getSubsampledHistoryOfShip(1L)).isEqualTo(finalResult);
+    }
+
+    @Test
+    void getSimpleTrajectoryThresholdTest() throws DatabaseException {
+        AnomalyDetectionPipeline anomalyDetectionPipeline = mock(AnomalyDetectionPipeline.class);
+        QueryExecutor queryExecutor = mock(QueryExecutor.class);
+        ShipsDataService shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor, shipInformationExtractor, notificationService);
+
+        List<DatabaseExtractObject> queryResult = new ArrayList<>();
+
+        for (int i = 0; i < 1000; i++) {
+            DatabaseExtractObject object1 = new DatabaseExtractObject(signal3, 1F);
+            queryResult.add(object1);
+        }
+
+        when(queryExecutor.executeQueryOneLong(1, "src/main/resources/db/sampledHistory.sql", DatabaseExtractObject.class)).thenReturn(queryResult);
+        when(notificationService.getAllNotificationForShip(1L)).thenReturn(new ArrayList<>());
+
+        List<TrajectoryObject> finalResult = new ArrayList<>();
+
+        for (int i = 0; i < 1000; i++) {
+            TrajectoryObject object1 = new TrajectoryObject(1L, 11F, 20F, signal3.getTimestamp(), 1F);
+            finalResult.add(object1);
+        }
+
+        assertThat(shipsDataService.getSubsampledHistoryOfShip(1L).size()).isEqualTo(1000);
         assertThat(shipsDataService.getSubsampledHistoryOfShip(1L)).isEqualTo(finalResult);
     }
 }
