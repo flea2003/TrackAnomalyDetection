@@ -15,14 +15,13 @@ import {
 } from "./ShipMarkerCluster";
 import L from "leaflet";
 import "leaflet.markercluster";
+import mapConfig from "../../configs/mapConfig.json";
 
 import "../../styles/map.css";
 import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
-
-import mapConfig from "../../configs/mapConfig.json";
 
 interface MapProps {
   ships: ShipDetails[];
@@ -89,7 +88,9 @@ const LMap = forwardRef<MapExportedMethodsType, MapProps>(
 
       // Update centering on the tracked ship
       const ship = trackedShip.ship;
-      const shipInList = ships.find((s) => ship !== null && s.id === ship.id);
+      const shipInList = ships.find(
+        (s) => ship !== null && ship !== undefined && s.id === ship.id,
+      );
       if (
         shipInList !== undefined &&
         differentShipPositions(ship, shipInList)
@@ -178,9 +179,15 @@ function mapFlyToShip(
   const map = mapRef.current;
   const ship = trackedShip.ship;
 
-  if (map === null || ship === null) {
+  if (
+    map === null ||
+    ship === null ||
+    ship === undefined ||
+    ship.lat === undefined ||
+    ship.lng === undefined
+  ) {
     ErrorNotificationService.addWarning(
-      "Cannot center the map on the ship: map or ship is null",
+      "Cannot center the map on the ship: map, ship or its position is null",
     );
     return;
   }

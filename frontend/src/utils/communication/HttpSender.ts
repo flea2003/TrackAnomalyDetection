@@ -9,7 +9,7 @@ class HttpSender {
   /**
    * Send an asynchronous GET request to the backend server
    * mentioning the desired endpoint
-   * @param endpoint - endpoint accessed
+   * @param endpoint endpoint accessed
    */
   // eslint-disable-next-line
   static async get(endpoint: string): Promise<any> {
@@ -20,10 +20,9 @@ class HttpSender {
       }
       return await response.json();
     } catch (error) {
-      if (error instanceof Error)
-        ErrorNotificationService.addError(
-          "Error while fetching " + endpoint + ": " + error.message,
-        );
+      ErrorNotificationService.addError(
+        "Error while fetching " + endpoint + ": " + (error as Error).message,
+      );
 
       return null;
     }
@@ -42,10 +41,9 @@ class HttpSender {
         ErrorNotificationService.addWarning("Error while fetching " + endpoint);
       }
     } catch (error) {
-      if (error instanceof Error)
-        ErrorNotificationService.addError(
-          "Error while fetching " + endpoint + ": " + error.message,
-        );
+      ErrorNotificationService.addError(
+        "Error while fetching " + endpoint + ": " + (error as Error).message,
+      );
     }
   }
 }

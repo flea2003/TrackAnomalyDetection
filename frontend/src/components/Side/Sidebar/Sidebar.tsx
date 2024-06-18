@@ -5,15 +5,12 @@ import ErrorNotificationService from "../../../services/ErrorNotificationService
 import shipIcon from "../../../assets/icons/anomaly-list/ship.png";
 import bellIconNotRead from "../../../assets/icons/regular-notifications/notification_bell_orange.png";
 import bellIconRead from "../../../assets/icons/regular-notifications/notification_bell.svg";
-import settingsIcon from "../../../assets/icons/helper-icons/settings.svg";
 import bugIcon from "../../../assets/icons/error-notifications/bug.svg";
 import bugIconRed from "../../../assets/icons/error-notifications/bug-red.png";
-
 import shipIconSelected from "../../../assets/icons/selected-sidebar-icons/ship-blue.png";
 import notificationIconSelected from "../../../assets/icons/selected-sidebar-icons/notification-bell-blue.png";
-import settingsIconSelected from "../../../assets/icons/selected-sidebar-icons/settings-blue.png";
 import bugIconSelected from "../../../assets/icons/selected-sidebar-icons/bug_blue.png";
-
+import ShipNotification from "../../../model/ShipNotification";
 import { NotificationService } from "../../../services/NotificationService";
 
 import "../../../styles/common.css";
@@ -22,6 +19,7 @@ import "../../../styles/sidebar.css";
 interface SidebarProps {
   pageChanger: (currentPage: CurrentPage) => void;
   currentPage: CurrentPage;
+  notifications: ShipNotification[];
 }
 
 /**
@@ -30,45 +28,34 @@ interface SidebarProps {
  *
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  * @param currentPage current page that is being displayed
+ * @param notifications all notifications stored in frontend
  */
-function Sidebar({ pageChanger, currentPage }: SidebarProps) {
+function Sidebar({ pageChanger, currentPage, notifications }: SidebarProps) {
   // Load the icons
 
   const shipIconAlt = "Ship Icon";
   const bellIconAlt = "Bell Icon";
-  const settingsIconAlt = "Settings Icon";
   const bugIconAlt = "Bug Icon";
 
   const [displayedAnomalyList, setDisplayedAnomalyList] = useState(false);
   const [displayedNotifications, setDisplayedNotifications] = useState(false);
-  const [displayedSettings, setDisplayedSettings] = useState(false);
   const [displayedBugs, setDisplayedBugs] = useState(false);
 
   const changeAnomalyListIcon = () => {
     setDisplayedAnomalyList((x) => !x);
     setDisplayedNotifications(false);
-    setDisplayedSettings(false);
     setDisplayedBugs(false);
   };
 
   const changeNotificationsIcon = () => {
     setDisplayedAnomalyList(false);
     setDisplayedNotifications((x) => !x);
-    setDisplayedSettings(false);
-    setDisplayedBugs(false);
-  };
-
-  const changeSettingsIcon = () => {
-    setDisplayedAnomalyList(false);
-    setDisplayedNotifications(false);
-    setDisplayedSettings((x) => !x);
     setDisplayedBugs(false);
   };
 
   const changeBugsIcon = () => {
     setDisplayedAnomalyList(false);
     setDisplayedNotifications(false);
-    setDisplayedSettings(false);
     setDisplayedBugs((x) => !x);
   };
   // Define the click handlers for the icons
@@ -82,26 +69,15 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
     changeNotificationsIcon();
   };
 
-  const onSettingsIconClicked = () => {
-    pageChanger({ currentPage: "settings", shownItemId: -1 });
-    changeSettingsIcon();
-  };
-
   const onBugIconClicked = () => {
     pageChanger({ currentPage: "errors", shownItemId: -1 });
     changeBugsIcon();
   };
 
   if (currentPage.currentPage === "none") {
-    if (
-      displayedBugs ||
-      displayedSettings ||
-      displayedNotifications ||
-      displayedAnomalyList
-    ) {
+    if (displayedBugs || displayedNotifications || displayedAnomalyList) {
       setDisplayedAnomalyList(false);
       setDisplayedNotifications(false);
-      setDisplayedSettings(false);
       setDisplayedBugs(false);
     }
   }
@@ -135,36 +111,20 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
       >
         {!displayedNotifications && (
           <img
-            src={getNotificationsBellType().toString()}
-            className="bell-icon-not-selected"
+            src={getNotificationsBell(notifications).toString()}
+            className={getNotificationsClass(notifications)}
             alt={bellIconAlt}
           />
         )}
         {displayedNotifications && (
           <img
-            src={notificationIconSelected}
+            src={
+              NotificationService.areAllRead(notifications)
+                ? notificationIconSelected
+                : bellIconNotRead
+            }
             className="bell-icon-selected"
             alt={bellIconAlt}
-          />
-        )}
-      </span>
-      <span
-        data-testid="sidebar-settings-icon"
-        className="sidebar-entry"
-        onClick={onSettingsIconClicked}
-      >
-        {!displayedSettings && (
-          <img
-            src={settingsIcon}
-            className="settings-icon-not-selected"
-            alt={settingsIconAlt}
-          />
-        )}
-        {displayedSettings && (
-          <img
-            src={settingsIconSelected}
-            className="settings-icon-selected"
-            alt={settingsIconAlt}
           />
         )}
       </span>
@@ -175,14 +135,18 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
       >
         {!displayedBugs && (
           <img
-            src={getBugIcon()}
-            className="bug-icon-not-selected"
+            src={getBugIconNotSelected()}
+            className={getErrorNotificationsClass()}
             alt={bugIconAlt}
           />
         )}
         {displayedBugs && (
           <img
-            src={bugIconSelected}
+            src={
+              ErrorNotificationService.areAllRead()
+                ? bugIconSelected
+                : bugIconRed
+            }
             className="bug-icon-selected"
             alt={bugIconAlt}
           />
@@ -192,7 +156,7 @@ function Sidebar({ pageChanger, currentPage }: SidebarProps) {
   );
 }
 
-function getBugIcon() {
+function getBugIconNotSelected() {
   if (ErrorNotificationService.areAllRead()) {
     return bugIcon;
   }
@@ -200,14 +164,42 @@ function getBugIcon() {
 }
 
 /**
- * Changes the style of the notification bell background based on whether
+ * Changes the icon of the notification bell based on whether
  * there are any unread notifications
+ *
+ * @param notifications all notifications stored in frontend
  */
-function getNotificationsBellType() {
-  if (NotificationService.areAllRead()) {
+function getNotificationsBell(notifications: ShipNotification[]) {
+  if (NotificationService.areAllRead(notifications)) {
     return bellIconRead;
   }
   return bellIconNotRead;
+}
+
+/**
+ * Changes the style of the notification bell when notifications window is not displayed,
+ * based on whether all notifications are read or not (the hovering should differ
+ * for these scenarios)
+ *
+ * @param notifications all notifications stored in frontend
+ */
+function getNotificationsClass(notifications: ShipNotification[]) {
+  if (NotificationService.areAllRead(notifications)) {
+    return "bell-icon-not-selected-all-read";
+  }
+  return "bell-icon-not-selected-not-all-read";
+}
+
+/**
+ * Changes the style of the bug notifications icon when notifications window is not displayed,
+ * based on whether all error notifications are read or not (the hovering should differ
+ * for these scenarios)
+ */
+function getErrorNotificationsClass() {
+  if (ErrorNotificationService.areAllRead()) {
+    return "bug-icon-not-selected-all-read";
+  }
+  return "bug-icon-not-selected-not-all-read";
 }
 
 export default Sidebar;
