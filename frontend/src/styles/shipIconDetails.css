@@ -1,5 +1,5 @@
 .shipIconDetails {
-    background-color: #bbbbbb;
+    background-color: var(--background);
     opacity: 70%;
     border-radius: 5%;
     border: 1px solid #000;
@@ -7,6 +7,9 @@
     flex-direction: column;
     position: absolute;
     padding: 5px;
+
+    color: black;
+    font-weight: 500;
 
     top: var(--top);
     left: var(--left);
