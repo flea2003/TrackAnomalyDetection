@@ -47,12 +47,14 @@ const AnomalyTitleWithSlider = ({
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(event.target.value);
-    // if(value >= 0 && value <= 100){
-    //   console.log(anomalyThreshold);
-    //   setFilterThreshold(value);
-    //   console.log(anomalyThreshold);
-    // }
+    const sanitizedValue = event.target.value.replace(/(\.[0-9]*[1-9])0+$/, '$1');
+    let newValue = parseFloat(sanitizedValue);
+    if(isNaN(newValue)){
+      newValue = 0;
+    }
+
+    newValue = Math.min(newValue, 100);
+    setFilterThreshold(newValue);
   }
 
   return (
@@ -93,15 +95,16 @@ const AnomalyTitleWithSlider = ({
           <div className="threshold-div">
             {isEditing ? (
               <input type="number"
-                // value={anomalyThreshold.toString()}
-                // onChange={handleInputChange}
-                onBlur={() => {
-                  setIsEditing(!isEditing)
-                }}
-                className="number-input"
-                autoFocus
+               value={Number(anomalyThreshold).toString()}
+               onChange = {(e) => handleInputChange(e)}
+               onBlur={(e) => {
+                 handleInputChange(e)
+                 setIsEditing(!isEditing)
+               }}
+               className="number-input"
+               autoFocus
               />
-            ) : (
+              ) : (
               <div onClick={() => {setIsEditing(!isEditing)}}>
                 {anomalyThreshold}%
               </div>
