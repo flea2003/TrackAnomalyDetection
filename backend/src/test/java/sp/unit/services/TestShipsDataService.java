@@ -261,8 +261,8 @@ public class TestShipsDataService {
 
         List<Notification> notificationServiceResult = new ArrayList<>(
             Arrays.asList(
-                    new Notification(12L, 1L, false, new CurrentShipDetails(new AnomalyInformation(2F, "", null, 1L), signal7, null)),
-                    new Notification(12L, 1L, false, new CurrentShipDetails(new AnomalyInformation(4F, "", null, 1L), signal8, null)))
+                    new Notification(12L, 1L, new CurrentShipDetails(new AnomalyInformation(2F, "", null, 1L), signal7, null)),
+                    new Notification(12L, 1L, new CurrentShipDetails(new AnomalyInformation(4F, "", null, 1L), signal8, null)))
         );
 
         when(notificationService.getAllNotificationForShip(1L)).thenReturn(notificationServiceResult);
