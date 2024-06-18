@@ -26,12 +26,13 @@ import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
+import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 interface MapProps {
   ships: ShipDetails[];
-  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
   setDisplayedTrajectory: React.Dispatch<
-    React.SetStateAction<TrajectoryPoint[][]>
+    React.SetStateAction<TrajectoryAndNotificationPair>
   >;
   refObjects: React.RefObject<ExtractedFunctionsSide>;
   currentPage: CurrentPage;
@@ -45,19 +46,6 @@ interface ExtractedFunctionsMap {
 interface TrackedShipType {
   ship: ShipDetails | null;
   zoomLevel: number;
-}
-
-/**
- * A class that stores a pair of a trajectory object and a notification
- */
-class TrajectoryAndNotificationPair {
-  trajectory: TrajectoryPoint[];
-  notification: LatLng | undefined;
-
-  constructor(trajectory: TrajectoryPoint[], notification: LatLng | undefined) {
-    this.trajectory = trajectory;
-    this.notification = notification;
-  }
 }
 
 /**

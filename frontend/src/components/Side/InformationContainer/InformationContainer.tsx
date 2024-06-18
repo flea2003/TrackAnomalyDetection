@@ -7,13 +7,13 @@ import ErrorList from "./ErrorNotificationsList/ErrorList";
 import ErrorNotificationService from "../../../services/ErrorNotificationService";
 import NotificationList from "./NotificationsList/NotificationList";
 import ShipNotification from "../../../model/ShipNotification";
-import TrajectoryPoint from "../../../model/TrajectoryPoint";
 import NotificationDetails from "./NotificationsList/NotificationDetails";
+import TrajectoryAndNotificationPair from "../../../model/TrajectoryAndNotificationPair";
 
 interface ObjectProps {
   currentPage: CurrentPage;
   ships: ShipDetails[];
-  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
   notifications: ShipNotification[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
@@ -62,7 +62,6 @@ function InformationContainer({
           displayedTrajectoryAndNotifications={
             displayedTrajectoryAndNotifications
           }
-          notifications={notifications}
           mapCenteringFun={mapCenteringFun}
           shipId={currentPage.shownItemId}
           pageChanger={pageChanger}

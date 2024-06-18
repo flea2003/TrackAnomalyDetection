@@ -9,7 +9,7 @@ import "./styles/common.css";
 import Side, { ExtractedFunctionsSide } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
 import "./styles/common.css";
-import TrajectoryPoint from "./model/TrajectoryPoint";
+import TrajectoryAndNotificationPair from "./model/TrajectoryAndNotificationPair";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -72,7 +72,7 @@ function App() {
   // 1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
   // 2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
   const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
-    useState<TrajectoryPoint[][]>([]);
+    useState<TrajectoryAndNotificationPair>(new TrajectoryAndNotificationPair([], undefined));
 
   // Return the main view of the application
   return (

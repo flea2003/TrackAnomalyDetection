@@ -10,11 +10,11 @@ import { NotificationService } from "../../../../services/NotificationService";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
-import TrajectoryPoint from "../../../../model/TrajectoryPoint";
+import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
-  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
   mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
   shipId: number;

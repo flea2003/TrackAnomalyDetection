@@ -19,10 +19,11 @@ import InformationPopUp from "../Information/InformationPopUp";
 import "../../styles/common.css";
 import "../../styles/side.css";
 import TrajectoryPoint from "../../model/TrajectoryPoint";
+import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 interface SideProps {
   ships: ShipDetails[];
-  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;

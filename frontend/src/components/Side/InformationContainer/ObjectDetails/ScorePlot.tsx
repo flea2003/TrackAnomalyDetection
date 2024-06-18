@@ -2,15 +2,15 @@ import ShipDetails from "../../../../model/ShipDetails";
 import plottingConfig from "../../../../configs/plottingConfig.json";
 import Plot from "react-plotly.js";
 import anomalyScorePlotStyle from "../../../../configs/anomalyScorePlotStyle.json";
-import TrajectoryPoint from "../../../../model/TrajectoryPoint";
 import ShipNotification from "../../../../model/ShipNotification";
 import React from "react";
 import PlotDataPointItem from "../../../../templates/PlotDataPointItem";
 import "../../../../styles/object-details/scorePlot.css";
+import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
 
 interface ScorePlotProps {
   ship: ShipDetails;
-  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
   notifications: ShipNotification[];
 }
 
@@ -173,8 +173,8 @@ function ScorePlot(props: ScorePlotProps) {
   );
 }
 
-const preprocessHistory = (trajectoryData: TrajectoryPoint[][]) => {
-  const parsedFilteredData = trajectoryData[0]
+const preprocessHistory = (trajectoryData: TrajectoryAndNotificationPair) => {
+  const parsedFilteredData = trajectoryData.trajectory
     .map((trajectoryPoint) => {
       return {
         anomalyScore: trajectoryPoint.anomalyScore,
@@ -200,33 +200,6 @@ const preprocessHistory = (trajectoryData: TrajectoryPoint[][]) => {
   });
 };
 
-function arePropsEqual(prevProps: ScorePlotProps, nextProps: ScorePlotProps) {
-  const sameShip = prevProps.ship.id === nextProps.ship.id;
 
-  const sameTrajectoryInfo =
-    prevProps.displayedTrajectoryAndNotifications ===
-      nextProps.displayedTrajectoryAndNotifications ||
-    (prevProps.displayedTrajectoryAndNotifications.length ===
-      nextProps.displayedTrajectoryAndNotifications.length &&
-      prevProps.displayedTrajectoryAndNotifications.every(
-        (item, index) =>
-          item.length ===
-            nextProps.displayedTrajectoryAndNotifications[index].length &&
-          item.every(
-            (point, ptIndex) =>
-              point ===
-              nextProps.displayedTrajectoryAndNotifications[index][ptIndex],
-          ),
-      ));
 
-  const sameNotifications =
-    prevProps.notifications === nextProps.notifications ||
-    (prevProps.notifications.length === nextProps.notifications.length &&
-      prevProps.notifications.every(
-        (item, index) => item.id === nextProps.notifications[index].id,
-      ));
-
-  return sameShip && sameTrajectoryInfo && sameNotifications;
-}
-
-export default React.memo(ScorePlot, arePropsEqual);
+export default ScorePlot;

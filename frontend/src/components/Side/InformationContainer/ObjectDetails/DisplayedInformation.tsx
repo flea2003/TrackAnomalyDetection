@@ -11,11 +11,11 @@ import { CurrentPage } from "../../../../App";
 
 import "../../../../styles/object-details/objectDetails.css";
 import ScorePlot from "./ScorePlot";
-import TrajectoryPoint from "../../../../model/TrajectoryPoint";
+import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
-  displayedTrajectoryAndNotifications: TrajectoryPoint[][];
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
   notifications: ShipNotification[];
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
