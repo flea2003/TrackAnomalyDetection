@@ -1,18 +1,18 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
 import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.getDistanceTravelled;
-import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInHours;
 
 import sp.model.AISSignal;
 import java.text.DecimalFormat;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
 
-    // Speed threshold measured in knots
+    // Speed threshold measured in knots (nmi/h)
     private static final double SPEED_THRESHOLD = 55.5;
-    // Acceleration threshold measured in knots/min
-    private static final double ACCELERATION_THRESHOLD = 50;
-    // Speed accuracy margin measured in knots
+    // Acceleration threshold measured in knots/h (nmi/h^2)
+    private static final double ACCELERATION_THRESHOLD = 0.83;
+    // Speed accuracy margin measured in knots (nmi/h)
     private static final double REPORTED_SPEED_ACCURACY_MARGIN = 10;
 
     /**
@@ -68,19 +68,19 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
     }
 
     /**
-     * Compute speed based on the data of this and the past signals.
+     * Compute speed (nmi/h) based on the data of this and the past signals.
      *
      * @param currentSignal the current AIS signal
      * @param pastSignal the past AIS signal
      * @return the computed speed
      */
     private double computeSpeed(AISSignal currentSignal, AISSignal pastSignal) {
-        double time = (double) timeDiffInMinutes(currentSignal, pastSignal);
+        double time = timeDiffInHours(currentSignal, pastSignal);
         return getDistanceTravelled(currentSignal, pastSignal) / (time + 0.00001);
     }
 
     /**
-     * Calculate the difference between the reported speed in the distance and the calculated
+     * Calculate the difference (nmi/h) between the reported speed in the distance and the calculated
      * distance based on the two signals (the current one and the past one).
      *
      * @param currentSignal the current AIS signal
@@ -92,7 +92,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
     }
 
     /**
-     * Compute the acceleration based on the current and the past signals.
+     * Compute the acceleration (nmi/h^2) based on the current and the past signals.
      *
      * @param currentSignal the current AIS signal
      * @param pastSignal the past AIS signal
@@ -100,7 +100,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     private double computedAcceleration(AISSignal currentSignal, AISSignal pastSignal) {
         double speedDiff = currentSignal.getSpeed() - pastSignal.getSpeed();
-        return speedDiff / (timeDiffInMinutes(currentSignal, pastSignal) + 0.00001);
+        return speedDiff / (timeDiffInHours(currentSignal, pastSignal) + 0.00001);
     }
 
     /**
