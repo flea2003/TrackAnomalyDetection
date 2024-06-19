@@ -37,7 +37,7 @@ function AISDetails({ ship }: ObjectDetailsProps) {
         </div>
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Speed</div>
-          <div className="ais-details-info">{ship.speed} km/min</div>
+          <div className="ais-details-info">{ship.speed} knots</div>
         </div>
       </Stack>
       <Stack direction="column" className="ais-details-column">
