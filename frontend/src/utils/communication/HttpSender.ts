@@ -1,10 +1,11 @@
 import ErrorNotificationService from "../../services/ErrorNotificationService";
+import connectionSettings from "../../configs/connectionSettings.json";
 
 /**
  * Utility class that handles request sending to the backend
  */
 class HttpSender {
-  static url = "http://localhost:8180";
+  static url = connectionSettings.backendURL;
 
   /**
    * Send an asynchronous GET request to the backend server

@@ -8,6 +8,7 @@ import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
 import Side, { ExtractedFunctionsSide } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
+
 import "./styles/common.css";
 
 /**
@@ -32,13 +33,22 @@ function App() {
     }
   };
 
-  // Initialize a state for the current page. Note that it needs to be initialized here, in
-  // App.tsx, as it is needed for both LMap (for synchronized trajectory displaying) and Side functions
-  // Create state for current page
+  /**
+   * Initialize a state for the current page. Note that it needs to be initialized here, in
+   * App.tsx, as it is needed for both LMap (for synchronized trajectory displaying) and Side functions
+   * Create state for current page
+   */
   const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
 
-  // State for storing all ships retrieved from backend
+  /**
+   *  State for storing all ships retrieved from backend
+   */
   const [rawShips, setRawShips] = useState<ShipDetails[]>([]);
+
+  /**
+   * Put filter threshold as a state
+   */
+  const [filterThreshold, setFilterThreshold] = useState<number>(0);
 
   // Use effect to query for the ships every 2000ms
   useEffect(() => {
@@ -57,11 +67,7 @@ function App() {
     };
   }, []);
 
-  // Configure the state and the WebSocket connection with the backend server
   const sortedShips = ShipService.sortList(rawShips, "desc");
-
-  // Put filter threshold as a state
-  const [filterThreshold, setFilterThreshold] = useState<number>(0);
 
   // Create a separate array for displayed ships
   const displayedShips = sortedShips.filter(
@@ -73,6 +79,10 @@ function App() {
     <div className="App" id="root-div">
       <LMap
         ships={displayedShips}
+        // displayedTrajectoryAndNotifications={
+        //   displayedTrajectoryAndNotifications
+        // }
+        // setDisplayedTrajectory={setDisplayedTrajectory}
         refObjects={extractedFunctionsSide}
         currentPage={currentPage}
         ref={extractedFunctionsMap}
@@ -92,8 +102,8 @@ function App() {
 }
 
 /**
- * Function for intrducing the initial page, which is a map without any information
- * widndow being displayed
+ * Function for introducing the initial page, which is a map without any information
+ * window being displayed
  */
 function getPageChangerDefaultPage() {
   return {

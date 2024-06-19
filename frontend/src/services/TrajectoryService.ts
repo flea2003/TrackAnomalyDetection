@@ -3,6 +3,7 @@ import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
 import TrajectoryResponseItem from "../templates/TrajectoryResponseItem";
 import ShipDetails from "../model/ShipDetails";
+import connectionSettings from "../configs/connectionSettings.json";
 
 class TrajectoryService {
   /**
@@ -10,7 +11,7 @@ class TrajectoryService {
    * previous AIS signals and their corresponding anomaly information of a ship.
    * The fetched information is used for drawing past trajectories
    */
-  static shipSampledHistory = "/ships/history/sampled/";
+  static shipSampledHistory = connectionSettings.backendSampledHistoryEndpoint;
 
   /**
    * Id of the ship whose trajectory is/was most recently displayed on the map

@@ -41,6 +41,9 @@ interface ExtractedFunctionsSide {
  * @param mapCenteringFun map centering function
  * @param setFilterThreshold function that sets the filtering threshold
  * @param anomalyThreshold the anomaly threshold that is used for filtering
+ * @param extractedFunctionsMap reference of functions passed from the LMap components
+ * @param currentPage current page that is being dispalyed
+ * @param setCurrentPage function for modifying the current page value
  * @constructor
  */
 const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
@@ -106,6 +109,7 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
           <InformationContainer
             currentPage={currentPage}
             ships={ships}
+            extractedFunctionsMap={extractedFunctionsMap}
             notifications={notifications}
             pageChanger={pageChanger}
             mapCenteringFun={mapCenteringFun}

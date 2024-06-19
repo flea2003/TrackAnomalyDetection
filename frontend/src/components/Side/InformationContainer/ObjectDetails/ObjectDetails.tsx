@@ -7,12 +7,14 @@ import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import DisplayedInformation from "./DisplayedInformation";
 import { NotificationService } from "../../../../services/NotificationService";
+import { ExtractedFunctionsMap } from "../../../Map/LMap";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
   mapCenteringFun: (details: ShipDetails) => void;
   pageChanger: (currentPage: CurrentPage) => void;
   shipId: number;
@@ -23,7 +25,7 @@ interface ObjectDetailsProps {
  * The object to whose details are to be displayed is passed as a prop.
  *
  * @param ships array of all ships
- * @param notifications a list of all notifications
+ * @param extractedFunctionsMap reference of functions passed from the LMap components
  * @param mapCenteringFun function used for map centering on a needed ship
  * @param pageChanger page changer function
  * @param shipId id of the ship
@@ -31,6 +33,7 @@ interface ObjectDetailsProps {
  */
 function ObjectDetails({
   ships,
+  extractedFunctionsMap,
   mapCenteringFun,
   pageChanger,
   shipId,
@@ -67,6 +70,7 @@ function ObjectDetails({
 
       <DisplayedInformation
         ship={ship}
+        extractedFunctionsMap={extractedFunctionsMap}
         notifications={shipNotifications}
         pageChanger={pageChanger}
         mapCenteringFun={mapCenteringFun}

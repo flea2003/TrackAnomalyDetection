@@ -8,11 +8,14 @@ import AISDetails from "./AISDetails";
 import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 import ShipNotification from "../../../../model/ShipNotification";
 import { CurrentPage } from "../../../../App";
+import ScorePlot from "./ScorePlot";
+import { ExtractedFunctionsMap } from "../../../Map/LMap";
 
 import "../../../../styles/object-details/objectDetails.css";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
   notifications: ShipNotification[];
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
@@ -24,6 +27,7 @@ interface ObjectDetailsProps {
  * in object details window
  *
  * @param ship ship whose data is being displayed
+ * @param extractedFunctionsMap reference of functions passed from the LMap components
  * @param notifications array of all notifications
  * @param ships array of all ships
  * @param pageChanger page changer function
@@ -32,6 +36,7 @@ interface ObjectDetailsProps {
  */
 const DisplayedInformation = ({
   ship,
+  extractedFunctionsMap,
   notifications,
   ships,
   pageChanger,
@@ -70,8 +75,15 @@ const DisplayedInformation = ({
     setDisplayedPlot(true);
   };
 
+  const classnameIfAnomalyPlotIsDisplayed = displayedPlot
+    ? " anomaly-plot-displayed"
+    : "";
+
   return (
-    <Stack direction="column" className="menu-info-container">
+    <Stack
+      direction="column"
+      className={"menu-info-container" + classnameIfAnomalyPlotIsDisplayed}
+    >
       <Stack direction="row" className="menu-container">
         <div
           onClick={changeAnomalyInfo}
@@ -117,7 +129,13 @@ const DisplayedInformation = ({
         {displayedNotifications && notifications.length === 0 && (
           <div className="no-notifications">No notifications</div>
         )}
-        {displayedPlot && <div>Plot</div>}
+        {displayedPlot && (
+          <ScorePlot
+            ship={ship}
+            notifications={notifications}
+            extractedFunctionsMap={extractedFunctionsMap}
+          />
+        )}
       </Stack>
     </Stack>
   );

@@ -20,6 +20,7 @@ import mapConfig from "../../configs/mapConfig.json";
 import TrajectoryPoint from "../../model/TrajectoryPoint";
 import TrajectoryService from "../../services/TrajectoryService";
 import { CurrentPage } from "../../App";
+import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 import "../../styles/map.css";
 import "../../styles/common.css";
@@ -36,24 +37,15 @@ interface MapProps {
 // Define the type of the ref object
 interface ExtractedFunctionsMap {
   centerMapOntoShip: (details: ShipDetails) => void;
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
+  setDisplayedTrajectory: React.Dispatch<
+    React.SetStateAction<TrajectoryAndNotificationPair>
+  >;
 }
 
 interface TrackedShipType {
   ship: ShipDetails | null;
   zoomLevel: number;
-}
-
-/**
- * A class that stores a pair of a trajectory object and a notification
- */
-class TrajectoryAndNotificationPair {
-  trajectory: TrajectoryPoint[];
-  notification: LatLng | undefined;
-
-  constructor(trajectory: TrajectoryPoint[], notification: LatLng | undefined) {
-    this.trajectory = trajectory;
-    this.notification = notification;
-  }
 }
 
 /**
@@ -75,14 +67,6 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
     // Initialize the state for tracked ship
     const [trackedShip, setTrackedShip] = useState(getDefaultTrackedShipInfo());
 
-    // Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
-    // 1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
-    // 2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
-    const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
-      useState<TrajectoryAndNotificationPair>(
-        new TrajectoryAndNotificationPair([], undefined),
-      );
-
     // Initialize the hoverInfo variable that will manage the display of the
     // pop-up div containing reduced information about a particular ship
     const [hoverInfo, setHoverInfo] = useState(getDefaultHoverInfo());
@@ -95,11 +79,24 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       mapFlyToShip(mapRef, newTrackedShip);
       setTrackedShip(newTrackedShip);
     };
+    /**
+     * Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
+     *  1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
+     *  2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
+     *
+     * Also note that displayed trajectory is used for anomaly score plotting too, but there it is passed as a erference
+     */
+    const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
+      useState<TrajectoryAndNotificationPair>(
+        new TrajectoryAndNotificationPair([], undefined),
+      );
 
     // Define the methods that will be reachable by the parent components.
     useImperativeHandle(ref, () => ({
       centerMapOntoShip: (ship: ShipDetails) =>
         trackShip(ship, mapConfig.centeringShipZoomLevel),
+      displayedTrajectoryAndNotifications,
+      setDisplayedTrajectory,
     }));
 
     // Initialize map (once).
@@ -108,10 +105,12 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       initializeMap(mapRef, markersClustersRef);
     }, []);
 
-    // Update the ship markers when the ships array changes.
-    // Also, add ability to update the markers when the user
-    // is dragging through the map or zooming.
-    // Finally, ship marker tracing functionality is implemented here.
+    /**
+     * Update the ship markers when the ships array changes.
+     * Also, add ability to update the markers when the user
+     * is dragging through the map or zooming.
+     * Finally, ship marker tracing functionality is implemented here.
+     */
     useEffect(() => {
       const map = mapRef.current;
       if (!map) return;
@@ -177,6 +176,7 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
     useEffect(() => {
       // If currently object details are displayed, a trajectory of a corresponding ship must
       // be present on a map.
+
       if (currentPage.currentPage === "objectDetails") {
         // Find a needed ship from the array of all ships
         const ship = ships.find((x) => x.id === currentPage.shownItemId);
@@ -244,7 +244,7 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
           new TrajectoryAndNotificationPair([], undefined),
         );
       }
-    }, [currentPage, notifications, ships]);
+    }, [currentPage, notifications, ships, setDisplayedTrajectory]);
 
     /**
      * Updates trajectory visually on the map
