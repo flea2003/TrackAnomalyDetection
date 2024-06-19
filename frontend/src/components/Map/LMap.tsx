@@ -237,7 +237,7 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
           new TrajectoryAndNotificationPair([], undefined),
         );
       }
-    }, [currentPage, notifications, setDisplayedTrajectory]);
+    }, [currentPage, notifications, ships, setDisplayedTrajectory]);
 
     /**
      * Updates trajectory visually on the map

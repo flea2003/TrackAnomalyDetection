@@ -28,21 +28,13 @@ function ScorePlot(props: ScorePlotProps) {
   const notificationScoreHistory = shipNotifications.map(
     (notification) => notification.shipDetails.anomalyScore,
   );
-
+  console.log("NSCORE:{" + notificationScoreHistory + "}");
   const notificationTimestampHistory = shipNotifications.map(
     (notification) => new Date(notification.shipDetails.timestamp),
   );
+  console.log("NTIME:{" + notificationTimestampHistory + "}");
 
-  const rawTrajectoryData = props.displayedTrajectoryAndNotifications.trajectory;
-  if (rawTrajectoryData.length === 0 || rawTrajectoryData === undefined) {
-    return (
-    <div>
-      Waiting for data...
-    </div>
-    );
-  }
-
-  const shipHistory =  preprocessHistory(
+  const shipHistory = preprocessHistory(
     props.displayedTrajectoryAndNotifications,
   );
 
@@ -51,7 +43,10 @@ function ScorePlot(props: ScorePlotProps) {
     (dataPoint) => new Date(dataPoint.timestamp),
   );
 
+  console.log("SCORE:{" + scoreHistory + "}");
+  console.log("TIME:{" + timestampHistory + "}");
   // Plot datapoint descriptions
+
   const anomalyScoreDescriptions = scoreHistory.map((score, index) => {
     return `Score: ${score}<br>Timestamp: ${timestampHistory[index].toLocaleString()}`;
   });
@@ -83,10 +78,10 @@ function ScorePlot(props: ScorePlotProps) {
                 color: "#2e2b2b",
               },
             },
-            line: { color: "#63aaba"},
+            line: { color: "blue" },
             marker: {
-              color: "#63aaba",
-              size: 3,
+              color: "blue",
+              size: 5,
               symbol: "circle",
             },
           },
@@ -108,8 +103,8 @@ function ScorePlot(props: ScorePlotProps) {
               },
             },
             marker: {
-              color: "#ff7f27",
-              size: 3,
+              color: "yellow",
+              size: 5,
               symbol: "circle",
             },
           },
@@ -141,8 +136,8 @@ function ScorePlot(props: ScorePlotProps) {
             ],
             showgrid: false,
             range: [
-              timestampHistory[0].getTime() - 1000 * 50,
-              timestampHistory[timestampHistory.length - 1].getTime() + 1000 * 10,
+              timestampHistory[0].getTime(),
+              timestampHistory[timestampHistory.length - 1].getTime(),
             ],
           },
           yaxis: {
@@ -150,23 +145,22 @@ function ScorePlot(props: ScorePlotProps) {
             tickfont: { size: 6 },
           },
           legend: {
-            // change orientation 
-            orientation: "v",
+            orientation: "h",
             x: 0.5, // Center the legend horizontally
-            y: 0.9, // Position above the top of the plot area
+            y: 1.1, // Position above the top of the plot area
             xanchor: "center", // Anchor the legend at its center
             yanchor: "bottom", // Anchor the legend just below the specified 'y' position
           },
           shapes: [
             {
               type: "line",
-              x0: timestampHistory[0].getTime(),
-              x1: timestampHistory[timestampHistory.length - 1].getTime(),
+              x0: scoreHistory[0],
+              x1: scoreHistory[scoreHistory.length - 1],
               y0: threshold,
               y1: threshold,
               line: {
-                color: "#ff7f27",
-                width: 1,
+                color: "red",
+                width: 2,
                 dash: "dash",
               },
             },
@@ -205,6 +199,7 @@ const preprocessHistory = (trajectoryData: TrajectoryAndNotificationPair) => {
     }
   });
 };
+
 
 
 export default ScorePlot;

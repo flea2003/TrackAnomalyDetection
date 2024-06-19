@@ -75,10 +75,8 @@ const DisplayedInformation = ({
     setDisplayedPlot(true);
   };
 
-  const classnameIfAnomalyPlotIsDisplayed = displayedPlot ? " anomaly-plot-displayed" : "";
-
   return (
-    <Stack direction="column" className={"menu-info-container" + classnameIfAnomalyPlotIsDisplayed} >
+    <Stack direction="column" className="menu-info-container">
       <Stack direction="row" className="menu-container">
         <div
           onClick={changeAnomalyInfo}
