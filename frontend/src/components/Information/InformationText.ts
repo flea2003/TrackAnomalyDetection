@@ -6,8 +6,8 @@ export const informationText = (page: string) => {
        list includes the vessel's type (represented by an icon), the last three digits of the vessel's ID,
        its current anomaly score, and the time since the most recent AIS signal. You can click 
        on an entry for more detailed information. Also, once the entry is clicked, a corresponding
-       ship is centered on the map. Moreover, by clicking the filter icon, you can change
-       the anomaly score threshold to filter out vessels with scores below the threshold.
+       ship is centered on the map. Moreover, after clicking the filter icon, you can change
+       the anomaly score threshold to filter out vessels with scores below the threshold either by sliding the range slider or by clicking on the threshold itself and typing the desired value.
        Lastly, you can click the close button or the ship icon in the menu to exit the Anomaly List.
         `;
     case "objectDetails":
