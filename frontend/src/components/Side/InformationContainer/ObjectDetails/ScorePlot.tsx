@@ -6,22 +6,31 @@ import ShipNotification from "../../../../model/ShipNotification";
 import React from "react";
 import PlotDataPointItem from "../../../../templates/PlotDataPointItem";
 import "../../../../styles/object-details/scorePlot.css";
-import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
+import { ExtractedFunctionsMap } from "../../../Map/LMap";
 
 interface ScorePlotProps {
   ship: ShipDetails;
-  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
   notifications: ShipNotification[];
 }
 
-function ScorePlot(props: ScorePlotProps) {
-  const selectedShipId = props.ship.id;
+/**
+ *
+ * @param ship ship whose data is being dispalyed
+ * @param extractedFunctionsMap reference of functions passed from the LMap component
+ * @param notifications all notification history stored in frontend
+ * @constructor
+ */
+function ScorePlot({
+  ship,
+  extractedFunctionsMap,
+  notifications,
+}: ScorePlotProps) {
+  const selectedShipId = ship.id;
 
   const threshold = plottingConfig.notificationThreshold;
 
-  const allNotifications = props.notifications;
-
-  const shipNotifications = allNotifications.filter((notification) => {
+  const shipNotifications = notifications.filter((notification) => {
     return notification.shipDetails.id === selectedShipId;
   });
 
@@ -34,9 +43,7 @@ function ScorePlot(props: ScorePlotProps) {
   );
   console.log("NTIME:{" + notificationTimestampHistory + "}");
 
-  const shipHistory = preprocessHistory(
-    props.displayedTrajectoryAndNotifications,
-  );
+  const shipHistory = preprocessHistory(extractedFunctionsMap);
 
   const scoreHistory = shipHistory.map((dataPoint) => dataPoint.anomalyScore);
   const timestampHistory = shipHistory.map(
@@ -173,15 +180,26 @@ function ScorePlot(props: ScorePlotProps) {
   );
 }
 
-const preprocessHistory = (trajectoryData: TrajectoryAndNotificationPair) => {
-  const parsedFilteredData = trajectoryData.trajectory
-    .map((trajectoryPoint) => {
-      return {
-        anomalyScore: trajectoryPoint.anomalyScore,
-        timestamp: new Date(trajectoryPoint.timestamp),
-      } as PlotDataPointItem;
-    })
-    .filter((trajectoryPnt) => trajectoryPnt.anomalyScore !== -1);
+/**
+ * Function that turns the TrajectoryAndNotification object to a needed array
+ * for plotting
+ *
+ * @param extractedFunctionsMap function dictionary that contains reference to the trajectory object
+ */
+const preprocessHistory = (
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>,
+) => {
+  if (extractedFunctionsMap.current === null) return [];
+
+  const parsedFilteredData =
+    extractedFunctionsMap.current.displayedTrajectoryAndNotifications.trajectory
+      .map((trajectoryPoint) => {
+        return {
+          anomalyScore: trajectoryPoint.anomalyScore,
+          timestamp: new Date(trajectoryPoint.timestamp),
+        } as PlotDataPointItem;
+      })
+      .filter((trajectoryPnt) => trajectoryPnt.anomalyScore !== -1);
 
   // Remove duplicate instances
   const uniqueDataPoints = Array.from(
@@ -199,7 +217,5 @@ const preprocessHistory = (trajectoryData: TrajectoryAndNotificationPair) => {
     }
   });
 };
-
-
 
 export default ScorePlot;

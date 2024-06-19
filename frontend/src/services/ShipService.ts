@@ -3,7 +3,6 @@ import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";
 import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
-import endpointConfig from "../configs/endpointsConfig.json";
 import connectionSettings from "../configs/connectionSettings.json";
 
 class ShipService {

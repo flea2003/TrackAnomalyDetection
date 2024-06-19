@@ -30,10 +30,6 @@ import "leaflet/dist/leaflet.css";
 
 interface MapProps {
   ships: ShipDetails[];
-  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
-  setDisplayedTrajectory: React.Dispatch<
-    React.SetStateAction<TrajectoryAndNotificationPair>
-  >;
   refObjects: React.RefObject<ExtractedFunctionsSide>;
   currentPage: CurrentPage;
 }
@@ -41,6 +37,10 @@ interface MapProps {
 // Define the type of the ref object
 interface ExtractedFunctionsMap {
   centerMapOntoShip: (details: ShipDetails) => void;
+  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
+  setDisplayedTrajectory: React.Dispatch<
+    React.SetStateAction<TrajectoryAndNotificationPair>
+  >;
 }
 
 interface TrackedShipType {
@@ -57,16 +57,7 @@ interface TrackedShipType {
  * @param pageChanger function that, when called, changes the page displayed in the second column.
  */
 const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
-  (
-    {
-      ships,
-      displayedTrajectoryAndNotifications,
-      setDisplayedTrajectory,
-      refObjects,
-      currentPage
-    },
-    ref,
-  ) => {
+  ({ ships, refObjects, currentPage }, ref) => {
     // Map is ref to have one instance. This ref will be initialized in useEffect.
     const mapRef = useRef<L.Map | null>(null);
 
@@ -88,11 +79,24 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       mapFlyToShip(mapRef, newTrackedShip);
       setTrackedShip(newTrackedShip);
     };
+    /**
+     * Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
+     *  1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
+     *  2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
+     *
+     * Also note that displayed trajectory is used for anomaly score plotting too, but there it is passed as a erference
+     */
+    const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
+      useState<TrajectoryAndNotificationPair>(
+        new TrajectoryAndNotificationPair([], undefined),
+      );
 
     // Define the methods that will be reachable by the parent components.
     useImperativeHandle(ref, () => ({
       centerMapOntoShip: (ship: ShipDetails) =>
         trackShip(ship, mapConfig.centeringShipZoomLevel),
+      displayedTrajectoryAndNotifications,
+      setDisplayedTrajectory,
     }));
 
     // Initialize map (once).
@@ -173,7 +177,6 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       // If currently object details are displayed, a trajectory of a corresponding ship must
       // be present on a map.
 
-      console.log("blet")
       if (currentPage.currentPage === "objectDetails") {
         // Find a needed ship from the array of all ships
         const ship = ships.find((x) => x.id === currentPage.shownItemId);

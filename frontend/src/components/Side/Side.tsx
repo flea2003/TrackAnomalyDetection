@@ -15,15 +15,12 @@ import { Stack } from "@mui/material";
 import config from "../../configs/generalConfig.json";
 import { ExtractedFunctionsMap } from "../Map/LMap";
 import InformationPopUp from "../Information/InformationPopUp";
-import TrajectoryPoint from "../../model/TrajectoryPoint";
-import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
 
 interface SideProps {
   ships: ShipDetails[];
-  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
   mapCenteringFun: (details: ShipDetails) => void;
   setFilterThreshold: (value: number) => void;
   anomalyThreshold: number;
@@ -44,13 +41,15 @@ interface ExtractedFunctionsSide {
  * @param mapCenteringFun map centering function
  * @param setFilterThreshold function that sets the filtering threshold
  * @param anomalyThreshold the anomaly threshold that is used for filtering
+ * @param extractedFunctionsMap reference of functions passed from the LMap components
+ * @param currentPage current page that is being dispalyed
+ * @param setCurrentPage function for modifying the current page value
  * @constructor
  */
 const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
   (
     {
       ships,
-      displayedTrajectoryAndNotifications,
       mapCenteringFun,
       setFilterThreshold,
       anomalyThreshold,
@@ -110,16 +109,16 @@ const Side = forwardRef<ExtractedFunctionsSide, SideProps>(
           <InformationContainer
             currentPage={currentPage}
             ships={ships}
-            displayedTrajectoryAndNotifications={
-            displayedTrajectoryAndNotifications
-          }
-          notifications={notifications}
-          pageChanger={pageChanger}
-          mapCenteringFun={mapCenteringFun}
-          setFilterThreshold={setFilterThreshold}
-          anomalyThreshold={anomalyThreshold}
-        />
-        <Sidebar pageChanger={pageChanger} currentPage={currentPage}
+            extractedFunctionsMap={extractedFunctionsMap}
+            notifications={notifications}
+            pageChanger={pageChanger}
+            mapCenteringFun={mapCenteringFun}
+            setFilterThreshold={setFilterThreshold}
+            anomalyThreshold={anomalyThreshold}
+          />
+          <Sidebar
+            pageChanger={pageChanger}
+            currentPage={currentPage}
             notifications={notifications}
           />
         </Stack>

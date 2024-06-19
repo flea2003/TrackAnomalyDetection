@@ -9,13 +9,13 @@ import NotificationListWithoutTitle from "../NotificationsList/NotificationListW
 import ShipNotification from "../../../../model/ShipNotification";
 import { CurrentPage } from "../../../../App";
 import ScorePlot from "./ScorePlot";
-import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
+import { ExtractedFunctionsMap } from "../../../Map/LMap";
 
 import "../../../../styles/object-details/objectDetails.css";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
-  displayedTrajectoryAndNotifications: TrajectoryAndNotificationPair;
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
   notifications: ShipNotification[];
   ships: ShipDetails[];
   pageChanger: (currentPage: CurrentPage) => void;
@@ -27,7 +27,7 @@ interface ObjectDetailsProps {
  * in object details window
  *
  * @param ship ship whose data is being displayed
- * @param displayedTrajectoryAndNotifications historical data of the ship
+ * @param extractedFunctionsMap reference of functions passed from the LMap components
  * @param notifications array of all notifications
  * @param ships array of all ships
  * @param pageChanger page changer function
@@ -36,7 +36,7 @@ interface ObjectDetailsProps {
  */
 const DisplayedInformation = ({
   ship,
-  displayedTrajectoryAndNotifications,
+  extractedFunctionsMap,
   notifications,
   ships,
   pageChanger,
@@ -127,9 +127,7 @@ const DisplayedInformation = ({
             <ScorePlot
               ship={ship}
               notifications={notifications}
-              displayedTrajectoryAndNotifications={
-                displayedTrajectoryAndNotifications
-              }
+              extractedFunctionsMap={extractedFunctionsMap}
             />
           </div>
         )}

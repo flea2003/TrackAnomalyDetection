@@ -8,7 +8,6 @@ import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
 import Side, { ExtractedFunctionsSide } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
-import TrajectoryAndNotificationPair from "./model/TrajectoryAndNotificationPair";
 
 import "./styles/common.css";
 
@@ -47,16 +46,6 @@ function App() {
   const [rawShips, setRawShips] = useState<ShipDetails[]>([]);
 
   /**
-   * Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
-   *  1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
-   *  2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
-   *
-   * Also note that displayed trajectory is used for anomaly score plotting too, so thus it is defined in App.tsx
-   */
-  const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
-      useState<TrajectoryAndNotificationPair>(new TrajectoryAndNotificationPair([], undefined));
-
-  /**
    * Put filter threshold as a state
    */
   const [filterThreshold, setFilterThreshold] = useState<number>(0);
@@ -90,19 +79,16 @@ function App() {
     <div className="App" id="root-div">
       <LMap
         ships={displayedShips}
-        displayedTrajectoryAndNotifications={
-          displayedTrajectoryAndNotifications
-        }
-        setDisplayedTrajectory={setDisplayedTrajectory}
+        // displayedTrajectoryAndNotifications={
+        //   displayedTrajectoryAndNotifications
+        // }
+        // setDisplayedTrajectory={setDisplayedTrajectory}
         refObjects={extractedFunctionsSide}
         currentPage={currentPage}
         ref={extractedFunctionsMap}
       />
       <Side
         ships={displayedShips}
-        displayedTrajectoryAndNotifications={
-          displayedTrajectoryAndNotifications
-        }
         mapCenteringFun={mapCenteringFun}
         setFilterThreshold={setFilterThreshold}
         anomalyThreshold={filterThreshold}
