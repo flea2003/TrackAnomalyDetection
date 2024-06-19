@@ -130,13 +130,11 @@ const DisplayedInformation = ({
           <div className="no-notifications">No notifications</div>
         )}
         {displayedPlot && (
-          <div className="plot-container">
-            <ScorePlot
-              ship={ship}
-              notifications={notifications}
-              extractedFunctionsMap={extractedFunctionsMap}
-            />
-          </div>
+          <ScorePlot
+            ship={ship}
+            notifications={notifications}
+            extractedFunctionsMap={extractedFunctionsMap}
+          />
         )}
       </Stack>
     </Stack>

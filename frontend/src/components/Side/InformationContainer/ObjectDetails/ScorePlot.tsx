@@ -1,7 +1,6 @@
 import ShipDetails from "../../../../model/ShipDetails";
 import plottingConfig from "../../../../configs/plottingConfig.json";
 import Plot from "react-plotly.js";
-import anomalyScorePlotStyle from "../../../../configs/anomalyScorePlotStyle.json";
 import ShipNotification from "../../../../model/ShipNotification";
 import React from "react";
 import PlotDataPointItem from "../../../../templates/PlotDataPointItem";
@@ -45,7 +44,7 @@ function ScorePlot({
   const shipHistory = preprocessHistory(extractedFunctionsMap);
 
   if (shipHistory.length === 0) {
-    return <div>Waiting for data...</div>;
+    return <div className="plot-container">Waiting for data...</div>;
   }
 
   const scoreHistory = shipHistory.map((dataPoint) => dataPoint.anomalyScore);
@@ -67,7 +66,17 @@ function ScorePlot({
   return (
     <div className="plot-container">
       <Plot
+        style={{ width: "100%", height: "100%", paddingBottom: "30px" }}
         data={[
+          {
+            x: [0],
+            y: [0],
+            line: { color: "#ff7f27" },
+            name: "Anomaly Threshold",
+            marker: {
+              size: 0,
+            },
+          },
           {
             x: timestampHistory.map((val) => val.getTime()),
             y: scoreHistory,
@@ -111,19 +120,18 @@ function ScorePlot({
             },
             marker: {
               color: "#ff7f27",
-              size: 3,
+              size: 5,
               symbol: "circle",
             },
           },
         ]}
         layout={{
-          ...anomalyScorePlotStyle,
-          autosize: true,
+          showlegend: true,
           margin: {
-            r: 40,
-            l: 40,
-            t: 30,
-            b: 30,
+            r: 35,
+            l: 35,
+            t: 15,
+            b: 25,
           },
           xaxis: {
             title: "Timestamp",
@@ -143,7 +151,7 @@ function ScorePlot({
             ],
             showgrid: false,
             range: [
-              timestampHistory[0].getTime() - 1000 * 50,
+              timestampHistory[0].getTime() - 1000 * 10,
               timestampHistory[timestampHistory.length - 1].getTime() +
                 1000 * 10,
             ],
@@ -218,7 +226,11 @@ const preprocessHistory = (
       return -1;
     }
     if (p1.timestamp === p2.timestamp) {
-      return 0;
+      if (p1.anomalyScore === p2.anomalyScore) {
+        return 0;
+      } else {
+        return p1.anomalyScore < p2.anomalyScore ? -1 : 1;
+      }
     } else {
       return 1;
     }
