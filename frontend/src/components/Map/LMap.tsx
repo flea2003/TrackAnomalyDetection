@@ -20,13 +20,13 @@ import mapConfig from "../../configs/mapConfig.json";
 import TrajectoryPoint from "../../model/TrajectoryPoint";
 import TrajectoryService from "../../services/TrajectoryService";
 import { CurrentPage } from "../../App";
+import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 import "../../styles/map.css";
 import "../../styles/common.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
-import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 interface MapProps {
   ships: ShipDetails[];
@@ -101,10 +101,12 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
       initializeMap(mapRef, markersClustersRef);
     }, []);
 
-    // Update the ship markers when the ships array changes.
-    // Also, add ability to update the markers when the user
-    // is dragging through the map or zooming.
-    // Finally, ship marker tracing functionality is implemented here.
+    /**
+     * Update the ship markers when the ships array changes.
+     * Also, add ability to update the markers when the user
+     * is dragging through the map or zooming.
+     * Finally, ship marker tracing functionality is implemented here.
+     */
     useEffect(() => {
       const map = mapRef.current;
       if (!map) return;
@@ -170,6 +172,8 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
     useEffect(() => {
       // If currently object details are displayed, a trajectory of a corresponding ship must
       // be present on a map.
+
+      console.log("blet")
       if (currentPage.currentPage === "objectDetails") {
         // Find a needed ship from the array of all ships
         const ship = ships.find((x) => x.id === currentPage.shownItemId);

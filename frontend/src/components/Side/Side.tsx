@@ -15,11 +15,11 @@ import { Stack } from "@mui/material";
 import config from "../../configs/generalConfig.json";
 import { ExtractedFunctionsMap } from "../Map/LMap";
 import InformationPopUp from "../Information/InformationPopUp";
+import TrajectoryPoint from "../../model/TrajectoryPoint";
+import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 import "../../styles/common.css";
 import "../../styles/side.css";
-import TrajectoryPoint from "../../model/TrajectoryPoint";
-import TrajectoryAndNotificationPair from "../../model/TrajectoryAndNotificationPair";
 
 interface SideProps {
   ships: ShipDetails[];

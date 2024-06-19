@@ -7,10 +7,10 @@ import ShipNotification from "../../../../model/ShipNotification";
 import { calculateAnomalyColor } from "../../../../utils/AnomalyColorCalculator";
 import DisplayedInformation from "./DisplayedInformation";
 import { NotificationService } from "../../../../services/NotificationService";
+import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
 
 import "../../../../styles/common.css";
 import "../../../../styles/object-details/objectDetails.css";
-import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
 
 interface ObjectDetailsProps {
   ships: ShipDetails[];

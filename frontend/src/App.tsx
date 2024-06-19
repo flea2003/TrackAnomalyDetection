@@ -8,8 +8,9 @@ import ErrorNotificationService from "./services/ErrorNotificationService";
 import "./styles/common.css";
 import Side, { ExtractedFunctionsSide } from "./components/Side/Side";
 import ShipService from "./services/ShipService";
-import "./styles/common.css";
 import TrajectoryAndNotificationPair from "./model/TrajectoryAndNotificationPair";
+
+import "./styles/common.css";
 
 /**
  * Interface for storing the type of component that is currently displayed in the second column.
@@ -33,13 +34,32 @@ function App() {
     }
   };
 
-  // Initialize a state for the current page. Note that it needs to be initialized here, in
-  // App.tsx, as it is needed for both LMap (for synchronized trajectory displaying) and Side functions
-  // Create state for current page
+  /**
+   * Initialize a state for the current page. Note that it needs to be initialized here, in
+   * App.tsx, as it is needed for both LMap (for synchronized trajectory displaying) and Side functions
+   * Create state for current page
+   */
   const [currentPage, setCurrentPage] = useState(getPageChangerDefaultPage());
 
-  // State for storing all ships retrieved from backend
+  /**
+   *  State for storing all ships retrieved from backend
+   */
   const [rawShips, setRawShips] = useState<ShipDetails[]>([]);
+
+  /**
+   * Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
+   *  1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
+   *  2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
+   *
+   * Also note that displayed trajectory is used for anomaly score plotting too, so thus it is defined in App.tsx
+   */
+  const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
+      useState<TrajectoryAndNotificationPair>(new TrajectoryAndNotificationPair([], undefined));
+
+  /**
+   * Put filter threshold as a state
+   */
+  const [filterThreshold, setFilterThreshold] = useState<number>(0);
 
   // Use effect to query for the ships every 2000ms
   useEffect(() => {
@@ -60,19 +80,10 @@ function App() {
 
   const sortedShips = ShipService.sortList(rawShips, "desc");
 
-  // Put filter threshold as a state
-  const [filterThreshold, setFilterThreshold] = useState<number>(0);
-
   // Create a separate array for displayed ships
   const displayedShips = sortedShips.filter(
     (x) => x.anomalyScore >= filterThreshold,
   );
-
-  // Initialize the displayed trajectory state. The trajectory is a pair (stored as an array) of two elements:
-  // 1. an array of (coordinates + anomaly scores) for the to-be-displayed trajectory
-  // 2. an array of coordinates for notifications that should be added to the trajectory. In case no need to be added, the list should be empty
-  const [displayedTrajectoryAndNotifications, setDisplayedTrajectory] =
-    useState<TrajectoryAndNotificationPair>(new TrajectoryAndNotificationPair([], undefined));
 
   // Return the main view of the application
   return (
@@ -105,8 +116,8 @@ function App() {
 }
 
 /**
- * Function for intrducing the initial page, which is a map without any information
- * widndow being displayed
+ * Function for introducing the initial page, which is a map without any information
+ * window being displayed
  */
 function getPageChangerDefaultPage() {
   return {

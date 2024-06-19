@@ -8,10 +8,10 @@ import AISDetails from "./AISDetails";
 import NotificationListWithoutTitle from "../NotificationsList/NotificationListWithoutTitle";
 import ShipNotification from "../../../../model/ShipNotification";
 import { CurrentPage } from "../../../../App";
-
-import "../../../../styles/object-details/objectDetails.css";
 import ScorePlot from "./ScorePlot";
 import TrajectoryAndNotificationPair from "../../../../model/TrajectoryAndNotificationPair";
+
+import "../../../../styles/object-details/objectDetails.css";
 
 interface ObjectDetailsProps {
   ship: ShipDetails;
