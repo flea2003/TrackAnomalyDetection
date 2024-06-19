@@ -72,7 +72,7 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Speed is inaccurate: the approximated speed of 840.06 km/min is different from reported speed of 22 km/min by more than allowed margin of 10 km/min.
+                        Speed is inaccurate: the approximated speed of 27216.37 knots is different from reported speed of 22 knots by more than allowed margin of 10 knots.
                         """
         );
     }
@@ -103,7 +103,7 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Speed is inaccurate: the approximated speed of 2.74 km/min is different from reported speed of 12.8 km/min by more than allowed margin of 10 km/min.
+                        Speed is inaccurate: the approximated speed of 88.7 knots is different from reported speed of 12.8 knots by more than allowed margin of 10 knots.
                         """
         );
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(0.0f);
@@ -132,17 +132,18 @@ public class SpeedStatefulMapFunctionTest {
         assertThat(anomalies.get(1).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(1).getValue().getExplanation()).isEqualTo(
                 """
-                        Speed is too big: 60 km/min is faster than threshold of 55.5 km/min.
-                        Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 60 km/min by more than allowed margin of 10 km/min.
-                        Acceleration is too big: 50 km/min^2 is bigger than threshold of 50 km/min^2.
+                        Speed is too big: 60 knots is faster than threshold of 55.5 knots.
+                        Speed is inaccurate: the approximated speed of 0 knots is different from reported speed of 60 knots by more than allowed margin of 10 knots.
+                        Acceleration is too big: 2998 knots/h is bigger than threshold of 300 knots/h.
                         """
         );
 
         assertThat(anomalies.get(2).getValue().getScore()).isEqualTo(25f);
         assertThat(anomalies.get(2).getValue().getExplanation()).isEqualTo(
                 """
-                        Speed is too big: 110 km/min is faster than threshold of 55.5 km/min.
-                        Speed is inaccurate: the approximated speed of 0 km/min is different from reported speed of 110 km/min by more than allowed margin of 10 km/min.
+                        Speed is too big: 110 knots is faster than threshold of 55.5 knots.
+                        Speed is inaccurate: the approximated speed of 0 knots is different from reported speed of 110 knots by more than allowed margin of 10 knots.
+                        Acceleration is too big: 2998 knots/h is bigger than threshold of 300 knots/h.
                         """
         );
     }

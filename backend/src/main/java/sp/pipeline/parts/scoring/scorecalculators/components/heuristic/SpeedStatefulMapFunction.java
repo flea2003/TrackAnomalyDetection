@@ -11,7 +11,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
     // Speed threshold measured in knots (nmi/h)
     private static final double SPEED_THRESHOLD = 55.5;
     // Acceleration threshold measured in knots/h (nmi/h^2)
-    private static final double ACCELERATION_THRESHOLD = 0.83;
+    private static final double ACCELERATION_THRESHOLD = 300;
     // Speed accuracy margin measured in knots (nmi/h)
     private static final double REPORTED_SPEED_ACCURACY_MARGIN = 10;
 
@@ -60,8 +60,8 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         if (computedAcceleration(currentSignal, pastSignal) > ACCELERATION_THRESHOLD) {
             isAnomaly = true;
             explanation += "Acceleration is too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
-                    + " knots/min is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
-                    + " knots/min" + explanationEnding();
+                    + " knots/h is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
+                    + " knots/h" + explanationEnding();
         }
 
         return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
@@ -100,7 +100,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     private double computedAcceleration(AISSignal currentSignal, AISSignal pastSignal) {
         double speedDiff = currentSignal.getSpeed() - pastSignal.getSpeed();
-        return speedDiff / (timeDiffInHours(currentSignal, pastSignal) + 0.00001);
+        return Math.round(speedDiff / (timeDiffInHours(currentSignal, pastSignal) + 0.00001));
     }
 
     /**

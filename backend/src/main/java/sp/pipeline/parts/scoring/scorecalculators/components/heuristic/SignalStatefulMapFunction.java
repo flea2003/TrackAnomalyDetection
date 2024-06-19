@@ -11,7 +11,8 @@ import java.text.DecimalFormat;
 public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
 
     private static final long SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES = 10;
-    private static final double TRAVELLED_DISTANCE_THRESHOLD = 6;
+    // Threshold measured in nmi/h (knots)
+    private static final double TRAVELLED_DISTANCE_SPEED_THRESHOLD = 3.2;
 
     /**
      * Checks if the current signal is an anomaly.
@@ -38,7 +39,7 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
         DecimalFormat df = getDecimalFormatter();
 
         boolean signalsNotFrequent = timeDiffInMinutes(currentSignal, pastSignal) > SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES;
-        boolean shipTravelledMuch = distanceDividedByHours(currentSignal, pastSignal) > TRAVELLED_DISTANCE_THRESHOLD;
+        boolean shipTravelledMuch = distanceDividedByHours(currentSignal, pastSignal) > TRAVELLED_DISTANCE_SPEED_THRESHOLD;
 
         if (signalsNotFrequent && shipTravelledMuch) {
             isAnomaly = true;
@@ -48,7 +49,7 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
                     + " minutes is more than threshold of " + SIGNAL_TIME_DIFF_THRESHOLD_IN_MINUTES + " minutes,"
                     + " and ship's speed (between two signals) is too large: "
                     + df.format(distanceDividedByHours(currentSignal, pastSignal))
-                    + " km/h is more than threshold of " + TRAVELLED_DISTANCE_THRESHOLD + " km/h"
+                    + " nmi/h is more than threshold of " + TRAVELLED_DISTANCE_SPEED_THRESHOLD + " nmi/h"
                     + explanationEnding();
         }
 
@@ -67,7 +68,7 @@ public class SignalStatefulMapFunction extends HeuristicStatefulMapFunction {
     }
 
     /**
-     * Calculates the distance divided by hours. Used for method `shipTravelledMuch`.
+     * Calculates the distance (nmi) divided by hours. Used for method `shipTravelledMuch`.
      *
      * @param currentSignal the current signal
      * @param pastSignal the past signal
