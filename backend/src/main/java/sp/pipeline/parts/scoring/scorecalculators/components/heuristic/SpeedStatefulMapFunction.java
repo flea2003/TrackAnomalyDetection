@@ -8,8 +8,11 @@ import java.text.DecimalFormat;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
 
+    // Speed threshold measured in knots
     private static final double SPEED_THRESHOLD = 55.5;
+    // Acceleration threshold measured in knots/min
     private static final double ACCELERATION_THRESHOLD = 50;
+    // Speed accuracy margin measured in knots
     private static final double REPORTED_SPEED_ACCURACY_MARGIN = 10;
 
     /**
@@ -40,25 +43,25 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         if (currentSignal.getSpeed() > SPEED_THRESHOLD) {
             isAnomaly = true;
             explanation += "Speed is too big: " + df.format(currentSignal.getSpeed())
-                    + " km/min is faster than threshold of " + df.format(SPEED_THRESHOLD)
-                    + " km/min" + explanationEnding();
+                    + " knots is faster than threshold of " + df.format(SPEED_THRESHOLD)
+                    + " knots" + explanationEnding();
         }
 
         // Check the difference between the computed speed and the reported speed
         if (reportedSpeedDifference(currentSignal, pastSignal) > REPORTED_SPEED_ACCURACY_MARGIN) {
             isAnomaly = true;
             explanation += "Speed is inaccurate: the approximated speed of " + df.format(computeSpeed(currentSignal, pastSignal))
-                    + " km/min is different from reported speed of " + df.format(currentSignal.getSpeed())
-                    + " km/min by more than allowed margin of " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
-                    + " km/min" + explanationEnding();
+                    + " knots is different from reported speed of " + df.format(currentSignal.getSpeed())
+                    + " knots by more than allowed margin of " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
+                    + " knots" + explanationEnding();
         }
 
         // Compute and check acceleration between two signals
         if (computedAcceleration(currentSignal, pastSignal) > ACCELERATION_THRESHOLD) {
             isAnomaly = true;
             explanation += "Acceleration is too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
-                    + " km/min^2 is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
-                    + " km/min^2" + explanationEnding();
+                    + " knots/min is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
+                    + " knots/min" + explanationEnding();
         }
 
         return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);

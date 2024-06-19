@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 public class Tools {
 
     /**
-     * Util static class that calculates the globe distance between 2 points.
+     * Util static class that calculates the globe distance (km) between 2 points.
      *
      * @param lat1 the latitude of the first point.
      * @param lon1 the longitude of the first point.
