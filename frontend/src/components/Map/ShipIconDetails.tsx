@@ -38,7 +38,7 @@ const ShipIconDetails = (props: ShipIconDetailsType) => {
         </div>
         <div>
           <strong>Speed: </strong>
-          {props.shipDetails.speed} knots
+          {props.shipDetails.speed.toFixed(2)} knots
         </div>
         <div>
           <strong>Lag: </strong>

@@ -29,15 +29,15 @@ function AISDetails({ ship }: ObjectDetailsProps) {
         </div>
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Course</div>
-          <div className="ais-details-info">{ship.course}°</div>
+          <div className="ais-details-info">{ship.course.toFixed(2)}°</div>
         </div>
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Latitude</div>
-          <div className="ais-details-info">{ship.getRoundedLatitude()}</div>
+          <div className="ais-details-info">{ship.getRoundedLatitude().toFixed(2)}°</div>
         </div>
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Speed</div>
-          <div className="ais-details-info">{ship.speed} knots</div>
+          <div className="ais-details-info">{ship.speed.toFixed(2)} knots</div>
         </div>
       </Stack>
       <Stack direction="column" className="ais-details-column">
@@ -47,11 +47,11 @@ function AISDetails({ ship }: ObjectDetailsProps) {
         </div>
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Heading</div>
-          <div className="ais-details-info">{ship.heading}°</div>
+          <div className="ais-details-info">{ship.heading.toFixed(2)}°</div>
         </div>
         <div className="ais-details-info-container">
           <div className="ais-details-subtitle">Longitude</div>
-          <div className="ais-details-info">{ship.getRoundedLongitude()}</div>
+          <div className="ais-details-info">{ship.getRoundedLongitude().toFixed(2)}°</div>
         </div>
       </Stack>
     </Stack>
