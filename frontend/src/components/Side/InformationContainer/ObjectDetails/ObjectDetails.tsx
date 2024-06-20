@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import ShipDetails from "../../../../model/ShipDetails";
 import returnIcon from "../../../../assets/icons/helper-icons/back.svg";
@@ -45,10 +45,12 @@ function ObjectDetails({
     ShipNotification[]
   >([]);
 
-  NotificationService.getAllNotificationsForShip(shipId).then(
-    (newNotifications: ShipNotification[]) =>
-      setShipNotifications(newNotifications),
-  );
+  useEffect(() => {
+    NotificationService.getAllNotificationsForShip(shipId).then(
+      (newNotifications: ShipNotification[]) =>
+        setShipNotifications(newNotifications),
+    );
+  }, [shipId]);
 
   if (ship === undefined) {
     return shipNotFoundElement();

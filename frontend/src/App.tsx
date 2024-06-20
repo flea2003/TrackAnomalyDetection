@@ -32,7 +32,6 @@ function App() {
       ErrorNotificationService.addWarning("extractedFunctionsMap is null");
     }
   };
-
   /**
    * Initialize a state for the current page. Note that it needs to be initialized here, in
    * App.tsx, as it is needed for both LMap (for synchronized trajectory displaying) and Side functions
@@ -79,10 +78,6 @@ function App() {
     <div className="App" id="root-div">
       <LMap
         ships={displayedShips}
-        // displayedTrajectoryAndNotifications={
-        //   displayedTrajectoryAndNotifications
-        // }
-        // setDisplayedTrajectory={setDisplayedTrajectory}
         refObjects={extractedFunctionsSide}
         currentPage={currentPage}
         ref={extractedFunctionsMap}
