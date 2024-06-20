@@ -102,3 +102,27 @@ test("Get hours and minutes invalid", () => {
     "Not available",
   );
 });
+
+test("Compare Dates Equal", () => {
+  const aisTimestamp1 = "2004-03-27T01:02:00Z";
+  const aisTimestamp2 = "2004-03-27T01:02:00Z";
+  expect(
+    TimeUtilities.compareDates(aisTimestamp1, aisTimestamp2),
+  ).toStrictEqual(0);
+});
+
+test("Compare Dates More", () => {
+  const aisTimestamp1 = "2004-04-27T01:02:00Z";
+  const aisTimestamp2 = "2004-03-27T01:02:00Z";
+  expect(
+    TimeUtilities.compareDates(aisTimestamp1, aisTimestamp2),
+  ).toStrictEqual(-1);
+});
+
+test("Compare Dates Less", () => {
+  const aisTimestamp1 = "2004-03-27T00:02:00Z";
+  const aisTimestamp2 = "2004-03-27T01:02:00Z";
+  expect(
+    TimeUtilities.compareDates(aisTimestamp1, aisTimestamp2),
+  ).toStrictEqual(1);
+});

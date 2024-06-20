@@ -5,6 +5,7 @@ import List from "@mui/material/List";
 import { CurrentPage } from "../../../../App";
 import ShipDetails from "../../../../model/ShipDetails";
 import ShipThresholdModifier from "./AnomalyTitleWithSlider";
+import config from "../../../../configs/generalConfig.json";
 
 import "../../../../styles/common.css";
 import "../../../../styles/anomaly-list/anomalyList.css";
@@ -34,17 +35,16 @@ function AnomalyList({
   setFilterThreshold,
   anomalyThreshold,
 }: AnomalyListProps) {
-  const listEntries = [];
-  for (let i = 0; i < ships.length; i++) {
-    listEntries.push(
+  const listEntries = ships
+    .slice(0, config.anomalyListMaxEntries)
+    .map((ship, id) => (
       <AnomalyListEntry
-        key={i}
-        shipDetails={ships[i]}
+        key={id}
+        shipDetails={ship}
         pageChanger={pageChanger}
         mapCenteringFun={mapCenteringFun}
-      />,
-    );
-  }
+      />
+    ));
 
   let noShipsEntry = <div> </div>;
   if (listEntries.length === 0) {

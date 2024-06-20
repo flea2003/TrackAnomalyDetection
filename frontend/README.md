@@ -1,63 +1,58 @@
-# Frontend Documentation
+# Frontend
 
-## Building the project
+This frontend (website) is the part of the application that is visible to the user. It displays the ships and their information on the map, in addition to providing some other features (such as, notifications).
 
-In order to work with the frontend, one has to install the NodeJS programming environment. This can be done by running:
-```
-sudo apt update
-sudo apt install nodejs
-node -v
-```
+Frontend is implemented using [React.js framework](https://react.dev/).
 
-Afterwards, locate to the frontend directory and run the following command to install the npm dependencies:
+## Table of Contents
+- [Running Frontend](#running-frontend)
+- [Running Tests and Static Checks](#running-tests-and-static-checks)
+- [Icon Sources](#icon-sources)
 
-```
-npm install
-```
+## Running Frontend
 
-## Running the project
+**Before starting the frontend, you need to set up and start the Druid, Kafka and backend.** The instructions can be found in the [README.md in the folder above](../README.md).
 
-In order to run the project, one can use the following commands:
+When you are ready to start the frontend, you need to install the required packages and run the frontend using the following commands:
+```shell
+cd codebase/frontend
 
-`npm start` - runs the app in the development mode. Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits. You will also see any lint errors in the console.
-
-`npm test` - this command runs the test suite. See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-`npm run build` - builds the app for production to the `build` folder. This command prepares the code for deployment.
-
-## Additional information
-
-This template project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-The command that was used to generate it is:
-```
-npx create-react-app frontend --template typescript --use-npm
+npm ci        # Install the Node packages based on 
+              # the package.json and package-lock.json.
+              
+npm run start # The website can now be reached at
+              # http://localhost:3000/.
 ```
 
-`npm` - Node package manager.
+If you want to run the production build, then you need to run the following command and follow the instructions written there:
+```shell
+npm run build
+```
 
-`npx` - npm package runner.
+## Running tests and static checks
 
-`create-react-app` - command to initiate a react app.
+To ensure code quality of the frontend code, the following tools are used (also included in the GitLab pipeline):
+- [Jest testing framework](https://jestjs.io/)
+- [ESLint linter](https://eslint.org/)
+- [Prettier formatter](https://prettier.io/)
 
-`--template typescript` - flag to create a typescript template instead of javascript.
+Before running any of these, go to the `frontend` folder, and install the Node packages:
+```shell
+cd codebase/frontend
+npm ci
+```
 
-`--use-npm` - npx doesn't create a repo in the current folder.
+Then you can run the tests and other checks using the following commands:
+```shell
+npm run lint            # Runs ESLint.
+npm run prettier:check  # Runs Prettier to check the formatting.
+npm run prettier:format # Runs Prettier to automatically 
+                        # format the code.
+npm run test:ci         # Runs the test and generates report in the folder 
+                        # codebase/frontend/coverage/lcov-report.
+```
 
-## Description of the files
-
-`tsconfig` - Typescript configuration.
-
-`package.json` - the dependencies of the frontend.
-
-`package-lock.json` - fetched versions of the dependencies.
-
-`robots.txt` - a file used to communicate with web crawlers and other web robots about which parts of your site they are allowed to access.
-
-## Learn More
-
-If this documentation wasn't clear enough, here is the [React documentation](https://reactjs.org/).
-
-## Icons
+## Icon Sources
 
 - bell-notifications.svg - taken from https://iconoir.com/
 - settings.svg - taken from https://iconoir.com/

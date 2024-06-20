@@ -2,7 +2,7 @@ import React from "react";
 import L from "leaflet";
 import { calculateAnomalyColor } from "../../utils/AnomalyColorCalculator";
 import ShipDetails from "../../model/ShipDetails";
-import { ShipIconDetailsType } from "../ShipIconDetails/ShipIconDetails";
+import { ShipIconDetailsType } from "./ShipIconDetails";
 
 /**
  * This function creates the ship icon using some magic and HTML canvas.
@@ -146,11 +146,9 @@ const handleMouseOverShipIcon = (
 /**
  * Utility function to update the state of the information pop-up div
  * whenever the mouse leaves the surface of the ship icon
- * @param e - the event triggered by the "mouseout" action
  * @param setHoverInfo - state management function
  */
 const handleMouseOutShipIcon = (
-  e: L.LeafletMouseEvent,
   setHoverInfo: React.Dispatch<React.SetStateAction<ShipIconDetailsType>>,
 ) => {
   setHoverInfo({
@@ -166,4 +164,5 @@ export {
   handleMouseOverShipIcon,
   handleMouseOutShipIcon,
   extractIconCoordinates,
+  drawShipStationaryCircle,
 };

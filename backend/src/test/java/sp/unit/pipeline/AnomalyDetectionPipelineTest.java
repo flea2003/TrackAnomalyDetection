@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import sp.pipeline.AnomalyDetectionPipeline;
+import sp.pipeline.FlinkEnvironment;
 import sp.pipeline.PipelineConfiguration;
 import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.aggregation.aggregators.CurrentStateAggregator;
@@ -75,7 +76,8 @@ class AnomalyDetectionPipelineTest {
                     idAssignmentBuilder,
                     scoreCalculationBuilder,
                     scoreAggregationBuilder,
-                    notificationsDetectionBuilder
+                    notificationsDetectionBuilder,
+                    new FlinkEnvironment().localFlinkEnv()
             );
         });
 
@@ -92,7 +94,7 @@ class AnomalyDetectionPipelineTest {
     @Test
     void testRunPipelineRuntimeException() throws Exception {
         setupPipelineComponents();
-        doThrow(new RuntimeException()).when(flinkEnv).executeAsync();
+        when(flinkEnv.executeAsync()).thenThrow(new RuntimeException());
         assertThrows(RuntimeException.class, () -> {
            anomalyDetectionPipeline.runPipeline();
         });

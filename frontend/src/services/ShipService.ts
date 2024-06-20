@@ -3,12 +3,15 @@ import ShipDetails from "../model/ShipDetails";
 import APIResponseItem from "../templates/APIResponseItem";
 import HttpSender from "../utils/communication/HttpSender";
 import ErrorNotificationService from "./ErrorNotificationService";
+import connectionSettings from "../configs/connectionSettings.json";
 
 class ShipService {
   /** Backend API endpoint for retrieving (polling) the information about
    * the latest ship details for each ship, encapsulating: the AIS information and current/max anomaly information
    */
-  static shipsCurrentDetailsEndpoint = "/ships/details";
+  static shipsCurrentDetailsEndpoint =
+    connectionSettings.backendCurrentShipDetailsEndpoint;
+  static historyEndpoint = connectionSettings.backendHistoryEndpoint;
 
   /**
    * This method queries the backend for the CurrentShipDetails array
@@ -116,10 +119,7 @@ class ShipService {
    * @param list - fetched list with ShipDetails instances
    * @param order - either `asc` for ascending or '`desc` for descending (default)
    */
-  static sortList: (list: ShipDetails[], order: string) => ShipDetails[] = (
-    list,
-    order = "desc",
-  ) => {
+  static sortList = (list: ShipDetails[], order = "desc") => {
     if (!["desc", "asc"].includes(order)) {
       ErrorNotificationService.addError("Invalid sorting order");
       return [];
@@ -140,21 +140,6 @@ class ShipService {
       return sortedList.reverse();
     }
     return sortedList;
-  };
-
-  /**
-   * Utility method for constructing a map representation of the ShipDetails array.
-   * @param shipDetailsArray - ShipDetails array encapsulating the information fetched from the backend
-   */
-  static constructMap: (
-    shipDetailsArray: ShipDetails[],
-  ) => Map<number, ShipDetails> = (shipDetailsArray) => {
-    const initialMap = new Map<number, ShipDetails>();
-    for (let i = 0; i < shipDetailsArray.length; i++) {
-      const shipDetailsInstance = shipDetailsArray[i];
-      initialMap.set(shipDetailsInstance.id, shipDetailsInstance);
-    }
-    return initialMap;
   };
 }
 

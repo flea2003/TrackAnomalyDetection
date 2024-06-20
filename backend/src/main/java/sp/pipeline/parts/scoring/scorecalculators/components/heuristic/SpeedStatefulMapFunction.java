@@ -1,15 +1,18 @@
 package sp.pipeline.parts.scoring.scorecalculators.components.heuristic;
 
 import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.getDistanceTravelled;
-import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInMinutes;
+import static sp.pipeline.parts.scoring.scorecalculators.components.heuristic.Tools.timeDiffInHours;
 
 import sp.model.AISSignal;
 import java.text.DecimalFormat;
 
 public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
 
+    // Speed threshold measured in knots (nmi/h)
     private static final double SPEED_THRESHOLD = 55.5;
-    private static final double ACCELERATION_THRESHOLD = 50;
+    // Acceleration threshold measured in knots/h (nmi/h^2)
+    private static final double ACCELERATION_THRESHOLD = 300;
+    // Speed accuracy margin measured in knots (nmi/h)
     private static final double REPORTED_SPEED_ACCURACY_MARGIN = 10;
 
     /**
@@ -40,44 +43,44 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
         if (currentSignal.getSpeed() > SPEED_THRESHOLD) {
             isAnomaly = true;
             explanation += "Speed is too big: " + df.format(currentSignal.getSpeed())
-                    + " km/min is faster than threshold of " + df.format(SPEED_THRESHOLD)
-                    + " km/min" + explanationEnding();
+                    + " knots is faster than threshold of " + df.format(SPEED_THRESHOLD)
+                    + " knots" + explanationEnding();
         }
 
         // Check the difference between the computed speed and the reported speed
         if (reportedSpeedDifference(currentSignal, pastSignal) > REPORTED_SPEED_ACCURACY_MARGIN) {
             isAnomaly = true;
             explanation += "Speed is inaccurate: the approximated speed of " + df.format(computeSpeed(currentSignal, pastSignal))
-                    + " km/min is different from reported speed of " + df.format(currentSignal.getSpeed())
-                    + " km/min by more than allowed margin of " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
-                    + " km/min" + explanationEnding();
+                    + " knots is different from reported speed of " + df.format(currentSignal.getSpeed())
+                    + " knots by more than allowed margin of " + df.format(REPORTED_SPEED_ACCURACY_MARGIN)
+                    + " knots" + explanationEnding();
         }
 
         // Compute and check acceleration between two signals
         if (computedAcceleration(currentSignal, pastSignal) > ACCELERATION_THRESHOLD) {
             isAnomaly = true;
             explanation += "Acceleration is too big: " + df.format(computedAcceleration(currentSignal, pastSignal))
-                    + " km/min^2 is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
-                    + " km/min^2" + explanationEnding();
+                    + " knots/h is bigger than threshold of " + df.format(ACCELERATION_THRESHOLD)
+                    + " knots/h" + explanationEnding();
         }
 
         return new AnomalyScoreWithExplanation(isAnomaly, getAnomalyScore(), explanation);
     }
 
     /**
-     * Compute speed based on the data of this and the past signals.
+     * Compute speed (nmi/h) based on the data of this and the past signals.
      *
      * @param currentSignal the current AIS signal
      * @param pastSignal the past AIS signal
      * @return the computed speed
      */
     private double computeSpeed(AISSignal currentSignal, AISSignal pastSignal) {
-        double time = (double) timeDiffInMinutes(currentSignal, pastSignal);
+        double time = timeDiffInHours(currentSignal, pastSignal);
         return getDistanceTravelled(currentSignal, pastSignal) / (time + 0.00001);
     }
 
     /**
-     * Calculate the difference between the reported speed in the distance and the calculated
+     * Calculate the difference (nmi/h) between the reported speed in the distance and the calculated
      * distance based on the two signals (the current one and the past one).
      *
      * @param currentSignal the current AIS signal
@@ -89,7 +92,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
     }
 
     /**
-     * Compute the acceleration based on the current and the past signals.
+     * Compute the acceleration (nmi/h^2) based on the current and the past signals.
      *
      * @param currentSignal the current AIS signal
      * @param pastSignal the past AIS signal
@@ -97,7 +100,7 @@ public class SpeedStatefulMapFunction extends HeuristicStatefulMapFunction {
      */
     private double computedAcceleration(AISSignal currentSignal, AISSignal pastSignal) {
         double speedDiff = currentSignal.getSpeed() - pastSignal.getSpeed();
-        return speedDiff / (timeDiffInMinutes(currentSignal, pastSignal) + 0.00001);
+        return Math.round(speedDiff / (timeDiffInHours(currentSignal, pastSignal) + 0.00001));
     }
 
     /**

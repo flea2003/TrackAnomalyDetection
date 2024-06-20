@@ -36,9 +36,10 @@
     padding: 0;
     width: 95%;
     max-height: 100%;
-    border: var(--border);
-    border-bottom: none;
-    margin-bottom: 5px;
+    border-top: var(--border);
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    margin-bottom: 3px;
 }
 
 #notification-list-close-icon {

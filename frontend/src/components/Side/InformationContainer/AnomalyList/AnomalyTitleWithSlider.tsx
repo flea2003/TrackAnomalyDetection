@@ -3,7 +3,6 @@ import { useState } from "react";
 import closeIcon from "../../../../assets/icons/helper-icons/close.svg";
 import filterIconBlue from "../../../../assets/icons/selected-sidebar-icons/filter-blue.png";
 import filterIcon from "../../../../assets/icons/anomaly-list/filter.svg";
-
 import Stack from "@mui/material/Stack";
 import { CurrentPage } from "../../../../App";
 
@@ -33,6 +32,7 @@ const AnomalyTitleWithSlider = ({
 }: ObjectDetailsProps) => {
   // State to manage the visibility of the extended container
   const [isExtended, setIsExtended] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Function used to alter the state of whether the slider is shown or not
   const toggleExtended = () => {
@@ -43,6 +43,19 @@ const AnomalyTitleWithSlider = ({
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(event.target.value);
     setFilterThreshold(value);
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitizedValue = event.target.value.replace(
+      /(\.[0-9]*[1-9])0+$/,
+      "$1",
+    );
+    let newValue = parseFloat(sanitizedValue);
+    if (isNaN(newValue) || newValue < 0) {
+      newValue = 0;
+    }
+    newValue = Math.min(newValue, 100);
+    setFilterThreshold(newValue);
   };
 
   return (
@@ -80,7 +93,37 @@ const AnomalyTitleWithSlider = ({
             value={anomalyThreshold}
             onChange={handleSliderChange}
           />
-          <div className="threshold-div">{anomalyThreshold}%</div>
+          <div className="threshold-div">
+            {isEditing ? (
+              <Stack direction="row">
+                <input
+                  type="number"
+                  value={Number(anomalyThreshold).toString()}
+                  onChange={(e) => handleInputChange(e)}
+                  onBlur={(e) => {
+                    handleInputChange(e);
+                    setIsEditing(!isEditing);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                  className="number-input"
+                  autoFocus
+                />
+                %
+              </Stack>
+            ) : (
+              <div
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                }}
+              >
+                {anomalyThreshold}%
+              </div>
+            )}
+          </div>
         </span>
       )}
     </Stack>

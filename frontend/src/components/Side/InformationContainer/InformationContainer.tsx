@@ -8,11 +8,12 @@ import ErrorNotificationService from "../../../services/ErrorNotificationService
 import NotificationList from "./NotificationsList/NotificationList";
 import ShipNotification from "../../../model/ShipNotification";
 import NotificationDetails from "./NotificationsList/NotificationDetails";
-import "../../../styles/settings.css";
+import { ExtractedFunctionsMap } from "../../Map/LMap";
 
 interface ObjectProps {
   currentPage: CurrentPage;
   ships: ShipDetails[];
+  extractedFunctionsMap: React.RefObject<ExtractedFunctionsMap>;
   notifications: ShipNotification[];
   pageChanger: (currentPage: CurrentPage) => void;
   mapCenteringFun: (details: ShipDetails) => void;
@@ -25,6 +26,7 @@ interface ObjectProps {
  *
  * @param currentPage function for setting the current page
  * @param ships list of all ships that are currently displayed
+ * @param extractedFunctionsMap reference of functions passed from the LMap components
  * @param notifications list of all notifications
  * @param pageChanger page changer functions
  * @param mapCenteringFun map centering function
@@ -35,6 +37,7 @@ interface ObjectProps {
 function InformationContainer({
   currentPage,
   ships,
+  extractedFunctionsMap,
   notifications,
   pageChanger,
   mapCenteringFun,
@@ -56,7 +59,7 @@ function InformationContainer({
       return (
         <ObjectDetails
           ships={ships}
-          notifications={notifications}
+          extractedFunctionsMap={extractedFunctionsMap}
           mapCenteringFun={mapCenteringFun}
           shipId={currentPage.shownItemId}
           pageChanger={pageChanger}

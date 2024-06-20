@@ -1,25 +1,18 @@
-react_build:
-  stage: build
+.react_job_template:
   image: node:20.13.1
   needs: []
   before_script:
     - cd frontend
     - npm ci
-  script:
-    - npm run build
-
 
 react_tests:
+  extends: [.react_job_template]
   stage: test
-  image: node:20.13.1
-  needs: ["react_build"]
-  before_script:
-    - cd frontend
-    - npm ci
   script:
     - npm run test:ci
   artifacts:
     when: always
+    expire_in: 1 week
     paths:
       - frontend/junit.xml
       - frontend/coverage/cobertura-coverage.xml
@@ -31,39 +24,29 @@ react_tests:
         path: frontend/coverage/cobertura-coverage.xml
 
 react_linter:
+  extends: [.react_job_template]
   stage: code_quality
-  image: node:20.13.1
-  needs: ["react_build"]
-  before_script:
-    - cd frontend
-    - npm ci
   script:
     - npm run lint
 
 react_prettier_checks:
+  extends: [.react_job_template]
   stage: code_quality
-  image: node:20.13.1
-  needs: ["react_build"]
-  before_script:
-    - cd frontend
-    - npm ci
   script:
     - npm run prettier:check
 
 react_statement_coverage:
+  extends: [.react_job_template]
   stage: collect_coverage
-  image: node:20.13.1
   needs: ["react_tests"]
-  before_script: cd frontend
   script:
     - cat coverage/lcov-report/index.html | head -n26 | tail -n1 | grep -Po "\d+(\.\d+)?"
   coverage: /\d+\.\d+/
 
 react_branch_coverage:
+  extends: [.react_job_template]
   stage: collect_coverage
-  image: node:20.13.1
   needs: ["react_tests"]
-  before_script: cd frontend
   script:
     - cat coverage/lcov-report/index.html | head -n33 | tail -n1 | grep -Po "\d+(\.\d+)?"
   coverage: /\d+\.\d+/

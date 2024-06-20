@@ -1,5 +1,8 @@
 package sp.pipeline.parts.aggregation;
 
+import java.time.OffsetDateTime;
+import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +85,13 @@ public class ScoreAggregationBuilder {
         // Perform aggregation for each ship (use the currentStateAggregator stateful map)
         DataStream<CurrentShipDetails> aggregatedStream = mergedStream
                 .keyBy(ShipInformation::getShipId)
-                .map(currentStateAggregator);
+                .map(currentStateAggregator)
+                    .assignTimestampsAndWatermarks(
+            WatermarkStrategy.<CurrentShipDetails>forMonotonousTimestamps()
+                .withTimestampAssigner(
+                    (SerializableTimestampAssigner<CurrentShipDetails>)
+                        (element, recordTimestamp) -> OffsetDateTime.now().toEpochSecond())
+        );
 
         // Sink the aggregated stream to a Kafka topic
         KafkaSink<CurrentShipDetails> kafkaSink = streamUtils.createSinkFlinkToKafka(

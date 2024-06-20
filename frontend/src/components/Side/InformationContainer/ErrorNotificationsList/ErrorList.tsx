@@ -34,7 +34,7 @@ function ErrorList({ pageChanger }: ErrorListProps) {
           data-testid="error-list-close-icon"
           onClick={() => pageChanger({ currentPage: "none", shownItemId: -1 })}
         />
-        Error list
+        Error List
         <img
           src={markAll}
           id="error-list-mark-all-button"

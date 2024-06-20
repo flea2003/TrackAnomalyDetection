@@ -22,7 +22,7 @@ const ShipIconDetails = (props: ShipIconDetailsType) => {
   } else {
     // Utility object for handling the injection of custom CSS properties
     const customStyle: CSSProperties = {
-      "--top": `${props.y + 10}px`,
+      "--top": `${props.y + 25}px`,
       "--left": `${props.x - 42.5}px`,
     } as CSSProperties & { [key: string]: string };
 
@@ -38,7 +38,7 @@ const ShipIconDetails = (props: ShipIconDetailsType) => {
         </div>
         <div>
           <strong>Speed: </strong>
-          {props.shipDetails.speed} kn
+          {props.shipDetails.speed.toFixed(2)} knots
         </div>
         <div>
           <strong>Lag: </strong>

@@ -1,9 +1,11 @@
 package sp.pipeline;
 
-import org.apache.flink.configuration.Configuration;
+import jakarta.annotation.PreDestroy;
+import org.apache.flink.core.execution.JobClient;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import sp.model.AISSignal;
 import sp.model.AnomalyInformation;
@@ -12,7 +14,6 @@ import sp.pipeline.parts.aggregation.ScoreAggregationBuilder;
 import sp.pipeline.parts.identification.IdAssignmentBuilder;
 import sp.pipeline.parts.notifications.NotificationsDetectionBuilder;
 import sp.pipeline.parts.scoring.ScoreCalculationBuilder;
-import sp.pipeline.utils.OffsetDateTimeSerializer;
 
 @Service
 public class AnomalyDetectionPipeline {
@@ -21,37 +22,7 @@ public class AnomalyDetectionPipeline {
     private final ScoreCalculationBuilder scoreCalculationBuilder;
     private final ScoreAggregationBuilder scoreAggregationBuilder;
     private final NotificationsDetectionBuilder notificationsDetectionBuilder;
-
-    /**
-     * Constructor for the AnomalyDetectionPipeline class.
-     *
-     * @param idAssignmentBuilder builder for the id assignment part of the pipeline
-     * @param scoreCalculationBuilder builder for the score calculation part of the pipeline
-     * @param scoreAggregationBuilder builder for the score aggregation part of the pipeline
-     * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
-     */
-    @Autowired
-    public AnomalyDetectionPipeline(IdAssignmentBuilder idAssignmentBuilder,
-                                    ScoreCalculationBuilder scoreCalculationBuilder,
-                                    ScoreAggregationBuilder scoreAggregationBuilder,
-                                    NotificationsDetectionBuilder notificationsDetectionBuilder) {
-        this.idAssignmentBuilder = idAssignmentBuilder;
-        this.scoreCalculationBuilder = scoreCalculationBuilder;
-        this.scoreAggregationBuilder = scoreAggregationBuilder;
-        this.notificationsDetectionBuilder = notificationsDetectionBuilder;
-
-        // For now, hardcode some flink properties. This will be completely redone in the next MR
-        // (we will be connecting to a remote cluster)
-        Configuration config = new Configuration();
-        config.setString("taskmanager.memory.fraction", "0.3");
-        config.setString("taskmanager.memory.network.max", "300 mb");
-        config.setString("pipeline.default-kryo-serializers",
-                "class:java.time.OffsetDateTime,serializer:" + OffsetDateTimeSerializer.class.getName());
-
-        this.flinkEnv = StreamExecutionEnvironment.createLocalEnvironment(config);
-
-        buildPipeline();
-    }
+    private JobClient flinkJob;
 
     /**
      * An overloaded constructor (same as above) that allows to inject a custom
@@ -63,11 +34,13 @@ public class AnomalyDetectionPipeline {
      * @param notificationsDetectionBuilder builder for the notifications detection part of the pipeline
      * @param flinkEnv injected Flink environment
      */
+    @Autowired
     public AnomalyDetectionPipeline(
             IdAssignmentBuilder idAssignmentBuilder,
             ScoreCalculationBuilder scoreCalculationBuilder,
             ScoreAggregationBuilder scoreAggregationBuilder,
             NotificationsDetectionBuilder notificationsDetectionBuilder,
+            @Qualifier("localFlinkEnv")
             StreamExecutionEnvironment flinkEnv
     ) {
         this.idAssignmentBuilder = idAssignmentBuilder;
@@ -83,7 +56,11 @@ public class AnomalyDetectionPipeline {
      *
      * @throws Exception when closing Flink environment throws exception
      */
+    @PreDestroy
     public void closePipeline() throws Exception {
+        if (flinkJob != null) {
+            flinkJob.cancel();
+        }
         flinkEnv.close();
     }
 
@@ -115,7 +92,7 @@ public class AnomalyDetectionPipeline {
      */
     public void runPipeline() {
         try {
-            this.flinkEnv.executeAsync();
+            flinkJob = this.flinkEnv.executeAsync("Anomaly Detection Pipeline");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -16,7 +16,7 @@ interface ObjectDetailsProps {
  * Component that displays the anomaly information of a ship
  *
  * @param ship ships whose anomaly information is being displayed
- * @param addAnomalyScore boolean that defines whether or not anomaly score should be displayed
+ * @param addAnomalyScore boolean that defines whether anomaly score should be displayed
  * @constructor
  */
 function AnomalyDetails({ ship, addAnomalyScore }: ObjectDetailsProps) {
@@ -76,7 +76,7 @@ function getExplanationList(str: string) {
  * @param ship ship whose data is being considered
  */
 function getMaximumAnomalyInfoList(ship: ShipDetails) {
-  if (ship.explanation === "") {
+  if (ship.maxAnomalyScore === undefined) {
     return (
       <ul className="anomaly-details-entry-value">
         <li key={0}>No anomalous behaviour registered.</li>
@@ -86,7 +86,7 @@ function getMaximumAnomalyInfoList(ship: ShipDetails) {
 
   return (
     <ul className="anomaly-details-entry-value">
-      <li key={0}>Score: {ship.anomalyScore}%</li>
+      <li key={0}>Score: {ship.maxAnomalyScore}%</li>
       <li key={1}>
         Obtained: {TimeUtilities.reformatTimestamp(ship.correspondingTimestamp)}
       </li>

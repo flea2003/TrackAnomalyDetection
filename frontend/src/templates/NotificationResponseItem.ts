@@ -1,7 +1,6 @@
 interface NotificationResponseItem {
   id: number;
   shipID: number;
-  read: boolean; // for some reason 'is..' is automatically cut-out
   currentShipDetails: {
     currentAISSignal: {
       id: number;

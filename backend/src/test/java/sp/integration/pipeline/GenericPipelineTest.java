@@ -106,9 +106,9 @@ class GenericPipelineTest {
 
     @AfterEach
     void tearDown() throws Exception {
+        anomalyDetectionPipeline.closePipeline();
         embeddedKafka.doWithAdmin(x -> x.deleteTopics(List.of(rawAISTopic, rawAISTopic, currentShipDetailsTopic)));
         embeddedKafka.destroy();
-        env.close();
     }
 
     /**
@@ -162,7 +162,7 @@ class GenericPipelineTest {
         shipInformationExtractor = new ShipInformationExtractor(streamUtils, config);
 
         // Instantiate Service classes for querying
-        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor, shipInformationExtractor);
+        shipsDataService = new ShipsDataService(anomalyDetectionPipeline, queryExecutor, shipInformationExtractor, notificationService);
     }
 
     /**

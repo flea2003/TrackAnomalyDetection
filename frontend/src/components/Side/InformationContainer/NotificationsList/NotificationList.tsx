@@ -46,9 +46,9 @@ function NotificationList({
     />
   );
 
-  let noNotificactionsEntry = <div> </div>;
+  let noNotificationsEntry = <div> </div>;
   if (notifications.length === 0) {
-    noNotificactionsEntry = (
+    noNotificationsEntry = (
       <div className="no-ships-entry"> No notifications </div>
     );
   }
@@ -67,9 +67,7 @@ function NotificationList({
           id="notification-list-mark-all-button"
           title="Mark all as read"
           onClick={() => {
-            NotificationService.queryBackendToMarkAllNotificationsAsRead(
-              notifications,
-            );
+            NotificationService.markAllNotificationsAsRead(notifications);
           }}
           alt="Close"
         ></img>
@@ -82,7 +80,7 @@ function NotificationList({
           mapCenteringFun={mapCenteringFun}
         />
       ) : (
-        noNotificactionsEntry
+        noNotificationsEntry
       )}
     </Stack>
   );

@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 public class Tools {
 
     /**
-     * Util static class that calculates the globe distance between 2 points.
+     * Util static class that calculates the globe distance (nautical miles) between 2 points.
      *
      * @param lat1 the latitude of the first point.
      * @param lon1 the longitude of the first point.
@@ -29,7 +29,7 @@ public class Tools {
 
         double r = 6371;
 
-        return (float) (r * c);
+        return (float) (r * c * 0.54);
     }
 
     /**
@@ -79,7 +79,7 @@ public class Tools {
     }
 
     /**
-     * Calculates the distance travelled from the location of one AIS signal to the location
+     * Calculates the distance travelled (nautical miles) from the location of one AIS signal to the location
      * of another.
      *
      * @param currentSignal the current AIS signal
