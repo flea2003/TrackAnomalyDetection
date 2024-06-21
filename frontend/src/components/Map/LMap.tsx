@@ -240,6 +240,7 @@ const LMap = forwardRef<ExtractedFunctionsMap, MapProps>(
 
       // In case any other page is displayed, get rid of the displayed trajectory
       else {
+        TrajectoryService.idOfCurrentlyStoredShip = -1;
         setDisplayedTrajectory(
           new TrajectoryAndNotificationPair([], undefined),
         );

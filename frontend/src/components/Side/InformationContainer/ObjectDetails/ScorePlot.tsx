@@ -221,7 +221,7 @@ const preprocessHistory = (
     new Set(parsedFilteredData.map((obj) => JSON.stringify(obj))),
   ).map((json) => JSON.parse(json) as PlotDataPointItem);
 
-  return uniqueDataPoints.sort((p1, p2) => {
+  const sorted = uniqueDataPoints.sort((p1, p2) => {
     if (p1.timestamp < p2.timestamp) {
       return -1;
     }
@@ -235,6 +235,23 @@ const preprocessHistory = (
       return 1;
     }
   });
+
+  // If 2 signals in a row have the same timestamp but different anomaly scores, remove the first one
+  const finalList = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i].timestamp === sorted[i + 1].timestamp) {
+      if (sorted[i].anomalyScore !== sorted[i + 1].anomalyScore) {
+        finalList.push(sorted[i + 1]);
+        i++;
+      } else {
+        finalList.push(sorted[i]);
+      }
+    } else {
+      finalList.push(sorted[i]);
+    }
+  }
+
+  return finalList;
 };
 
 export default ScorePlot;
